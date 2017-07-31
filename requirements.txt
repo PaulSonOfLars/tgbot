@@ -1,2 +1,3 @@
 sqlalchemy
 python-telegram-bot
+psycopg2

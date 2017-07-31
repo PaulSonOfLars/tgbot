@@ -1,17 +1,11 @@
 import logging
 from pprint import pprint
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, BaseFilter
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
 from tg_bot.config import Development as Configuration
+from tg_bot.custom_filters import SimaoFilter
 from tg_bot.sql import add_note_to_db, get_note, rm_note
-
-
-class SimaoFilter(BaseFilter):
-    def filter(self, message):
-        return 'simao' in message.text.lower()
-
-simao_filter = SimaoFilter()
 
 
 def test(bot, update):
@@ -63,6 +57,17 @@ def reply_simshit(bot, update):
     update.effective_message.reply_text("Did you mean: simshit?")
 
 
+def del_message(bot, update):
+    chat_id = update.effective_chat.id
+    message_id = update.effective_message.message_id
+
+    res = bot.deleteMessage(chat_id, message_id)
+    if res:
+        bot.sendMessage(chat_id, "Bitch no stickers", "HTML")
+    else:
+        bot.sendMessage(chat_id, "Ehhhhh idk why that didn't work, ask Pol", "HTML")
+
+
 def main():
     updater = Updater(Configuration.API_KEY)
     dispatcher = updater.dispatcher
@@ -79,14 +84,23 @@ def main():
     save_handler = CommandHandler("save", save, pass_args=True)
     get_handler = CommandHandler("get", get, pass_args=True)
     delete_handler = CommandHandler("delete", delete, pass_args=True)
-    simao_handler = MessageHandler(simao_filter, reply_simshit)
+    simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
+    sticker_handler = MessageHandler((~ Filters.private)
+                                     & (Filters.sticker
+                                     | Filters.audio
+                                     | Filters.document
+                                     | Filters.video
+                                     | Filters.contact
+                                     | Filters.photo
+                                     | Filters.voice), del_message)
 
     dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(save_handler)
     dispatcher.add_handler(get_handler)
     dispatcher.add_handler(delete_handler)
-    dispatcher.add_handler(simao_handler)
+    # dispatcher.add_handler(simao_handler)
+    dispatcher.add_handler(sticker_handler)
 
     updater.start_polling()
     updater.idle()
