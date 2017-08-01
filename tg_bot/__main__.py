@@ -3,9 +3,11 @@ from pprint import pprint
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
+from tg_bot import sql
 from tg_bot.config import Development as Configuration
 from tg_bot.custom_filters import SimaoFilter
-from tg_bot.sql import add_note_to_db, get_note, rm_note
+
+lock_types = ["sticker", "audio", "voice", "document", "video", "contact", "photo"]
 
 
 def test(bot, update):
@@ -20,7 +22,7 @@ def save(bot, update, args):
         del args[0]
         note_data = " ".join(args)
 
-        add_note_to_db(chat_id, notename, note_data)
+        sql.add_note_to_db(chat_id, notename, note_data)
         update.effective_message.reply_text("yas! added " + notename)
     else:
         update.effective_message.reply_text("Dude, theres no note")
@@ -31,7 +33,7 @@ def get(bot, update, args):
     if len(args) >= 1:
         notename = args[0]
 
-        note = get_note(chat_id, notename)
+        note = sql.get_note(chat_id, notename)
         if note:
             update.effective_message.reply_text(note.value)
             return
@@ -45,11 +47,13 @@ def delete(bot, update, args):
     chat_id = update.effective_chat.id
     notename = args[0]
 
-    rm_note(chat_id, notename)
+    sql.rm_note(chat_id, notename)
     update.effective_message.reply_text("Successfully removed note")
 
 
 def start(bot, update):
+    chat_id = update.effective_chat.id
+    sql.init_permissions(chat_id)
     update.effective_message.reply_text("Yo, whadup?")
 
 
@@ -62,10 +66,106 @@ def del_message(bot, update):
     message_id = update.effective_message.message_id
 
     res = bot.deleteMessage(chat_id, message_id)
-    if res:
-        bot.sendMessage(chat_id, "Bitch no stickers", "HTML")
+    if not res:
+        bot.sendMessage(chat_id, "Dafarq, I can't delete that", "HTML")
+
+
+def lock(bot, update, args):
+    chat_id = update.effective_chat.id
+    lock_type = args[0]
+    if len(args) >= 1 and lock_type in lock_types:
+        sql.update_lock(chat_id, lock_type, locked=True)
     else:
-        bot.sendMessage(chat_id, "Ehhhhh idk why that didn't work, ask Pol", "HTML")
+        bot.sendMessage(chat_id, "What are you trying to lock...?", "HTML")
+
+
+def unlock(bot, update, args):
+    chat_id = update.effective_chat.id
+    lock_type = args[0]
+    if len(args) >= 1 and lock_type in lock_types:
+        sql.update_lock(chat_id, lock_type, locked=False)
+    else:
+        bot.sendMessage(chat_id, "What are you trying to unlock...?", "HTML")
+
+
+def del_sticker(bot, update):
+    chat_id = update.effective_chat.id
+    if sql.is_locked(chat_id, "sticker"):
+        del_message(bot, update)
+
+
+def del_audio(bot, update):
+    chat_id = update.effective_chat.id
+    if sql.is_locked(chat_id, "audio"):
+        del_message(bot, update)
+
+
+def del_voice(bot, update):
+    chat_id = update.effective_chat.id
+    if sql.is_locked(chat_id, "voice"):
+        del_message(bot, update)
+
+
+def del_document(bot, update):
+    chat_id = update.effective_chat.id
+    if sql.is_locked(chat_id, "document"):
+        del_message(bot, update)
+
+
+def del_video(bot, update):
+    chat_id = update.effective_chat.id
+    if sql.is_locked(chat_id, "video"):
+        del_message(bot, update)
+
+
+def del_contact(bot, update):
+    chat_id = update.effective_chat.id
+    if sql.is_locked(chat_id, "contact"):
+        del_message(bot, update)
+
+
+def del_photo(bot, update):
+    chat_id = update.effective_chat.id
+    if sql.is_locked(chat_id, "photo"):
+        del_message(bot, update)
+
+
+def locktypes(bot, update):
+    update.effective_message.reply_text(lock_types)
+
+
+# def promote(bot, update):
+#     chat_id = update.effective_chat.id
+#     prev_message = update.effective_message.reply_to_message
+#     if prev_message:
+#         user_id = prev_message.from_user.id
+#         res = bot.promoteChatMember(chat_id, user_id,
+#                                     can_change_info=True,
+#                                     can_post_messages=True,
+#                                     can_edit_messages=True,
+#                                     can_delete_messages=True,
+#                                     can_invite_users=True,
+#                                     can_restrict_members=True,
+#                                     can_pin_messages=True,
+#                                     can_promote_members=True)
+#         print("promoted " + str(res))
+#
+#
+# def demote(bot, update):
+#     chat_id = update.effective_chat.id
+#     prev_message = update.effective_message.reply_to_message
+#     if prev_message:
+#         user_id = prev_message.from_user.id
+#         res = bot.promoteChatMember(chat_id, user_id,
+#                                     can_change_info=False,
+#                                     can_post_messages=False,
+#                                     can_edit_messages=False,
+#                                     can_delete_messages=False,
+#                                     can_invite_users=False,
+#                                     can_restrict_members=False,
+#                                     can_pin_messages=False,
+#                                     can_promote_members=False)
+#         print("promoted " + str(res))
 
 
 def main():
@@ -75,7 +175,7 @@ def main():
     # enable logging
     logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        level=logging.INFO)
+        level=logging.DEBUG)
 
     LOGGER = logging.getLogger(__name__)
 
@@ -84,23 +184,40 @@ def main():
     save_handler = CommandHandler("save", save, pass_args=True)
     get_handler = CommandHandler("get", get, pass_args=True)
     delete_handler = CommandHandler("delete", delete, pass_args=True)
+    lock_handler = CommandHandler("lock", lock, pass_args=True)
+    unlock_handler = CommandHandler("unlock", unlock, pass_args=True)
+    locktypes_handler = CommandHandler("locktypes", locktypes)
+    sticker_handler = MessageHandler((~ Filters.private) & Filters.sticker, del_sticker)
+    audio_handler = MessageHandler((~ Filters.private) & Filters.audio, del_audio)
+    voice_handler = MessageHandler((~ Filters.private) & Filters.voice, del_voice)
+    document_handler = MessageHandler((~ Filters.private) & Filters.document, del_document)
+    video_handler = MessageHandler((~ Filters.private) & Filters.video, del_video)
+    contact_handler = MessageHandler((~ Filters.private) & Filters.contact, del_contact)
+    photo_handler = MessageHandler((~ Filters.private) & Filters.photo, del_photo)  # TODO: gif detection -> mime_type?
     simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
-    sticker_handler = MessageHandler((~ Filters.private)
-                                     & (Filters.sticker
-                                     | Filters.audio
-                                     | Filters.document
-                                     | Filters.video
-                                     | Filters.contact
-                                     | Filters.photo
-                                     | Filters.voice), del_message)
+
+    # promote_handler = CommandHandler("promote", promote)
+    # demote_handler = CommandHandler("demote", demote)
+    #
+    # dispatcher.add_handler(promote_handler)
+    # dispatcher.add_handler(demote_handler)
 
     dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(save_handler)
     dispatcher.add_handler(get_handler)
     dispatcher.add_handler(delete_handler)
-    # dispatcher.add_handler(simao_handler)
+    dispatcher.add_handler(lock_handler)
+    dispatcher.add_handler(unlock_handler)
+    dispatcher.add_handler(locktypes_handler)
     dispatcher.add_handler(sticker_handler)
+    dispatcher.add_handler(audio_handler)
+    dispatcher.add_handler(voice_handler)
+    dispatcher.add_handler(document_handler)
+    dispatcher.add_handler(video_handler)
+    dispatcher.add_handler(contact_handler)
+    dispatcher.add_handler(photo_handler)
+    # dispatcher.add_handler(simao_handler)
 
     updater.start_polling()
     updater.idle()

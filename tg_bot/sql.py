@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from tg_bot.models import Base, Notes
+from tg_bot.__main__ import lock_types
+from tg_bot.models import Base, Notes, Permissions
 from tg_bot.config import Development as Configuration
 
 engine = create_engine(Configuration.SQLALCHEMY_DATABASE_URI)
@@ -33,3 +34,39 @@ def rm_note(chat_id, notename):
     if note:
         sess.delete(note)
         sess.commit()
+
+
+# New chat added -> setup permissions
+def init_permissions(chat_id, force=False):
+    curr_perms = sess.query(Permissions).filter(Permissions.chat_id == str(chat_id)).all()
+    if len(lock_types) != len(curr_perms) or force:
+        for elem in curr_perms:
+            sess.delete(elem)
+        sess.flush()
+        for lock in lock_types:
+            perm = Permissions(str(chat_id), lock)
+            sess.add(perm)
+        sess.commit()
+
+
+def update_lock(chat_id, lock_type, locked):
+    curr_perms = sess.query(Permissions).get((str(chat_id), lock_type))
+    if not curr_perms:
+        print("Perms didnt exist! creating")
+        init_permissions(chat_id, force=True)
+        curr_perms = sess.query(Permissions).get((str(chat_id), lock_type))
+    curr_perms.locked = locked
+    sess.add(curr_perms)  # NOTE do i really need to commit...?
+    sess.commit()
+
+
+# TODO: in memory keystore loaded at bot start
+def is_locked(chat_id, lock_type):
+    curr_perms = sess.query(Permissions).get((str(chat_id), lock_type))
+    if not curr_perms:
+        print("Perms didnt exist! creating")
+        init_permissions(chat_id, force=True)
+        curr_perms = sess.query(Permissions).get((str(chat_id), lock_type))
+        sess.add(curr_perms)
+        sess.commit()
+    return curr_perms.locked
