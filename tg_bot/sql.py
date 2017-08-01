@@ -30,5 +30,6 @@ def get_note(chat_id, notename):
 
 def rm_note(chat_id, notename):
     note = sess.query(Notes).get((str(chat_id), notename))
-    sess.delete(note)
-    sess.commit()
+    if note:
+        sess.delete(note)
+        sess.commit()

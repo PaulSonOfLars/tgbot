@@ -28,7 +28,7 @@ def save(bot, update, args):
 
 def get(bot, update, args):
     chat_id = update.effective_chat.id
-    if len(args) > 1:
+    if len(args) >= 1:
         notename = args[0]
 
         note = get_note(chat_id, notename)
