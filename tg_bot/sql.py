@@ -1,9 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from tg_bot.__main__ import lock_types
 from tg_bot.models import Base, Notes, Permissions
 from tg_bot.config import Development as Configuration
+from tg_bot.modules.locks import lock_types
 
 engine = create_engine(Configuration.SQLALCHEMY_DATABASE_URI)
 
