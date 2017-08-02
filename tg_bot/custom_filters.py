@@ -7,3 +7,11 @@ class __SimaoFilter(BaseFilter):
 
 
 SimaoFilter = __SimaoFilter()
+
+
+class __HashFilter(BaseFilter):
+    def filter(self, message):
+        # NOTE: assumes message is parsed in order, and hashtag is always first
+        return message.entities and message.entities[0].type == 'hashtag'
+
+HashFilter = __HashFilter()
