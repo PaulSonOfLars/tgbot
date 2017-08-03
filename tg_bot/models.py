@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text, String, Boolean
+from sqlalchemy import Column, Text, String, Boolean, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -11,7 +11,7 @@ class Notes(Base):
     value = Column(Text, nullable=False)
 
     def __init__(self, chat_id, name, value):
-        self.chat_id = chat_id
+        self.chat_id = str(chat_id)  # ensure string
         self.name = name
         self.value = value
 
@@ -26,9 +26,22 @@ class Permissions(Base):
     locked = Column(Boolean)
 
     def __init__(self, chat_id, value):
-        self.chat_id = chat_id
+        self.chat_id = str(chat_id)  # ensure string
         self.value = value
         self.locked = False
 
     def __repr__(self):
         return "<Permission %s>" % self.value
+
+
+class UserInfo(Base):
+    __tablename__ = "userinfo"
+    user_id = Column(Integer, primary_key=True)
+    info = Column(Text)
+
+    def __init__(self, user_id, info):
+        self.user_id = user_id
+        self.info = info
+
+    def __repr__(self):
+        return "<User info %d>" % self.user_id

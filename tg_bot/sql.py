@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from tg_bot.models import Base, Notes, Permissions
+from tg_bot.models import Base, Notes, Permissions, UserInfo
 from tg_bot.config import Development as Configuration
 from tg_bot.modules.locks import lock_types
 
@@ -70,3 +70,20 @@ def is_locked(chat_id, lock_type):
         sess.add(curr_perms)
         sess.commit()
     return curr_perms.locked
+
+
+def get_user_info(user_id):
+    userinfo = sess.query(UserInfo).get(user_id)
+    if userinfo:
+        return userinfo.info
+    return None
+
+
+def set_user_info(user_id, info):
+    userinfo = sess.query(UserInfo).get(user_id)
+    if userinfo:
+        userinfo.info = info
+    else:
+        userinfo = UserInfo(user_id, info)
+    sess.add(userinfo)
+    sess.commit()

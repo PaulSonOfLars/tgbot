@@ -26,17 +26,20 @@ def hash_get(bot, update):
     get(bot, update, [no_hash])
 
 
-def save(bot, update, args):
+def save(bot, update):
     chat_id = update.effective_chat.id
-    if len(args) >= 2:
-        notename = args[0]
-        del args[0]
-        note_data = " ".join(args)
+    text = update.effective_message.text
+    args = text.split(None, 2)  # use python's maxsplit to separate Cmd, note_name, and data
+
+    if len(args) >= 3:
+        notename = args[1]
+        note_data = args[2]
 
         sql.add_note_to_db(chat_id, notename, note_data)
         update.effective_message.reply_text("yas! added " + notename)
-    elif update.effective_message.reply_to_message and len(args) >= 1:
-        notename = args[0]
+
+    elif update.effective_message.reply_to_message and len(args) >= 2:
+        notename = args[1]
         note_data = update.effective_message.reply_to_message
         print(note_data.text)
         sql.add_note_to_db(chat_id, notename, note_data.text)
@@ -54,7 +57,7 @@ def delete(bot, update, args):
     update.effective_message.reply_text("Successfully removed note")
 
 get_handler = CommandHandler("get", get, pass_args=True)
-save_handler = CommandHandler("save", save, pass_args=True)
+save_handler = CommandHandler("save", save)
 delete_handler = CommandHandler("delete", delete, pass_args=True)
 hash_get_handler = MessageHandler(HashFilter, hash_get)
 
