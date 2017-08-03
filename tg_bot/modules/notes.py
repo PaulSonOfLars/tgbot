@@ -49,7 +49,7 @@ def save(bot, update):
         update.effective_message.reply_text("Dude, theres no note")
 
 
-def delete(bot, update, args):
+def clear(bot, update, args):
     chat_id = update.effective_chat.id
     notename = args[0]
 
@@ -58,7 +58,7 @@ def delete(bot, update, args):
 
 get_handler = CommandHandler("get", get, pass_args=True)
 save_handler = CommandHandler("save", save)
-delete_handler = CommandHandler("delete", delete, pass_args=True)
+delete_handler = CommandHandler("clear", clear, pass_args=True)
 hash_get_handler = MessageHandler(HashFilter, hash_get)
 
 dispatcher.add_handler(get_handler)

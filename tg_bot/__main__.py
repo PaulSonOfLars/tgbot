@@ -26,53 +26,10 @@ def reply_simshit(bot, update):
     update.effective_message.reply_text("Did you mean: simshit?")
 
 
-# def promote(bot, update):
-#     chat_id = update.effective_chat.id
-#     prev_message = update.effective_message.reply_to_message
-#     if prev_message:
-#         user_id = prev_message.from_user.id
-#         res = bot.promoteChatMember(chat_id, user_id,
-#                                     can_change_info=True,
-#                                     can_post_messages=True,
-#                                     can_edit_messages=True,
-#                                     can_delete_messages=True,
-#                                     can_invite_users=True,
-#                                     can_restrict_members=True,
-#                                     can_pin_messages=True,
-#                                     can_promote_members=True)
-#         print("promoted " + str(res))
-#
-#
-# def demote(bot, update):
-#     chat_id = update.effective_chat.id
-#     prev_message = update.effective_message.reply_to_message
-#     if prev_message:
-#         user_id = prev_message.from_user.id
-#         res = bot.promoteChatMember(int(chat_id), int(user_id),
-#                                     can_change_info=False,
-#                                     can_post_messages=False,
-#                                     can_edit_messages=False,
-#                                     can_delete_messages=False,
-#                                     can_invite_users=False,
-#                                     can_restrict_members=False,
-#                                     can_pin_messages=False,
-#                                     can_promote_members=False)
-#         print("promoted " + str(res))
-#
-#
-# def restrict(bot, update):
-#     chat_id = update.effective_chat.id
-#     prev_message = update.effective_message.reply_to_message
-#     if prev_message:
-#         user_id = prev_message.from_user.id
-#         print(str(user_id) + "is the user_id")
-#         print(str(chat_id) + "is the chat id")
-#         res = bot.promoteChatMember(int(chat_id), int(user_id),
-#                                     can_edit_message=True)
-#         print("promoted " + str(res))
-
 # for test purposes
 def error_callback(bot, update, error):
+    pprint(update.effective_chat.get_member(bot.id).__dict__)
+
     try:
         raise error
     except Unauthorized:
@@ -81,6 +38,9 @@ def error_callback(bot, update, error):
         # remove update.message.chat_id from conversation list
     except BadRequest:
         print("no nono2")
+        print("BadRequest caught")
+        print(error)
+
         # handle malformed requests - read more below!
     except TimedOut:
         print("no nono3")
@@ -106,13 +66,7 @@ def main():
 
     # simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
 
-    # promote_handler = CommandHandler("promote", promote)
-    # demote_handler = CommandHandler("demote", demote)
-    # restrict_handler = CommandHandler("restrict", restrict)
-    #
-    # dispatcher.add_handler(promote_handler)
-    # dispatcher.add_handler(demote_handler)
-    # dispatcher.add_handler(restrict_handler)
+
 
     dispatcher.add_handler(CommandHandler("rights", test_rights))
 
