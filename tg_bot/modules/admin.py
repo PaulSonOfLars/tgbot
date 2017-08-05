@@ -1,4 +1,5 @@
 from telegram.ext import CommandHandler
+from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
 
@@ -7,6 +8,7 @@ def is_admin(bot, update):
     return update.effective_chat.get_member(bot.id).status == 'administrator'
 
 
+@run_async
 def promote(bot, update):
     if is_admin(bot, update):
         chat_id = update.effective_chat.id
@@ -25,6 +27,7 @@ def promote(bot, update):
             print("promoted " + str(res))
 
 
+@run_async
 def demote(bot, update):
     if is_admin(bot, update):
         chat_id = update.effective_chat.id
@@ -43,6 +46,7 @@ def demote(bot, update):
             print("promoted " + str(res))
 
 
+@run_async
 def restrict(bot, update):
     if is_admin(bot, update):
         chat_id = update.effective_chat.id
@@ -56,6 +60,7 @@ def restrict(bot, update):
             print("promoted " + str(res))
 
 
+@run_async
 def pin(bot, update):
     if is_admin(bot, update):
         chat_id = update.effective_chat.id

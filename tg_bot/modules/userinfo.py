@@ -1,8 +1,10 @@
 from telegram.ext import CommandHandler
+from telegram.ext.dispatcher import run_async
 
 from tg_bot import sql, dispatcher
 
 
+@run_async
 def about_user(bot, update):
     message = update.effective_message
     is_reply = message.reply_to_message is not None

@@ -1,9 +1,11 @@
 from telegram.ext import CommandHandler, MessageHandler
+from telegram.ext.dispatcher import run_async
 
 from tg_bot import sql, dispatcher
 from tg_bot.custom_filters import HashFilter
 
 
+@run_async
 def get(bot, update, args):
     chat_id = update.effective_chat.id
     if len(args) >= 1:
@@ -19,6 +21,8 @@ def get(bot, update, args):
         update.effective_message.reply_text("Get rekt")
 
 
+# Note: async funccall to an async func.
+@run_async
 def hash_get(bot, update):
     message = update.effective_message.text
     fst_word = message.split()[0]
