@@ -28,8 +28,6 @@ def reply_simshit(bot, update):
 
 # for test purposes
 def error_callback(bot, update, error):
-    pprint(update.effective_chat.get_member(bot.id).__dict__)
-
     try:
         raise error
     except Unauthorized:

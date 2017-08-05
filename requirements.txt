@@ -1,3 +1,4 @@
+psycopg2cffi
 sqlalchemy
 python-telegram-bot
 psycopg2
