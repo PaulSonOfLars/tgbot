@@ -76,7 +76,7 @@ def pin(bot, update, args):
 
 
 @run_async
-def unpin(bot, update, args):
+def unpin(bot, update):
     if is_admin(bot, update):
         chat_id = update.effective_chat.id
         bot.unpinChatMessage(chat_id)
