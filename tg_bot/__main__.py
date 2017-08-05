@@ -16,6 +16,15 @@ def test(bot, update):
     update.effective_message.reply_text("Hola tester")
 
 
+def get_id(bot, update):
+    if update.effective_message.reply_to_message:
+        user = update.effective_message.reply_to_message.from_user
+        update.effective_message.reply_text(user.username + "'s id is " + str(user.id))
+    else:
+        chat = update.effective_chat
+        update.effective_message.reply_text("This group's id is " + str(chat.id))
+
+
 def start(bot, update):
     chat_id = update.effective_chat.id
     sql.init_permissions(chat_id)
@@ -61,15 +70,16 @@ def test_rights(bot, update):
 def main():
     test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start)
+    id_handler = CommandHandler("id", get_id)
 
     # simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
-
 
 
     dispatcher.add_handler(CommandHandler("rights", test_rights))
 
     dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
+    dispatcher.add_handler(id_handler)
 
     # dispatcher.add_handler(simao_handler)
 

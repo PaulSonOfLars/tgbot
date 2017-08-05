@@ -1,4 +1,5 @@
-from psycopg2cffi import compat
+# from psycopg2cffi import compat  # this replaces psycopg2 so as to run with pypy
+# compat.register()
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -6,7 +7,6 @@ from tg_bot.models import Base, Notes, Permissions, UserInfo
 from tg_bot.config import Development as Configuration
 from tg_bot.modules.locks import lock_types
 
-compat.register()
 
 engine = create_engine(Configuration.SQLALCHEMY_DATABASE_URI)
 
