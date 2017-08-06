@@ -4,7 +4,7 @@ import os
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler
 
-from tg_bot import dispatcher, updater, TOKEN
+from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, unless named numerically!
 from tg_bot.modules import *
@@ -85,7 +85,7 @@ def main():
 
     # dispatcher.add_error_handler(error_callback)
 
-    if os.environ.get('HEROKU', False):
+    if HEROKU:
         port = int(os.environ.get('PORT', 5000))
         updater.start_webhook(listen="0.0.0.0",
                               port=port,
