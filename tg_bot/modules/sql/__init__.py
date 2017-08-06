@@ -2,12 +2,14 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from tg_bot.config import Development as Configuration
+from tg_bot import HEROKU
+if not HEROKU:
+    from tg_bot.config import Development as Configuration
 from tg_bot.models import Base
 
 
 def start():
-    if os.environ.get('HEROKU', False):
+    if HEROKU:
         db_uri = os.environ.get('DATABASE_URL')
     else:
         db_uri = Configuration.SQLALCHEMY_DATABASE_URI
