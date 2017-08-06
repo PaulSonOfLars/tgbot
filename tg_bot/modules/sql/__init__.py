@@ -8,7 +8,7 @@ from tg_bot.models import Base
 
 def start():
     if os.environ.get('HEROKU', False):
-        db_uri = os.environ.get('DB_URI')
+        db_uri = os.environ.get('DATABASE_URL')
     else:
         db_uri = Configuration.SQLALCHEMY_DATABASE_URI
     engine = create_engine(db_uri)
