@@ -1,9 +1,10 @@
 from pprint import pprint
 
+import os
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler
 
-from tg_bot import dispatcher, updater
+from tg_bot import dispatcher, updater, TOKEN
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, unless named numerically!
 from tg_bot.modules import *
@@ -84,7 +85,14 @@ def main():
 
     # dispatcher.add_error_handler(error_callback)
 
-    updater.start_polling()
+    if os.environ.get('HEROKU', False):
+        port = int(os.environ.get('PORT', 5000))
+        updater.start_webhook(listen="0.0.0.0",
+                              port=port,
+                              url_path=TOKEN)
+        updater.bot.set_webhook("https://tgpolbot.herokuapp.com/" + TOKEN)
+    else:
+        updater.start_polling()
     updater.idle()
 
 
