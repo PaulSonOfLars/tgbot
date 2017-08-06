@@ -1,8 +1,9 @@
 from telegram.ext import CommandHandler, MessageHandler
 from telegram.ext.dispatcher import run_async
 
-from tg_bot import sql, dispatcher
+from tg_bot import dispatcher
 from tg_bot.custom_filters import HashFilter
+import tg_bot.modules.sql.notes_sql as sql
 
 
 @run_async
@@ -60,14 +61,12 @@ def clear(bot, update, args):
     sql.rm_note(chat_id, notename)
     update.effective_message.reply_text("Successfully removed note")
 
-get_handler = CommandHandler("get", get, pass_args=True)
-save_handler = CommandHandler("save", save)
-delete_handler = CommandHandler("clear", clear, pass_args=True)
-hash_get_handler = MessageHandler(HashFilter, hash_get)
+GET_HANDLER = CommandHandler("get", get, pass_args=True)
+SAVE_HANDLER = CommandHandler("save", save)
+DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
+HASH_GET_HANDLER = MessageHandler(HashFilter, hash_get)
 
-dispatcher.add_handler(get_handler)
-dispatcher.add_handler(save_handler)
-dispatcher.add_handler(delete_handler)
-dispatcher.add_handler(hash_get_handler)
-
-
+dispatcher.add_handler(GET_HANDLER)
+dispatcher.add_handler(SAVE_HANDLER)
+dispatcher.add_handler(DELETE_HANDLER)
+dispatcher.add_handler(HASH_GET_HANDLER)

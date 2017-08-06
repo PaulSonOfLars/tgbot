@@ -1,5 +1,6 @@
 import logging
 
+import os
 from telegram.ext import Updater
 
 from tg_bot.config import Development as Configuration
@@ -11,5 +12,11 @@ logging.basicConfig(
 
 LOGGER = logging.getLogger(__name__)
 
-updater = Updater(Configuration.API_KEY)
+if os.environ.get('HEROKU', False):
+    TOKEN = os.environ.get('TOKEN', None)
+else:
+    TOKEN = Configuration.API_KEY
+
+updater = Updater(TOKEN)
+
 dispatcher = updater.dispatcher

@@ -3,12 +3,12 @@ from pprint import pprint
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler
 
-from tg_bot import sql, dispatcher, updater
-
+from tg_bot import dispatcher, updater
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, unless named numerically!
 from tg_bot.modules import *
-print("Loaded modules: " + str(all_modules))
+
+print("Loaded modules: " + str(ALL_MODULES))
 
 
 def test(bot, update):
@@ -26,8 +26,7 @@ def get_id(bot, update):
 
 
 def start(bot, update):
-    chat_id = update.effective_chat.id
-    sql.init_permissions(chat_id)
+    # sql.init_permissions(update.effective_chat.id)
     update.effective_message.reply_text("Yo, whadup?")
 
 
@@ -55,8 +54,9 @@ def error_callback(bot, update, error):
     except NetworkError:
         print("no nono4")
         # handle other connection problems
-    except ChatMigrated as e:
+    except ChatMigrated as err:
         print("no nono5")
+        print(err)
         # the chat_id of a group has changed, use e.new_chat_id instead
     except TelegramError:
         print(error)
@@ -74,7 +74,6 @@ def main():
 
     # simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
 
-
     dispatcher.add_handler(CommandHandler("rights", test_rights))
 
     dispatcher.add_handler(test_handler)
@@ -83,7 +82,7 @@ def main():
 
     # dispatcher.add_handler(simao_handler)
 
-    dispatcher.add_error_handler(error_callback)
+    # dispatcher.add_error_handler(error_callback)
 
     updater.start_polling()
     updater.idle()

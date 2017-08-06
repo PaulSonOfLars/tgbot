@@ -1,13 +1,14 @@
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
-from tg_bot import sql, dispatcher
+from tg_bot import dispatcher
+import tg_bot.modules.sql.locks_sql as sql
 
-lock_types = ["sticker", "audio", "voice", "document", "video", "contact", "photo"]
+LOCK_TYPES = ["sticker", "audio", "voice", "document", "video", "contact", "photo"]
 
 
 def locktypes(bot, update):
-    update.effective_message.reply_text(lock_types)
+    update.effective_message.reply_text(LOCK_TYPES)
 
 
 def can_delete(bot, update):
@@ -16,8 +17,8 @@ def can_delete(bot, update):
 
 def lock(bot, update, args):
     chat_id = update.effective_chat.id
-    lock_type = args[0]
-    if len(args) >= 1 and lock_type in lock_types:
+    if len(args) >= 1 and args[0] in LOCK_TYPES:
+        lock_type = args[0]
         sql.update_lock(chat_id, lock_type, locked=True)
     else:
         update.effective_message.reply_text("What are you trying to lock...?")
@@ -28,8 +29,8 @@ def lock(bot, update, args):
 
 def unlock(bot, update, args):
     chat_id = update.effective_chat.id
-    lock_type = args[0]
-    if len(args) >= 1 and lock_type in lock_types:
+    if len(args) >= 1 and args[0] in LOCK_TYPES:
+        lock_type = args[0]
         sql.update_lock(chat_id, lock_type, locked=False)
     else:
         bot.sendMessage(chat_id, "What are you trying to unlock...?", "HTML")
@@ -68,6 +69,7 @@ def del_voice(bot, update):
 
 @run_async
 def del_document(bot, update):
+    print(update.message.document)
     chat_id = update.effective_chat.id
     if sql.is_locked(chat_id, "document") and can_delete(bot, update):
         update.effective_message.delete()
@@ -94,27 +96,30 @@ def del_photo(bot, update):
         update.effective_message.delete()
 
 
-locktypes_handler = CommandHandler("locktypes", locktypes)
-lock_handler = CommandHandler("lock", lock, pass_args=True)
-unlock_handler = CommandHandler("unlock", unlock, pass_args=True)
-delete_handler = CommandHandler("delete", del_message)
-sticker_handler = MessageHandler((~ Filters.private) & Filters.sticker, del_sticker)
-audio_handler = MessageHandler((~ Filters.private) & Filters.audio, del_audio)
-voice_handler = MessageHandler((~ Filters.private) & Filters.voice, del_voice)
-document_handler = MessageHandler((~ Filters.private) & Filters.document, del_document)
-video_handler = MessageHandler((~ Filters.private) & Filters.video, del_video)
-contact_handler = MessageHandler((~ Filters.private) & Filters.contact, del_contact)
-photo_handler = MessageHandler((~ Filters.private) & Filters.photo, del_photo)  # TODO: gif detection -> mime_type?
+def test(bot, update):
+    print(update.effective_message)
 
 
-dispatcher.add_handler(lock_handler)
-dispatcher.add_handler(unlock_handler)
-dispatcher.add_handler(delete_handler)
-dispatcher.add_handler(locktypes_handler)
-dispatcher.add_handler(sticker_handler)
-dispatcher.add_handler(audio_handler)
-dispatcher.add_handler(voice_handler)
-dispatcher.add_handler(document_handler)
-dispatcher.add_handler(video_handler)
-dispatcher.add_handler(contact_handler)
-dispatcher.add_handler(photo_handler)
+LOCKTYPES_HANDLER = CommandHandler("locktypes", locktypes)
+LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True)
+UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True)
+DELETE_HANDLER = CommandHandler("delete", del_message)
+STICKER_HANDLER = MessageHandler((~ Filters.private) & Filters.sticker, del_sticker)
+AUDIO_HANDLER = MessageHandler((~ Filters.private) & Filters.audio, del_audio)
+VOICE_HANDLER = MessageHandler((~ Filters.private) & Filters.voice, del_voice)
+DOCUMENT_HANDLER = MessageHandler((~ Filters.private) & Filters.document, del_document)
+VIDEO_HANDLER = MessageHandler((~ Filters.private) & Filters.video, del_video)
+CONTACT_HANDLER = MessageHandler((~ Filters.private) & Filters.contact, del_contact)
+PHOTO_HANDLER = MessageHandler((~ Filters.private) & Filters.photo, del_photo)  # TODO: gif detection -> mime_type?
+
+dispatcher.add_handler(LOCK_HANDLER)
+dispatcher.add_handler(UNLOCK_HANDLER)
+dispatcher.add_handler(DELETE_HANDLER)
+dispatcher.add_handler(LOCKTYPES_HANDLER)
+dispatcher.add_handler(STICKER_HANDLER)
+dispatcher.add_handler(AUDIO_HANDLER)
+dispatcher.add_handler(VOICE_HANDLER)
+dispatcher.add_handler(DOCUMENT_HANDLER)
+dispatcher.add_handler(VIDEO_HANDLER)
+dispatcher.add_handler(CONTACT_HANDLER)
+dispatcher.add_handler(PHOTO_HANDLER)

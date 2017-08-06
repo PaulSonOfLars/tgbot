@@ -110,24 +110,24 @@ def invite(bot, update):
     chat = update.effective_chat
     if is_admin(bot, update):
         if chat.username:
-            update.effective_message.reply_text(chat.username )
+            update.effective_message.reply_text(chat.username)
         else:
             invitelink = bot.exportChatInviteLink(chat.id)
             update.effective_message.reply_text(invitelink)
 
 
-pin_handler = CommandHandler("pin", pin, pass_args=True)
-unpin_handler = CommandHandler("unpin", unpin)
-kick_handler = CommandHandler("ban", kick)
-unkick_handler = CommandHandler("unban", unkick, pass_args=True)
-invite_handler = CommandHandler("invite", invite)
-promote_handler = CommandHandler("promote", promote)
-demote_handler = CommandHandler("demote", demote)
+PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
+UNPIN_HANDLER = CommandHandler("unpin", unpin)
+KICK_HANDLER = CommandHandler("ban", kick)
+UNKICK_HANDLER = CommandHandler("unban", unkick, pass_args=True)
+INVITE_HANDLER = CommandHandler("invite", invite)
+PROMOTE_HANDLER = CommandHandler("promote", promote)
+DEMOTE_HANDLER = CommandHandler("demote", demote)
 
-dispatcher.add_handler(pin_handler)
-dispatcher.add_handler(unpin_handler)
-dispatcher.add_handler(kick_handler)
-dispatcher.add_handler(unkick_handler)
-dispatcher.add_handler(invite_handler)
-dispatcher.add_handler(promote_handler)
-dispatcher.add_handler(demote_handler)
+dispatcher.add_handler(PIN_HANDLER)
+dispatcher.add_handler(UNPIN_HANDLER)
+dispatcher.add_handler(KICK_HANDLER)
+dispatcher.add_handler(UNKICK_HANDLER)
+dispatcher.add_handler(INVITE_HANDLER)
+dispatcher.add_handler(PROMOTE_HANDLER)
+dispatcher.add_handler(DEMOTE_HANDLER)
