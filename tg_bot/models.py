@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Text, String, Boolean, Integer
+from sqlalchemy import Column, Text, String, Boolean, Integer, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -45,3 +45,38 @@ class UserInfo(Base):
 
     def __repr__(self):
         return "<User info %d>" % self.user_id
+
+
+class Person(Base):
+    __tablename__ = "person"
+    name = Column(Text, primary_key=True, unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "<Person {}>".format(self.name)
+
+
+class Owing(Base):
+    __tablename__ = "owing"
+    owing_id = Column(Integer, primary_key=True)
+    ower = Column(Text,
+                  ForeignKey("person.name",
+                             onupdate="CASCADE",
+                             ondelete="CASCADE"),
+                  nullable=False)
+    owee = Column(Text,
+                  ForeignKey("person.name",
+                             onupdate="CASCADE",
+                             ondelete="CASCADE"),
+                  nullable=False)
+    amount = Column(Integer, nullable=False)
+
+    def __init__(self, ower, owee, amount=0):
+        self.ower = ower
+        self.owee = owee
+        self.amount = amount
+
+    def __repr__(self):
+        return "<{} owes {} {}>".format(self.ower, self.owee, self.amount)

@@ -1,22 +1,45 @@
 from pprint import pprint
 
 import os
+from random import randint
+from time import sleep
+
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler
+from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
-# NOTE: Module order is not guaranteed, unless named numerically!
+# NOTE: Module order is not guaranteed, specify that in modules/loadorder.txt!
 from tg_bot.modules import *
 
 print("Loaded modules: " + str(ALL_MODULES))
 
+RUN_STRINGS = (
+    "Where do you think you're going?",
+    "Huh? what? did he get away?",
+    "ZZzzZZzz... Huh? what? oh, just him again, nevermind.",
+    "Get back here!",
+    "Not so fast...",
+    "Look out for the wall!",
+    "Don't leave me alone with them!!",
+    "You run, you die.",
+    "Run fatboy, run!",
+    "Jokes on you, I'm everywhere",
+    "You're gonna regret that...",
+    "You could also try /kickme, I hear thats fun.",
+    "Go bother someone else, no-one here cares.",
+    "I hear @MSFJarvis wants to hear more about you."
+)
 
+
+@run_async
 def test(bot, update):
     # pprint(eval(str(update)))
     update.effective_message.reply_text("Hola tester")
 
 
+@run_async
 def get_id(bot, update):
     if update.effective_message.reply_to_message:
         user = update.effective_message.reply_to_message.from_user
@@ -24,6 +47,13 @@ def get_id(bot, update):
     else:
         chat = update.effective_chat
         update.effective_message.reply_text("This group's id is " + str(chat.id))
+
+
+@run_async
+def runs(bot, update):
+    sleep(5)
+    someint = randint(0, len(RUN_STRINGS)-1)
+    update.effective_message.reply_text(RUN_STRINGS[someint])
 
 
 def start(bot, update):
@@ -72,6 +102,7 @@ def main():
     test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start)
     id_handler = CommandHandler("id", get_id)
+    runs_handler = CommandHandler("runs", runs)
 
     # simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
 
@@ -80,6 +111,7 @@ def main():
     dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(id_handler)
+    dispatcher.add_handler(runs_handler)
 
     # dispatcher.add_handler(simao_handler)
 
