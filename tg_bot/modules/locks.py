@@ -1,4 +1,3 @@
-from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
@@ -42,13 +41,6 @@ def unlock(bot, update, args):
 
     if not can_delete(bot, update):
         update.effective_message.reply_text("I'm not an administrator, so can't do anything.")
-
-
-@run_async
-def del_message(bot, update):
-    if can_delete(bot, update) and update.effective_message.reply_to_message:
-        update.effective_message.reply_to_message.delete()
-        update.effective_message.delete()
 
 
 @run_async
@@ -101,27 +93,9 @@ def del_photo(bot, update):
         update.effective_message.delete()
 
 
-@run_async
-def purge(bot, update):
-    curr_message = update.effective_message
-    chat_id = update.effective_chat.id
-    user_id = curr_message.from_user.id
-    if curr_message.reply_to_message and can_delete(bot, update) and is_user_admin(update, user_id):
-        message_id = update.effective_message.reply_to_message.message_id
-        curr_message_id = update.effective_message.message_id
-        for m_id in range(message_id, curr_message_id + 1):  # +1 to include curr message
-            try:
-                bot.deleteMessage(chat_id, m_id)
-            except BadRequest as err:
-                print(err)
-                pass
-        bot.send_message(chat_id, "Purge complete.", 'Markdown')
-
 LOCKTYPES_HANDLER = CommandHandler("locktypes", locktypes)
 LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True)
 UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True)
-DELETE_HANDLER = CommandHandler("delete", del_message)
-PURGE_HANDLER = CommandHandler("purge", purge)
 
 STICKER_HANDLER = MessageHandler((~ Filters.private) & Filters.sticker, del_sticker)
 AUDIO_HANDLER = MessageHandler((~ Filters.private) & Filters.audio, del_audio)
@@ -133,8 +107,6 @@ PHOTO_HANDLER = MessageHandler((~ Filters.private) & Filters.photo, del_photo)  
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(UNLOCK_HANDLER)
-dispatcher.add_handler(DELETE_HANDLER)
-dispatcher.add_handler(PURGE_HANDLER)
 dispatcher.add_handler(LOCKTYPES_HANDLER)
 dispatcher.add_handler(STICKER_HANDLER)
 dispatcher.add_handler(AUDIO_HANDLER)

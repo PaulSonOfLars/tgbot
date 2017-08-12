@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Text, String, Boolean, Integer, ForeignKey
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -23,13 +24,13 @@ class Notes(Base):
 class Permissions(Base):
     __tablename__ = "permissions"
     chat_id = Column(String(14), primary_key=True)
-    audio = Column(Boolean)
-    voice = Column(Boolean)
-    contact = Column(Boolean)
-    video = Column(Boolean)
-    document = Column(Boolean)
-    photo = Column(Boolean)
-    sticker = Column(Boolean)
+    audio = Column(Boolean, default=False)
+    voice = Column(Boolean, default=False)
+    contact = Column(Boolean, default=False)
+    video = Column(Boolean, default=False)
+    document = Column(Boolean, default=False)
+    photo = Column(Boolean, default=False)
+    sticker = Column(Boolean, default=False)
 
     def __init__(self, chat_id):
         self.chat_id = str(chat_id)  # ensure string
@@ -69,6 +70,7 @@ class Person(Base):
         return "<Person {}>".format(self.name)
 
 
+# TODO: use chat_ids too
 class Owing(Base):
     __tablename__ = "owing"
     owing_id = Column(Integer, primary_key=True)
@@ -91,3 +93,17 @@ class Owing(Base):
 
     def __repr__(self):
         return "<{} owes {} {}>".format(self.ower, self.owee, self.amount)
+
+
+class MutedUsers(Base):
+    __tablename__ = "mutedusers"
+    chat_id = Column(String(14), primary_key=True)
+    muted_users = Column(postgresql.ARRAY(Integer, dimensions=1), default=[])  # 1 dimensional list
+
+    def __init__(self, chat_id):
+        self.chat_id = str(chat_id)  # ensure string
+        self.muted_users = []
+
+    def __repr__(self):
+        return "<Mute status for %s in chat %s>" % (self.user_id, self.chat_id)
+
