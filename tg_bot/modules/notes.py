@@ -46,7 +46,6 @@ def save(bot, update):
     elif update.effective_message.reply_to_message and len(args) >= 2:
         notename = args[1]
         note_data = update.effective_message.reply_to_message
-        print(note_data.text)
         sql.add_note_to_db(chat_id, notename, note_data.text)
         update.effective_message.reply_text("yas! added replied message " + notename)
 
