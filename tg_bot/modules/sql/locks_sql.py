@@ -2,38 +2,73 @@
 from tg_bot.models import Permissions
 from tg_bot.modules.sql import session
 
+KEYSTORE = {}
 
-def init_permissions(chat_id, force=False):
-    from tg_bot.modules.locks import LOCK_TYPES
-    curr_perms = session.query(Permissions).filter(Permissions.chat_id == str(chat_id)).all()
-    if len(LOCK_TYPES) != len(curr_perms) or force:
-        for elem in curr_perms:
-            session.delete(elem)
+
+def init_permissions(chat_id, reset=False):
+    curr_perm = session.query(Permissions).get(str(chat_id))
+    if reset:
+        session.delete(curr_perm)
         session.flush()
-        for lock in LOCK_TYPES:
-            perm = Permissions(str(chat_id), lock)
-            session.add(perm)
-        session.commit()
+    perm = Permissions(str(chat_id))
+    KEYSTORE[str(chat_id)] = perm
+    session.add(perm)
+    session.commit()
+    return perm
 
 
 def update_lock(chat_id, lock_type, locked):
-    curr_perms = session.query(Permissions).get((str(chat_id), lock_type))
-    if not curr_perms:
-        print("Perms didnt exist! creating")
-        init_permissions(chat_id, force=True)
-        curr_perms = session.query(Permissions).get((str(chat_id), lock_type))
-    curr_perms.locked = locked
-    session.add(curr_perms)  # NOTE do i really need to commit...?
+    # curr_perm = session.query(Permissions).get(str(chat_id))
+    curr_perm = KEYSTORE.get(str(chat_id))
+    if not curr_perm:
+        print("Perms didnt exist for {}! creating".format(chat_id))
+        curr_perm = init_permissions(chat_id)
+
+    if lock_type == "audio":
+        curr_perm.audio = locked
+    elif lock_type == "voice":
+        curr_perm.voice = locked
+    elif lock_type == "contact":
+        curr_perm.contact = locked
+    elif lock_type == "video":
+        curr_perm.video = locked
+    elif lock_type == "document":
+        curr_perm.document = locked
+    elif lock_type == "photo":
+        curr_perm.photo = locked
+    elif lock_type == "sticker":
+        curr_perm.sticker = locked
+
+    session.add(curr_perm)  # NOTE: do i really need to add...?
     session.commit()
 
 
-# TODO: in memory keystore loaded at bot start
 def is_locked(chat_id, lock_type):
-    curr_perms = session.query(Permissions).get((str(chat_id), lock_type))
-    if not curr_perms:
-        print("Perms didnt exist! creating")
-        init_permissions(chat_id, force=True)
-        curr_perms = session.query(Permissions).get((str(chat_id), lock_type))
-        session.add(curr_perms)
-        session.commit()
-    return curr_perms.locked
+    curr_perm = KEYSTORE.get(str(chat_id))
+    if not curr_perm:
+        return False
+
+    elif lock_type == "sticker":
+        return curr_perm.sticker
+    elif lock_type == "photo":
+        return curr_perm.photo
+    elif lock_type == "audio":
+        return curr_perm.audio
+    elif lock_type == "voice":
+        return curr_perm.voice
+    elif lock_type == "contact":
+        return curr_perm.contact
+    elif lock_type == "video":
+        return curr_perm.video
+    elif lock_type == "document":
+        return curr_perm.document
+
+
+def load_ks():
+    all_perms = session.query(Permissions).all()
+    for chat in all_perms:
+        KEYSTORE[chat.chat_id] = chat
+    print("Keystore loaded, length " + str(len(KEYSTORE)))
+
+# LOAD KEYSTORE ON BOT START
+load_ks()

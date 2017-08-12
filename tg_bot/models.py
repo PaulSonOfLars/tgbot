@@ -19,19 +19,30 @@ class Notes(Base):
         return "<Note %s>" % self.name
 
 
+# TODO: add gifs
 class Permissions(Base):
     __tablename__ = "permissions"
     chat_id = Column(String(14), primary_key=True)
-    value = Column(Text, primary_key=True)
-    locked = Column(Boolean)
+    audio = Column(Boolean)
+    voice = Column(Boolean)
+    contact = Column(Boolean)
+    video = Column(Boolean)
+    document = Column(Boolean)
+    photo = Column(Boolean)
+    sticker = Column(Boolean)
 
-    def __init__(self, chat_id, value):
+    def __init__(self, chat_id):
         self.chat_id = str(chat_id)  # ensure string
-        self.value = value
-        self.locked = False
+        self.audio = False
+        self.voice = False
+        self.contact = False
+        self.video = False
+        self.document = False
+        self.photo = False
+        self.sticker = False
 
     def __repr__(self):
-        return "<Permission %s>" % self.value
+        return "<Permissions for %s>" % self.chat_id
 
 
 class UserInfo(Base):
