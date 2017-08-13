@@ -6,29 +6,31 @@ from tg_bot.custom_filters import HashFilter
 import tg_bot.modules.sql.notes_sql as sql
 
 
-@run_async
-def get(bot, update, args):
+def get(update, notename):
     chat_id = update.effective_chat.id
+    note = sql.get_note(chat_id, notename)
+    if note:
+        update.effective_message.reply_text(note.value)
+        return
+    else:
+        update.effective_message.reply_text("This note doesn't exist")
+
+
+@run_async
+def cmd_get(bot, update, args):
     if len(args) >= 1:
         notename = args[0]
-
-        note = sql.get_note(chat_id, notename)
-        if note:
-            update.effective_message.reply_text(note.value)
-            return
-        else:
-            update.effective_message.reply_text("This doesn't exist")
+        get(update, notename)
     else:
         update.effective_message.reply_text("Get rekt")
 
 
-# Note: async funccall to an async func.
 @run_async
 def hash_get(bot, update):
     message = update.effective_message.text
     fst_word = message.split()[0]
     no_hash = fst_word[1:]
-    get(bot, update, [no_hash])
+    get(update, no_hash)
 
 
 def save(bot, update):
@@ -60,7 +62,9 @@ def clear(bot, update, args):
     sql.rm_note(chat_id, notename)
     update.effective_message.reply_text("Successfully removed note")
 
-GET_HANDLER = CommandHandler("get", get, pass_args=True)
+# TODO: list all notes (and beware max_size limits)
+
+GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 SAVE_HANDLER = CommandHandler("save", save)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
 HASH_GET_HANDLER = MessageHandler(HashFilter, hash_get)

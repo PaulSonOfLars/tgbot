@@ -29,7 +29,7 @@ def set_about_user(bot, update):
     message = update.effective_message
     user_id = message.from_user.id
     text = message.text
-    info = text.split(None, 1)[1]  # use python's maxsplit to only remove the first word
+    info = text.split(None, 1)[1]  # use python's maxsplit to only remove the cmd, hence keeping newlines.
     sql.set_user_info(user_id, info)
     update.effective_message.reply_text("Updated your info!")
 

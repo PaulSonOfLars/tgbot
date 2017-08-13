@@ -2,15 +2,14 @@ from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
-
-
-def bot_is_admin(bot, update):
-    return update.effective_chat.get_member(bot.id).status == 'administrator'
+from tg_bot.modules.helper_funcs import is_bot_admin, is_user_admin
 
 
 @run_async
 def promote(bot, update):
-    if bot_is_admin(bot, update):
+    chat = update.effective_chat
+    message = update.effective_message
+    if is_bot_admin(chat, bot.id) and is_user_admin(chat, message.from_user.id):
         chat_id = update.effective_chat.id
         prev_message = update.effective_message.reply_to_message
         if prev_message:
@@ -40,7 +39,9 @@ def promote(bot, update):
 
 @run_async
 def demote(bot, update):
-    if bot_is_admin(bot, update):
+    chat = update.effective_chat
+    message = update.effective_message
+    if is_bot_admin(chat, bot.id) and is_user_admin(chat, message.from_user.id):
         chat_id = update.effective_chat.id
         prev_message = update.effective_message.reply_to_message
         if prev_message:
@@ -60,7 +61,9 @@ def demote(bot, update):
 
 @run_async
 def pin(bot, update, args):
-    if bot_is_admin(bot, update):
+    chat = update.effective_chat
+    message = update.effective_message
+    if is_bot_admin(chat, bot.id) and is_user_admin(chat, message.from_user.id):
         chat_id = update.effective_chat.id
         chat_type = update.effective_chat.type
         is_group = chat_type != "private" and chat_type != "channel"
@@ -77,14 +80,18 @@ def pin(bot, update, args):
 
 @run_async
 def unpin(bot, update):
-    if bot_is_admin(bot, update):
+    chat = update.effective_chat
+    message = update.effective_message
+    if is_bot_admin(chat, bot.id) and is_user_admin(chat, message.from_user.id):
         chat_id = update.effective_chat.id
         bot.unpinChatMessage(chat_id)
 
 
 @run_async
 def kick(bot, update):
-    if bot_is_admin(bot, update):
+    chat = update.effective_chat
+    message = update.effective_message
+    if is_bot_admin(chat, bot.id) and is_user_admin(chat, message.from_user.id):
         prev_message = update.effective_message.reply_to_message
 
         if prev_message:
@@ -96,7 +103,8 @@ def kick(bot, update):
 
 @run_async
 def kickme(bot, update):
-    if bot_is_admin(bot, update):
+    chat = update.effective_chat
+    if is_bot_admin(chat, bot.id):
         user_id = update.effective_message.from_user.id
         user_is_admin = update.effective_chat.get_member(user_id).status == 'administrator'
         if user_is_admin:
@@ -109,7 +117,9 @@ def kickme(bot, update):
 
 @run_async
 def unkick(bot, update, args):
-    if bot_is_admin(bot, update):
+    chat = update.effective_chat
+    message = update.effective_message
+    if is_bot_admin(chat, bot.id) and is_user_admin(chat, message.from_user.id):
         if len(args) >= 1:
             user_id = args[0]
         else:
@@ -121,13 +131,13 @@ def unkick(bot, update, args):
 @run_async
 def invite(bot, update):
     chat = update.effective_chat
-    if bot_is_admin(bot, update):
+    message = update.effective_message
+    if is_bot_admin(chat, bot.id) and is_user_admin(chat, message.from_user.id):
         if chat.username:
             update.effective_message.reply_text(chat.username)
         else:
             invitelink = bot.exportChatInviteLink(chat.id)
             update.effective_message.reply_text(invitelink)
-
 
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)

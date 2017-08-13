@@ -4,50 +4,63 @@ import requests
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 from tg_bot import dispatcher, TOKEN
+from tg_bot.modules.helper_funcs import is_bot_admin, is_user_admin
 
 PWR_TELEGRAM_URL = "https://api.pwrtelegram.xyz/bot"
 
 
-# TODO make some helper module for these or something idk
-def can_delete(bot, update):
-    return update.effective_chat.get_member(bot.id).can_delete_messages
-
-
-def is_user_admin(chat, user_id):
-    return chat.get_member(user_id).status == 'administrator'
-
-
 @run_async
-def mute(bot, update):
+def mute(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
-    if message.reply_to_message:
-        user_id = message.reply_to_message.from_user.id
+    if is_bot_admin(bot, update) and is_user_admin(chat, message.from_user.id):
+        if len(args) >= 1 and args[0][0] == '@':
+            user = args[0]
+            res = requests.get(PWR_TELEGRAM_URL + TOKEN + "/getChat", params={'chat_id': user})
+            if res.status_code == 200:
+                # pprint(json.loads(res.text))
+                res = json.loads(res.text).get('result')
+                user_id = res.get('id')
+            else:
+                message.reply_text("Uh... an external error occured unmuting."
+                                   "You'll be able to mute them if you reply to that person's message instead.")
+                return
 
-        res = bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
-        if res:
+        elif message.reply_to_message:
+            user_id = message.reply_to_message.from_user.id
+
+        else:
+            message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
+            return
+
+        success = bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+        if success:
             message.reply_text("Muted!")
 
 
 @run_async
-def unmute(bot, update):
+def unmute(bot, update, args):
     chat = update.effective_chat
-    msg = update.effective_message
-    words = msg.text.split()
-    mentions = [username for username in words if username[0] == '@']
-    user = mentions[0]
-    res = requests.get(PWR_TELEGRAM_URL + TOKEN + "/getChat", params={'chat_id': user})
-    if res.status_code == 200:
-        # pprint(json.loads(res.text))
-        res = json.loads(res.text).get('result')
-        user_id = res.get('id')
-        res = bot.restrict_chat_member(chat.id, int(user_id), can_send_messages=True)
-        if res:
-            msg.reply_text("Unmuted " + user)
+    message = update.effective_message
+
+    if is_bot_admin(bot, update) and is_user_admin(chat, message.from_user.id):
+        if len(args) >= 1 and args[0][0] == '@':
+            user = args[0]
+            res = requests.get(PWR_TELEGRAM_URL + TOKEN + "/getChat", params={'chat_id': user})
+            if res.status_code == 200:
+                # pprint(json.loads(res.text))
+                res = json.loads(res.text).get('result')
+                user_id = res.get('id')
+                success = bot.restrict_chat_member(chat.id, int(user_id), can_send_messages=True)
+                if success:
+                    message.reply_text("Unmuted " + user)
+
+            else:
+                message.reply_text("Uh... an external error occured unmuting.")
 
 
-MUTE_HANDLER = CommandHandler("mute", mute)
-UNMUTE_HANDLER = CommandHandler("unmute", unmute)
+MUTE_HANDLER = CommandHandler("mute", mute, pass_args=True)
+UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True)
 
 dispatcher.add_handler(MUTE_HANDLER)
 dispatcher.add_handler(UNMUTE_HANDLER)

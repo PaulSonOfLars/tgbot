@@ -3,6 +3,7 @@ from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
 import tg_bot.modules.sql.locks_sql as sql
+from tg_bot.modules.helper_funcs import can_delete, is_user_admin
 
 LOCK_TYPES = ["sticker", "audio", "voice", "document", "video", "contact", "photo"]
 
@@ -11,85 +12,78 @@ def locktypes(bot, update):
     update.effective_message.reply_text(LOCK_TYPES)
 
 
-def can_delete(bot, update):
-    return update.effective_chat.get_member(bot.id).can_delete_messages
-
-
-def is_user_admin(update, user_id):
-    return update.effective_chat.get_member(user_id).status == 'administrator'
-
-
 def lock(bot, update, args):
     chat_id = update.effective_chat.id
-    if len(args) >= 1 and args[0] in LOCK_TYPES:
-        lock_type = args[0]
-        sql.update_lock(chat_id, lock_type, locked=True)
-    else:
-        update.effective_message.reply_text("What are you trying to lock...?")
+    chat = update.effective_chat
+    message = update.effective_message
+    if can_delete(chat, bot.id):
+        if len(args) >= 1 and args[0] in LOCK_TYPES:
+            lock_type = args[0]
+            sql.update_lock(chat_id, lock_type, locked=True)
+        else:
+            update.effective_message.reply_text("What are you trying to lock...?")
 
-    if not can_delete(bot, update):
-        update.effective_message.reply_text("I'm not an administrator, so can't do anything.")
+    else:
+        update.effective_message.reply_text("I'm not an administrator, or haven't got delete rights.")
 
 
 def unlock(bot, update, args):
-    chat_id = update.effective_chat.id
-    if len(args) >= 1 and args[0] in LOCK_TYPES:
-        lock_type = args[0]
-        sql.update_lock(chat_id, lock_type, locked=False)
-    else:
-        bot.sendMessage(chat_id, "What are you trying to unlock...?", "HTML")
-
-    if not can_delete(bot, update):
-        update.effective_message.reply_text("I'm not an administrator, so can't do anything.")
+    chat = update.effective_chat
+    message = update.effective_message
+    if is_user_admin(chat, message.from_user.id):
+        if len(args) >= 1 and args[0] in LOCK_TYPES:
+            lock_type = args[0]
+            sql.update_lock(chat.id, lock_type, locked=False)
+        else:
+            bot.sendMessage(chat.id, "What are you trying to unlock...?", "HTML")
 
 
 @run_async
 def del_sticker(bot, update):
-    chat_id = update.effective_chat.id
-    if sql.is_locked(chat_id, "sticker") and can_delete(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "sticker") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
 
 @run_async
 def del_audio(bot, update):
-    chat_id = update.effective_chat.id
-    if sql.is_locked(chat_id, "audio") and can_delete(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "audio") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
 
 @run_async
 def del_voice(bot, update):
-    chat_id = update.effective_chat.id
-    if sql.is_locked(chat_id, "voice") and can_delete(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "voice") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
 
 @run_async
 def del_document(bot, update):
-    print(update.message.document)
-    chat_id = update.effective_chat.id
-    if sql.is_locked(chat_id, "document") and can_delete(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "document") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
 
 @run_async
 def del_video(bot, update):
-    chat_id = update.effective_chat.id
-    if sql.is_locked(chat_id, "video") and can_delete(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "video") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
 
 @run_async
 def del_contact(bot, update):
-    chat_id = update.effective_chat.id
-    if sql.is_locked(chat_id, "contact") and can_delete(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "contact") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
 
 @run_async
 def del_photo(bot, update):
-    chat_id = update.effective_chat.id
-    if sql.is_locked(chat_id, "photo") and can_delete(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "photo") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
 
