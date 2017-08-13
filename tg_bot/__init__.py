@@ -19,6 +19,6 @@ if HEROKU:
 else:
     TOKEN = Configuration.API_KEY
 
-updater = Updater(TOKEN)
+updater = Updater(TOKEN, workers=6)
 
 dispatcher = updater.dispatcher

@@ -1,8 +1,14 @@
-from telegram.ext import CommandHandler, MessageHandler, Filters
+import json
+
+import requests
+from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
-import tg_bot.modules.sql.muting_sql as sql
+from tg_bot import dispatcher, TOKEN
+
+PWR_TELEGRAM_URL = "https://api.pwrtelegram.xyz/bot"
 
 
+# TODO make some helper module for these or something idk
 def can_delete(bot, update):
     return update.effective_chat.get_member(bot.id).can_delete_messages
 
@@ -12,40 +18,36 @@ def is_user_admin(chat, user_id):
 
 
 @run_async
-def del_muted(bot, update):
-    curr_message = update.effective_message
-    chat_id = update.effective_chat.id
-    user_id = curr_message.from_user.id
-
-    if can_delete(bot, update):
-        if sql.is_user_muted(chat_id, user_id):
-            curr_message.delete()
-        else:
-            raise DispatcherHandlerContinue
-
-
 def mute(bot, update):
-    curr_message = update.effective_message
     chat = update.effective_chat
-    print(curr_message.reply_to_message)
-    if curr_message.reply_to_message:
-        user_id = curr_message.reply_to_message.from_user.id
-        if not is_user_admin(chat, user_id):
-            sql.mute_user(chat.id, user_id)
-        else:
-            curr_message.reply_text("Cannot mute an admin!")
+    message = update.effective_message
+    if message.reply_to_message:
+        user_id = message.reply_to_message.from_user.id
+
+        res = bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+        if res:
+            message.reply_text("Muted!")
 
 
-def unmute(bot, update, args):
-    # TODO
-    pass
+@run_async
+def unmute(bot, update):
+    chat = update.effective_chat
+    msg = update.effective_message
+    words = msg.text.split()
+    mentions = [username for username in words if username[0] == '@']
+    user = mentions[0]
+    res = requests.get(PWR_TELEGRAM_URL + TOKEN + "/getChat", params={'chat_id': user})
+    if res.status_code == 200:
+        # pprint(json.loads(res.text))
+        res = json.loads(res.text).get('result')
+        user_id = res.get('id')
+        res = bot.restrict_chat_member(chat.id, int(user_id), can_send_messages=True)
+        if res:
+            msg.reply_text("Unmuted " + user)
+
 
 MUTE_HANDLER = CommandHandler("mute", mute)
-UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True)
-DEL_MUTED_HANDLER = MessageHandler(Filters.all, del_muted)
+UNMUTE_HANDLER = CommandHandler("unmute", unmute)
 
-# NOTE: nice to keep msg_deleting first in loadorder.txt to get this to work properly.
-# Currently disabled because HandlerContinue wont import
-# dispatcher.add_handler(DEL_MUTED_HANDLER)
-# dispatcher.add_handler(MUTE_HANDLER)
-# dispatcher.add_handler(UNMUTE_HANDLER)
+dispatcher.add_handler(MUTE_HANDLER)
+dispatcher.add_handler(UNMUTE_HANDLER)
