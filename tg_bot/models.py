@@ -59,6 +59,19 @@ class UserInfo(Base):
         return "<User info %d>" % self.user_id
 
 
+class UserBio(Base):
+    __tablename__ = "userbio"
+    user_id = Column(Integer, primary_key=True)
+    bio = Column(Text)
+
+    def __init__(self, user_id, bio):
+        self.user_id = user_id
+        self.bio = bio
+
+    def __repr__(self):
+        return "<User info %d>" % self.user_id
+
+
 class Person(Base):
     __tablename__ = "person"
     name = Column(Text, primary_key=True, unique=True)

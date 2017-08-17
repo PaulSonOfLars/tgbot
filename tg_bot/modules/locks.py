@@ -21,10 +21,10 @@ def lock(bot, update, args):
             lock_type = args[0]
             sql.update_lock(chat_id, lock_type, locked=True)
         else:
-            update.effective_message.reply_text("What are you trying to lock...?")
+            message.reply_text("What are you trying to lock...?")
 
     else:
-        update.effective_message.reply_text("I'm not an administrator, or haven't got delete rights.")
+        message.reply_text("I'm not an administrator, or haven't got delete rights.")
 
 
 def unlock(bot, update, args):
