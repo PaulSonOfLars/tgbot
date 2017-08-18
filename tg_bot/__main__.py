@@ -5,12 +5,13 @@ from random import randint
 from time import sleep
 
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/loadorder.txt!
+from tg_bot.custom_filters import SimaoFilter
 from tg_bot.modules import *
 
 print("Loaded modules: " + str(ALL_MODULES))
@@ -104,7 +105,7 @@ def main():
     id_handler = CommandHandler("id", get_id)
     runs_handler = CommandHandler("runs", runs)
 
-    # simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
+    simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
 
     dispatcher.add_handler(CommandHandler("rights", test_rights))
 

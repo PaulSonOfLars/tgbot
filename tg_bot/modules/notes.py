@@ -1,8 +1,7 @@
-from telegram.ext import CommandHandler, MessageHandler
+from telegram.ext import CommandHandler, MessageHandler, RegexHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
-from tg_bot.custom_filters import HashFilter
 import tg_bot.modules.sql.notes_sql as sql
 
 
@@ -67,7 +66,7 @@ def clear(bot, update, args):
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 SAVE_HANDLER = CommandHandler("save", save)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
-HASH_GET_HANDLER = MessageHandler(HashFilter, hash_get)
+HASH_GET_HANDLER = RegexHandler("^#([^\s])+", hash_get)
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)
