@@ -4,6 +4,7 @@ import os
 from random import randint
 from time import sleep
 
+import requests
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async
@@ -99,11 +100,22 @@ def test_rights(bot, update):
     pprint(update.effective_chat.get_member(bot.id).__dict__)
 
 
+def get_bot_ip(bot, update):
+    """ Sends the bot's IP address, so as to be able to ssh in if necessary.
+        OWNER ONLY.
+    """
+    sender = update.message.from_user
+    if sender.id == 254318997:
+        res = requests.get("ipinfo.io/ip")
+        update.message.reply_text(res.text)
+
+
 def main():
     test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start)
     id_handler = CommandHandler("id", get_id)
     runs_handler = CommandHandler("runs", runs)
+    ip_handler = CommandHandler("ip", get_bot_ip)
 
     simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
 
@@ -113,6 +125,7 @@ def main():
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(id_handler)
     dispatcher.add_handler(runs_handler)
+    dispatcher.add_handler(ip_handler)
 
     # dispatcher.add_handler(simao_handler)
 
