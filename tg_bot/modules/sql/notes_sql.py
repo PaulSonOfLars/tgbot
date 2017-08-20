@@ -1,4 +1,4 @@
-# Note: chat_id's are stored as strings because the int is over 32 bits.
+# Note: chat_id's are stored as strings because the int is too large to be stored in a PSQL database.
 from tg_bot.models import Notes
 from tg_bot.modules.sql import session
 
@@ -23,3 +23,7 @@ def rm_note(chat_id, notename):
     if note:
         session.delete(note)
         session.commit()
+
+
+def get_all_chat_notes(chat_id):
+    return session.query(Notes).filter(Notes.chat_id == str(chat_id)).all()

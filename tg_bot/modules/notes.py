@@ -1,3 +1,4 @@
+from telegram import MAX_MESSAGE_LENGTH, ParseMode
 from telegram.ext import CommandHandler, MessageHandler, RegexHandler
 from telegram.ext.dispatcher import run_async
 
@@ -61,14 +62,30 @@ def clear(bot, update, args):
     sql.rm_note(chat_id, notename)
     update.effective_message.reply_text("Successfully removed note")
 
-# TODO: list all notes (and beware max_size limits)
+
+def list_notes(bot , update):
+    chat_id = update.effective_chat.id
+    note_list = sql.get_all_chat_notes(chat_id)
+
+    msg = "*Notes in chat:*\n"
+    for note in note_list:
+        if len(msg) + len(note.name) > MAX_MESSAGE_LENGTH:
+            update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
+            msg = ""
+        msg += " - {} \n".format(note.name)
+
+    if len(msg) != 0 and msg != "*Notes in chat:*\n":
+        update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
+
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 SAVE_HANDLER = CommandHandler("save", save)
+LIST_HANDLER = CommandHandler("notes", list_notes)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
 HASH_GET_HANDLER = RegexHandler("^#([^\s])+", hash_get)
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)
+dispatcher.add_handler(LIST_HANDLER)
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(HASH_GET_HANDLER)
