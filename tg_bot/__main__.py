@@ -106,7 +106,7 @@ def get_bot_ip(bot, update):
     """
     sender = update.message.from_user
     if sender.id == 254318997:
-        res = requests.get("ipinfo.io/ip")
+        res = requests.get("http://ipinfo.io/ip")
         update.message.reply_text(res.text)
 
 
