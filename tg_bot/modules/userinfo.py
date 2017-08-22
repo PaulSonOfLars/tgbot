@@ -31,9 +31,10 @@ def set_about_me(bot, update):
     message = update.effective_message
     user_id = message.from_user.id
     text = message.text
-    info = text.split(None, 1)[1]  # use python's maxsplit to only remove the cmd, hence keeping newlines.
-    sql.set_user_me_info(user_id, info)
-    update.effective_message.reply_text("Updated your info!")
+    info = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
+    if len(info) == 2:
+        sql.set_user_me_info(user_id, info[1])
+        update.effective_message.reply_text("Updated your info!")
 
 
 def about_bio(bot, update):
@@ -63,11 +64,12 @@ def set_about_bio(bot, update):
         user_id = repl_message.from_user.id
         if user_id == message.from_user.id:
             message.reply_text("Ha, you can't set your own bio! You're at the mercy of others here...")
-
+            return
         text = message.text
-        bio = text.split(None, 1)[1]  # use python's maxsplit to only remove the cmd, hence keeping newlines.
-        sql.set_user_bio(user_id, bio)
-        message.reply_text("Updated {}'s info!".format(repl_message.from_user.name))
+        bio = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
+        if len(bio) == 2:
+            sql.set_user_bio(user_id, bio[1])
+            message.reply_text("Updated {}'s bio!".format(repl_message.from_user.name))
 
 
 SET_BIO_HANDLER = CommandHandler("setbio", set_about_bio)

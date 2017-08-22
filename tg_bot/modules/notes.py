@@ -6,13 +6,13 @@ from tg_bot import dispatcher
 import tg_bot.modules.sql.notes_sql as sql
 
 
-def get(update, notename):
+def get(update, notename, show_none=True):
     chat_id = update.effective_chat.id
     note = sql.get_note(chat_id, notename)
     if note:
         update.effective_message.reply_text(note.value)
         return
-    else:
+    elif show_none:
         update.effective_message.reply_text("This note doesn't exist")
 
 
@@ -30,7 +30,7 @@ def hash_get(bot, update):
     message = update.effective_message.text
     fst_word = message.split()[0]
     no_hash = fst_word[1:]
-    get(update, no_hash)
+    get(update, no_hash, False)
 
 
 def save(bot, update):
