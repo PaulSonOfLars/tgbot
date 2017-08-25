@@ -6,11 +6,14 @@ from tg_bot import dispatcher
 import tg_bot.modules.sql.notes_sql as sql
 
 
-def get(update, notename, show_none=True):
+def get(bot, update, notename, show_none=True):
     chat_id = update.effective_chat.id
     note = sql.get_note(chat_id, notename)
     if note:
-        update.effective_message.reply_text(note.value)
+        if note.is_reply:
+            bot.forward_message(chat_id=chat_id, from_chat_id=chat_id, message_id=note.value)
+        else:
+            update.effective_message.reply_text(note.value)
         return
     elif show_none:
         update.effective_message.reply_text("This note doesn't exist")
@@ -20,7 +23,7 @@ def get(update, notename, show_none=True):
 def cmd_get(bot, update, args):
     if len(args) >= 1:
         notename = args[0]
-        get(update, notename)
+        get(bot, update, notename, show_none=True)
     else:
         update.effective_message.reply_text("Get rekt")
 
@@ -30,7 +33,7 @@ def hash_get(bot, update):
     message = update.effective_message.text
     fst_word = message.split()[0]
     no_hash = fst_word[1:]
-    get(update, no_hash, False)
+    get(bot, update, no_hash, show_none=False)
 
 
 def save(bot, update):
@@ -42,13 +45,14 @@ def save(bot, update):
         notename = args[1]
         note_data = args[2]
 
-        sql.add_note_to_db(chat_id, notename, note_data)
+        sql.add_note_to_db(chat_id, notename, note_data, is_reply=False)
         update.effective_message.reply_text("yas! added " + notename)
 
     elif update.effective_message.reply_to_message and len(args) >= 2:
         notename = args[1]
         note_data = update.effective_message.reply_to_message
-        sql.add_note_to_db(chat_id, notename, note_data.text)
+
+        sql.add_note_to_db(chat_id, notename, note_data.message_id, is_reply=True)
         update.effective_message.reply_text("yas! added replied message " + notename)
 
     else:

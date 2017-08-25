@@ -3,13 +3,9 @@ from tg_bot.models import Notes
 from tg_bot.modules.sql import session
 
 
-def add_note_to_db(chat_id, notename, note_data):
-    prev = session.query(Notes).get((str(chat_id), notename))
-    if prev:
-        prev.value = note_data
-        note = prev
-    else:
-        note = Notes(str(chat_id), notename, note_data)
+def add_note_to_db(chat_id, notename, note_data, is_reply=False):
+    session.query(Notes).get((str(chat_id), notename)).delete()
+    note = Notes(str(chat_id), notename, note_data, is_reply=is_reply)
     session.add(note)
     session.commit()
 
