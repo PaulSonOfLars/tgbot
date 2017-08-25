@@ -10,11 +10,13 @@ class Notes(Base):
     chat_id = Column(String(14), primary_key=True)
     name = Column(Text, primary_key=True)
     value = Column(Text, nullable=False)
+    is_reply = Column(Boolean, default=False)
 
-    def __init__(self, chat_id, name, value):
+    def __init__(self, chat_id, name, value, is_reply=False):
         self.chat_id = str(chat_id)  # ensure string
         self.name = name
         self.value = value
+        self.is_reply = is_reply
 
     def __repr__(self):
         return "<Note %s>" % self.name
