@@ -31,6 +31,10 @@ def del_message(bot, update):
         update.effective_message.reply_to_message.delete()
         update.effective_message.delete()
 
+docs = """
+ - /del: deletes the message you replied to
+ - /purge: deletes all messages between this and the replied to message
+"""
 
 DELETE_HANDLER = CommandHandler("del", del_message)
 PURGE_HANDLER = CommandHandler("purge", purge)

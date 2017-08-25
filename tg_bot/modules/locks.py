@@ -86,6 +86,11 @@ def del_photo(bot, update):
     if sql.is_locked(chat.id, "photo") and can_delete(chat, bot.id):
         update.effective_message.delete()
 
+docs = """
+ - /locktypes: a list of possible locktypes
+ - /lock <type>: lock items of a certain type
+ - /unlock <type>: unlock items of a certain type
+"""
 
 LOCKTYPES_HANDLER = CommandHandler("locktypes", locktypes)
 LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True)

@@ -71,6 +71,12 @@ def set_about_bio(bot, update):
             sql.set_user_bio(user_id, bio[1])
             message.reply_text("Updated {}'s bio!".format(repl_message.from_user.name))
 
+docs = """
+ - /setbio <text>: while replying will save another user's bio
+ - /bio: will get your or another user's bio
+ - /setme <text>: will set your info
+ - /me: will get your or another user's info
+"""
 
 SET_BIO_HANDLER = CommandHandler("setbio", set_about_bio)
 GET_BIO_HANDLER = CommandHandler("bio", about_bio)

@@ -1,3 +1,4 @@
+import importlib
 from pprint import pprint
 
 import os
@@ -13,9 +14,18 @@ from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/loadorder.txt!
 from tg_bot.custom_filters import SimaoFilter
-from tg_bot.modules import *
+from tg_bot.modules import ALL_MODULES
 
-print("Loaded modules: " + str(ALL_MODULES))
+print("Loading modules: " + str(ALL_MODULES))
+help_strings = "Commands:"
+for e in ALL_MODULES:
+    val = importlib.import_module("tg_bot.modules." + e)
+    if hasattr(val, "docs"):
+        help_strings += val.docs
+    else:
+        help_strings += "\n {} module has no help docs. \n".format(e)
+
+print("Successfully loaded modules: " + str(ALL_MODULES))
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -110,12 +120,17 @@ def get_bot_ip(bot, update):
         update.message.reply_text(res.text)
 
 
+def get_help(bot, update):
+    update.effective_message.reply_text(help_strings)
+
+
 def main():
     test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start)
     id_handler = CommandHandler("id", get_id)
     runs_handler = CommandHandler("runs", runs)
     ip_handler = CommandHandler("ip", get_bot_ip)
+    help_handler = CommandHandler("help", get_help)
 
     simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
 
@@ -126,6 +141,7 @@ def main():
     dispatcher.add_handler(id_handler)
     dispatcher.add_handler(runs_handler)
     dispatcher.add_handler(ip_handler)
+    dispatcher.add_handler(help_handler)
 
     # dispatcher.add_handler(simao_handler)
 

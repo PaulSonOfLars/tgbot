@@ -139,13 +139,23 @@ def invite(bot, update):
             invitelink = bot.exportChatInviteLink(chat.id)
             update.effective_message.reply_text(invitelink)
 
+docs = """
+ - /pin: pins the message replied to
+ - /unpin: unpins the currently pinned message
+ - /ban: bans a user
+ - /unban <user_id>: unbans a user given his user id
+ - /kickme: kicks the user
+ - /invite: gets invitelink
+ - /promote: promotes the user replied to
+ - /demote: demotes the user replied to
+"""
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
 UNPIN_HANDLER = CommandHandler("unpin", unpin)
 
 KICK_HANDLER = CommandHandler("ban", kick)
-KICKME_HANDLER = CommandHandler("kickme", kickme)
 UNKICK_HANDLER = CommandHandler("unban", unkick, pass_args=True)
+KICKME_HANDLER = CommandHandler("kickme", kickme)
 
 INVITE_HANDLER = CommandHandler("invite", invite)
 

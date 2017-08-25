@@ -100,7 +100,6 @@ def make_keyboard(keyboard_elems):
 
     return InlineKeyboardMarkup(keyboard)
 
-
 dispatcher.add_handler(CommandHandler("owes", owes, pass_args=True, pass_user_data=True))
 dispatcher.add_handler(CommandHandler("reset", reset, pass_args=True, pass_user_data=True))
 dispatcher.add_handler(CommandHandler("add", add, pass_args=True))

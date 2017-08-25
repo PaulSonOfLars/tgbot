@@ -1,5 +1,5 @@
 from telegram import MAX_MESSAGE_LENGTH, ParseMode
-from telegram.ext import CommandHandler, MessageHandler, RegexHandler
+from telegram.ext import CommandHandler, RegexHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
@@ -81,12 +81,20 @@ def list_notes(bot , update):
     if len(msg) != 0 and msg != "*Notes in chat:*\n":
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
+docs = """
+ - /get  <notename>: get the note with this notename
+ - #<notename>: same as /get
+ - /save <notename> <notedata>: saves notedata as a note with name notename
+ - /save <notename>: save the replied message as a note with name notename
+ - /note: list all notes in this chat
+ - /clear <notename>: clear note with this name
+"""
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
+HASH_GET_HANDLER = RegexHandler("^#([^\s])+", hash_get)
 SAVE_HANDLER = CommandHandler("save", save)
 LIST_HANDLER = CommandHandler("notes", list_notes)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
-HASH_GET_HANDLER = RegexHandler("^#([^\s])+", hash_get)
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)

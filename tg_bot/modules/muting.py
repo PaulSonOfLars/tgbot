@@ -58,6 +58,10 @@ def unmute(bot, update, args):
             else:
                 message.reply_text("Uh... an external error occured unmuting.")
 
+docs = """
+ - /mute: silences a user
+ - /unmute <userhandle>: unmutes a user
+"""
 
 MUTE_HANDLER = CommandHandler("mute", mute, pass_args=True)
 UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True)
