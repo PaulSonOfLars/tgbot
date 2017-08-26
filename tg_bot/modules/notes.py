@@ -67,7 +67,7 @@ def clear(bot, update, args):
     update.effective_message.reply_text("Successfully removed note")
 
 
-def list_notes(bot , update):
+def list_notes(bot, update):
     chat_id = update.effective_chat.id
     note_list = sql.get_all_chat_notes(chat_id)
 
@@ -81,7 +81,8 @@ def list_notes(bot , update):
     if len(msg) != 0 and msg != "*Notes in chat:*\n":
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
-docs = """
+
+__help__ = """
  - /get  <notename>: get the note with this notename
  - #<notename>: same as /get
  - /save <notename> <notedata>: saves notedata as a note with name notename
@@ -91,7 +92,7 @@ docs = """
 """
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
-HASH_GET_HANDLER = RegexHandler("^#([^\s])+", hash_get)
+HASH_GET_HANDLER = RegexHandler(r"^#([^\s])+", hash_get)
 SAVE_HANDLER = CommandHandler("save", save)
 LIST_HANDLER = CommandHandler("notes", list_notes)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)

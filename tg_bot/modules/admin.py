@@ -139,7 +139,7 @@ def invite(bot, update):
             invitelink = bot.exportChatInviteLink(chat.id)
             update.effective_message.reply_text(invitelink)
 
-docs = """
+__help__ = """
  - /pin: pins the message replied to
  - /unpin: unpins the currently pinned message
  - /ban: bans a user
@@ -170,4 +170,3 @@ dispatcher.add_handler(UNKICK_HANDLER)
 dispatcher.add_handler(INVITE_HANDLER)
 dispatcher.add_handler(PROMOTE_HANDLER)
 dispatcher.add_handler(DEMOTE_HANDLER)
-

@@ -1,4 +1,3 @@
-# TODO make some helper module for these or something idk
 def can_delete(chat, bot_id):
     return chat.get_member(bot_id).can_delete_messages
 

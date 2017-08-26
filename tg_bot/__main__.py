@@ -16,14 +16,23 @@ from tg_bot import dispatcher, updater, TOKEN, HEROKU
 from tg_bot.custom_filters import SimaoFilter
 from tg_bot.modules import ALL_MODULES
 
+
+help_strings = """
+Commands available:
+ - /start: start the bot
+ - /id: get current group id. if used replying to a message, gets that user's id.
+ - /runs: after a 5 sec delay, send a random string from an array of replies.
+ - /help: PM's you this message.
+"""
+
 print("Loading modules: " + str(ALL_MODULES))
-help_strings = "Commands:"
-for e in ALL_MODULES:
-    val = importlib.import_module("tg_bot.modules." + e)
-    if hasattr(val, "docs"):
-        help_strings += val.docs
+
+for module_name in ALL_MODULES:
+    imported_module = importlib.import_module("tg_bot.modules." + module_name)
+    if hasattr(imported_module, "__help__"):
+        help_strings += imported_module.__help__
     else:
-        help_strings += "\n {} module has no help docs. \n".format(e)
+        help_strings += "\n {} module has no help docs, but is loaded. \n".format(module_name)
 
 print("Successfully loaded modules: " + str(ALL_MODULES))
 
@@ -121,7 +130,18 @@ def get_bot_ip(bot, update):
 
 
 def get_help(bot, update):
-    update.effective_message.reply_text(help_strings)
+    user = update.effective_message.from_user
+    chat = update.effective_chat
+
+    if chat.type == "private":
+        update.effective_message.reply_text(help_strings)
+
+    else:
+        try:
+            bot.send_message(user.id, help_strings)
+            update.effective_message.reply_text("I've PM'ed you about me.")
+        except Unauthorized:
+            update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
 
 
 def main():
@@ -136,7 +156,7 @@ def main():
 
     dispatcher.add_handler(CommandHandler("rights", test_rights))
 
-    dispatcher.add_handler(test_handler)
+    # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(id_handler)
     dispatcher.add_handler(runs_handler)
@@ -156,7 +176,6 @@ def main():
     else:
         updater.start_polling()
     updater.idle()
-
 
 if __name__ == '__main__':
     main()

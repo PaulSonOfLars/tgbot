@@ -58,7 +58,7 @@ def unmute(bot, update, args):
             else:
                 message.reply_text("Uh... an external error occured unmuting.")
 
-docs = """
+__help__ = """
  - /mute: silences a user
  - /unmute <userhandle>: unmutes a user
 """

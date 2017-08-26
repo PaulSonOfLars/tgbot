@@ -1,19 +1,19 @@
 # New chat added -> setup permissions
 from tg_bot.models import Permissions
-from tg_bot.modules.sql import session
+from tg_bot.modules.sql import SESSION
 
 KEYSTORE = {}
 
 
 def init_permissions(chat_id, reset=False):
-    curr_perm = session.query(Permissions).get(str(chat_id))
+    curr_perm = SESSION.query(Permissions).get(str(chat_id))
     if reset:
-        session.delete(curr_perm)
-        session.flush()
+        SESSION.delete(curr_perm)
+        SESSION.flush()
     perm = Permissions(str(chat_id))
     KEYSTORE[str(chat_id)] = perm
-    session.add(perm)
-    session.commit()
+    SESSION.add(perm)
+    SESSION.commit()
     return perm
 
 
@@ -39,8 +39,8 @@ def update_lock(chat_id, lock_type, locked):
     elif lock_type == "sticker":
         curr_perm.sticker = locked
 
-    session.add(curr_perm)  # NOTE: do i really need to add...?
-    session.commit()
+    SESSION.add(curr_perm)  # NOTE: do i really need to add...?
+    SESSION.commit()
 
 
 def is_locked(chat_id, lock_type):
@@ -65,7 +65,7 @@ def is_locked(chat_id, lock_type):
 
 
 def load_ks():
-    all_perms = session.query(Permissions).all()
+    all_perms = SESSION.query(Permissions).all()
     for chat in all_perms:
         KEYSTORE[chat.chat_id] = chat
     print("Keystore loaded, length " + str(len(KEYSTORE)))

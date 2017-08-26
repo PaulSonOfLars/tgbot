@@ -2,10 +2,10 @@ from sqlalchemy import Column, Text, String, Boolean, Integer, ForeignKey
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+BASE = declarative_base()
 
 
-class Notes(Base):
+class Notes(BASE):
     __tablename__ = "notes"
     chat_id = Column(String(14), primary_key=True)
     name = Column(Text, primary_key=True)
@@ -23,7 +23,7 @@ class Notes(Base):
 
 
 # TODO: add gifs
-class Permissions(Base):
+class Permissions(BASE):
     __tablename__ = "permissions"
     chat_id = Column(String(14), primary_key=True)
     audio = Column(Boolean, default=False)
@@ -48,7 +48,7 @@ class Permissions(Base):
         return "<Permissions for %s>" % self.chat_id
 
 
-class UserInfo(Base):
+class UserInfo(BASE):
     __tablename__ = "userinfo"
     user_id = Column(Integer, primary_key=True)
     info = Column(Text)
@@ -61,7 +61,7 @@ class UserInfo(Base):
         return "<User info %d>" % self.user_id
 
 
-class UserBio(Base):
+class UserBio(BASE):
     __tablename__ = "userbio"
     user_id = Column(Integer, primary_key=True)
     bio = Column(Text)
@@ -74,7 +74,7 @@ class UserBio(Base):
         return "<User info %d>" % self.user_id
 
 
-class Person(Base):
+class Person(BASE):
     __tablename__ = "person"
     name = Column(Text, primary_key=True, unique=True)
 
@@ -86,7 +86,7 @@ class Person(Base):
 
 
 # TODO: use chat_ids too
-class Owing(Base):
+class Owing(BASE):
     __tablename__ = "owing"
     owing_id = Column(Integer, primary_key=True)
     ower = Column(Text,
@@ -110,7 +110,7 @@ class Owing(Base):
         return "<{} owes {} {}>".format(self.ower, self.owee, self.amount)
 
 
-class MutedUsers(Base):
+class MutedUsers(BASE):
     __tablename__ = "mutedusers"
     chat_id = Column(String(14), primary_key=True)
     muted_users = Column(postgresql.ARRAY(Integer, dimensions=1), default=[])  # 1 dimensional list
@@ -121,4 +121,3 @@ class MutedUsers(Base):
 
     def __repr__(self):
         return "<Mute status for %s in chat %s>" % (self.user_id, self.chat_id)
-

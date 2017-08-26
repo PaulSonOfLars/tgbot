@@ -18,7 +18,6 @@ def purge(bot, update):
                 bot.deleteMessage(chat.id, m_id)
             except BadRequest as err:
                 print(err)
-                pass
         bot.send_message(chat.id, "Purge complete.", 'Markdown')
 
 
@@ -31,7 +30,7 @@ def del_message(bot, update):
         update.effective_message.reply_to_message.delete()
         update.effective_message.delete()
 
-docs = """
+__help__ = """
  - /del: deletes the message you replied to
  - /purge: deletes all messages between this and the replied to message
 """
@@ -41,4 +40,3 @@ PURGE_HANDLER = CommandHandler("purge", purge)
 
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(PURGE_HANDLER)
-
