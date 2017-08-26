@@ -6,6 +6,7 @@ from random import randint
 from time import sleep
 
 import requests
+import telegram
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async
@@ -129,16 +130,40 @@ def get_bot_ip(bot, update):
         update.message.reply_text(res.text)
 
 
+def split_message(msg):
+    if len(msg) < telegram.MAX_MESSAGE_LENGTH:
+        return [msg]
+    else:
+        lines = help_strings.splitlines()
+        small_help = ""
+        result = []
+        for line in lines:
+            small_help += "\n"
+            if len(small_help) + len(line) < telegram.MAX_MESSAGE_LENGTH:
+                small_help += line
+            else:
+                result.append(small_help)
+                small_help = line
+        else:
+            # Else statement at the end of the for loop, to send leftover string.
+            result.append(small_help)
+
+        return result
+
+
 def get_help(bot, update):
     user = update.effective_message.from_user
     chat = update.effective_chat
 
     if chat.type == "private":
-        update.effective_message.reply_text(help_strings)
+        for msg in split_message(help_strings):
+            update.effective_message.reply_text(msg)
 
     else:
         try:
-            bot.send_message(user.id, help_strings)
+            for msg in split_message(help_strings):
+                bot.send_message(user.id, msg)
+
             update.effective_message.reply_text("I've PM'ed you about me.")
         except Unauthorized:
             update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
