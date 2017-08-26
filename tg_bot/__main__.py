@@ -120,6 +120,7 @@ def test_rights(bot, update):
     pprint(update.effective_chat.get_member(bot.id).__dict__)
 
 
+@run_async
 def get_bot_ip(bot, update):
     """ Sends the bot's IP address, so as to be able to ssh in if necessary.
         OWNER ONLY.
@@ -138,19 +139,20 @@ def split_message(msg):
         small_help = ""
         result = []
         for line in lines:
-            small_help += "\n"
-            if len(small_help) + len(line) < telegram.MAX_MESSAGE_LENGTH:
-                small_help += line
+            newline = line + "\n"
+            if len(small_help) + len(newline) < telegram.MAX_MESSAGE_LENGTH:
+                small_help += newline
             else:
                 result.append(small_help)
-                small_help = line
+                small_help = newline
         else:
-            # Else statement at the end of the for loop, to send leftover string.
+            # Else statement at the end of the for loop, to append leftover string.
             result.append(small_help)
 
         return result
 
 
+@run_async
 def get_help(bot, update):
     user = update.effective_message.from_user
     chat = update.effective_chat

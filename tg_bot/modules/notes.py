@@ -1,6 +1,7 @@
 from telegram import MAX_MESSAGE_LENGTH, ParseMode
 from telegram.ext import CommandHandler, RegexHandler
 from telegram.ext.dispatcher import run_async
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
 import tg_bot.modules.sql.notes_sql as sql
@@ -73,10 +74,11 @@ def list_notes(bot, update):
 
     msg = "*Notes in chat:*\n"
     for note in note_list:
-        if len(msg) + len(note.name) > MAX_MESSAGE_LENGTH:
+        note_name = escape_markdown(" - {}\n".format(note.name))
+        if len(msg) + len(note_name) > MAX_MESSAGE_LENGTH:
             update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
             msg = ""
-        msg += " - {} \n".format(note.name)
+        msg += note_name
 
     if len(msg) != 0 and msg != "*Notes in chat:*\n":
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
