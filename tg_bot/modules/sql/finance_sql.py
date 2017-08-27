@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Text, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, Unicode
 
 from tg_bot.modules.sql import SESSION, BASE
 
 
 class Person(BASE):
     __tablename__ = "person"
-    name = Column(Text, primary_key=True, unique=True)
+    name = Column(Unicode, primary_key=True, unique=True)
 
     def __init__(self, name):
         self.name = name
@@ -18,12 +18,12 @@ class Person(BASE):
 class Owing(BASE):
     __tablename__ = "owing"
     owing_id = Column(Integer, primary_key=True)
-    ower = Column(Text,
+    ower = Column(Unicode,
                   ForeignKey("person.name",
                              onupdate="CASCADE",
                              ondelete="CASCADE"),
                   nullable=False)
-    owee = Column(Text,
+    owee = Column(Unicode,
                   ForeignKey("person.name",
                              onupdate="CASCADE",
                              ondelete="CASCADE"),

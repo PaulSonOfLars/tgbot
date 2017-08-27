@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Unicode
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -6,7 +6,7 @@ from tg_bot.modules.sql import SESSION, BASE
 class UserInfo(BASE):
     __tablename__ = "userinfo"
     user_id = Column(Integer, primary_key=True)
-    info = Column(Text)
+    info = Column(Unicode)
 
     def __init__(self, user_id, info):
         self.user_id = user_id
@@ -19,7 +19,7 @@ class UserInfo(BASE):
 class UserBio(BASE):
     __tablename__ = "userbio"
     user_id = Column(Integer, primary_key=True)
-    bio = Column(Text)
+    bio = Column(Unicode)
 
     def __init__(self, user_id, bio):
         self.user_id = user_id
