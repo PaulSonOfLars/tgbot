@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Text, String, Boolean, Integer, ForeignKey
-from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import declarative_base
 
 BASE = declarative_base()
@@ -108,16 +107,3 @@ class Owing(BASE):
 
     def __repr__(self):
         return "<{} owes {} {}>".format(self.ower, self.owee, self.amount)
-
-
-class MutedUsers(BASE):
-    __tablename__ = "mutedusers"
-    chat_id = Column(String(14), primary_key=True)
-    muted_users = Column(postgresql.ARRAY(Integer, dimensions=1), default=[])  # 1 dimensional list
-
-    def __init__(self, chat_id):
-        self.chat_id = str(chat_id)  # ensure string
-        self.muted_users = []
-
-    def __repr__(self):
-        return "<Mute status for %s in chat %s>" % (self.user_id, self.chat_id)
