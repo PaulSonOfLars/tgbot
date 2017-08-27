@@ -15,7 +15,10 @@ class Welcome(BASE):
     def __repr__(self):
         return "<Chat {} should Welcome new users: {}>".format(self.chat_id, self.should_welcome)
 
-BASE.metadata.create_all(SESSION.get_bind())
+Welcome.__table__.create()
+
+# Note: could do this too
+# BASE.metadata.tables["welcome_pref"].create()
 
 KEYSTORE = {}
 

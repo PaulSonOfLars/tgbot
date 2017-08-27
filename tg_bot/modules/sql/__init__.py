@@ -16,6 +16,7 @@ def start():
     else:
         db_uri = Configuration.SQLALCHEMY_DATABASE_URI
     engine = create_engine(db_uri, client_encoding="utf8")
+    BASE.metadata.bind = engine
     BASE.metadata.create_all(engine)
     session_maker = sessionmaker(autoflush=False)
     return session_maker(bind=engine)
