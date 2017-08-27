@@ -1,5 +1,5 @@
 # Note: chat_id's are stored as strings because the int is too large to be stored in a PSQL database.
-from sqlalchemy import Column, String, Boolean, Unicode
+from sqlalchemy import Column, String, Boolean, UnicodeText
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -7,8 +7,8 @@ from tg_bot.modules.sql import SESSION, BASE
 class Notes(BASE):
     __tablename__ = "notes"
     chat_id = Column(String(14), primary_key=True)
-    name = Column(Unicode, primary_key=True)
-    value = Column(Unicode, nullable=False)
+    name = Column(UnicodeText, primary_key=True)
+    value = Column(UnicodeText, nullable=False)
     is_reply = Column(Boolean, default=False)
 
     def __init__(self, chat_id, name, value, is_reply=False):
