@@ -29,7 +29,7 @@ class Permissions(BASE):
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
 
-Permissions.__table__.create()
+Permissions.__table__.create(checkfirst=True)
 
 KEYSTORE = {}
 

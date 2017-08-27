@@ -28,8 +28,8 @@ class UserBio(BASE):
     def __repr__(self):
         return "<User info %d>" % self.user_id
 
-UserInfo.__table__.create()
-UserBio.__table__.create()
+UserInfo.__table__.create(checkfirst=True)
+UserBio.__table__.create(checkfirst=True)
 
 
 def get_user_me_info(user_id):

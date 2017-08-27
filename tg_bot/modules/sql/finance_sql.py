@@ -38,8 +38,8 @@ class Owing(BASE):
     def __repr__(self):
         return "<{} owes {} {}>".format(self.ower, self.owee, self.amount)
 
-Owing.__table__.create()
-Person.__table__.create()
+Owing.__table__.create(checkfirst=True)
+Person.__table__.create(checkfirst=True)
 
 
 def get_owers():
