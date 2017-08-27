@@ -80,7 +80,10 @@ def list_notes(bot, update):
             msg = ""
         msg += note_name
 
-    if len(msg) != 0 and msg != "*Notes in chat:*\n":
+    if msg == "*Notes in chat:*\n":
+        update.effective_message.reply_text("No notes in this chat!")
+
+    elif len(msg) != 0:
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
 
@@ -89,7 +92,7 @@ __help__ = """
  - #<notename>: same as /get
  - /save <notename> <notedata>: saves notedata as a note with name notename
  - /save <notename>: save the replied message as a note with name notename
- - /note: list all notes in this chat
+ - /notes: list all notes in this chat
  - /clear <notename>: clear note with this name
 """
 

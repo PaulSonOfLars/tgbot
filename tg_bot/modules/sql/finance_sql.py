@@ -1,5 +1,42 @@
-from tg_bot.modules.sql import SESSION
-from tg_bot.models import Owing, Person
+from sqlalchemy import Column, Text, Integer, ForeignKey
+
+from tg_bot.modules.sql import SESSION, BASE
+
+
+class Person(BASE):
+    __tablename__ = "person"
+    name = Column(Text, primary_key=True, unique=True)
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return "<Person {}>".format(self.name)
+
+
+# TODO: use chat_ids too
+class Owing(BASE):
+    __tablename__ = "owing"
+    owing_id = Column(Integer, primary_key=True)
+    ower = Column(Text,
+                  ForeignKey("person.name",
+                             onupdate="CASCADE",
+                             ondelete="CASCADE"),
+                  nullable=False)
+    owee = Column(Text,
+                  ForeignKey("person.name",
+                             onupdate="CASCADE",
+                             ondelete="CASCADE"),
+                  nullable=False)
+    amount = Column(Integer, nullable=False)
+
+    def __init__(self, ower, owee, amount=0):
+        self.ower = ower
+        self.owee = owee
+        self.amount = amount
+
+    def __repr__(self):
+        return "<{} owes {} {}>".format(self.ower, self.owee, self.amount)
 
 
 def get_owers():

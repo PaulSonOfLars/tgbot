@@ -1,9 +1,9 @@
 from telegram.ext import BaseFilter
 
 
-class __SimaoFilter(BaseFilter):
-    def filter(self, message):
-        return 'simao' in message.text.lower()
+class CustomFilters(object):
+    class _SimaoFilter(BaseFilter):
+        def filter(self, message):
+            return 'simao' in message.text.lower()
 
-
-SimaoFilter = __SimaoFilter()
+    SimaoFilter = _SimaoFilter()

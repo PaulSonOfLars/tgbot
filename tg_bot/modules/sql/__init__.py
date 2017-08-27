@@ -1,9 +1,10 @@
 import os
+
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from tg_bot import HEROKU
-from tg_bot.models import BASE
 
 if not HEROKU:
     from tg_bot.config import Development as Configuration
@@ -19,4 +20,5 @@ def start():
     session_maker = sessionmaker(autoflush=False)
     return session_maker(bind=engine)
 
+BASE = declarative_base()
 SESSION = start()

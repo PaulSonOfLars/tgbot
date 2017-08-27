@@ -1,5 +1,20 @@
-from tg_bot.models import Welcome
-from tg_bot.modules.sql import SESSION
+from sqlalchemy import Column, String, Boolean
+
+from tg_bot.modules.sql import SESSION, BASE
+
+
+class Welcome(BASE):
+    __tablename__ = "welcome_pref"
+    chat_id = Column(String(14), primary_key=True)
+    should_welcome = Column(Boolean, default=True)
+
+    def __init__(self, chat_id, should_welcome=True):
+        self.chat_id = chat_id
+        self.should_welcome = should_welcome
+
+    def __repr__(self):
+        return "<Chat {} should Welcome new users: {}>".format(self.chat_id, self.should_welcome)
+
 
 KEYSTORE = {}
 

@@ -1,6 +1,33 @@
 # New chat added -> setup permissions
-from tg_bot.models import Permissions
-from tg_bot.modules.sql import SESSION
+from sqlalchemy import Column, String, Boolean
+
+from tg_bot.modules.sql import SESSION, BASE
+
+
+# TODO: add gifs
+class Permissions(BASE):
+    __tablename__ = "permissions"
+    chat_id = Column(String(14), primary_key=True)
+    audio = Column(Boolean, default=False)
+    voice = Column(Boolean, default=False)
+    contact = Column(Boolean, default=False)
+    video = Column(Boolean, default=False)
+    document = Column(Boolean, default=False)
+    photo = Column(Boolean, default=False)
+    sticker = Column(Boolean, default=False)
+
+    def __init__(self, chat_id):
+        self.chat_id = str(chat_id)  # ensure string
+        self.audio = False
+        self.voice = False
+        self.contact = False
+        self.video = False
+        self.document = False
+        self.photo = False
+        self.sticker = False
+
+    def __repr__(self):
+        return "<Permissions for %s>" % self.chat_id
 
 KEYSTORE = {}
 

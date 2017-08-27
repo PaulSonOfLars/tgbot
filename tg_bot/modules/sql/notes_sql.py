@@ -1,6 +1,24 @@
 # Note: chat_id's are stored as strings because the int is too large to be stored in a PSQL database.
-from tg_bot.models import Notes
-from tg_bot.modules.sql import SESSION
+from sqlalchemy import Column, String, Text, Boolean
+
+from tg_bot.modules.sql import SESSION, BASE
+
+
+class Notes(BASE):
+    __tablename__ = "notes"
+    chat_id = Column(String(14), primary_key=True)
+    name = Column(Text, primary_key=True)
+    value = Column(Text, nullable=False)
+    is_reply = Column(Boolean, default=False)
+
+    def __init__(self, chat_id, name, value, is_reply=False):
+        self.chat_id = str(chat_id)  # ensure string
+        self.name = name
+        self.value = value
+        self.is_reply = is_reply
+
+    def __repr__(self):
+        return "<Note %s>" % self.name
 
 
 def add_note_to_db(chat_id, notename, note_data, is_reply=False):

@@ -14,7 +14,7 @@ from telegram.ext.dispatcher import run_async
 from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
-from tg_bot.custom_filters import SimaoFilter
+from tg_bot.custom_filters import CustomFilters
 from tg_bot.modules import ALL_MODULES
 
 
@@ -177,7 +177,7 @@ def main():
     ip_handler = CommandHandler("ip", get_bot_ip)
     help_handler = CommandHandler("help", get_help)
 
-    simao_handler = MessageHandler(Filters.text & SimaoFilter, reply_simshit)
+    simao_handler = MessageHandler(Filters.text & CustomFilters.SimaoFilter, reply_simshit)
 
     dispatcher.add_handler(CommandHandler("rights", test_rights))
 

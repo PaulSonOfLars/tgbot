@@ -1,5 +1,32 @@
-from tg_bot.models import UserInfo, UserBio
-from tg_bot.modules.sql import SESSION
+from sqlalchemy import Column, Integer, Text
+
+from tg_bot.modules.sql import SESSION, BASE
+
+
+class UserInfo(BASE):
+    __tablename__ = "userinfo"
+    user_id = Column(Integer, primary_key=True)
+    info = Column(Text)
+
+    def __init__(self, user_id, info):
+        self.user_id = user_id
+        self.info = info
+
+    def __repr__(self):
+        return "<User info %d>" % self.user_id
+
+
+class UserBio(BASE):
+    __tablename__ = "userbio"
+    user_id = Column(Integer, primary_key=True)
+    bio = Column(Text)
+
+    def __init__(self, user_id, bio):
+        self.user_id = user_id
+        self.bio = bio
+
+    def __repr__(self):
+        return "<User info %d>" % self.user_id
 
 
 def get_user_me_info(user_id):
