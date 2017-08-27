@@ -1,6 +1,7 @@
 from telegram import ParseMode
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
 import tg_bot.modules.sql.userinfo_sql as sql
@@ -15,7 +16,7 @@ def about_me(bot, update):
     else:
         user = message.from_user
 
-    info = sql.get_user_me_info(user.id)
+    info = escape_markdown(sql.get_user_me_info(user.id))
 
     if info:
         update.effective_message.reply_text("*{}*:\n{}".format(user.name, info),
@@ -45,7 +46,7 @@ def about_bio(bot, update):
     else:
         user = message.from_user
 
-    info = sql.get_user_bio(user.id)
+    info = escape_markdown(sql.get_user_bio(user.id))
 
     if info:
         update.effective_message.reply_text("*{}*:\n{}".format(user.name, info),
