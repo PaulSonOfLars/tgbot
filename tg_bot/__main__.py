@@ -26,8 +26,6 @@ Commands available:
  - /help: PM's you this message.
 """
 
-print("Loading modules: " + str(ALL_MODULES))
-
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
     if hasattr(imported_module, "__help__"):

@@ -68,7 +68,7 @@ def load_ks():
     all_perms = SESSION.query(Permissions).all()
     for chat in all_perms:
         KEYSTORE[chat.chat_id] = chat
-    print("Keystore loaded, length " + str(len(KEYSTORE)))
+    print("Locked types keystore loaded, length " + str(len(KEYSTORE)))
 
 # LOAD KEYSTORE ON BOT START
 load_ks()
