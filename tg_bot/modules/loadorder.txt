@@ -1,6 +1,0 @@
-msg_deleting
-locks
-admin
-notes
-userinfo
-muting

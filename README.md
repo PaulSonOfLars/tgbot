@@ -65,10 +65,17 @@ To start the bot, simply run:
 ## Modules
 ### Setting load order.
 
-The module load order can be changed via modules/loadorder.txt
-If this file is present, only modules in that file will be loaded, and in that order.
-Write one module name per line.
+The module load order can be changed via `modules/load.json`.
+The file should contain ONLY one json object.
+Two variables are looked for:
+- `load`: a list of elements to load, and in which order to load them.
+- `no_load`: a list of elements NOT to load.
 
+If `load` is not present, or is an empty list, all modules in `modules/` will be selected for loading by default.
+
+If `no_load` is not present, or is an empty list, all modules selected for loading will be loaded.
+
+If a module is in both `load` and `no_load`, the module will not be loaded - `no_load` takes priority.
 ### Creating your own modules.
 
 Creating a module has been simplified as much as possible - but do not hesitate to suggest more ways of simplifying.

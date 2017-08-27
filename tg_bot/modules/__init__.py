@@ -1,27 +1,40 @@
+import json
+
+
 def __list_all_modules():
     from os.path import dirname, basename, isfile, join
     import glob
     # This generates a list of modules in this folder for the * in __main__ to work.
-    mod_paths = glob.glob(dirname(__file__)+"/*.py")
+    mod_paths = glob.glob(dirname(__file__) + "/*.py")
+    all_modules = [basename(f)[:-3] for f in mod_paths if isfile(f)
+                       and f.endswith(".py")
+                       and not f.endswith('__init__.py')
+                       and not f.endswith('helper_funcs.py')]
 
-    # load modules from the order in this file.
-    try:
-        with open(join(dirname(__file__), "loadorder.txt")) as f:
-            contents = f.read().split()
+    filepath = join(dirname(__file__), "load.json")
 
-        if contents:
-            if all(any(mod == basename(path)[:-3] for path in mod_paths) for mod in contents):
-                return contents
-            else:
+    if isfile(filepath):
+        with open(join(dirname(__file__), "load.json")) as f:
+            data = json.load(f)
+
+        if "load" in data and data.get("load"):
+            to_load = data.get("load")
+
+            if not all(any(mod == module_name for module_name in all_modules) for mod in to_load):
                 print("Invalid loadorder names. Quitting.")
                 quit(1)
-    except FileNotFoundError:
-        pass
 
-    return [basename(f)[:-3] for f in mod_paths if isfile(f)
-            and f.endswith(".py")
-            and not f.endswith('__init__.py')
-            and not f.endswith('helper_funcs.py')]
+        else:
+            to_load = all_modules
+
+        if "no_load" in data and data.get("no_load"):
+            not_to_load = data.get("no_load")
+            print("Not loading: {}".format(not_to_load))
+            return [item for item in to_load if item not in not_to_load]
+
+        return to_load
+    return all_modules
 
 ALL_MODULES = __list_all_modules()
+print("Modules to load:{}".format(ALL_MODULES))
 __all__ = ALL_MODULES + ["ALL_MODULES"]

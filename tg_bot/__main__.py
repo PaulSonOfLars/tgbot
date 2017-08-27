@@ -13,7 +13,7 @@ from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
-# NOTE: Module order is not guaranteed, specify that in modules/loadorder.txt!
+# NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.custom_filters import SimaoFilter
 from tg_bot.modules import ALL_MODULES
 
