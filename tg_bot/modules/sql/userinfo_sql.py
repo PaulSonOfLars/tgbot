@@ -28,6 +28,8 @@ class UserBio(BASE):
     def __repr__(self):
         return "<User info %d>" % self.user_id
 
+BASE.metadata.create_all(SESSION.get_bind())
+
 
 def get_user_me_info(user_id):
     userinfo = SESSION.query(UserInfo).get(user_id)

@@ -20,6 +20,8 @@ class Notes(BASE):
     def __repr__(self):
         return "<Note %s>" % self.name
 
+BASE.metadata.create_all(SESSION.get_bind())
+
 
 def add_note_to_db(chat_id, notename, note_data, is_reply=False):
     prev = SESSION.query(Notes).get((str(chat_id), notename))

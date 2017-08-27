@@ -29,6 +29,8 @@ class Permissions(BASE):
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
 
+BASE.metadata.create_all(SESSION.get_bind())
+
 KEYSTORE = {}
 
 

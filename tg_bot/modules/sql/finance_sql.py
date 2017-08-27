@@ -38,6 +38,8 @@ class Owing(BASE):
     def __repr__(self):
         return "<{} owes {} {}>".format(self.ower, self.owee, self.amount)
 
+BASE.metadata.create_all(SESSION.get_bind())
+
 
 def get_owers():
     people = SESSION.query(Owing).distinct(Owing.ower).all()
