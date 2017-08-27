@@ -8,7 +8,6 @@ def new_member(bot, update):
     chat = update.effective_chat
     if sql.get_preference(chat.id):
         new_mem = update.effective_message.new_chat_members
-        print(new_mem)
         for member in new_mem:
             update.effective_message.reply_text("My man {}, how are you?".format(member.username))
 
@@ -17,7 +16,6 @@ def left_member(bot, update):
     chat = update.effective_chat
     if sql.get_preference(chat.id):
         left_mem = update.effective_message.left_chat_member
-        print(left_mem)
         if left_mem:
             update.effective_message.reply_text("Nice knowing ya!")
 
