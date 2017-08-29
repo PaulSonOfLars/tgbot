@@ -16,10 +16,10 @@ def about_me(bot, update):
     else:
         user = message.from_user
 
-    info = escape_markdown(sql.get_user_me_info(user.id))
+    info = sql.get_user_me_info(user.id)
 
     if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.name, info),
+        update.effective_message.reply_text("*{}*:\n{}".format(user.name, escape_markdown(info)),
                                             parse_mode=ParseMode.MARKDOWN)
     elif is_reply:
         username = message.reply_to_message.from_user.first_name
@@ -46,14 +46,14 @@ def about_bio(bot, update):
     else:
         user = message.from_user
 
-    info = escape_markdown(sql.get_user_bio(user.id))
+    info = sql.get_user_bio(user.id)
 
     if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.name, info),
+        update.effective_message.reply_text("*{}*:\n{}".format(user.name, escape_markdown(info)),
                                             parse_mode=ParseMode.MARKDOWN)
     elif is_reply:
         username = message.reply_to_message.from_user.first_name
-        update.effective_message.reply_text("{} hasn't had a message set for himselt yet!".format(username))
+        update.effective_message.reply_text("{} hasn't had a message set about himself yet!".format(username))
     else:
         update.effective_message.reply_text("You haven't had a bio set about yourself yet!")
 
@@ -71,6 +71,8 @@ def set_about_bio(bot, update):
         if len(bio) == 2:
             sql.set_user_bio(user_id, bio[1])
             message.reply_text("Updated {}'s bio!".format(repl_message.from_user.name))
+    else:
+        message.reply_text("Reply to someone's message to set their bio!")
 
 __help__ = """
  - /setbio <text>: while replying will save another user's bio
