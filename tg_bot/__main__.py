@@ -16,7 +16,7 @@ from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.custom_filters import CustomFilters
 from tg_bot.modules import ALL_MODULES
-
+from tg_bot.config import Development as Config
 
 help_strings = """
 Commands available:
@@ -123,10 +123,8 @@ def get_bot_ip(bot, update):
     """ Sends the bot's IP address, so as to be able to ssh in if necessary.
         OWNER ONLY.
     """
-    sender = update.message.from_user
-    if sender.id == 254318997:
-        res = requests.get("http://ipinfo.io/ip")
-        update.message.reply_text(res.text)
+    res = requests.get("http://ipinfo.io/ip")
+    update.message.reply_text(res.text)
 
 
 def split_message(msg):
@@ -174,7 +172,7 @@ def main():
     start_handler = CommandHandler("start", start)
     id_handler = CommandHandler("id", get_id)
     runs_handler = CommandHandler("runs", runs)
-    ip_handler = CommandHandler("ip", get_bot_ip)
+    ip_handler = CommandHandler("ip", get_bot_ip, filters=Filters.chat(Config.OWNER_ID))
     help_handler = CommandHandler("help", get_help)
 
     simao_handler = MessageHandler(Filters.text & CustomFilters.SimaoFilter, reply_simshit)

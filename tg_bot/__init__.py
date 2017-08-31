@@ -5,7 +5,7 @@ from telegram.ext import Updater
 
 HEROKU = bool(os.environ.get('HEROKU', False))
 if not HEROKU:
-    from tg_bot.config import Development as Configuration
+    from tg_bot.config import Development as Config
 
 # enable logging
 logging.basicConfig(
@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 if HEROKU:
     TOKEN = os.environ.get('TOKEN', None)
 else:
-    TOKEN = Configuration.API_KEY
+    TOKEN = Config.API_KEY
 
 updater = Updater(TOKEN, workers=6)
 
