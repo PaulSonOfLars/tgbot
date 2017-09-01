@@ -40,3 +40,7 @@ def remove_filter(chat_id, keyword):
     if res:
         SESSION.delete(res)
         SESSION.commit()
+
+
+def get_chat_filters(chat_id):
+    return SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(chat_id)).all()

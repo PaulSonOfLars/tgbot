@@ -9,7 +9,9 @@ def new_member(bot, update):
     if sql.get_preference(chat.id):
         new_mem = update.effective_message.new_chat_members
         for member in new_mem:
-            update.effective_message.reply_text("My man {}, how are you?".format(member.username))
+            # Don't welcome yourself
+            if not member.id == bot.id:
+                update.effective_message.reply_text("My man {}, how are you?".format(member.username))
 
 
 def left_member(bot, update):

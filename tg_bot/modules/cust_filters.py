@@ -1,9 +1,10 @@
 import re
 
 import telegram
-from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop
+from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop, run_async
 
 from tg_bot import dispatcher
+from tg_bot.modules.helper_funcs import user_admin
 from tg_bot.modules.sql import cust_filters_sql as sql
 
 HANDLER_GROUP = 10
@@ -48,14 +49,19 @@ def add_filter(chat_id, keyword, reply):
     dispatcher.add_handler(custom_handler, HANDLER_GROUP)
 
 
+@run_async
 def list_handlers(bot, update):
     chat = update.effective_chat
-    handlers = dispatcher.handlers.get(HANDLER_GROUP, [])
+    all_handlers = sql.get_chat_filters(chat.id)
+
+    if not all_handlers:
+        update.effective_message.reply_text("No filters are active here!")
+        return
 
     filter_list = "Current filters in this chat:\n"
-    for h in handlers:
-        if h.filters.chat_id == chat.id:
-            entry = " - {}\n".format(h.filters.matched_word)
+    for handler in all_handlers:
+        if handler.filters.chat_id == chat.id:
+            entry = " - {}\n".format(handler.filters.matched_word)
             if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
                 update.effective_message.reply_text(filter_list)
                 filter_list = entry
@@ -64,10 +70,9 @@ def list_handlers(bot, update):
 
     if not filter_list == "Current filters in this chat:\n":
         update.effective_message.reply_text(filter_list)
-    else:
-        update.effective_message.reply_text("No filters are active here!")
 
 
+@user_admin
 def filters(bot, update):
     chat = update.effective_chat
     text = update.effective_message.text
@@ -75,6 +80,7 @@ def filters(bot, update):
     keyword = args[1]
     reply = args[2]
 
+# Note: perhaps handlers can be removed somehow using sql.get_chat_filters
     for handler in dispatcher.handlers.get(HANDLER_GROUP):
         if handler.filters == (args[1], chat.id):
             dispatcher.remove_handler(handler, HANDLER_GROUP)
@@ -83,12 +89,20 @@ def filters(bot, update):
 
     add_filter(chat.id, keyword, reply)
 
-    update.effective_message.reply_text("Handler Added!")
+    update.effective_message.reply_text("Handler {} added!".format(keyword))
     raise DispatcherHandlerStop
 
 
+@user_admin
 def stop_filter(bot, update, args):
     chat = update.effective_chat
+
+    all_handlers = sql.get_chat_filters(chat.id)
+
+    if not all_handlers:
+        update.effective_message.reply_text("No filters are active here!")
+        return
+
     for handler in dispatcher.handlers.get(HANDLER_GROUP):
         if handler.filters == (args[0], chat.id):
             sql.remove_filter(chat.id, args[0])
@@ -98,12 +112,12 @@ def stop_filter(bot, update, args):
 
     update.effective_message.reply_text("That's not a current filter - run /list for all filters.")
 
+
 __help__ = """
  - /filter <keyword> <reply message>: add a filter to this chat. bot will now reply the message whenever 'keyword' is mentioned.
  - /stop <filter keyword>: stop that filter.
  - /list: list all active filters in this chat
 """
-
 
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter, pass_args=True)
