@@ -1,4 +1,4 @@
 requests
 sqlalchemy
-python-telegram-bot
+python-telegram-bot>=8.0.0
 psycopg2
