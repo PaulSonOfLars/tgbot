@@ -69,14 +69,19 @@ def list_handlers(bot, update):
 
 
 def filters(bot, update):
+    chat = update.effective_chat
     text = update.effective_message.text
     args = text.split(None, 2)  # use python's maxsplit to separate Cmd, keyword, and reply_text
     keyword = args[1]
     reply = args[2]
 
-    sql.add_filter(update.effective_chat.id, keyword, reply)
+    for handler in dispatcher.handlers.get(HANDLER_GROUP):
+        if handler.filters == (args[1], chat.id):
+            dispatcher.remove_handler(handler, HANDLER_GROUP)
 
-    add_filter(update.effective_chat.id, keyword, reply)
+    sql.add_filter(chat.id, keyword, reply)
+
+    add_filter(chat.id, keyword, reply)
 
     update.effective_message.reply_text("Handler Added!")
     raise DispatcherHandlerStop
