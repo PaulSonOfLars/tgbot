@@ -13,7 +13,7 @@ class RegexSearcher(BaseFilter):
     def __init__(self, chat_id, word):
         super().__init__()
         self.matched_word = word
-        self.pattern = "( |^)" + self.matched_word + "( |$)"
+        self.pattern = "( |^)" + self.matched_word + "( |$|[^\w])"
         self.chat_id = chat_id
 
     def filter(self, message):
