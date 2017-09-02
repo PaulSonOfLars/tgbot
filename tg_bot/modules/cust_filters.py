@@ -11,10 +11,10 @@ HANDLER_GROUP = 10
 
 
 class RegexSearcher(BaseFilter):
-    def __init__(self, chat_id, word):
+    def __init__(self, chat_id, keyword):
         super().__init__()
-        self.matched_word = word
-        self.pattern = "( |^)" + self.matched_word + "( |$|[^\w])"
+        self.keyword = keyword
+        self.pattern = "( |^)" + self.keyword + "( |$|[^\w])"
         self.chat_id = chat_id
 
     def filter(self, message):
@@ -23,13 +23,13 @@ class RegexSearcher(BaseFilter):
                     and re.search(self.pattern, message.text, flags=re.IGNORECASE))
 
     def __eq__(self, other):
-        return other == (self.matched_word, self.chat_id)
+        return other == (self.keyword, self.chat_id)
 
     def __str__(self):
-        return self.matched_word
+        return self.keyword
 
     def __repr__(self):
-        return "<RegexSearcher for {} by {} in chat {}>".format(self.matched_word, self.pattern, self.chat_id)
+        return "<RegexSearcher for {} by {} in chat {}>".format(self.keyword, self.pattern, self.chat_id)
 
 
 def load_filters():
@@ -60,8 +60,8 @@ def list_handlers(bot, update):
 
     filter_list = "Current filters in this chat:\n"
     for handler in all_handlers:
-        if handler.filters.chat_id == chat.id:
-            entry = " - {}\n".format(handler.filters.matched_word)
+        if handler.chat_id == chat.id:
+            entry = " - {}\n".format(handler.keyword)
             if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
                 update.effective_message.reply_text(filter_list)
                 filter_list = entry
