@@ -1,3 +1,4 @@
+import re
 from functools import wraps
 from tg_bot.config import Development as Config
 
@@ -44,3 +45,26 @@ def is_reply(func):
             func(bot, update, *args, **kwargs)
 
     return reply
+
+
+def markdown_parser(txt):
+    """
+    regex: matches all double *, _, ` as well as valid []() formations.
+    if these dont match, match lone *, _ \` and [ assign them the groupname `esc` - and escape them.
+
+    :param txt:  text to parse
+    :return: valid markdown string
+    """
+    match_md = r'\*(.*?)\*|' \
+               r'_(.*?)_|' \
+               r'`(.*?)`|' \
+               r'(?<!\\)(\[.*?\])(\(.*?\))|' \
+               r'(?P<esc>[\*`_\[])'
+    offset = 0  # offset to be used as adding a \ character causes the string to shift
+    for e in re.finditer(match_md, txt):
+        # if e.group('astx') or e.group('bctck') or e.group('undes') or e.group('sqbrkt'):
+        if e.group('esc'):
+            start = e.start()
+            txt = txt[:start+offset] + '\\' + txt[start+offset:]
+            offset += 1
+    return txt

@@ -5,6 +5,7 @@ from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
 import tg_bot.modules.sql.notes_sql as sql
+from tg_bot.modules.helper_funcs import markdown_parser
 
 
 def get(bot, update, notename, show_none=True):
@@ -14,7 +15,8 @@ def get(bot, update, notename, show_none=True):
         if note.is_reply:
             bot.forward_message(chat_id=chat_id, from_chat_id=chat_id, message_id=note.value)
         else:
-            update.effective_message.reply_text(note.value)
+            update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
+                                                disable_web_page_preview=True)
         return
     elif show_none:
         update.effective_message.reply_text("This note doesn't exist")
@@ -44,9 +46,18 @@ def save(bot, update):
 
     if len(args) >= 3:
         notename = args[1]
-        note_data = args[2]
+        txt = args[2]
 
-        sql.add_note_to_db(chat_id, notename, note_data, is_reply=False)
+        # Ensure backticks arent removed by telegram
+        counter = len(txt) - len(text)  # set correct offset relative to command + notename
+        for ent in update.effective_message.entities:
+            if ent.type == 'code':  # if code, add backticks
+                start = ent.offset + counter
+                end = ent.length + start
+                txt = txt[:start] + '`' + txt[start: end] + '`' + txt[end:]
+                counter += 2
+
+        sql.add_note_to_db(chat_id, notename, markdown_parser(txt), is_reply=False)
         update.effective_message.reply_text("yas! added " + notename)
 
     elif update.effective_message.reply_to_message and len(args) >= 2:
