@@ -7,6 +7,7 @@ from time import sleep
 
 import requests
 import telegram
+from telegram import ParseMode
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async
@@ -14,7 +15,6 @@ from telegram.ext.dispatcher import run_async
 from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
-from tg_bot.custom_filters import CustomFilters
 from tg_bot.modules import ALL_MODULES
 from tg_bot.config import Development as Config
 
@@ -56,7 +56,7 @@ RUN_STRINGS = (
 @run_async
 def test(bot, update):
     # pprint(eval(str(update)))
-    update.effective_message.reply_text("Hola tester")
+    update.effective_message.reply_text("Hola tester! _I_ *have* `markdown`", parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -79,10 +79,6 @@ def runs(bot, update):
 def start(bot, update):
     # sql.init_permissions(update.effective_chat.id)
     update.effective_message.reply_text("Yo, whadup?")
-
-
-def reply_simshit(bot, update):
-    update.effective_message.reply_text("Did you mean: simshit?")
 
 
 # for test purposes
@@ -175,8 +171,6 @@ def main():
     ip_handler = CommandHandler("ip", get_bot_ip, filters=Filters.chat(Config.OWNER_ID))
     help_handler = CommandHandler("help", get_help)
 
-    simao_handler = MessageHandler(Filters.text & CustomFilters.SimaoFilter, reply_simshit)
-
     dispatcher.add_handler(CommandHandler("rights", test_rights))
 
     # dispatcher.add_handler(test_handler)
@@ -185,8 +179,6 @@ def main():
     dispatcher.add_handler(runs_handler)
     dispatcher.add_handler(ip_handler)
     dispatcher.add_handler(help_handler)
-
-    # dispatcher.add_handler(simao_handler)
 
     # dispatcher.add_error_handler(error_callback)
 
