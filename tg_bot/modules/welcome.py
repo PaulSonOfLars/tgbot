@@ -11,7 +11,7 @@ def new_member(bot, update):
         for member in new_mem:
             # Don't welcome yourself
             if not member.id == bot.id:
-                update.effective_message.reply_text("My man {}, how are you?".format(member.username))
+                update.effective_message.reply_text("My man {}, how are you?".format(member.username or member.first_name))
 
 
 def left_member(bot, update):
