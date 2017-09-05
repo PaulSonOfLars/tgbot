@@ -3,7 +3,8 @@ A modular telegram Python bot running on python3 with an sqlalchemy database.
 
 Originally a simple group management bot with multiple admin features, it has now become extremely modular and simple to use.
 
-Can be found on telegram as [Marie](https://t.me/BanhammerMarie_bot)
+Can be found on telegram as [Marie](https://t.me/BanhammerMarie_bot).
+Alternatively, [find me on telegram](https://t.me/SonOfLars) for any help/questions about this bot!
 
 ## Setting up the bot (Read this before trying to use!):
 Please make sure you have python3 installed, as I cannot guarantee everything will work as expected with python2!

@@ -4,6 +4,8 @@ class Config(object):
     OWNER_ID = "YOUR ID HERE"  # If you dont know, run the bot and do /id in your private chat with it
     LOGGER = True
     SQLALCHEMY_DATABASE_URI = 'sqldbtype://username:pw@hostname:port/db_name'
+    MESSAGE_DUMP = None
+    USE_MESSAGE_DUMP = False
 
 
 class Production(Config):

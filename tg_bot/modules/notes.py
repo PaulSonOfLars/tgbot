@@ -6,6 +6,12 @@ from telegram.utils.helpers import escape_markdown
 from tg_bot import dispatcher
 import tg_bot.modules.sql.notes_sql as sql
 from tg_bot.modules.helper_funcs import markdown_parser
+from tg_bot.config import Development as Config
+
+if Config.USE_MESSAGE_DUMP:
+    DUMP = Config.MESSAGE_DUMP
+else:
+    DUMP = None
 
 
 def get(bot, update, notename, show_none=True):
@@ -13,7 +19,7 @@ def get(bot, update, notename, show_none=True):
     note = sql.get_note(chat_id, notename)
     if note:
         if note.is_reply:
-            bot.forward_message(chat_id=chat_id, from_chat_id=chat_id, message_id=note.value)
+            bot.forward_message(chat_id=chat_id, from_chat_id=DUMP or chat_id, message_id=note.value)
         else:
             update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
                                                 disable_web_page_preview=True)
@@ -62,9 +68,12 @@ def save(bot, update):
 
     elif update.effective_message.reply_to_message and len(args) >= 2:
         notename = args[1]
-        note_data = update.effective_message.reply_to_message
+        msg = update.effective_message.reply_to_message
 
-        sql.add_note_to_db(chat_id, notename, note_data.message_id, is_reply=True)
+        if Config.USE_MESSAGE_DUMP:
+            msg = bot.forward_message(chat_id=DUMP, from_chat_id=chat_id, message_id=msg.message_id)
+
+        sql.add_note_to_db(chat_id, notename, msg.message_id, is_reply=True)
         update.effective_message.reply_text("yas! added replied message " + notename)
 
     else:
