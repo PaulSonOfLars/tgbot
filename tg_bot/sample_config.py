@@ -5,7 +5,6 @@ class Config(object):
     LOGGER = True
     SQLALCHEMY_DATABASE_URI = 'sqldbtype://username:pw@hostname:port/db_name'
     MESSAGE_DUMP = None
-    USE_MESSAGE_DUMP = False
 
 
 class Production(Config):
