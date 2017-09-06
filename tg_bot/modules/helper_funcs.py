@@ -8,11 +8,23 @@ def can_delete(chat, bot_id):
 
 
 def is_user_admin(chat, user_id):
-    return chat.get_member(user_id).status == 'administrator'
+    return chat.get_member(user_id).status == 'administrator' or chat.get_member(user_id).status == 'owner'
 
 
 def is_bot_admin(chat, bot_id):
-    return chat.get_member(bot_id).status == 'administrator'
+    return chat.get_member(bot_id).status == 'administrator' or chat.get_member(bot_id).status == 'owner'
+
+
+def bot_can_delete(func):
+    @wraps(func)
+    def delete_rights(bot, update, *args, **kwargs):
+        if update.effective_chat.get_member(bot.id).can_delete_messages:
+            func(bot, update, *args, **kwargs)
+        else:
+            update.effective_message.reply_text("I can't delete messages here! "
+                                                "Make me admin and/or allow me to delete other user's messages!")
+
+    return delete_rights
 
 
 def bot_admin(func):
