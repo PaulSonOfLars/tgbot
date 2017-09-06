@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, ForeignKey, UnicodeText
+from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -51,7 +52,10 @@ def add_person(name):
     if SESSION.query(Person).get(name) is None:
         person = Person(name)
         SESSION.add(person)
-        SESSION.commit()
+        try:
+            SESSION.commit()
+        except IntegrityError:
+            SESSION.rollback()
         return True
     return False  # Already exists
 
@@ -73,5 +77,8 @@ def set_sum(ower, owee, amount):
     else:
         owed.amount += amount
     SESSION.add(owed)
-    SESSION.commit()
+    try:
+        SESSION.commit()
+    except IntegrityError:
+        SESSION.rollback()
     return owed.ower + " owes " + owed.owee + " " + str(owed.amount)

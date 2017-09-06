@@ -1,5 +1,6 @@
 # New chat added -> setup permissions
 from sqlalchemy import Column, String, Boolean
+from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -29,9 +30,30 @@ class Permissions(BASE):
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
 
-Permissions.__table__.create(checkfirst=True)
 
-KEYSTORE = {}
+class Restrictions(BASE):
+    __tablename__ = "restrictions"
+    chat_id = Column(String(14), primary_key=True)
+    messages = Column(Boolean, default=False)
+    media = Column(Boolean, default=False)
+    other = Column(Boolean, default=False)
+    preview = Column(Boolean, default=False)
+
+    def __init__(self, chat_id):
+        self.chat_id = str(chat_id)  # ensure string
+        self.messages = False
+        self.media = False
+        self.other = False
+        self.previews = False
+
+    def __repr__(self):
+        return "<Restrictions for %s>" % self.chat_id
+
+Permissions.__table__.create(checkfirst=True)
+Restrictions.__table__.create(checkfirst=True)
+
+LOCK_KEYSTORE = {}
+RESTR_KEYSTORE = {}
 
 
 def init_permissions(chat_id, reset=False):
@@ -40,15 +62,26 @@ def init_permissions(chat_id, reset=False):
         SESSION.delete(curr_perm)
         SESSION.flush()
     perm = Permissions(str(chat_id))
-    KEYSTORE[str(chat_id)] = perm
+    LOCK_KEYSTORE[str(chat_id)] = perm
     SESSION.add(perm)
     SESSION.commit()
     return perm
 
 
+def init_restrictions(chat_id, reset=False):
+    curr_restr = SESSION.query(Restrictions).get(str(chat_id))
+    if reset:
+        SESSION.delete(curr_restr)
+        SESSION.flush()
+    restr = Restrictions(str(chat_id))
+    RESTR_KEYSTORE[str(chat_id)] = restr
+    SESSION.add(restr)
+    SESSION.commit()
+    return restr
+
+
 def update_lock(chat_id, lock_type, locked):
-    # curr_perm = session.query(Permissions).get(str(chat_id))
-    curr_perm = KEYSTORE.get(str(chat_id))
+    curr_perm = LOCK_KEYSTORE.get(str(chat_id))
     if not curr_perm:
         print("Perms didnt exist for {}! creating".format(chat_id))
         curr_perm = init_permissions(chat_id)
@@ -68,12 +101,32 @@ def update_lock(chat_id, lock_type, locked):
     elif lock_type == "sticker":
         curr_perm.sticker = locked
 
-    SESSION.add(curr_perm)  # NOTE: do i really need to add...?
-    SESSION.commit()
+    curr = SESSION.object_session(curr_perm)
+    curr.add(curr_perm)
+    curr.commit()
+
+
+def update_restriction(chat_id, restr_type, locked):
+    curr_restr = RESTR_KEYSTORE.get(str(chat_id))
+    if not curr_restr:
+        print("Restr didnt exist for {}! creating".format(chat_id))
+        curr_restr = init_restrictions(chat_id)
+    if restr_type == "messages":
+        curr_restr.messages = locked
+    elif restr_type == "media":
+        curr_restr.media = locked
+    elif restr_type == "other":
+        curr_restr.other = locked
+    elif restr_type == "previews":
+        curr_restr.preview = locked
+
+    curr = SESSION.object_session(curr_restr)
+    curr.add(curr_restr)
+    curr.commit()
 
 
 def is_locked(chat_id, lock_type):
-    curr_perm = KEYSTORE.get(str(chat_id))
+    curr_perm = LOCK_KEYSTORE.get(str(chat_id))
     if not curr_perm:
         return False
 
@@ -93,11 +146,27 @@ def is_locked(chat_id, lock_type):
         return curr_perm.document
 
 
+def is_restr_locked(chat_id, lock_type):
+    curr_perm = RESTR_KEYSTORE.get(str(chat_id))
+
+    if lock_type == "messages":
+        return curr_perm.messages
+    elif lock_type == "media":
+        return curr_perm.media
+    elif lock_type == "other":
+        return curr_perm.other
+    elif lock_type == "previews":
+        return curr_perm.previews
+
+
 def load_ks():
     all_perms = SESSION.query(Permissions).all()
     for chat in all_perms:
-        KEYSTORE[chat.chat_id] = chat
-    print("Locked types keystore loaded, length " + str(len(KEYSTORE)))
+        LOCK_KEYSTORE[chat.chat_id] = chat
+    all_restr = SESSION.query(Restrictions).all()
+    for chat in all_restr:
+        RESTR_KEYSTORE[chat.chat_id] = chat
+    print("Locked types keystore loaded, length " + str(len(LOCK_KEYSTORE)))
 
 # LOAD KEYSTORE ON BOT START
 load_ks()

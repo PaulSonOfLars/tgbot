@@ -3,58 +3,74 @@ from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import is_user_admin, user_admin, bot_admin
+from tg_bot.modules.users import get_user_id
 
 
 @bot_admin
 @user_admin
 @run_async
-def promote(bot, update):
+def promote(bot, update, args):
     chat_id = update.effective_chat.id
-    prev_message = update.effective_message.reply_to_message
-    if prev_message:
-        user_id = prev_message.from_user.id
-        # NOTE: Doesnt work atm. TG issue.
-        # res = bot.promoteChatMember(chat_id, user_id,
-        #                             can_change_info=True,
-        #                             can_post_messages=True,
-        #                             can_edit_messages=True,
-        #                             can_delete_messages=True,
-        #                             can_invite_users=True,
-        #                             can_restrict_members=True,
-        #                             can_pin_messages=True,
-        #                             can_promote_members=True)
+    message = update.effective_message
+    prev_message = message.reply_to_message
 
-        # NOTE: but this works. issue due to NoneType in post/edit messages.
-        res = bot.promoteChatMember(chat_id, user_id,
-                                    can_change_info=True,
-                                    can_delete_messages=True,
-                                    can_invite_users=True,
-                                    can_restrict_members=True,
-                                    can_pin_messages=True,
-                                    can_promote_members=True)
-        if res:
-            update.effective_message.reply_text("successfully promoted!")
+    if len(args) >= 1 and args[0][0] == '@':
+        user = args[0]
+        user_id = get_user_id(user)
+        if not user_id:
+            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+                               "you reply to that person's message instead.")
+            return
+    elif prev_message:
+        user_id = prev_message.from_user.id
+        # set same perms as bot - bot can't assign higher perms than itself!
+
+    else:
+        return
+    bot_member = update.effective_chat.get_member(bot.id)
+    res = bot.promoteChatMember(chat_id, user_id,
+                                can_change_info=bot_member.can_change_info,
+                                can_post_messages=bot_member.can_post_messages,
+                                can_edit_messages=bot_member.can_edit_messages,
+                                can_delete_messages=bot_member.can_delete_messages,
+                                can_invite_users=bot_member.can_invite_users,
+                                can_restrict_members=bot_member.can_restrict_members,
+                                can_pin_messages=bot_member.can_pin_messages,
+                                can_promote_members=bot_member.can_promote_members)
+    if res:
+        update.effective_message.reply_text("Successfully promoted!")
 
 
 @bot_admin
 @user_admin
 @run_async
-def demote(bot, update):
+def demote(bot, update, args):
     chat_id = update.effective_chat.id
-    prev_message = update.effective_message.reply_to_message
-    if prev_message:
+    message = update.effective_message
+    prev_message = message.reply_to_message
+
+    if len(args) >= 1 and args[0][0] == '@':
+        user = args[0]
+        user_id = get_user_id(user)
+        if not user_id:
+            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+                               "you reply to that person's message instead.")
+            return
+    elif prev_message:
         user_id = prev_message.from_user.id
-        res = bot.promoteChatMember(int(chat_id), int(user_id),
-                                    can_change_info=False,
-                                    can_post_messages=False,
-                                    can_edit_messages=False,
-                                    can_delete_messages=False,
-                                    can_invite_users=False,
-                                    can_restrict_members=False,
-                                    can_pin_messages=False,
-                                    can_promote_members=False)
-        if res:
-            update.effective_message.reply_text("successfully demoted!")
+    else:
+        return
+    res = bot.promoteChatMember(int(chat_id), int(user_id),
+                                can_change_info=False,
+                                can_post_messages=False,
+                                can_edit_messages=False,
+                                can_delete_messages=False,
+                                can_invite_users=False,
+                                can_restrict_members=False,
+                                can_pin_messages=False,
+                                can_promote_members=False)
+    if res:
+        update.effective_message.reply_text("Successfully demoted!")
 
 
 @bot_admin
@@ -86,22 +102,31 @@ def unpin(bot, update):
 @bot_admin
 @user_admin
 @run_async
-def kick(bot, update):
+def kick(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
     prev_message = message.reply_to_message
 
-    if prev_message:
-        user_id = prev_message.from_user.id
-        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
-        if is_user_admin(chat, user_id):
-            message.reply_text("I really wish I could kick admins...")
+    if len(args) >= 1 and args[0][0] == '@':
+        user = args[0]
+        user_id = get_user_id(user)
+        if not user_id:
+            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+                               "you reply to that person's message instead.")
             return
-        res = update.effective_chat.kick_member(user_id)
-        if res:
-            message.reply_text("Kicked!")
-        else:
-            message.reply_text("Well damn, I cant kick that user.")
+    elif prev_message:
+        user_id = prev_message.from_user.id
+    else:
+        return
+    bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
+    if is_user_admin(chat, user_id):
+        message.reply_text("I really wish I could kick admins...")
+        return
+    res = update.effective_chat.kick_member(user_id)
+    if res:
+        message.reply_text("Kicked!")
+    else:
+        message.reply_text("Well damn, I cant kick that user.")
 
 
 @bot_admin
@@ -123,10 +148,16 @@ def kickme(bot, update):
 @user_admin
 @run_async
 def unkick(bot, update, args):
-    if len(args) >= 1:
-        user_id = args[0]
+    message = update.effective_message
+
+    if len(args) >= 1 and args[0][0] == '@':
+        user = args[0]
+        user_id = get_user_id(user)
+        if not user_id:
+            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+                               "you reply to that person's message instead.")
+            return
     else:
-        update.effective_message.reply_text("Give me a numeric user ID!")
         return
     update.effective_chat.unban_member(user_id)
 
@@ -157,14 +188,14 @@ __help__ = """
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
 UNPIN_HANDLER = CommandHandler("unpin", unpin)
 
-KICK_HANDLER = CommandHandler("ban", kick)
+KICK_HANDLER = CommandHandler("ban", kick, pass_args=True)
 UNKICK_HANDLER = CommandHandler("unban", unkick, pass_args=True)
 KICKME_HANDLER = CommandHandler("kickme", kickme)
 
 INVITE_HANDLER = CommandHandler("invite", invite)
 
-PROMOTE_HANDLER = CommandHandler("promote", promote)
-DEMOTE_HANDLER = CommandHandler("demote", demote)
+PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True)
+DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True)
 
 dispatcher.add_handler(PIN_HANDLER)
 dispatcher.add_handler(UNPIN_HANDLER)

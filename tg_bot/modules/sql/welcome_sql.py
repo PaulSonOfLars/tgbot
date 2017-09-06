@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Boolean
+from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -40,7 +41,10 @@ def set_preference(chat_id, should_welcome):
         curr.should_welcome = should_welcome
     KEYSTORE[str(chat_id)] = curr
     SESSION.add(curr)
-    SESSION.commit()
+    try:
+        SESSION.commit()
+    except IntegrityError:
+        SESSION.rollback()
 
 
 def load_ks():

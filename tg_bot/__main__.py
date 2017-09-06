@@ -110,10 +110,6 @@ def error_callback(bot, update, error):
         # handle all other telegram related errors
 
 
-def test_rights(bot, update):
-    pprint(update.effective_chat.get_member(bot.id).__dict__)
-
-
 @run_async
 def get_bot_ip(bot, update):
     """ Sends the bot's IP address, so as to be able to ssh in if necessary.
@@ -170,8 +166,6 @@ def main():
     runs_handler = CommandHandler("runs", runs)
     ip_handler = CommandHandler("ip", get_bot_ip, filters=Filters.chat(Config.OWNER_ID))
     help_handler = CommandHandler("help", get_help)
-
-    dispatcher.add_handler(CommandHandler("rights", test_rights))
 
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)

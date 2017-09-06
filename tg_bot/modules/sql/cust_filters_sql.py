@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, UnicodeText
+from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -32,14 +33,20 @@ def add_filter(chat_id, keyword, reply):
         res.reply = reply
 
     SESSION.add(res)
-    SESSION.commit()
+    try:
+        SESSION.commit()
+    except IntegrityError:
+        SESSION.rollback()
 
 
 def remove_filter(chat_id, keyword):
     res = SESSION.query(CustomFilters).get((str(chat_id), keyword))
     if res:
         SESSION.delete(res)
-        SESSION.commit()
+        try:
+            SESSION.commit()
+        except IntegrityError:
+            SESSION.rollback()
 
 
 def get_chat_filters(chat_id):

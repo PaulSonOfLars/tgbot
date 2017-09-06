@@ -35,12 +35,13 @@ class RegexSearcher(BaseFilter):
 def load_filters():
     all_filters = sql.get_all_filters()
 
-    print("Loading {} filters".format(len(all_filters)))
     if not all_filters:
         return
 
     for filt in all_filters:
         add_filter(filt.chat_id, filt.keyword, filt.reply)
+
+    print("Loaded {} filters".format(len(all_filters)))
 
 
 def add_filter(chat_id, keyword, reply):
@@ -129,4 +130,3 @@ dispatcher.add_handler(STOP_HANDLER)
 dispatcher.add_handler(LIST_HANDLER)
 
 load_filters()
-print("All filters loaded")

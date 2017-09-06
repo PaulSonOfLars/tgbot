@@ -1,0 +1,105 @@
+from sqlalchemy import Column, Integer, UnicodeText, String, ForeignKey, UniqueConstraint
+from sqlalchemy.exc import IntegrityError
+
+from tg_bot.modules.sql import BASE, SESSION
+
+
+class Users(BASE):
+    __tablename__ = "users"
+    user_id = Column(Integer, primary_key=True)
+    username = Column(UnicodeText)
+
+    def __init__(self, user_id, username=None):
+        self.user_id = user_id
+        self.username = username
+
+    def __repr__(self):
+        return "<User {} ({})>".format(self.username, self.user_id)
+
+
+class Chats(BASE):
+    __tablename__ = "chats"
+    chat_id = Column(String(14), primary_key=True)
+    chat_name = Column(UnicodeText, nullable=False)
+
+    def __init__(self, chat_id, chat_name):
+        self.chat_id = chat_id
+        self.chat_name = chat_name
+
+    def __repr__(self):
+        return "<Chat {} ({})>".format(self.chat_name, self.chat_id)
+
+
+class ChatMembers(BASE):
+    __tablename__ = "chat_members"
+    priv_chat_id = Column(Integer, primary_key=True)
+    # chat = relationship("Chats", order_by="chats.chat_id", cascade="all, delete-orphan")
+    # user = relationship("Users", order_by="users.user_id", cascade="all, delete-orphan")
+    chat = Column(String(14),
+                  ForeignKey("chats.chat_id",
+                             onupdate="CASCADE",
+                             ondelete="CASCADE"),
+                  nullable=False)
+    user = Column(Integer,
+                  ForeignKey("users.user_id",
+                             onupdate="CASCADE",
+                             ondelete="CASCADE"),
+                  nullable=False)
+    __table_args__ = (UniqueConstraint('chat', 'user', name='_chat_members_uc'),)
+
+    def __init__(self, chat, user):
+        self.chat = chat
+        self.user = user
+
+    def __repr__(self):
+        return "<Chat user {} ({}) in chat {} ({})>".format(self.user.username, self.user.user_id,
+                                                            self.chat.chat_name, self.chat.chat_id)
+
+
+Users.__table__.create(checkfirst=True)
+Chats.__table__.create(checkfirst=True)
+ChatMembers.__table__.create(checkfirst=True)
+
+
+def update_user(user_id, username, chat_id, chat_name):
+    user = SESSION.query(Users).get(user_id)
+    if not user:
+        user = Users(user_id, username)
+        SESSION.add(user)
+        try:
+            SESSION.commit()
+        except IntegrityError:
+            SESSION.rollback()
+    else:
+        user.username = username
+
+    chat = SESSION.query(Chats).get(str(chat_id))
+    if not chat:
+        chat = Chats(str(chat_id), chat_name)
+        SESSION.add(chat)
+        try:
+            SESSION.commit()
+        except IntegrityError:
+            SESSION.rollback()
+
+    else:
+        chat.chat_name = chat_name
+
+    member = SESSION.query(ChatMembers).filter(ChatMembers.chat == chat.chat_id,
+                                               ChatMembers.user == user.user_id).first()
+    if not member:
+        chat_member = ChatMembers(chat.chat_id, user.user_id)
+        SESSION.add(chat_member)
+
+    try:
+        SESSION.commit()
+    except IntegrityError:
+        SESSION.rollback()
+
+
+def get_user_by_name(username):
+    return SESSION.query(Users).filter(Users.username == username).first()
+
+
+def get_chat_members(chat_id):
+    return SESSION.query(ChatMembers).filter(ChatMembers.chat == str(chat_id)).all()

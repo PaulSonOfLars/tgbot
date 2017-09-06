@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, UnicodeText
+from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -46,7 +47,10 @@ def set_user_me_info(user_id, info):
     else:
         userinfo = UserInfo(user_id, info)
     SESSION.add(userinfo)
-    SESSION.commit()
+    try:
+        SESSION.commit()
+    except IntegrityError:
+        SESSION.rollback()
 
 
 def get_user_bio(user_id):
@@ -63,4 +67,7 @@ def set_user_bio(user_id, bio):
     else:
         userbio = UserBio(user_id, bio)
     SESSION.add(userbio)
-    SESSION.commit()
+    try:
+        SESSION.commit()
+    except IntegrityError:
+        SESSION.rollback()
