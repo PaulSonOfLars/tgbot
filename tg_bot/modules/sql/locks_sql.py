@@ -147,16 +147,18 @@ def is_locked(chat_id, lock_type):
 
 
 def is_restr_locked(chat_id, lock_type):
-    curr_perm = RESTR_KEYSTORE.get(str(chat_id))
+    curr_restr = RESTR_KEYSTORE.get(str(chat_id))
+    if not curr_restr:
+        return False
 
     if lock_type == "messages":
-        return curr_perm.messages
+        return curr_restr.messages
     elif lock_type == "media":
-        return curr_perm.media
+        return curr_restr.media
     elif lock_type == "other":
-        return curr_perm.other
+        return curr_restr.other
     elif lock_type == "previews":
-        return curr_perm.previews
+        return curr_restr.previews
 
 
 def load_ks():
