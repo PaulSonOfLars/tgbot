@@ -8,11 +8,11 @@ def can_delete(chat, bot_id):
 
 
 def is_user_admin(chat, user_id):
-    return chat.get_member(user_id).status == 'administrator' or chat.get_member(user_id).status == 'owner'
+    return chat.get_member(user_id).status == 'administrator' or chat.get_member(user_id).status == 'creator'
 
 
 def is_bot_admin(chat, bot_id):
-    return chat.get_member(bot_id).status == 'administrator' or chat.get_member(bot_id).status == 'owner'
+    return chat.get_member(bot_id).status == 'administrator' or chat.get_member(bot_id).status == 'creator'
 
 
 def bot_can_delete(func):
