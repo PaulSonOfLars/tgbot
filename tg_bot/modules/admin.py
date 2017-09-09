@@ -134,12 +134,12 @@ def kick(bot, update, args):
         user_id = prev_message.from_user.id
     else:
         return
-    bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     if is_user_admin(chat, user_id):
         message.reply_text("I really wish I could kick admins...")
         return
     res = update.effective_chat.kick_member(user_id)
     if res:
+        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
         message.reply_text("Kicked!")
     else:
         message.reply_text("Well damn, I cant kick that user.")
