@@ -11,7 +11,7 @@ def new_member(bot, update):
         for member in new_mem:
             # Don't welcome yourself
             if not member.id == bot.id:
-                update.effective_message.reply_text("My man {}, how are you?".format(member.username or member.first_name))
+                update.effective_message.reply_text("My man {}, how are you?".format(member.first_name))
 
 
 def left_member(bot, update):
@@ -40,6 +40,8 @@ def change_preference(bot, update, args):
 __help__ = """
  - /welcome <yes/no>: enable/disable welcome and goodbye messages
 """
+
+# TODO: /setwelcome command
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)

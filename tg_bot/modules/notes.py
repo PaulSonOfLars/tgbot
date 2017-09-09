@@ -107,18 +107,22 @@ __help__ = """
  - #<notename>: same as /get
  - /save <notename> <notedata>: saves notedata as a note with name notename
  - /save <notename>: save the replied message as a note with name notename
- - /notes: list all notes in this chat
+ - /notes or /saved: list all saved notes in this chat
  - /clear <notename>: clear note with this name
 """
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 HASH_GET_HANDLER = RegexHandler(r"^#([^\s])+", hash_get)
+
 SAVE_HANDLER = CommandHandler("save", save)
-LIST_HANDLER = CommandHandler("notes", list_notes)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
+
+LIST_HANDLER = CommandHandler("notes", list_notes)
+LIST_HANDLER2 = CommandHandler("saved", list_notes)
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)
 dispatcher.add_handler(LIST_HANDLER)
+dispatcher.add_handler(LIST_HANDLER2)
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(HASH_GET_HANDLER)
