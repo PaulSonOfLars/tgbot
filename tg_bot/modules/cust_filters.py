@@ -14,7 +14,7 @@ class RegexSearcher(BaseFilter):
     def __init__(self, chat_id, keyword):
         super().__init__()
         self.keyword = keyword
-        self.pattern = "( |^)" + re.escape(self.keyword) + "( |$|[^\w])"
+        self.pattern = "( |^|[^\w])" + re.escape(self.keyword) + "( |$|[^\w])"
         self.chat_id = chat_id
 
     def filter(self, message):
@@ -83,7 +83,7 @@ def filters(bot, update):
         reply = args[2]
 
         # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
-        for handler in dispatcher.handlers.get(HANDLER_GROUP):
+        for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
             if handler.filters == (args[1], chat.id):
                 dispatcher.remove_handler(handler, HANDLER_GROUP)
 
@@ -105,7 +105,7 @@ def stop_filter(bot, update, args):
         update.effective_message.reply_text("No filters are active here!")
         return
 
-    for handler in dispatcher.handlers.get(HANDLER_GROUP):
+    for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
         if handler.filters == (args[0], chat.id):
             sql.remove_filter(chat.id, args[0])
             dispatcher.remove_handler(handler, HANDLER_GROUP)
