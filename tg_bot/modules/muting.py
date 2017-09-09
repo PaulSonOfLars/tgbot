@@ -16,7 +16,7 @@ def mute(bot, update, args):
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
     elif message.reply_to_message:
@@ -42,7 +42,7 @@ def unmute(bot, update, args):
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
         success = bot.restrict_chat_member(chat.id, int(user_id), can_send_messages=True)

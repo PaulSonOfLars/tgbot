@@ -19,7 +19,7 @@ def promote(bot, update, args):
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
     elif prev_message:
@@ -54,7 +54,7 @@ def demote(bot, update, args):
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
     elif prev_message:
@@ -127,7 +127,7 @@ def kick(bot, update, args):
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
     elif prev_message:
@@ -142,7 +142,7 @@ def kick(bot, update, args):
         bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
         message.reply_text("Kicked!")
     else:
-        message.reply_text("Well damn, I cant kick that user.")
+        message.reply_text("Well damn, I can't kick that user.")
 
 
 @bot_admin
@@ -170,7 +170,7 @@ def unkick(bot, update, args):
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interract with them if "
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
     else:
