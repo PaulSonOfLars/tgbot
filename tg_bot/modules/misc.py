@@ -76,11 +76,11 @@ def get_time(bot, update, args):
             address_parts = loc['results'][0]['address_components']
             for part in address_parts:
                 if 'country' in part['types']:
-                    country = part.get('short_name')
+                    country = part.get('long_name')
                 if 'administrative_area_level_1' in part['types'] and not city:
                     city = part.get('long_name')
                 if 'locality' in part['types']:
-                    city = part.get('short_name')
+                    city = part.get('long_name')
 
             if city and country:
                 location = "{}, {}".format(city, country)
@@ -98,7 +98,7 @@ def get_time(bot, update, args):
 
 # /ip is for private use, and /runs is better left undocumented...
 __help__ = """
-- /id: get the current group id. If used by replying to a message, gets that user's id.
+ - /id: get the current group id. If used by replying to a message, gets that user's id.
  - /runs: reply a random string from an array of replies.
  - /time <place>: gives the local time at the given place
 """

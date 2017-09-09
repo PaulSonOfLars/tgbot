@@ -40,11 +40,13 @@ def set_preference(chat_id, should_welcome):
     else:
         curr.should_welcome = should_welcome
     KEYSTORE[str(chat_id)] = curr
-    SESSION.add(curr)
+
+    curr_sess = SESSION.object_session(curr)
+    curr_sess.add(curr)
     try:
-        SESSION.commit()
+        curr_sess.commit()
     except IntegrityError:
-        SESSION.rollback()
+        curr_sess.rollback()
 
 
 def load_ks():

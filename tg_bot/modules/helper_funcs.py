@@ -22,9 +22,33 @@ def bot_can_delete(func):
             func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I can't delete messages here! "
-                                                "Make me admin and/or allow me to delete other user's messages!")
+                                                "Make sure I'm admin and can delete other user's messages.")
 
     return delete_rights
+
+
+def can_pin(func):
+    @wraps(func)
+    def pin_rights(bot, update, *args, **kwargs):
+        if update.effective_chat.get_member(bot.id).can_pin_messages:
+            func(bot, update, *args, **kwargs)
+        else:
+            update.effective_message.reply_text("I can't pin messages here! "
+                                                "Make sure I'm admin and can pin messages.")
+
+    return pin_rights
+
+
+def can_promote(func):
+    @wraps(func)
+    def promote_rights(bot, update, *args, **kwargs):
+        if update.effective_chat.get_member(bot.id).can_promote_members:
+            func(bot, update, *args, **kwargs)
+        else:
+            update.effective_message.reply_text("I can't promote/demote people here! "
+                                                "Make sure I'm admin and can appoint new admins.")
+
+    return promote_rights
 
 
 def bot_admin(func):

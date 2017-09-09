@@ -1,12 +1,13 @@
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import is_user_admin, user_admin, bot_admin
+from tg_bot.modules.helper_funcs import is_user_admin, user_admin, bot_admin, can_pin, can_promote
 from tg_bot.modules.users import get_user_id
 
 
-@bot_admin
+@can_promote
 @user_admin
 @run_async
 def promote(bot, update, args):
@@ -41,11 +42,11 @@ def promote(bot, update, args):
         update.effective_message.reply_text("Successfully promoted!")
 
 
-@bot_admin
+@can_promote
 @user_admin
 @run_async
 def demote(bot, update, args):
-    chat_id = update.effective_chat.id
+    chat = update.effective_chat
     message = update.effective_message
     prev_message = message.reply_to_message
 
@@ -60,20 +61,35 @@ def demote(bot, update, args):
         user_id = prev_message.from_user.id
     else:
         return
-    res = bot.promoteChatMember(int(chat_id), int(user_id),
-                                can_change_info=False,
-                                can_post_messages=False,
-                                can_edit_messages=False,
-                                can_delete_messages=False,
-                                can_invite_users=False,
-                                can_restrict_members=False,
-                                can_pin_messages=False,
-                                can_promote_members=False)
-    if res:
-        update.effective_message.reply_text("Successfully demoted!")
+
+    if chat.get_member(user_id).status == 'creator':
+        message.reply_text("This person CREATED the chat, how would I demote him?")
+        return
+
+    if not chat.get_member(user_id).status == 'administrator':
+        message.reply_text("Can't demote what wasn't promoted!")
+        return
+
+    try:
+        res = bot.promoteChatMember(int(chat.id), int(user_id),
+                                    can_change_info=False,
+                                    can_post_messages=False,
+                                    can_edit_messages=False,
+                                    can_delete_messages=False,
+                                    can_invite_users=False,
+                                    can_restrict_members=False,
+                                    can_pin_messages=False,
+                                    can_promote_members=False)
+        if res:
+            message.reply_text("Successfully demoted!")
+        else:
+            message.reply_text("Could not demote.")
+    except BadRequest:
+        message.reply_text("Could not demote. Maybe the admin status was appointed by another "
+                           "user, so I can't act upon him!")
 
 
-@bot_admin
+@can_pin
 @user_admin
 @run_async
 def pin(bot, update, args):
@@ -91,7 +107,7 @@ def pin(bot, update, args):
         bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
 
 
-@bot_admin
+@can_pin
 @user_admin
 @run_async
 def unpin(bot, update):
