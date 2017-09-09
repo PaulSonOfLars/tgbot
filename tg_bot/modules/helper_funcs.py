@@ -8,11 +8,11 @@ def can_delete(chat, bot_id):
 
 
 def is_user_admin(chat, user_id):
-    return chat.get_member(user_id).status == 'administrator' or chat.get_member(user_id).status == 'owner'
+    return chat.get_member(user_id).status == 'administrator' or chat.get_member(user_id).status == 'creator'
 
 
 def is_bot_admin(chat, bot_id):
-    return chat.get_member(bot_id).status == 'administrator' or chat.get_member(bot_id).status == 'owner'
+    return chat.get_member(bot_id).status == 'administrator' or chat.get_member(bot_id).status == 'creator'
 
 
 def bot_can_delete(func):
@@ -42,7 +42,7 @@ def user_admin(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):
         user_id = update.effective_message.from_user.id
-        if update.effective_chat.get_member(user_id).status == 'administrator' or user_id == Config.OWNER_ID:
+        if is_user_admin(update.effective_chat, user_id) or user_id == Config.OWNER_ID:
             func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("Who dis non-admin telling me what to do?")
