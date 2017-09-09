@@ -83,9 +83,9 @@ def pin(bot, update, args):
 
     prev_message = update.effective_message.reply_to_message
 
-    is_silent = False
+    is_silent = True
     if len(args) >= 1:
-        is_silent = args[0].lower() == 'silent'
+        is_silent = not (args[0].lower() == 'notify' or args[0].lower() == 'loud')
 
     if prev_message and is_group:
         bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
@@ -175,12 +175,12 @@ def invite(bot, update):
 
 
 __help__ = """
- - /pin: pins the message replied to
+ - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifs to users.
  - /unpin: unpins the currently pinned message
  - /ban: bans a user
  - /unban <user_id>: unbans a user given his user id
  - /kickme: kicks the user
- - /invite: gets invitelink
+ - /invitelink: gets invitelink
  - /promote: promotes the user replied to
  - /demote: demotes the user replied to
 """
@@ -192,7 +192,7 @@ KICK_HANDLER = CommandHandler("ban", kick, pass_args=True)
 UNKICK_HANDLER = CommandHandler("unban", unkick, pass_args=True)
 KICKME_HANDLER = CommandHandler("kickme", kickme)
 
-INVITE_HANDLER = CommandHandler("invite", invite)
+INVITE_HANDLER = CommandHandler("invitelink", invite)
 
 PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True)
 DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True)
