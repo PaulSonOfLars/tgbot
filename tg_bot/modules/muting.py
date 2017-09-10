@@ -61,16 +61,23 @@ def unmute(bot, update, args):
             message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
-        success = bot.restrict_chat_member(chat.id, int(user_id),
-                                           can_send_messages=True,
-                                           can_send_media_messages=True,
-                                           can_send_other_messages=True,
-                                           can_add_web_page_previews=True)
-        if success:
-            message.reply_text("Unmuted " + user)
+    elif message.reply_to_message:
+        user_id = message.reply_to_message.from_user.id
 
-        else:
-            message.reply_text("Uh... I couldn't unmute this one")
+    else:
+        message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
+        return
+
+    success = bot.restrict_chat_member(chat.id, int(user_id),
+                                       can_send_messages=True,
+                                       can_send_media_messages=True,
+                                       can_send_other_messages=True,
+                                       can_add_web_page_previews=True)
+    if success:
+        message.reply_text("Unmuted!")
+
+    else:
+        message.reply_text("Uh... I couldn't unmute this one")
 
 
 __help__ = """
