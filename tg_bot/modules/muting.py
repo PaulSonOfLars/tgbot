@@ -23,6 +23,14 @@ def mute(bot, update, args):
     elif message.reply_to_message:
         user_id = message.reply_to_message.from_user.id
 
+    elif message.entities and message.parse_entities('text_mention'):
+        entities = message.parse_entities('text_mention')
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
+
     else:
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
         return
@@ -63,6 +71,14 @@ def unmute(bot, update, args):
             return
     elif message.reply_to_message:
         user_id = message.reply_to_message.from_user.id
+
+    elif message.entities and message.parse_entities('text_mention'):
+        entities = message.parse_entities('text_mention')
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
 
     else:
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")

@@ -26,10 +26,18 @@ def promote(bot, update, args):
             return
     elif prev_message:
         user_id = prev_message.from_user.id
-        # set same perms as bot - bot can't assign higher perms than itself!
+
+    elif message.entities and message.parse_entities('text_mention'):
+        entities = message.parse_entities('text_mention')
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
 
     else:
         return
+    # set same perms as bot - bot can't assign higher perms than itself!
     bot_member = update.effective_chat.get_member(bot.id)
     res = bot.promoteChatMember(chat_id, user_id,
                                 can_change_info=bot_member.can_change_info,
@@ -61,6 +69,14 @@ def demote(bot, update, args):
             return
     elif prev_message:
         user_id = prev_message.from_user.id
+
+    elif message.entities and message.parse_entities('text_mention'):
+        entities = message.parse_entities('text_mention')
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
     else:
         return
 
@@ -134,8 +150,17 @@ def kick(bot, update, args):
             return
     elif prev_message:
         user_id = prev_message.from_user.id
+
+    elif message.entities and message.parse_entities('text_mention'):
+        entities = message.parse_entities('text_mention')
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
     else:
         return
+
     if is_user_admin(chat, user_id):
         message.reply_text("I really wish I could kick admins...")
         return
@@ -174,6 +199,14 @@ def unkick(bot, update, args):
         if not user_id:
             message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
+            return
+
+    elif message.entities and message.parse_entities('text_mention'):
+        entities = message.parse_entities('text_mention')
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
             return
     else:
         return
