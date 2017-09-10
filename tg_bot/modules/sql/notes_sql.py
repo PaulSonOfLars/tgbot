@@ -1,6 +1,7 @@
 # Note: chat_id's are stored as strings because the int is too large to be stored in a PSQL database.
+import threading
+
 from sqlalchemy import Column, String, Boolean, UnicodeText
-from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -23,17 +24,21 @@ class Notes(BASE):
 
 Notes.__table__.create(checkfirst=True)
 
+INSERTION_LOCK = threading.Lock()
+
 
 def add_note_to_db(chat_id, notename, note_data, is_reply=False):
+    INSERTION_LOCK.acquire()
     prev = SESSION.query(Notes).get((str(chat_id), notename))
     if prev:
         SESSION.delete(prev)
     note = Notes(str(chat_id), notename, note_data, is_reply=is_reply)
+
     SESSION.add(note)
-    try:
-        SESSION.commit()
-    except IntegrityError:
-        SESSION.rollback()
+    SESSION.commit()
+    SESSION.rollback()
+
+    INSERTION_LOCK.release()
 
 
 def get_note(chat_id, notename):
@@ -41,13 +46,14 @@ def get_note(chat_id, notename):
 
 
 def rm_note(chat_id, notename):
+    INSERTION_LOCK.acquire()
+
     note = SESSION.query(Notes).get((str(chat_id), notename))
     if note:
         SESSION.delete(note)
-        try:
-            SESSION.commit()
-        except IntegrityError:
-            SESSION.rollback()
+        SESSION.commit()
+
+    INSERTION_LOCK.release()
 
 
 def get_all_chat_notes(chat_id):

@@ -1,6 +1,7 @@
 # New chat added -> setup permissions
+import threading
+
 from sqlalchemy import Column, String, Boolean
-from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -55,6 +56,8 @@ Restrictions.__table__.create(checkfirst=True)
 LOCK_KEYSTORE = {}
 RESTR_KEYSTORE = {}
 
+INSERTION_LOCK = threading.Lock()
+
 
 def init_permissions(chat_id, reset=False):
     curr_perm = SESSION.query(Permissions).get(str(chat_id))
@@ -81,6 +84,7 @@ def init_restrictions(chat_id, reset=False):
 
 
 def update_lock(chat_id, lock_type, locked):
+    INSERTION_LOCK.acquire()
     curr_perm = LOCK_KEYSTORE.get(str(chat_id))
     if not curr_perm:
         print("Perms didnt exist for {}! creating".format(chat_id))
@@ -101,16 +105,19 @@ def update_lock(chat_id, lock_type, locked):
     elif lock_type == "sticker":
         curr_perm.sticker = locked
 
-    curr = SESSION.object_session(curr_perm)
-    curr.add(curr_perm)
-    curr.commit()
+    SESSION.add(curr_perm)
+    SESSION.commit()
+    INSERTION_LOCK.release()
 
 
 def update_restriction(chat_id, restr_type, locked):
+    INSERTION_LOCK.acquire()
+
     curr_restr = RESTR_KEYSTORE.get(str(chat_id))
     if not curr_restr:
         print("Restr didnt exist for {}! creating".format(chat_id))
         curr_restr = init_restrictions(chat_id)
+
     if restr_type == "messages":
         curr_restr.messages = locked
     elif restr_type == "media":
@@ -120,9 +127,9 @@ def update_restriction(chat_id, restr_type, locked):
     elif restr_type == "previews":
         curr_restr.preview = locked
 
-    curr = SESSION.object_session(curr_restr)
-    curr.add(curr_restr)
-    curr.commit()
+    SESSION.add(curr_restr)
+    SESSION.commit()
+    INSERTION_LOCK.release()
 
 
 def is_locked(chat_id, lock_type):
@@ -169,6 +176,7 @@ def load_ks():
     for chat in all_restr:
         RESTR_KEYSTORE[chat.chat_id] = chat
     print("Locked types keystore loaded, length " + str(len(LOCK_KEYSTORE)))
+    SESSION.close()
 
 # LOAD KEYSTORE ON BOT START
 load_ks()

@@ -25,20 +25,20 @@ def left_member(bot, update):
 def change_preference(bot, update, args):
     chat = update.effective_chat
     if len(args) >= 1:
-        if args[0].lower() == "yes":
+        if args[0].lower() == "on":
             sql.set_preference(str(chat.id), True)
             update.effective_message.reply_text("I'll be polite!")
 
-        elif args[0].lower() == "no":
+        elif args[0].lower() == "off":
             sql.set_preference(str(chat.id), False)
             update.effective_message.reply_text("I'm sulking, not saying hello anymore.")
 
         else:
             # idek what youre writing, say yes or no
-            update.effective_message.reply_text("I understand 'yes' or 'no' only!")
+            update.effective_message.reply_text("I understand 'on' or 'off' only!")
 
 __help__ = """
- - /welcome <yes/no>: enable/disable welcome and goodbye messages
+ - /welcome <on/off>: enable/disable welcome and goodbye messages
 """
 
 # TODO: /setwelcome command

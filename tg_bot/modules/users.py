@@ -1,8 +1,8 @@
 from telegram.ext import MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
-from tg_bot import dispatcher
 import tg_bot.modules.sql.users_sql as sql
+from tg_bot import dispatcher
 
 USERS_GROUP = 2
 

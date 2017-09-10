@@ -1,5 +1,6 @@
 import re
 from functools import wraps
+
 from tg_bot.config import Development as Config
 
 
@@ -54,7 +55,7 @@ def can_promote(func):
 def bot_admin(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):
-        if update.effective_chat.get_member(bot.id).status == 'administrator':
+        if is_bot_admin(update.effective_chat, bot.id):
             func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I ain't admin!")

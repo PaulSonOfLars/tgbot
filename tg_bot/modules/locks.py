@@ -1,8 +1,8 @@
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
-from tg_bot import dispatcher
 import tg_bot.modules.sql.locks_sql as sql
+from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import can_delete, is_user_admin, bot_can_delete, user_admin
 from tg_bot.modules.sql import users_sql
 
@@ -26,6 +26,7 @@ def lock(bot, update, args):
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=True)
+                message.reply_text("Locked {} for everyone!".format(args[0]))
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
@@ -65,6 +66,8 @@ def unlock(bot, update, args):
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=False)
+                message.reply_text("Unlocked {} for everyone!".format(args[0]))
+
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=False)
                 members = users_sql.get_chat_members(chat.id)

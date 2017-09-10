@@ -3,8 +3,8 @@ from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher
 import tg_bot.modules.sql.userinfo_sql as sql
+from tg_bot import dispatcher
 
 
 @run_async

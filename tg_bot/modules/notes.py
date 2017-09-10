@@ -3,10 +3,10 @@ from telegram.ext import CommandHandler, RegexHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher
 import tg_bot.modules.sql.notes_sql as sql
-from tg_bot.modules.helper_funcs import markdown_parser
+from tg_bot import dispatcher
 from tg_bot.config import Development as Config
+from tg_bot.modules.helper_funcs import markdown_parser
 
 
 def get(bot, update, notename, show_none=True):

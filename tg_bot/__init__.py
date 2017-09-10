@@ -1,6 +1,6 @@
 import logging
-
 import os
+
 from telegram.ext import Updater
 
 HEROKU = bool(os.environ.get('HEROKU', False))

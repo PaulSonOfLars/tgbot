@@ -118,12 +118,12 @@ def stop_filter(bot, update, args):
 __help__ = """
  - /filter <keyword> <reply message>: add a filter to this chat. bot will now reply the message whenever 'keyword' is mentioned.
  - /stop <filter keyword>: stop that filter.
- - /list: list all active filters in this chat
+ - /filters: list all active filters in this chat
 """
 
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter, pass_args=True)
-LIST_HANDLER = CommandHandler("list", list_handlers)
+LIST_HANDLER = CommandHandler("filters", list_handlers)
 
 dispatcher.add_handler(FILTER_HANDLER)
 dispatcher.add_handler(STOP_HANDLER)

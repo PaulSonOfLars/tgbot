@@ -1,5 +1,6 @@
+import threading
+
 from sqlalchemy import Column, String, UnicodeText
-from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -20,33 +21,29 @@ class CustomFilters(BASE):
 
 CustomFilters.__table__.create(checkfirst=True)
 
+INSERTION_LOCK = threading.Lock()
+
 
 def get_all_filters():
     return SESSION.query(CustomFilters).all()
 
 
 def add_filter(chat_id, keyword, reply):
-    res = SESSION.query(CustomFilters).get((str(chat_id), keyword))
-    if not res:
-        res = CustomFilters(chat_id, keyword, reply)
-    else:
-        res.reply = reply
+    INSERTION_LOCK.acquire()
 
+    res = CustomFilters(chat_id, keyword, reply)
     SESSION.add(res)
-    try:
-        SESSION.commit()
-    except IntegrityError:
-        SESSION.rollback()
+    SESSION.commit()
+    INSERTION_LOCK.release()
 
 
 def remove_filter(chat_id, keyword):
+    INSERTION_LOCK.acquire()
     res = SESSION.query(CustomFilters).get((str(chat_id), keyword))
     if res:
         SESSION.delete(res)
-        try:
-            SESSION.commit()
-        except IntegrityError:
-            SESSION.rollback()
+        SESSION.commit()
+    INSERTION_LOCK.release()
 
 
 def get_chat_filters(chat_id):

@@ -1,5 +1,6 @@
+import threading
+
 from sqlalchemy import Column, Integer, UnicodeText
-from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -32,6 +33,8 @@ class UserBio(BASE):
 UserInfo.__table__.create(checkfirst=True)
 UserBio.__table__.create(checkfirst=True)
 
+INSERTION_LOCK = threading.Lock()
+
 
 def get_user_me_info(user_id):
     userinfo = SESSION.query(UserInfo).get(user_id)
@@ -41,16 +44,15 @@ def get_user_me_info(user_id):
 
 
 def set_user_me_info(user_id, info):
+    INSERTION_LOCK.acquire()
     userinfo = SESSION.query(UserInfo).get(user_id)
     if userinfo:
         userinfo.info = info
     else:
         userinfo = UserInfo(user_id, info)
     SESSION.add(userinfo)
-    try:
-        SESSION.commit()
-    except IntegrityError:
-        SESSION.rollback()
+    SESSION.commit()
+    INSERTION_LOCK.release()
 
 
 def get_user_bio(user_id):
@@ -61,13 +63,13 @@ def get_user_bio(user_id):
 
 
 def set_user_bio(user_id, bio):
+    INSERTION_LOCK.acquire()
     userbio = SESSION.query(UserBio).get(user_id)
     if userbio:
         userbio.bio = bio
     else:
         userbio = UserBio(user_id, bio)
+
     SESSION.add(userbio)
-    try:
-        SESSION.commit()
-    except IntegrityError:
-        SESSION.rollback()
+    SESSION.commit()
+    INSERTION_LOCK.release()

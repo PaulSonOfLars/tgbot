@@ -1,6 +1,8 @@
-from sqlalchemy import Column, Integer, UnicodeText, String, ForeignKey, UniqueConstraint
-from sqlalchemy.exc import IntegrityError
+import threading
 
+from sqlalchemy import Column, Integer, UnicodeText, String, ForeignKey, UniqueConstraint
+
+from tg_bot import dispatcher
 from tg_bot.modules.sql import BASE, SESSION
 
 
@@ -60,16 +62,24 @@ Users.__table__.create(checkfirst=True)
 Chats.__table__.create(checkfirst=True)
 ChatMembers.__table__.create(checkfirst=True)
 
+INSERTION_LOCK = threading.Lock()
+
+
+def ensure_bot_in_db():
+    INSERTION_LOCK.acquire()
+    bot = Users(dispatcher.bot.id, dispatcher.bot.username)
+    SESSION.merge(bot)
+    SESSION.commit()
+    INSERTION_LOCK.release()
+
 
 def update_user(user_id, username, chat_id, chat_name):
+    INSERTION_LOCK.acquire()
     user = SESSION.query(Users).get(user_id)
     if not user:
         user = Users(user_id, username)
         SESSION.add(user)
-        try:
-            SESSION.commit()
-        except IntegrityError:
-            SESSION.rollback()
+        SESSION.flush()
     else:
         user.username = username
 
@@ -77,24 +87,19 @@ def update_user(user_id, username, chat_id, chat_name):
     if not chat:
         chat = Chats(str(chat_id), chat_name)
         SESSION.add(chat)
-        try:
-            SESSION.commit()
-        except IntegrityError:
-            SESSION.rollback()
+        SESSION.flush()
 
     else:
         chat.chat_name = chat_name
 
     member = SESSION.query(ChatMembers).filter(ChatMembers.chat == chat.chat_id,
-                                               ChatMembers.user == user.user_id).first()
+                                                                 ChatMembers.user == user.user_id).first()
     if not member:
         chat_member = ChatMembers(chat.chat_id, user.user_id)
         SESSION.add(chat_member)
 
-    try:
-        SESSION.commit()
-    except IntegrityError:
-        SESSION.rollback()
+    SESSION.commit()
+    INSERTION_LOCK.release()
 
 
 def get_user_by_name(username):
@@ -103,3 +108,5 @@ def get_user_by_name(username):
 
 def get_chat_members(chat_id):
     return SESSION.query(ChatMembers).filter(ChatMembers.chat == str(chat_id)).all()
+
+ensure_bot_in_db()

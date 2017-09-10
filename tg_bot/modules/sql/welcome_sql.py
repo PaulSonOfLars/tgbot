@@ -1,5 +1,6 @@
+import threading
+
 from sqlalchemy import Column, String, Boolean
-from sqlalchemy.exc import IntegrityError
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -18,10 +19,9 @@ class Welcome(BASE):
 
 Welcome.__table__.create(checkfirst=True)
 
-# Note: could do this too
-# BASE.metadata.tables["welcome_pref"].create()
-
 KEYSTORE = {}
+
+INSERTION_LOCK = threading.Lock()
 
 
 def get_preference(chat_id):
@@ -33,6 +33,7 @@ def get_preference(chat_id):
 
 
 def set_preference(chat_id, should_welcome):
+    INSERTION_LOCK.acquire()
     curr = KEYSTORE.get(str(chat_id))
     if not curr:
         print("Perms didnt exist for {}! creating".format(chat_id))
@@ -41,12 +42,9 @@ def set_preference(chat_id, should_welcome):
         curr.should_welcome = should_welcome
     KEYSTORE[str(chat_id)] = curr
 
-    curr_sess = SESSION.object_session(curr)
-    curr_sess.add(curr)
-    try:
-        curr_sess.commit()
-    except IntegrityError:
-        curr_sess.rollback()
+    SESSION.add(curr)
+    SESSION.commit()
+    INSERTION_LOCK.release()
 
 
 def load_ks():

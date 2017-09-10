@@ -1,5 +1,6 @@
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
+
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import bot_admin, user_admin
 from tg_bot.modules.users import get_user_id
@@ -26,9 +27,24 @@ def mute(bot, update, args):
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
         return
 
-    success = bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
-    if success:
-        message.reply_text("Muted!")
+    if user_id == bot.id:
+        message.reply_text("I'm not muting myself!")
+        return
+
+    member = chat.get_member(int(user_id))
+    print(member)
+
+    if member:
+        if member.status == 'administrator' or member.status == 'creator':
+            message.reply_text("Afraid I can't stop an admin from talking!")
+            return
+
+        success = bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+
+        if success:
+            message.reply_text("Muted!")
+        else:
+            message.reply_text("Did not go as expected - couldn't mute this user!")
 
 
 @bot_admin
@@ -45,12 +61,16 @@ def unmute(bot, update, args):
             message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
-        success = bot.restrict_chat_member(chat.id, int(user_id), can_send_messages=True)
+        success = bot.restrict_chat_member(chat.id, int(user_id),
+                                           can_send_messages=True,
+                                           can_send_media_messages=True,
+                                           can_send_other_messages=True,
+                                           can_add_web_page_previews=True)
         if success:
             message.reply_text("Unmuted " + user)
 
         else:
-            message.reply_text("Uh... I couldnt unmute this guy")
+            message.reply_text("Uh... I couldn't unmute this one")
 
 
 __help__ = """

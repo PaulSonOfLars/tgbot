@@ -1,6 +1,8 @@
+from telegram import ParseMode
 from telegram.error import BadRequest
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import is_user_admin, user_admin, bot_admin, can_pin, can_promote
@@ -190,6 +192,20 @@ def invite(bot, update):
         update.effective_message.reply_text(invitelink)
 
 
+@run_async
+def adminlist(bot, update):
+    administrators = update.effective_chat.get_administrators()
+    text = "Admins in *{}*:".format(update.effective_chat.title or "this chat")
+    for admin in administrators:
+        user = admin.user
+        name = user.first_name + (user.last_name or "")
+        if user.username:
+            name = "@" + user.username
+        text += "\n - {}".format(escape_markdown(name))
+
+    update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+
+
 __help__ = """
  - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifs to users.
  - /unpin: unpins the currently pinned message
@@ -199,6 +215,7 @@ __help__ = """
  - /invitelink: gets invitelink
  - /promote: promotes the user replied to
  - /demote: demotes the user replied to
+ - /adminlist: list of admins in the chat
 """
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
@@ -213,6 +230,8 @@ INVITE_HANDLER = CommandHandler("invitelink", invite)
 PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True)
 DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True)
 
+ADMINLIST_HANDLER = CommandHandler("adminlist", adminlist, filters=Filters.group)
+
 dispatcher.add_handler(PIN_HANDLER)
 dispatcher.add_handler(UNPIN_HANDLER)
 dispatcher.add_handler(KICK_HANDLER)
@@ -221,3 +240,4 @@ dispatcher.add_handler(UNKICK_HANDLER)
 dispatcher.add_handler(INVITE_HANDLER)
 dispatcher.add_handler(PROMOTE_HANDLER)
 dispatcher.add_handler(DEMOTE_HANDLER)
+dispatcher.add_handler(ADMINLIST_HANDLER)
