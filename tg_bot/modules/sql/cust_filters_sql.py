@@ -32,7 +32,7 @@ def add_filter(chat_id, keyword, reply):
     INSERTION_LOCK.acquire()
 
     res = CustomFilters(chat_id, keyword, reply)
-    SESSION.add(res)
+    SESSION.merge(res)  # merge to avoid duplicate key issues 
     SESSION.commit()
     INSERTION_LOCK.release()
 
