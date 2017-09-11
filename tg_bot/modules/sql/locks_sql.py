@@ -50,6 +50,7 @@ class Restrictions(BASE):
     def __repr__(self):
         return "<Restrictions for %s>" % self.chat_id
 
+
 Permissions.__table__.create(checkfirst=True)
 Restrictions.__table__.create(checkfirst=True)
 
@@ -84,52 +85,49 @@ def init_restrictions(chat_id, reset=False):
 
 
 def update_lock(chat_id, lock_type, locked):
-    INSERTION_LOCK.acquire()
-    curr_perm = LOCK_KEYSTORE.get(str(chat_id))
-    if not curr_perm:
-        print("Perms didnt exist for {}! creating".format(chat_id))
-        curr_perm = init_permissions(chat_id)
+    with INSERTION_LOCK:
+        curr_perm = LOCK_KEYSTORE.get(str(chat_id))
+        if not curr_perm:
+            print("Perms didnt exist for {}! creating".format(chat_id))
+            curr_perm = init_permissions(chat_id)
 
-    if lock_type == "audio":
-        curr_perm.audio = locked
-    elif lock_type == "voice":
-        curr_perm.voice = locked
-    elif lock_type == "contact":
-        curr_perm.contact = locked
-    elif lock_type == "video":
-        curr_perm.video = locked
-    elif lock_type == "document":
-        curr_perm.document = locked
-    elif lock_type == "photo":
-        curr_perm.photo = locked
-    elif lock_type == "sticker":
-        curr_perm.sticker = locked
+        if lock_type == "audio":
+            curr_perm.audio = locked
+        elif lock_type == "voice":
+            curr_perm.voice = locked
+        elif lock_type == "contact":
+            curr_perm.contact = locked
+        elif lock_type == "video":
+            curr_perm.video = locked
+        elif lock_type == "document":
+            curr_perm.document = locked
+        elif lock_type == "photo":
+            curr_perm.photo = locked
+        elif lock_type == "sticker":
+            curr_perm.sticker = locked
 
-    SESSION.add(curr_perm)
-    SESSION.commit()
-    INSERTION_LOCK.release()
+        SESSION.add(curr_perm)
+        SESSION.commit()
 
 
 def update_restriction(chat_id, restr_type, locked):
-    INSERTION_LOCK.acquire()
+    with INSERTION_LOCK:
+        curr_restr = RESTR_KEYSTORE.get(str(chat_id))
+        if not curr_restr:
+            print("Restr didnt exist for {}! creating".format(chat_id))
+            curr_restr = init_restrictions(chat_id)
 
-    curr_restr = RESTR_KEYSTORE.get(str(chat_id))
-    if not curr_restr:
-        print("Restr didnt exist for {}! creating".format(chat_id))
-        curr_restr = init_restrictions(chat_id)
+        if restr_type == "messages":
+            curr_restr.messages = locked
+        elif restr_type == "media":
+            curr_restr.media = locked
+        elif restr_type == "other":
+            curr_restr.other = locked
+        elif restr_type == "previews":
+            curr_restr.preview = locked
 
-    if restr_type == "messages":
-        curr_restr.messages = locked
-    elif restr_type == "media":
-        curr_restr.media = locked
-    elif restr_type == "other":
-        curr_restr.other = locked
-    elif restr_type == "previews":
-        curr_restr.preview = locked
-
-    SESSION.add(curr_restr)
-    SESSION.commit()
-    INSERTION_LOCK.release()
+        SESSION.add(curr_restr)
+        SESSION.commit()
 
 
 def is_locked(chat_id, lock_type):
@@ -177,6 +175,7 @@ def load_ks():
         RESTR_KEYSTORE[chat.chat_id] = chat
     print("Locked types keystore loaded, length " + str(len(LOCK_KEYSTORE)))
     SESSION.close()
+
 
 # LOAD KEYSTORE ON BOT START
 load_ks()

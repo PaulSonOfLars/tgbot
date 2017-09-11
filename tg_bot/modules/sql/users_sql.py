@@ -66,40 +66,38 @@ INSERTION_LOCK = threading.Lock()
 
 
 def ensure_bot_in_db():
-    INSERTION_LOCK.acquire()
-    bot = Users(dispatcher.bot.id, dispatcher.bot.username)
-    SESSION.merge(bot)
-    SESSION.commit()
-    INSERTION_LOCK.release()
+    with INSERTION_LOCK:
+        bot = Users(dispatcher.bot.id, dispatcher.bot.username)
+        SESSION.merge(bot)
+        SESSION.commit()
 
 
 def update_user(user_id, username, chat_id, chat_name):
-    INSERTION_LOCK.acquire()
-    user = SESSION.query(Users).get(user_id)
-    if not user:
-        user = Users(user_id, username)
-        SESSION.add(user)
-        SESSION.flush()
-    else:
-        user.username = username
+    with INSERTION_LOCK:
+        user = SESSION.query(Users).get(user_id)
+        if not user:
+            user = Users(user_id, username)
+            SESSION.add(user)
+            SESSION.flush()
+        else:
+            user.username = username
 
-    chat = SESSION.query(Chats).get(str(chat_id))
-    if not chat:
-        chat = Chats(str(chat_id), chat_name)
-        SESSION.add(chat)
-        SESSION.flush()
+        chat = SESSION.query(Chats).get(str(chat_id))
+        if not chat:
+            chat = Chats(str(chat_id), chat_name)
+            SESSION.add(chat)
+            SESSION.flush()
 
-    else:
-        chat.chat_name = chat_name
+        else:
+            chat.chat_name = chat_name
 
-    member = SESSION.query(ChatMembers).filter(ChatMembers.chat == chat.chat_id,
-                                                                 ChatMembers.user == user.user_id).first()
-    if not member:
-        chat_member = ChatMembers(chat.chat_id, user.user_id)
-        SESSION.add(chat_member)
+        member = SESSION.query(ChatMembers).filter(ChatMembers.chat == chat.chat_id,
+                                                   ChatMembers.user == user.user_id).first()
+        if not member:
+            chat_member = ChatMembers(chat.chat_id, user.user_id)
+            SESSION.add(chat_member)
 
-    SESSION.commit()
-    INSERTION_LOCK.release()
+        SESSION.commit()
 
 
 def get_user_by_name(username):
@@ -108,5 +106,6 @@ def get_user_by_name(username):
 
 def get_chat_members(chat_id):
     return SESSION.query(ChatMembers).filter(ChatMembers.chat == str(chat_id)).all()
+
 
 ensure_bot_in_db()

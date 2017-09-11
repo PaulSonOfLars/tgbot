@@ -19,6 +19,7 @@ class CustomFilters(BASE):
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
 
+
 CustomFilters.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.Lock()
@@ -29,21 +30,18 @@ def get_all_filters():
 
 
 def add_filter(chat_id, keyword, reply):
-    INSERTION_LOCK.acquire()
-
-    res = CustomFilters(chat_id, keyword, reply)
-    SESSION.merge(res)  # merge to avoid duplicate key issues 
-    SESSION.commit()
-    INSERTION_LOCK.release()
+    with INSERTION_LOCK:
+        res = CustomFilters(chat_id, keyword, reply)
+        SESSION.merge(res)  # merge to avoid duplicate key issues
+        SESSION.commit()
 
 
 def remove_filter(chat_id, keyword):
-    INSERTION_LOCK.acquire()
-    res = SESSION.query(CustomFilters).get((str(chat_id), keyword))
-    if res:
-        SESSION.delete(res)
-        SESSION.commit()
-    INSERTION_LOCK.release()
+    with INSERTION_LOCK:
+        res = SESSION.query(CustomFilters).get((str(chat_id), keyword))
+        if res:
+            SESSION.delete(res)
+            SESSION.commit()
 
 
 def get_chat_filters(chat_id):

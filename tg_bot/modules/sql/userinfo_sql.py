@@ -30,6 +30,7 @@ class UserBio(BASE):
     def __repr__(self):
         return "<User info %d>" % self.user_id
 
+
 UserInfo.__table__.create(checkfirst=True)
 UserBio.__table__.create(checkfirst=True)
 
@@ -44,15 +45,14 @@ def get_user_me_info(user_id):
 
 
 def set_user_me_info(user_id, info):
-    INSERTION_LOCK.acquire()
-    userinfo = SESSION.query(UserInfo).get(user_id)
-    if userinfo:
-        userinfo.info = info
-    else:
-        userinfo = UserInfo(user_id, info)
-    SESSION.add(userinfo)
-    SESSION.commit()
-    INSERTION_LOCK.release()
+    with INSERTION_LOCK:
+        userinfo = SESSION.query(UserInfo).get(user_id)
+        if userinfo:
+            userinfo.info = info
+        else:
+            userinfo = UserInfo(user_id, info)
+        SESSION.add(userinfo)
+        SESSION.commit()
 
 
 def get_user_bio(user_id):
@@ -63,13 +63,12 @@ def get_user_bio(user_id):
 
 
 def set_user_bio(user_id, bio):
-    INSERTION_LOCK.acquire()
-    userbio = SESSION.query(UserBio).get(user_id)
-    if userbio:
-        userbio.bio = bio
-    else:
-        userbio = UserBio(user_id, bio)
+    with INSERTION_LOCK:
+        userbio = SESSION.query(UserBio).get(user_id)
+        if userbio:
+            userbio.bio = bio
+        else:
+            userbio = UserBio(user_id, bio)
 
-    SESSION.add(userbio)
-    SESSION.commit()
-    INSERTION_LOCK.release()
+        SESSION.add(userbio)
+        SESSION.commit()
