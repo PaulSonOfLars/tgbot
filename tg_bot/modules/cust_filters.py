@@ -112,7 +112,7 @@ def stop_filter(bot, update, args):
             update.effective_message.reply_text("Yep, I'll stop replying to that.")
             return
 
-    update.effective_message.reply_text("That's not a current filter - run /list for all filters.")
+    update.effective_message.reply_text("That's not a current filter - run /filters for all active filters.")
 
 
 __help__ = """
