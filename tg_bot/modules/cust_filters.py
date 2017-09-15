@@ -1,5 +1,3 @@
-import re
-
 import telegram
 from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop, run_async
 
@@ -10,17 +8,16 @@ from tg_bot.modules.sql import cust_filters_sql as sql
 HANDLER_GROUP = 10
 
 
-class RegexSearcher(BaseFilter):
+class CustSearcher(BaseFilter):
     def __init__(self, chat_id, keyword):
         super().__init__()
-        self.keyword = keyword
-        self.pattern = "( |^|[^\w])" + re.escape(self.keyword) + "( |$|[^\w])"
+        self.keyword = keyword.lower()
         self.chat_id = chat_id
 
     def filter(self, message):
         return bool(message.text
                     and message.chat_id == self.chat_id
-                    and re.search(self.pattern, message.text, flags=re.IGNORECASE))
+                    and self.keyword in message.text.lower())
 
     def __eq__(self, other):
         return other == (self.keyword, self.chat_id)
@@ -29,7 +26,7 @@ class RegexSearcher(BaseFilter):
         return self.keyword
 
     def __repr__(self):
-        return "<RegexSearcher for {} by {} in chat {}>".format(self.keyword, self.pattern, self.chat_id)
+        return "<RegexSearcher for {} in chat {}>".format(self.keyword, self.chat_id)
 
 
 def load_filters():
@@ -39,17 +36,17 @@ def load_filters():
         return
 
     for filt in all_filters:
-        add_filter(filt.chat_id, filt.keyword, filt.reply)
+        add_filter(filt.chat_id, filt.keyword, filt.reply, filt.is_sticker)
 
     print("Loaded {} filters".format(len(all_filters)))
 
 
 def add_filter(chat_id, keyword, content, is_sticker=False):
     if is_sticker:
-        custom_handler = MessageHandler(RegexSearcher(int(chat_id), keyword),
+        custom_handler = MessageHandler(CustSearcher(int(chat_id), keyword),
                                         lambda b, u: u.effective_message.reply_sticker(content))
     else:
-        custom_handler = MessageHandler(RegexSearcher(int(chat_id), keyword),
+        custom_handler = MessageHandler(CustSearcher(int(chat_id), keyword),
                                         lambda b, u: u.effective_message.reply_text(content))
     dispatcher.add_handler(custom_handler, HANDLER_GROUP)
 
