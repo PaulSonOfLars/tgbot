@@ -166,7 +166,7 @@ def kick(bot, update, args):
         return
     res = update.effective_chat.kick_member(user_id)
     if res:
-        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
+        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')  # banhammer marie sticker
         message.reply_text("Kicked!")
     else:
         message.reply_text("Well damn, I can't kick that user.")

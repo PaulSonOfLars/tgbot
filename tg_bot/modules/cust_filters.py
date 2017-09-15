@@ -44,10 +44,25 @@ def load_filters():
     print("Loaded {} filters".format(len(all_filters)))
 
 
-def add_filter(chat_id, keyword, reply):
-    custom_handler = MessageHandler(RegexSearcher(int(chat_id), keyword),
-                                    lambda b, u: u.effective_message.reply_text(reply))
+def add_filter(chat_id, keyword, content, is_sticker=False):
+    if is_sticker:
+        custom_handler = MessageHandler(RegexSearcher(int(chat_id), keyword),
+                                        lambda b, u: u.effective_message.reply_sticker(content))
+    else:
+        custom_handler = MessageHandler(RegexSearcher(int(chat_id), keyword),
+                                        lambda b, u: u.effective_message.reply_text(content))
     dispatcher.add_handler(custom_handler, HANDLER_GROUP)
+
+
+def save_filter(chat_id, keyword, content, is_sticker=False):
+    # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
+    for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
+        if handler.filters == (keyword, chat_id):
+            dispatcher.remove_handler(handler, HANDLER_GROUP)
+
+    sql.add_filter(chat_id, keyword, content, is_sticker)
+
+    add_filter(chat_id, keyword, content, is_sticker)
 
 
 @run_async
@@ -76,23 +91,25 @@ def list_handlers(bot, update):
 @user_admin
 def filters(bot, update):
     chat = update.effective_chat
-    text = update.effective_message.text
-    args = text.split(None, 2)  # use python's maxsplit to separate Cmd, keyword, and reply_text
+    msg = update.effective_message
+    args = msg.text.split(None, 2)  # use python's maxsplit to separate Cmd, keyword, and reply_text
+
     if len(args) >= 3:
         keyword = args[1]
-        reply = args[2]
+        content = args[2]
+        is_sticker = False
 
-        # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
-        for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
-            if handler.filters == (args[1], chat.id):
-                dispatcher.remove_handler(handler, HANDLER_GROUP)
+    elif msg.reply_to_message and msg.reply_to_message.sticker:
+        keyword = args[1]
+        content = msg.reply_to_message.sticker.file_id
+        is_sticker = True
 
-        sql.add_filter(chat.id, keyword, reply)
+    else:
+        return
 
-        add_filter(chat.id, keyword, reply)
-
-        update.effective_message.reply_text("Handler {} added!".format(keyword))
-        raise DispatcherHandlerStop
+    save_filter(chat.id, keyword, content, is_sticker)
+    update.effective_message.reply_text("Handler {} added!".format(keyword))
+    raise DispatcherHandlerStop
 
 
 @user_admin

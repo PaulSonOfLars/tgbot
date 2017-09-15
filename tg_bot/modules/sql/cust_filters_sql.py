@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, String, UnicodeText
+from sqlalchemy import Column, String, UnicodeText, Boolean
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -10,11 +10,13 @@ class CustomFilters(BASE):
     chat_id = Column(String(14), primary_key=True)
     keyword = Column(UnicodeText, primary_key=True, nullable=False)
     reply = Column(UnicodeText, nullable=False)
+    is_sticker = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, chat_id, keyword, reply):
+    def __init__(self, chat_id, keyword, reply, is_sticker=False):
         self.chat_id = str(chat_id)  # ensure string
         self.keyword = keyword
         self.reply = reply
+        self.is_sticker = is_sticker
 
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
@@ -29,9 +31,9 @@ def get_all_filters():
     return SESSION.query(CustomFilters).all()
 
 
-def add_filter(chat_id, keyword, reply):
+def add_filter(chat_id, keyword, reply, is_sticker=False):
     with INSERTION_LOCK:
-        res = CustomFilters(chat_id, keyword, reply)
+        res = CustomFilters(chat_id, keyword, reply, is_sticker)
         SESSION.merge(res)  # merge to avoid duplicate key issues
         SESSION.commit()
 
