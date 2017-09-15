@@ -130,7 +130,8 @@ def stop_filter(bot, update, args):
 
 
 __help__ = """
- - /filter <keyword> <reply message>: add a filter to this chat. bot will now reply the message whenever 'keyword' is mentioned.
+ - /filter <keyword> <reply message>: add a filter to this chat. The bot will now reply the message whenever 'keyword' \
+ is mentioned. If you reply to a sticker with a keyword, the bot will reply with that sticker.
  - /stop <filter keyword>: stop that filter.
  - /filters: list all active filters in this chat
 """
