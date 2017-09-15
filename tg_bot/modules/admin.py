@@ -210,8 +210,11 @@ def unkick(bot, update, args):
             return
     else:
         return
-    update.effective_chat.unban_member(user_id)
-
+    res = update.effective_chat.unban_member(user_id)
+    if res:
+        message.reply_text("Yep, this user can join!")
+    else:
+        message.reply_text("Hm, couldn't unban this person.")
 
 @bot_admin
 @user_admin
