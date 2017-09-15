@@ -1,5 +1,5 @@
 from telegram import MAX_MESSAGE_LENGTH, ParseMode
-from telegram.ext import CommandHandler, RegexHandler
+from telegram.ext import CommandHandler, RegexHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
@@ -9,6 +9,7 @@ from tg_bot.config import Development as Config
 from tg_bot.modules.helper_funcs import markdown_parser
 
 
+# Do not async
 def get(bot, update, notename, show_none=True):
     chat_id = update.effective_chat.id
     note = sql.get_note(chat_id, notename)
@@ -40,6 +41,29 @@ def hash_get(bot, update):
     get(bot, update, no_hash, show_none=False)
 
 
+@run_async
+def save_replied(bot, update):
+    chat_id = update.effective_chat.id
+    text = update.effective_message.text
+    args = text.split(None, 3)  # use python's maxsplit to separate Cmd, note_name, and data
+    if len(args) == 3 and args[1] == "from":
+        notename = args[2]
+    elif len(args) >= 2:
+        notename = args[1]
+    else:
+        update.effective_message.reply_text("You need to give me a notename to save this message!")
+        return
+
+    msg = update.effective_message.reply_to_message
+
+    if Config.MESSAGE_DUMP:
+        msg = bot.forward_message(chat_id=Config.MESSAGE_DUMP, from_chat_id=chat_id, message_id=msg.message_id)
+
+    sql.add_note_to_db(chat_id, notename, msg.message_id, is_reply=True)
+    update.effective_message.reply_text("yas! added replied message " + notename)
+
+
+@run_async
 def save(bot, update):
     chat_id = update.effective_chat.id
     text = update.effective_message.text
@@ -60,16 +84,6 @@ def save(bot, update):
 
         sql.add_note_to_db(chat_id, notename, markdown_parser(txt), is_reply=False)
         update.effective_message.reply_text("yas! added " + notename)
-
-    elif update.effective_message.reply_to_message and len(args) >= 2:
-        notename = args[1]
-        msg = update.effective_message.reply_to_message
-
-        if Config.MESSAGE_DUMP:
-            msg = bot.forward_message(chat_id=Config.MESSAGE_DUMP, from_chat_id=chat_id, message_id=msg.message_id)
-
-        sql.add_note_to_db(chat_id, notename, msg.message_id, is_reply=True)
-        update.effective_message.reply_text("yas! added replied message " + notename)
 
     else:
         update.effective_message.reply_text("Dude, theres no note")
@@ -114,7 +128,8 @@ __help__ = """
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 HASH_GET_HANDLER = RegexHandler(r"^#([^\s])+", hash_get)
 
-SAVE_HANDLER = CommandHandler("save", save)
+SAVE_HANDLER = CommandHandler("save", save, filters=~Filters.reply)
+REPL_SAVE_HANDLER = CommandHandler("save", save_replied, filters=Filters.reply)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
 
 LIST_HANDLER = CommandHandler("notes", list_notes)
@@ -122,6 +137,7 @@ LIST_HANDLER2 = CommandHandler("saved", list_notes)
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)
+dispatcher.add_handler(REPL_SAVE_HANDLER)
 dispatcher.add_handler(LIST_HANDLER)
 dispatcher.add_handler(LIST_HANDLER2)
 dispatcher.add_handler(DELETE_HANDLER)
