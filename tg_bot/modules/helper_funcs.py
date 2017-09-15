@@ -75,15 +75,6 @@ def user_admin(func):
     return is_admin
 
 
-def is_reply(func):
-    @wraps(func)
-    def reply(bot, update, *args, **kwargs):
-        if update.effective_message.reply_to_message:
-            func(bot, update, *args, **kwargs)
-
-    return reply
-
-
 def markdown_parser(txt):
     """
     regex: matches all double *, _, ` as well as valid []() formations.

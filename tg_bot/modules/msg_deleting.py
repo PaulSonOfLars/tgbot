@@ -1,12 +1,11 @@
 from telegram.error import BadRequest
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import can_delete, user_admin, is_reply
+from tg_bot.modules.helper_funcs import can_delete, user_admin
 
 
-@is_reply
 @user_admin
 @run_async
 def purge(bot, update):
@@ -23,7 +22,6 @@ def purge(bot, update):
         bot.send_message(chat.id, "Purge complete.", 'Markdown')
 
 
-@is_reply
 @user_admin
 @run_async
 def del_message(bot, update):
@@ -37,8 +35,8 @@ __help__ = """
  - /purge: deletes all messages between this and the replied to message
 """
 
-DELETE_HANDLER = CommandHandler("del", del_message)
-PURGE_HANDLER = CommandHandler("purge", purge)
+DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.reply)
+PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.reply)
 
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(PURGE_HANDLER)
