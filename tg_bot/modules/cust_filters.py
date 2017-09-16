@@ -1,3 +1,5 @@
+import re
+
 import telegram
 from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop, run_async
 
@@ -11,13 +13,14 @@ HANDLER_GROUP = 10
 class CustSearcher(BaseFilter):
     def __init__(self, chat_id, keyword):
         super().__init__()
-        self.keyword = keyword.lower()
+        self.keyword = keyword
+        self.pattern = "( |^|[^\w])" + re.escape(self.keyword) + "( |$|[^\w])"
         self.chat_id = chat_id
 
     def filter(self, message):
         return bool(message.text
                     and message.chat_id == self.chat_id
-                    and self.keyword in message.text.lower())
+                    and re.search(self.pattern, message.text, flags=re.IGNORECASE))
 
     def __eq__(self, other):
         return other == (self.keyword, self.chat_id)
@@ -26,7 +29,7 @@ class CustSearcher(BaseFilter):
         return self.keyword
 
     def __repr__(self):
-        return "<RegexSearcher for {} in chat {}>".format(self.keyword, self.chat_id)
+        return "<RegexSearcher for {} by {} in chat {}>".format(self.keyword, self.pattern, self.chat_id)
 
 
 def load_filters():
