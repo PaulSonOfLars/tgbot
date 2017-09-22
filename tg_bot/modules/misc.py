@@ -1,9 +1,11 @@
 import json
 from datetime import datetime
-from random import randint
+import random
 
 import requests
+from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
 from tg_bot.config import Development as Config
@@ -20,9 +22,78 @@ RUN_STRINGS = (
     "Run fatboy, run!",
     "Jokes on you, I'm everywhere",
     "You're gonna regret that...",
-    "You could also try /kickme, I hear thats fun.",
+    "You could also try /kickme, I hear that's fun.",
     "Go bother someone else, no-one here cares.",
-    "I hear @MSFJarvis wants to hear more about you."
+    "I hear @MSFJarvis wants to hear more about you.",
+    "Please, remind me how much I care?",
+    "I'd run faster if I were you.",
+    "That's definitely the droid we're looking for.",
+    "May the odds be ever in your favour.",
+    "Famous last words.",
+    "And he disappeared forever, never to be seen again.",
+    "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this guy",
+    "Yeah yeah, just tap /kickme already.",
+    "Here, take this ring and head to Mordor while You're at it.",
+    "Legend has it, he's still running...",
+    "Unlike Harry Potter, your parents can't protect you from me.",
+    "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might "
+    "be the next Vader.",
+    "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0."
+)
+
+SLAP_TEMPLATES = (
+    "{user1} {hits} @{user2} with a {item}.",
+    "{user1} {hits} @{user2} around a bit with a {item}.",
+    "{user1} {throws} a {item} at @{user2}.",
+    "{user1} grabs a {item} and {throws} it at @{user2}'s face.",
+    "{user1} launches a {item} in @{user2}'s general direction.",
+    "{user1} sits on @{user2}'s face while slamming a {item} into their crotch.",
+    "{user1} starts slapping @{user2} silly with a {item}.",
+    "{user1} pins @{user2} down and repeatedly {hits} them with a {item}.",
+    "{user1} grabs up a {item} and {hits} @{user2} with it.",
+    "{user1} ties @{user2} to a chair and {throws} a {item} at them.",
+)
+
+ITEMS = (
+    "cast iron skillet",
+    "large trout",
+    "baseball bat",
+    "cricket bat",
+    "wooden cane",
+    "nail",
+    "printer",
+    "shovel",
+    "pair of trousers",
+    "CRT monitor",
+    "baguette",
+    "physics textbook",
+    "toaster",
+    "portrait of Richard Stallman",
+    "television",
+    "five ton truck",
+    "roll of duct tape",
+    "book",
+    "laptop",
+    "old television",
+    "sack of rocks",
+    "rainbow trout",
+    "rubber chicken",
+    "spiked bat",
+    "fire extinguisher",
+    "heavy rock",
+    "chunk of dirt"
+)
+
+THROW = (
+    "throws",
+    "flings",
+    "chucks")
+
+HIT = (
+    "hits",
+    "whacks",
+    "slaps",
+    "smacks"
 )
 
 GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -31,8 +102,25 @@ GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
 
 @run_async
 def runs(bot, update):
-    someint = randint(0, len(RUN_STRINGS) - 1)
-    update.effective_message.reply_text(RUN_STRINGS[someint])
+    update.effective_message.reply_text(random.choice(RUN_STRINGS))
+
+
+def slap(bot, update):
+    if update.effective_message.reply_to_message:
+        user1 = update.effective_message.from_user.username
+        user2 = update.effective_message.reply_to_message.from_user.username
+    else:
+        user1 = "[{}](tg://user?id={})".format(escape_markdown(bot.first_name), bot.id)
+        user2 = update.effective_message.from_user.username
+
+    temp = random.choice(SLAP_TEMPLATES)
+    item = random.choice(ITEMS)
+    hit = random.choice(HIT)
+    throw = random.choice(THROW)
+
+    repl = temp.format(user1=user1, user2=user2, item=item, hits=hit, throws=throw)
+
+    update.effective_message.reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -100,17 +188,21 @@ def get_time(bot, update, args):
 __help__ = """
  - /id: get the current group id. If used by replying to a message, gets that user's id.
  - /runs: reply a random string from an array of replies.
+ - /slap: slap a user, or get slapped if not a reply
  - /time <place>: gives the local time at the given place
 """
 
 # TODO: /stats
-runs_handler = CommandHandler("runs", runs)
 id_handler = CommandHandler("id", get_id)
 ip_handler = CommandHandler("ip", get_bot_ip, filters=Filters.chat(Config.OWNER_ID))
 
 time_handler = CommandHandler("time", get_time, pass_args=True)
 
+runs_handler = CommandHandler("runs", runs)
+slap_handler = CommandHandler("slap", slap)
+
 dispatcher.add_handler(id_handler)
 dispatcher.add_handler(time_handler)
 dispatcher.add_handler(runs_handler)
+dispatcher.add_handler(slap_handler)
 dispatcher.add_handler(ip_handler)
