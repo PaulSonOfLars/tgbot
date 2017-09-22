@@ -9,6 +9,7 @@ from tg_bot.modules.helper_funcs import is_user_admin, user_admin, bot_admin, ca
 from tg_bot.modules.users import get_user_id
 
 
+@bot_admin
 @can_promote
 @user_admin
 @run_async
@@ -52,6 +53,7 @@ def promote(bot, update, args):
         update.effective_message.reply_text("Successfully promoted!")
 
 
+@bot_admin
 @can_promote
 @user_admin
 @run_async
@@ -103,10 +105,11 @@ def demote(bot, update, args):
         else:
             message.reply_text("Could not demote.")
     except BadRequest:
-        message.reply_text("Could not demote. Maybe the admin status was appointed by another "
+        message.reply_text("Could not demote. I might not be admin, or the admin status was appointed by another "
                            "user, so I can't act upon him!")
 
 
+@bot_admin
 @can_pin
 @user_admin
 @run_async
@@ -125,6 +128,7 @@ def pin(bot, update, args):
         bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
 
 
+@bot_admin
 @can_pin
 @user_admin
 @run_async
@@ -215,6 +219,7 @@ def unkick(bot, update, args):
         message.reply_text("Yep, this user can join!")
     else:
         message.reply_text("Hm, couldn't unban this person.")
+
 
 @bot_admin
 @user_admin
