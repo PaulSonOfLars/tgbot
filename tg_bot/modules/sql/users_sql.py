@@ -108,4 +108,7 @@ def get_chat_members(chat_id):
     return SESSION.query(ChatMembers).filter(ChatMembers.chat == str(chat_id)).all()
 
 
+def get_all_chats():
+    return SESSION.query(Chats).all()
+
 ensure_bot_in_db()

@@ -1,8 +1,13 @@
-from telegram.ext import MessageHandler, Filters
+import sys
+from time import sleep
+
+from telegram import TelegramError
+from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.users_sql as sql
 from tg_bot import dispatcher
+from tg_bot.config import Development as Config
 
 USERS_GROUP = 2
 
@@ -20,6 +25,20 @@ def get_user_id(username):
 
 
 @run_async
+def broadcast(bot, update):
+    to_send = update.effective_message.text.split(None, 1)
+    if len(to_send) >= 2:
+        chats = sql.get_all_chats() or []
+        for chat in chats:
+            try:
+                bot.sendMessage(int(chat.chat_id), to_send[1])
+                sleep(0.1)
+            except TelegramError:
+                print("Couldn't send broadcast to {}, group name {}".format(chat.chat_id, chat.chat_name),
+                      file=sys.stderr)
+
+
+@run_async
 def log_user(bot, update):
     if update.effective_message.from_user.username:
         sql.update_user(update.effective_message.from_user.id,
@@ -28,6 +47,10 @@ def log_user(bot, update):
                         update.effective_chat.title)
 
 
+__help__ = ""  # no help string
+
+BROADCAST_HANDLER = (CommandHandler("broadcast", broadcast, filters=Filters.chat(Config.OWNER_ID)))
 USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
 
 dispatcher.add_handler(USER_HANDLER, USERS_GROUP)
+dispatcher.add_handler(BROADCAST_HANDLER)
