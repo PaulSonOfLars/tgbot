@@ -4,7 +4,7 @@ import os
 import telegram
 from telegram import ParseMode
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher, updater, TOKEN, HEROKU
@@ -12,18 +12,24 @@ from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
 
-help_strings = """
+HELP_STRINGS = """
 Commands available:
  - /start: start the bot
  - /help: PM's you this message.
 """
 
+MIGRATEABLE = []
+
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
     if hasattr(imported_module, "__help__"):
-        help_strings += imported_module.__help__
+        HELP_STRINGS += imported_module.__help__
     else:
-        help_strings += "\n {} module has no help docs, but is loaded. \n".format(module_name)
+        HELP_STRINGS += "\n {} module has no help docs, but is loaded. \n".format(module_name)
+
+    # Chats to migrate on chat_migrated events
+    if hasattr(imported_module, "__migrate__"):
+        MIGRATEABLE.append(imported_module)
 
 print("Successfully loaded modules: " + str(ALL_MODULES))
 
@@ -32,7 +38,6 @@ print("Successfully loaded modules: " + str(ALL_MODULES))
 def test(bot, update):
     # pprint(eval(str(update)))
     update.effective_message.reply_text("Hola tester! _I_ *have* `markdown`", parse_mode=ParseMode.MARKDOWN)
-
 
 
 def start(bot, update):
@@ -73,7 +78,7 @@ def split_message(msg):
     if len(msg) < telegram.MAX_MESSAGE_LENGTH:
         return [msg]
     else:
-        lines = help_strings.splitlines()
+        lines = HELP_STRINGS.splitlines()
         small_help = ""
         result = []
         for line in lines:
@@ -96,12 +101,12 @@ def get_help(bot, update):
     chat = update.effective_chat
 
     if chat.type == "private":
-        for msg in split_message(help_strings):
+        for msg in split_message(HELP_STRINGS):
             update.effective_message.reply_text(msg)
 
     else:
         try:
-            for msg in split_message(help_strings):
+            for msg in split_message(HELP_STRINGS):
                 bot.send_message(user.id, msg)
 
             update.effective_message.reply_text("I've PM'ed you about me.")
@@ -109,14 +114,31 @@ def get_help(bot, update):
             update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
 
 
+def migrate_chats(bot, update):
+    msg = update.effective_message
+    if msg.migrate_to_chat_id:
+        old_chat = update.effective_chat.id
+        new_chat = msg.migrate_to_chat_id
+    elif msg.migrate_from_chat_id:
+        old_chat = msg.migrate_from_chat_id
+        new_chat = update.effective_chat.id
+    else:
+        return
+
+    for mod in MIGRATEABLE:
+        mod.__migrate__(old_chat, new_chat)
+
+
 def main():
     test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start)
     help_handler = CommandHandler("help", get_help)
+    migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
+    dispatcher.add_handler(migrate_handler)
 
     # dispatcher.add_error_handler(error_callback)
 
