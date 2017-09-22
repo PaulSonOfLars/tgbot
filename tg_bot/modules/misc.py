@@ -107,7 +107,7 @@ def runs(bot, update):
 
 def slap(bot, update):
     if update.effective_message.reply_to_message:
-        user1 = update.effective_message.from_user.username
+        user1 = "@" + update.effective_message.from_user.username
         user2 = update.effective_message.reply_to_message.from_user.username
     else:
         user1 = "[{}](tg://user?id={})".format(escape_markdown(bot.first_name), bot.id)
