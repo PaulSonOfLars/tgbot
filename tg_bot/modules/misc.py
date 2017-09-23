@@ -33,7 +33,7 @@ RUN_STRINGS = (
     "And he disappeared forever, never to be seen again.",
     "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this guy",
     "Yeah yeah, just tap /kickme already.",
-    "Here, take this ring and head to Mordor while You're at it.",
+    "Here, take this ring and head to Mordor while you're at it.",
     "Legend has it, he's still running...",
     "Unlike Harry Potter, your parents can't protect you from me.",
     "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might "

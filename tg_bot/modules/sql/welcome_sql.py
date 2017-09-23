@@ -51,6 +51,7 @@ def load_ks():
     all_perms = SESSION.query(Welcome).all()
     for chat in all_perms:
         KEYSTORE[chat.chat_id] = chat
+    SESSION.close()
     print("Welcome message keystore loaded, length " + str(len(KEYSTORE)))
 
 
