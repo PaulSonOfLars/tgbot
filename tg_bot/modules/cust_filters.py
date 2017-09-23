@@ -132,6 +132,10 @@ def stop_filter(bot, update, args):
     update.effective_message.reply_text("That's not a current filter - run /filters for all active filters.")
 
 
+def __migrate__(old_chat_id, new_chat_id):
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
+
 __help__ = """
  - /filter <keyword> <reply message>: add a filter to this chat. The bot will now reply the message whenever 'keyword' \
  is mentioned. If you reply to a sticker with a keyword, the bot will reply with that sticker.

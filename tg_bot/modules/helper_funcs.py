@@ -93,6 +93,6 @@ def markdown_parser(txt):
         # if e.group('astx') or e.group('bctck') or e.group('undes') or e.group('sqbrkt'):
         if e.group('esc'):
             start = e.start()
-            txt = txt[:start+offset] + '\\' + txt[start+offset:]
+            txt = txt[:start + offset] + '\\' + txt[start + offset:]
             offset += 1
     return txt

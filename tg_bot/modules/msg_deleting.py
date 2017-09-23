@@ -30,6 +30,7 @@ def del_message(bot, update):
         update.effective_message.reply_to_message.delete()
         update.effective_message.delete()
 
+
 __help__ = """
  - /del: deletes the message you replied to
  - /purge: deletes all messages between this and the replied to message

@@ -5,7 +5,7 @@ import telegram
 from telegram import ParseMode
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
-from telegram.ext.dispatcher import run_async
+from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
 
 from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
@@ -125,8 +125,11 @@ def migrate_chats(bot, update):
     else:
         return
 
+    print("Migrating from {} to {}".format(old_chat, new_chat))
     for mod in MIGRATEABLE:
         mod.__migrate__(old_chat, new_chat)
+
+    raise DispatcherHandlerStop
 
 
 def main():
@@ -151,6 +154,7 @@ def main():
     else:
         updater.start_polling()
     updater.idle()
+
 
 if __name__ == '__main__':
     main()

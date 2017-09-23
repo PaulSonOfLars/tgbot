@@ -115,8 +115,10 @@ def list_notes(bot, update):
     elif len(msg) != 0:
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
+
 def __migrate__(old_chat_id, new_chat_id):
-    pass  # do stuff
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
 
 __help__ = """
  - /get  <notename>: get the note with this notename

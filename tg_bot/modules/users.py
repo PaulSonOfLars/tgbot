@@ -47,6 +47,10 @@ def log_user(bot, update):
                         update.effective_chat.title)
 
 
+def __migrate__(old_chat_id, new_chat_id):
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
+
 __help__ = ""  # no help string
 
 BROADCAST_HANDLER = (CommandHandler("broadcast", broadcast, filters=Filters.chat(Config.OWNER_ID)))

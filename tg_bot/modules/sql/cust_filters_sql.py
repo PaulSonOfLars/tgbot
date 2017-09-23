@@ -48,3 +48,11 @@ def remove_filter(chat_id, keyword):
 
 def get_chat_filters(chat_id):
     return SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(chat_id)).all()
+
+
+def migrate_chat(old_chat_id, new_chat_id):
+    with INSERTION_LOCK:
+        chat_filters = SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(old_chat_id)).all()
+        for filt in chat_filters:
+            filt.chat_id = str(new_chat_id)
+        SESSION.commit()

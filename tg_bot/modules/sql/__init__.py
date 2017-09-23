@@ -20,5 +20,6 @@ def start():
     BASE.metadata.create_all(engine)
     return scoped_session(sessionmaker(bind=engine, autoflush=False))
 
+
 BASE = declarative_base()
 SESSION = start()

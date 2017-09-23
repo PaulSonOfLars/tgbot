@@ -37,7 +37,7 @@ def set_preference(chat_id, should_welcome):
     with INSERTION_LOCK:
         curr = KEYSTORE.get(str(chat_id))
         if not curr:
-            print("Perms didnt exist for {}! creating".format(chat_id))
+            print("Perms didnt exist for {}! Creating.".format(chat_id))
             curr = Welcome(str(chat_id), should_welcome)
         else:
             curr.should_welcome = should_welcome
@@ -52,7 +52,18 @@ def load_ks():
     for chat in all_perms:
         KEYSTORE[chat.chat_id] = chat
     SESSION.close()
-    print("Welcome message keystore loaded, length " + str(len(KEYSTORE)))
+    print("Welcome message settings keystore loaded, with size {}.".format(len(KEYSTORE)))
+
+
+def migrate_chat(old_chat_id, new_chat_id):
+    global KEYSTORE
+    with INSERTION_LOCK:
+        chat = SESSION.query(Welcome).get(str(old_chat_id))
+        if chat:
+            chat.chat_id = str(new_chat_id)
+        SESSION.commit()
+        KEYSTORE = {}
+        load_ks()
 
 
 # LOAD KEYSTORE ON BOT START

@@ -74,6 +74,7 @@ def set_about_bio(bot, update):
     else:
         message.reply_text("Reply to someone's message to set their bio!")
 
+
 __help__ = """
  - /setbio <text>: while replying will save another user's bio
  - /bio: will get your or another user's bio

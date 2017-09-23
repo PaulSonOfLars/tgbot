@@ -53,3 +53,11 @@ def rm_note(chat_id, notename):
 
 def get_all_chat_notes(chat_id):
     return SESSION.query(Notes).filter(Notes.chat_id == str(chat_id)).all()
+
+
+def migrate_chat(old_chat_id, new_chat_id):
+    with INSERTION_LOCK:
+        chat_notes = SESSION.query(Notes).filter(Notes.chat_id == str(old_chat_id)).all()
+        for note in chat_notes:
+            note.chat_id = str(new_chat_id)
+        SESSION.commit()

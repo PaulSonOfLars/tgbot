@@ -11,7 +11,7 @@ def new_member(bot, update):
         for member in new_mem:
             # Don't welcome yourself
             if not member.id == bot.id:
-                update.effective_message.reply_text("My man {}, how are you?".format(member.first_name))
+                update.effective_message.reply_text("Hey {}, how are you?".format(member.first_name))
 
 
 def left_member(bot, update):
@@ -25,17 +25,22 @@ def left_member(bot, update):
 def change_preference(bot, update, args):
     chat = update.effective_chat
     if len(args) >= 1:
-        if args[0].lower() == "on":
+        if args[0].lower() == "on" or args[0].lower() == "yes":
             sql.set_preference(str(chat.id), True)
             update.effective_message.reply_text("I'll be polite!")
 
-        elif args[0].lower() == "off":
+        elif args[0].lower() == "off" or args[0].lower() == "no":
             sql.set_preference(str(chat.id), False)
             update.effective_message.reply_text("I'm sulking, not saying hello anymore.")
 
         else:
             # idek what youre writing, say yes or no
-            update.effective_message.reply_text("I understand 'on' or 'off' only!")
+            update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
+
+
+def __migrate__(old_chat_id, new_chat_id):
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
 
 __help__ = """
  - /welcome <on/off>: enable/disable welcome and goodbye messages

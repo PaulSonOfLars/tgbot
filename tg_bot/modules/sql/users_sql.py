@@ -111,4 +111,16 @@ def get_chat_members(chat_id):
 def get_all_chats():
     return SESSION.query(Chats).all()
 
+
+def migrate_chat(old_chat_id, new_chat_id):
+    with INSERTION_LOCK:
+        # TODO: rm old chat
+        chat = SESSION.query(Chats).get(str(old_chat_id))
+        if chat:
+            chat.chat_id = new_chat_id
+            SESSION.add(chat)
+
+        SESSION.commit()
+
+
 ensure_bot_in_db()

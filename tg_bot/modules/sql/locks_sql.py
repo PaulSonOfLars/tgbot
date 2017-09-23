@@ -177,5 +177,22 @@ def load_ks():
     SESSION.close()
 
 
+def migrate_chat(old_chat_id, new_chat_id):
+    global LOCK_KEYSTORE
+    global RESTR_KEYSTORE
+    with INSERTION_LOCK:
+        perms = SESSION.query(Permissions).get(str(old_chat_id))
+        if perms:
+            perms.chat_id = str(new_chat_id)
+
+        rest = SESSION.query(Restrictions).get(str(old_chat_id))
+        if rest:
+            rest.chat_id = str(new_chat_id)
+        SESSION.commit()
+        LOCK_KEYSTORE = {}
+        RESTR_KEYSTORE = {}
+        load_ks()
+
+
 # LOAD KEYSTORE ON BOT START
 load_ks()

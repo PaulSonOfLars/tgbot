@@ -188,6 +188,10 @@ def rest_other(bot, update):
                                  can_send_other_messages=False)
 
 
+def __migrate__(old_chat_id, new_chat_id):
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
+
 __help__ = """
  - /locktypes: a list of possible locktypes
  - /lock <type>: lock items of a certain type (not available in private)
