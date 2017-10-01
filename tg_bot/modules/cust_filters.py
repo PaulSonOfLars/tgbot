@@ -116,6 +116,9 @@ def filters(bot, update):
 def stop_filter(bot, update, args):
     chat = update.effective_chat
 
+    if len(args) < 1:
+        return
+
     all_handlers = sql.get_chat_filters(chat.id)
 
     if not all_handlers:

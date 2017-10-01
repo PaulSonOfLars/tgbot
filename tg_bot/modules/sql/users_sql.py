@@ -114,7 +114,6 @@ def get_all_chats():
 
 def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:
-        # TODO: rm old chat
         chat = SESSION.query(Chats).get(str(old_chat_id))
         if chat:
             chat.chat_id = new_chat_id

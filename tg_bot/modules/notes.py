@@ -91,10 +91,11 @@ def save(bot, update):
 
 def clear(bot, update, args):
     chat_id = update.effective_chat.id
-    notename = args[0]
+    if len(args) >= 1:
+        notename = args[0]
 
-    sql.rm_note(chat_id, notename)
-    update.effective_message.reply_text("Successfully removed note")
+        sql.rm_note(chat_id, notename)
+        update.effective_message.reply_text("Successfully removed note")
 
 
 def list_notes(bot, update):

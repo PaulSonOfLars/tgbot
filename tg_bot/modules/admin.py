@@ -38,6 +38,11 @@ def promote(bot, update, args):
 
     else:
         return
+
+    if user_id == bot.id:
+        update.effective_message.reply_text("I can't promote myself! Get an admin to do it for me.")
+        return
+
     # set same perms as bot - bot can't assign higher perms than itself!
     bot_member = update.effective_chat.get_member(bot.id)
     res = bot.promoteChatMember(chat_id, user_id,
@@ -88,6 +93,10 @@ def demote(bot, update, args):
 
     if not chat.get_member(user_id).status == 'administrator':
         message.reply_text("Can't demote what wasn't promoted!")
+        return
+
+    if user_id == bot.id:
+        update.effective_message.reply_text("I can't demote myself! Get an admin to do it for me.")
         return
 
     try:
@@ -180,8 +189,7 @@ def kick(bot, update, args):
 @run_async
 def kickme(bot, update):
     user_id = update.effective_message.from_user.id
-    user_is_admin = update.effective_chat.get_member(user_id).status == 'administrator'
-    if user_is_admin:
+    if is_user_admin(update.effective_chat, user_id):
         update.effective_message.reply_text("I wish I could... but you're an admin.")
         return
     res = update.effective_chat.kick_member(user_id)

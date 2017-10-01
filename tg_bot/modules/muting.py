@@ -40,7 +40,6 @@ def mute(bot, update, args):
         return
 
     member = chat.get_member(int(user_id))
-    print(member)
 
     if member:
         if member.status == 'administrator' or member.status == 'creator':
