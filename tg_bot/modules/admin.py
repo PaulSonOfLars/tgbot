@@ -9,10 +9,10 @@ from tg_bot.modules.helper_funcs import is_user_admin, user_admin, bot_admin, ca
 from tg_bot.modules.users import get_user_id
 
 
+@run_async
 @bot_admin
 @can_promote
 @user_admin
-@run_async
 def promote(bot, update, args):
     chat_id = update.effective_chat.id
     message = update.effective_message
@@ -58,10 +58,10 @@ def promote(bot, update, args):
         update.effective_message.reply_text("Successfully promoted!")
 
 
+@run_async
 @bot_admin
 @can_promote
 @user_admin
-@run_async
 def demote(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
@@ -118,10 +118,10 @@ def demote(bot, update, args):
                            "user, so I can't act upon him!")
 
 
+@run_async
 @bot_admin
 @can_pin
 @user_admin
-@run_async
 def pin(bot, update, args):
     chat_id = update.effective_chat.id
     chat_type = update.effective_chat.type
@@ -137,18 +137,18 @@ def pin(bot, update, args):
         bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
 
 
+@run_async
 @bot_admin
 @can_pin
 @user_admin
-@run_async
 def unpin(bot, update):
     chat_id = update.effective_chat.id
     bot.unpinChatMessage(chat_id)
 
 
+@run_async
 @bot_admin
 @user_admin
-@run_async
 def kick(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
@@ -185,8 +185,8 @@ def kick(bot, update, args):
         message.reply_text("Well damn, I can't kick that user.")
 
 
-@bot_admin
 @run_async
+@bot_admin
 def kickme(bot, update):
     user_id = update.effective_message.from_user.id
     if is_user_admin(update.effective_chat, user_id):
@@ -199,9 +199,9 @@ def kickme(bot, update):
         update.effective_message.reply_text("Huh? I can't :/")
 
 
+@run_async
 @bot_admin
 @user_admin
-@run_async
 def unkick(bot, update, args):
     message = update.effective_message
 
@@ -229,9 +229,9 @@ def unkick(bot, update, args):
         message.reply_text("Hm, couldn't unban this person.")
 
 
+@run_async
 @bot_admin
 @user_admin
-@run_async
 def invite(bot, update):
     chat = update.effective_chat
     if chat.username:

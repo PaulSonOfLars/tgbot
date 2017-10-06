@@ -1,7 +1,8 @@
 import re
 
 import telegram
-from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop, run_async
+from telegram import Update
+from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop, run_async, Handler, Filters
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import user_admin
@@ -32,28 +33,6 @@ class CustSearcher(BaseFilter):
         return "<RegexSearcher for {} by {} in chat {}>".format(self.keyword, self.pattern, self.chat_id)
 
 
-def load_filters():
-    all_filters = sql.get_all_filters()
-
-    if not all_filters:
-        return
-
-    for filt in all_filters:
-        add_filter(filt.chat_id, filt.keyword, filt.reply, filt.is_sticker)
-
-    print("Loaded {} filters".format(len(all_filters)))
-
-
-def add_filter(chat_id, keyword, content, is_sticker=False):
-    if is_sticker:
-        custom_handler = MessageHandler(CustSearcher(int(chat_id), keyword),
-                                        lambda b, u: u.effective_message.reply_sticker(content))
-    else:
-        custom_handler = MessageHandler(CustSearcher(int(chat_id), keyword),
-                                        lambda b, u: u.effective_message.reply_text(content))
-    dispatcher.add_handler(custom_handler, HANDLER_GROUP)
-
-
 def save_filter(chat_id, keyword, content, is_sticker=False):
     # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
     for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
@@ -61,8 +40,6 @@ def save_filter(chat_id, keyword, content, is_sticker=False):
             dispatcher.remove_handler(handler, HANDLER_GROUP)
 
     sql.add_filter(chat_id, keyword, content, is_sticker)
-
-    add_filter(chat_id, keyword, content, is_sticker)
 
 
 @run_async
@@ -76,13 +53,12 @@ def list_handlers(bot, update):
 
     filter_list = "Current filters in this chat:\n"
     for handler in all_handlers:
-        if int(handler.chat_id) == chat.id:
-            entry = " - {}\n".format(handler.keyword)
-            if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
-                update.effective_message.reply_text(filter_list)
-                filter_list = entry
-            else:
-                filter_list += entry
+        entry = " - {}\n".format(handler.keyword)
+        if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
+            update.effective_message.reply_text(filter_list)
+            filter_list = entry
+        else:
+            filter_list += entry
 
     if not filter_list == "Current filters in this chat:\n":
         update.effective_message.reply_text(filter_list)
@@ -119,20 +95,33 @@ def stop_filter(bot, update, args):
     if len(args) < 1:
         return
 
-    all_handlers = sql.get_chat_filters(chat.id)
+    chat_filters = sql.get_chat_filters(chat.id)
 
-    if not all_handlers:
+    if not chat_filters:
         update.effective_message.reply_text("No filters are active here!")
         return
 
-    for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
-        if handler.filters == (args[0], chat.id):
+    for filt in chat_filters:
+        if filt.chat_id == str(chat.id) and filt.keyword == args[0]:
             sql.remove_filter(chat.id, args[0])
-            dispatcher.remove_handler(handler, HANDLER_GROUP)
             update.effective_message.reply_text("Yep, I'll stop replying to that.")
             return
 
     update.effective_message.reply_text("That's not a current filter - run /filters for all active filters.")
+
+
+@run_async
+def reply_filter(bot, update):
+    chat_filters = sql.get_chat_filters(update.effective_chat.id)
+    message = update.effective_message
+    for filt in chat_filters:
+        pattern = "( |^|[^\w])" + re.escape(filt.keyword) + "( |$|[^\w])"
+        if re.search(pattern, message.text, flags=re.IGNORECASE):
+            if filt.is_sticker:
+                update.effective_message.reply_sticker(filt.reply)
+            else:
+                update.effective_message.reply_text(filt.reply)
+            break
 
 
 def __migrate__(old_chat_id, new_chat_id):
@@ -149,9 +138,9 @@ __help__ = """
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter, pass_args=True)
 LIST_HANDLER = CommandHandler("filters", list_handlers)
+CUST_FILTER_HANDLER = MessageHandler(Filters.all, reply_filter)
 
 dispatcher.add_handler(FILTER_HANDLER)
 dispatcher.add_handler(STOP_HANDLER)
 dispatcher.add_handler(LIST_HANDLER)
-
-load_filters()
+dispatcher.add_handler(CUST_FILTER_HANDLER, HANDLER_GROUP)

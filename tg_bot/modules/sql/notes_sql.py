@@ -49,6 +49,9 @@ def rm_note(chat_id, notename):
         if note:
             SESSION.delete(note)
             SESSION.commit()
+            return True
+        else:
+            return False
 
 
 def get_all_chat_notes(chat_id):

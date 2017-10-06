@@ -6,7 +6,7 @@ from telegram.utils.helpers import escape_markdown
 import tg_bot.modules.sql.notes_sql as sql
 from tg_bot import dispatcher
 from tg_bot.config import Development as Config
-from tg_bot.modules.helper_funcs import markdown_parser
+from tg_bot.modules.helper_funcs import markdown_parser, user_admin
 
 
 # Do not async
@@ -42,6 +42,7 @@ def hash_get(bot, update):
 
 
 @run_async
+@user_admin
 def save_replied(bot, update):
     chat_id = update.effective_chat.id
     text = update.effective_message.text
@@ -64,6 +65,7 @@ def save_replied(bot, update):
 
 
 @run_async
+@user_admin
 def save(bot, update):
     chat_id = update.effective_chat.id
     text = update.effective_message.text
@@ -94,8 +96,10 @@ def clear(bot, update, args):
     if len(args) >= 1:
         notename = args[0]
 
-        sql.rm_note(chat_id, notename)
-        update.effective_message.reply_text("Successfully removed note")
+        if sql.rm_note(chat_id, notename):
+            update.effective_message.reply_text("Successfully removed note")
+        else:
+            update.effective_message.reply_text("That's not a note in my database!")
 
 
 def list_notes(bot, update):

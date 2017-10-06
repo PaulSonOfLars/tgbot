@@ -1,3 +1,4 @@
+import collections
 import threading
 
 from sqlalchemy import Column, String, UnicodeText, Boolean
@@ -21,10 +22,17 @@ class CustomFilters(BASE):
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
 
+    def __eq__(self, other):
+        return bool(isinstance(other, CustomFilters)
+                    and self.chat_id == other.chat_id
+                    and self.keyword == other.keyword)
+
 
 CustomFilters.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.Lock()
+
+FILTER_KEYSTORE = collections.defaultdict(list)
 
 
 def get_all_filters():
@@ -33,21 +41,29 @@ def get_all_filters():
 
 def add_filter(chat_id, keyword, reply, is_sticker=False):
     with INSERTION_LOCK:
-        res = CustomFilters(chat_id, keyword, reply, is_sticker)
-        SESSION.merge(res)  # merge to avoid duplicate key issues
+        filt = CustomFilters(str(chat_id), keyword, reply, is_sticker)
+
+        if filt in FILTER_KEYSTORE[filt.chat_id]:  # if there already is a filter on that kw, remove it
+            FILTER_KEYSTORE[filt.chat_id].remove(filt)
+
+        FILTER_KEYSTORE[filt.chat_id].append(filt)
+        SESSION.merge(filt)  # merge to avoid duplicate key issues
         SESSION.commit()
 
 
 def remove_filter(chat_id, keyword):
     with INSERTION_LOCK:
-        res = SESSION.query(CustomFilters).get((str(chat_id), keyword))
-        if res:
-            SESSION.delete(res)
+        filt = SESSION.query(CustomFilters).get((str(chat_id), keyword))
+        if filt:
+            FILTER_KEYSTORE[filt.chat_id].remove(filt)
+            SESSION.delete(filt)
             SESSION.commit()
+            return True
+        return False
 
 
 def get_chat_filters(chat_id):
-    return SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(chat_id)).all()
+    return FILTER_KEYSTORE[str(chat_id)]
 
 
 def migrate_chat(old_chat_id, new_chat_id):
@@ -56,3 +72,15 @@ def migrate_chat(old_chat_id, new_chat_id):
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
         SESSION.commit()
+
+
+def load_keystore():
+    with INSERTION_LOCK:
+        all_filters = SESSION.query(CustomFilters).all()
+        for filt in all_filters:
+            FILTER_KEYSTORE[filt.chat_id].append(filt)
+        SESSION.close()
+        print("{} total filters added to {} chats.".format(len(all_filters), len(FILTER_KEYSTORE)))
+
+
+load_keystore()

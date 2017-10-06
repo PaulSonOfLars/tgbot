@@ -37,7 +37,9 @@ print("Successfully loaded modules: " + str(ALL_MODULES))
 @run_async
 def test(bot, update):
     # pprint(eval(str(update)))
-    update.effective_message.reply_text("Hola tester! _I_ *have* `markdown`", parse_mode=ParseMode.MARKDOWN)
+    # update.effective_message.reply_text("Hola tester! _I_ *have* `markdown`", parse_mode=ParseMode.MARKDOWN)
+    update.effective_message.reply_text("This person edited a message")
+    print(update.effective_message)
 
 
 def start(bot, update):
@@ -133,7 +135,7 @@ def migrate_chats(bot, update):
 
 
 def main():
-    test_handler = CommandHandler("test", test)
+    test_handler = MessageHandler(Filters.all, test, edited_updates=True, message_updates=False)
     start_handler = CommandHandler("start", start)
     help_handler = CommandHandler("help", get_help)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
