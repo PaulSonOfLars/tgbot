@@ -3,7 +3,7 @@ from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.locks_sql as sql
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import can_delete, is_user_admin, bot_can_delete, user_admin
+from tg_bot.modules.helper_funcs import can_delete, is_user_admin, bot_can_delete, user_admin, user_not_admin
 from tg_bot.modules.sql import users_sql
 
 LOCK_TYPES = ["sticker", "audio", "voice", "document", "video", "contact", "photo"]
@@ -13,6 +13,7 @@ RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews']
 REST_GROUP = 1
 
 
+@run_async
 def locktypes(bot, update):
     update.effective_message.reply_text("\n - ".join(["Locks: "] + LOCK_TYPES + RESTRICTION_TYPES))
 
@@ -26,7 +27,7 @@ def lock(bot, update, args):
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=True)
-                message.reply_text("Locked {} for everyone!".format(args[0]))
+                message.reply_text("Locked {} messages for all non-admins!".format(args[0]))
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
@@ -103,6 +104,7 @@ def unlock(bot, update, args):
 
 
 @run_async
+@user_not_admin
 def del_sticker(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "sticker") and can_delete(chat, bot.id):
@@ -110,6 +112,7 @@ def del_sticker(bot, update):
 
 
 @run_async
+@user_not_admin
 def del_audio(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "audio") and can_delete(chat, bot.id):
@@ -117,6 +120,7 @@ def del_audio(bot, update):
 
 
 @run_async
+@user_not_admin
 def del_voice(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "voice") and can_delete(chat, bot.id):
@@ -124,6 +128,7 @@ def del_voice(bot, update):
 
 
 @run_async
+@user_not_admin
 def del_document(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "document") and can_delete(chat, bot.id):
@@ -131,6 +136,7 @@ def del_document(bot, update):
 
 
 @run_async
+@user_not_admin
 def del_video(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "video") and can_delete(chat, bot.id):
@@ -138,6 +144,7 @@ def del_video(bot, update):
 
 
 @run_async
+@user_not_admin
 def del_contact(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "contact") and can_delete(chat, bot.id):
@@ -145,6 +152,7 @@ def del_contact(bot, update):
 
 
 @run_async
+@user_not_admin
 def del_photo(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "photo") and can_delete(chat, bot.id):
@@ -152,6 +160,7 @@ def del_photo(bot, update):
 
 
 @run_async
+@user_not_admin
 def rest_msg(bot, update):
     msg = update.effective_message
     chat = update.effective_chat
@@ -165,6 +174,7 @@ def rest_msg(bot, update):
 
 
 @run_async
+@user_not_admin
 def rest_media(bot, update):
     msg = update.effective_message
     chat = update.effective_chat
@@ -177,6 +187,7 @@ def rest_media(bot, update):
 
 
 @run_async
+@user_not_admin
 def rest_other(bot, update):
     msg = update.effective_message
     chat = update.effective_chat

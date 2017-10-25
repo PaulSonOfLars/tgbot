@@ -2,7 +2,6 @@ import importlib
 import os
 
 import telegram
-from telegram import ParseMode
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop

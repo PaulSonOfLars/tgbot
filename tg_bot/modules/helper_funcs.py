@@ -1,6 +1,8 @@
 import re
 from functools import wraps
 
+from telegram.utils.helpers import escape_markdown
+
 from tg_bot.config import Development as Config
 
 
@@ -9,7 +11,8 @@ def can_delete(chat, bot_id):
 
 
 def is_user_admin(chat, user_id):
-    return chat.get_member(user_id).status == 'administrator' or chat.get_member(user_id).status == 'creator'
+    return chat.get_member(user_id).status == 'administrator' or chat.get_member(
+        user_id).status == 'creator' or user_id == Config.OWNER_ID
 
 
 def is_bot_admin(chat, bot_id):
@@ -67,7 +70,7 @@ def user_admin(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):
         user_id = update.effective_message.from_user.id
-        if is_user_admin(update.effective_chat, user_id) or user_id == Config.OWNER_ID:
+        if is_user_admin(update.effective_chat, user_id):
             func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("Who dis non-admin telling me what to do?")
@@ -75,24 +78,82 @@ def user_admin(func):
     return is_admin
 
 
-def markdown_parser(txt):
-    """
-    regex: matches all double *, _, ` as well as valid []() formations.
-    if these dont match, match lone *, _ \` and [ assign them the groupname `esc` - and escape them.
+def user_not_admin(func):
+    @wraps(func)
+    def is_not_admin(bot, update, *args, **kwargs):
+        user_id = update.effective_message.from_user.id
+        if not is_user_admin(update.effective_chat, user_id):
+            func(bot, update, *args, **kwargs)
 
-    :param txt:  text to parse
+    return is_not_admin
+
+
+# match * (bold) (don't escape if in url)
+# match _ (italics) (don't escape if in url)
+# match ` (code)
+# match []() (markdown link)
+# else, escape *, _, `, and [
+MATCH_MD = r'\*(.*?)\*|' \
+           r'_(.*?)_|' \
+           r'`(.*?)`|' \
+           r'(?<!\\)(\[.*?\])(\(.*?\))|' \
+           r'(?P<esc>[\*_`\[])'
+
+
+def _selective_escape(to_parse):
+    """
+    Escape all invalid markdown
+
+    :param to_parse: text to escape
     :return: valid markdown string
     """
-    match_md = r'\*(.*?)\*|' \
-               r'_(.*?)_|' \
-               r'`(.*?)`|' \
-               r'(?<!\\)(\[.*?\])(\(.*?\))|' \
-               r'(?P<esc>[\*`_\[])'
     offset = 0  # offset to be used as adding a \ character causes the string to shift
-    for e in re.finditer(match_md, txt):
-        # if e.group('astx') or e.group('bctck') or e.group('undes') or e.group('sqbrkt'):
+    for e in re.finditer(MATCH_MD, to_parse):
         if e.group('esc'):
-            start = e.start()
-            txt = txt[:start + offset] + '\\' + txt[start + offset:]
+            ent_start = e.start()
+            to_parse = to_parse[:ent_start + offset] + '\\' + to_parse[ent_start + offset:]
             offset += 1
-    return txt
+    return to_parse
+
+
+def markdown_parser(txt, entities=None, offset=0):
+    """
+    Parse a string, escaping all invalid markdown entities.
+
+    Escapes URL's so as to avoid URL mangling.
+    Re-adds any telegram code entities obtained from the entities object.
+
+    :param txt: text to parse
+    :param entities: dict of message entities in text
+    :param offset: message offset - command and notename length
+    :return: valid markdown string
+    """
+    if not entities:
+        entities = {}
+
+    # regex to find []() links
+    md_links = re.finditer(r'(?<!\\)\[.*?\]\((.*?)\)', txt)
+    prev = 0
+    res = ""
+    # for each message entity, check start pos
+    for ent, ent_text in entities.items():
+        start = ent.offset + offset
+        end = ent.length + start
+        # URL handling
+        if ent.type == "url":
+            # if a markdown link starts at the same point as an entity URL link, don't escape it
+            if any(match.start(1) == start for match in md_links):
+                continue
+            # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
+            else:
+                res += _selective_escape(txt[prev:start] or "") + escape_markdown(ent_text)
+        # code handling
+        elif ent.type == "code":
+            res += _selective_escape(txt[prev:start]) + '`' + ent_text + '`'
+        # anything else
+        else:
+            continue
+        prev = end
+
+    res += _selective_escape(txt[prev:])  # add the rest of the text
+    return res

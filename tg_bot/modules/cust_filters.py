@@ -1,8 +1,7 @@
 import re
 
 import telegram
-from telegram import Update
-from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop, run_async, Handler, Filters
+from telegram.ext import CommandHandler, BaseFilter, MessageHandler, DispatcherHandlerStop, run_async, Filters
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import user_admin

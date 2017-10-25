@@ -68,23 +68,20 @@ def save_replied(bot, update):
 @user_admin
 def save(bot, update):
     chat_id = update.effective_chat.id
-    text = update.effective_message.text
-    args = text.split(None, 2)  # use python's maxsplit to separate Cmd, note_name, and data
+    msg = update.effective_message
+    raw_text = msg.text
+    args = raw_text.split(None, 2)  # use python's maxsplit to separate Cmd, note_name, and data
 
     if len(args) >= 3:
         notename = args[1]
         txt = args[2]
 
         # Ensure backticks arent removed by telegram
-        counter = len(txt) - len(text)  # set correct offset relative to command + notename
-        for ent in update.effective_message.entities:
-            if ent.type == 'code':  # if code, add backticks
-                start = ent.offset + counter
-                end = ent.length + start
-                txt = txt[:start] + '`' + txt[start: end] + '`' + txt[end:]
-                counter += 2
+        counter = len(txt) - len(raw_text)  # set correct offset relative to command + notename
 
-        sql.add_note_to_db(chat_id, notename, markdown_parser(txt), is_reply=False)
+        sql.add_note_to_db(chat_id, notename,
+                           markdown_parser(txt, entities=msg.parse_entities(), offset=counter),
+                           is_reply=False)
         update.effective_message.reply_text("yas! added " + notename)
 
     else:
