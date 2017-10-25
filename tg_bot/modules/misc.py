@@ -42,16 +42,16 @@ RUN_STRINGS = (
 )
 
 SLAP_TEMPLATES = (
-    "{user1} {hits} @{user2} with a {item}.",
-    "{user1} {hits} @{user2} around a bit with a {item}.",
-    "{user1} {throws} a {item} at @{user2}.",
-    "{user1} grabs a {item} and {throws} it at @{user2}'s face.",
-    "{user1} launches a {item} in @{user2}'s general direction.",
-    "{user1} sits on @{user2}'s face while slamming a {item} into their crotch.",
-    "{user1} starts slapping @{user2} silly with a {item}.",
-    "{user1} pins @{user2} down and repeatedly {hits} them with a {item}.",
-    "{user1} grabs up a {item} and {hits} @{user2} with it.",
-    "{user1} ties @{user2} to a chair and {throws} a {item} at them.",
+    "{user1} {hits} {user2} with a {item}.",
+    "{user1} {hits} {user2} around a bit with a {item}.",
+    "{user1} {throws} a {item} at {user2}.",
+    "{user1} grabs a {item} and {throws} it at {user2}'s face.",
+    "{user1} launches a {item} in {user2}'s general direction.",
+    "{user1} sits on {user2}'s face while slamming a {item} into their crotch.",
+    "{user1} starts slapping {user2} silly with a {item}.",
+    "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
+    "{user1} grabs up a {item} and {hits} {user2} with it.",
+    "{user1} ties {user2} to a chair and {throws} a {item} at them.",
 )
 
 ITEMS = (
@@ -104,12 +104,24 @@ def runs(bot, update):
 
 
 def slap(bot, update):
-    if update.effective_message.reply_to_message:
-        user1 = "@" + update.effective_message.from_user.username
-        user2 = update.effective_message.reply_to_message.from_user.username
+    msg = update.effective_message
+
+    if msg.from_user.username:
+        curr_user = "@" + escape_markdown(msg.from_user.username)
+    else:
+        curr_user = "[{}](tg://user?id={})".format(escape_markdown(msg.from_user.first_name), msg.from_user.id)
+
+    if msg.reply_to_message:
+        user1 = curr_user
+        if msg.reply_to_message.from_user.username:
+            user2 = "@" + escape_markdown(msg.reply_to_message.from_user.username)
+        else:
+            user2 = "[{}](tg://user?id={})".format(escape_markdown(msg.reply_to_message.from_user.first_name),
+                                                   msg.from_user.id)
+
     else:
         user1 = "[{}](tg://user?id={})".format(escape_markdown(bot.first_name), bot.id)
-        user2 = update.effective_message.from_user.username
+        user2 = curr_user
 
     temp = random.choice(SLAP_TEMPLATES)
     item = random.choice(ITEMS)
@@ -118,7 +130,7 @@ def slap(bot, update):
 
     repl = temp.format(user1=user1, user2=user2, item=item, hits=hit, throws=throw)
 
-    update.effective_message.reply_text(repl, parse_mode=ParseMode.MARKDOWN)
+    msg.reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
