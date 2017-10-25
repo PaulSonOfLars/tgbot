@@ -132,7 +132,7 @@ def markdown_parser(txt, entities=None, offset=0):
         entities = {}
 
     # regex to find []() links
-    md_links = re.finditer(r'(?<!\\)\[.*?\]\((.*?)\)', txt)
+    pattern = re.compile(r'(?<!\\)\[.*?\]\((.*?)\)')
     prev = 0
     res = ""
     # for each message entity, check start pos
@@ -142,7 +142,7 @@ def markdown_parser(txt, entities=None, offset=0):
         # URL handling
         if ent.type == "url":
             # if a markdown link starts at the same point as an entity URL link, don't escape it
-            if any(match.start(1) == start for match in md_links):
+            if any(match.start(1) == start for match in re.finditer(pattern, txt)):
                 continue
             # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
             else:
