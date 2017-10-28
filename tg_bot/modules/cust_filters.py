@@ -137,7 +137,7 @@ __help__ = """
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter, pass_args=True)
 LIST_HANDLER = CommandHandler("filters", list_handlers)
-CUST_FILTER_HANDLER = MessageHandler(Filters.text, reply_filter)
+CUST_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command, reply_filter)
 
 dispatcher.add_handler(FILTER_HANDLER)
 dispatcher.add_handler(STOP_HANDLER)

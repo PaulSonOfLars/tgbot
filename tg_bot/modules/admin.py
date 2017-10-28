@@ -192,7 +192,7 @@ def kickme(bot, update):
     if is_user_admin(update.effective_chat, user_id):
         update.effective_message.reply_text("I wish I could... but you're an admin.")
         return
-    res = update.effective_chat.kick_member(user_id)
+    res = update.effective_chat.unban_member(user_id)  # unban on current user = kick
     if res:
         update.effective_message.reply_text("No problem.")
     else:
