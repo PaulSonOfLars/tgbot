@@ -1,9 +1,10 @@
 from telegram import ParseMode
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
+from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin
+from tg_bot.modules.helper_funcs import user_admin, markdown_parser
 
 
 @run_async
@@ -20,13 +21,15 @@ def new_member(bot, update):
                         if member.last_name \
                         else member.first_name
                     count = chat.get_members_count()
+                    username = ("@" + escape_markdown(member.username)) or "[{}](tg://user?id={})".format(member.first_name, member.id)
                     res = cust_welcome.format(first=member.first_name,
                                               last=member.last_name or member.first_name,
-                                              fullname=fullname, username=member.username or member.first_name,
-                                              count=count)
+                                              fullname=fullname, username=username,
+                                              count=count, chatname=chat.title)
                 else:
-                    res = "Hey {}, how are you?".format(member.first_name)
-                update.effective_message.reply_text(res)
+                    res = "Hey {}, how are you?".format(escape_markdown(member.first_name))
+
+                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -41,13 +44,14 @@ def left_member(bot, update):
                     if left_mem.last_name \
                     else left_mem.first_name
                 count = chat.get_members_count()
+                username = ("@" + escape_markdown(left_mem.username)) or "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
                 res = cust_leave.format(first=left_mem.first_name,
                                         last=left_mem.last_name or left_mem.first_name,
-                                        fullname=fullname, username=left_mem.username or left_mem.first_name,
-                                        count=count)
+                                        fullname=fullname, username=username,
+                                        count=count, chatname=chat.title)
             else:
                 res = "Nice knowing ya!"
-            update.effective_message.reply_text(res)
+            update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -76,7 +80,11 @@ def set_welcome(bot, update):
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
     if len(args) == 2:
-        sql.set_custom_welcome(chat_id, args[1])
+        txt = args[1]
+        offset = len(txt) - len(raw_text)  # set correct offset relative to command
+        markdown_welcome_message = markdown_parser(txt, entities=msg.parse_entities(), offset=offset)
+
+        sql.set_custom_welcome(chat_id, markdown_welcome_message)
         update.effective_message.reply_text("Successfully set custom welcome message!")
 
 
@@ -96,7 +104,11 @@ def set_leave(bot, update):
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
     if len(args) == 2:
-        sql.set_custom_leave(chat_id, args[1])
+        txt = args[1]
+        offset = len(txt) - len(raw_text)  # set correct offset relative to command
+        markdown_leave_message = markdown_parser(txt, entities=msg.parse_entities(), offset=offset)
+
+        sql.set_custom_leave(chat_id, markdown_leave_message)
         update.effective_message.reply_text("Successfully set custom leave message!")
 
 
@@ -117,8 +129,10 @@ WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in mult
                 "last name.\n" \
                 " - `{username}`: this represents the new user's *username*. Defaults to a mention of the user's " \
                 "first name.\n" \
-                " - `{count}`: this represents the new user's *member number*.\n\n" \
-                "Each variable MUST be surrounded by {} to be replaced."
+                " - `{count}`: this represents the new user's *member number*.\n" \
+                " - `{chatname}`: this represents the *current chat name*.\n" \
+                "\nEach variable MUST be surrounded by {} to be replaced." \
+                "\nWelcome messages also support markdown, so you can make any elements bold/italic/code/links."
 
 
 @run_async
@@ -142,11 +156,11 @@ __help__ = """
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)
-PREF_HANDLER = CommandHandler("welcome", change_preference, pass_args=True)
-SET_WELCOME = CommandHandler("setwelcome", set_welcome)
-SET_LEAVE = CommandHandler("setleave", set_leave)
-RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome)
-RESET_LEAVE = CommandHandler("resetleave", reset_leave)
+PREF_HANDLER = CommandHandler("welcome", change_preference, pass_args=True, filters=Filters.group)
+SET_WELCOME = CommandHandler("setwelcome", set_welcome, filters=Filters.group)
+SET_LEAVE = CommandHandler("setleave", set_leave, filters=Filters.group)
+RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
+RESET_LEAVE = CommandHandler("resetleave", reset_leave, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
 dispatcher.add_handler(NEW_MEM_HANDLER)

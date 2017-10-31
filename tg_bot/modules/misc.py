@@ -109,18 +109,18 @@ def slap(bot, update):
     if msg.from_user.username:
         curr_user = "@" + escape_markdown(msg.from_user.username)
     else:
-        curr_user = "[{}](tg://user?id={})".format(escape_markdown(msg.from_user.first_name), msg.from_user.id)
+        curr_user = "[{}](tg://user?id={})".format(msg.from_user.first_name, msg.from_user.id)
 
     if msg.reply_to_message:
         user1 = curr_user
         if msg.reply_to_message.from_user.username:
             user2 = "@" + escape_markdown(msg.reply_to_message.from_user.username)
         else:
-            user2 = "[{}](tg://user?id={})".format(escape_markdown(msg.reply_to_message.from_user.first_name),
+            user2 = "[{}](tg://user?id={})".format(msg.reply_to_message.from_user.first_name,
                                                    msg.from_user.id)
 
     else:
-        user1 = "[{}](tg://user?id={})".format(escape_markdown(bot.first_name), bot.id)
+        user1 = "[{}](tg://user?id={})".format(bot.first_name, bot.id)
         user2 = curr_user
 
     temp = random.choice(SLAP_TEMPLATES)

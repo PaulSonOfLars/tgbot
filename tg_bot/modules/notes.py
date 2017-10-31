@@ -76,16 +76,14 @@ def save(bot, update):
         notename = args[1]
         txt = args[2]
 
-        # Ensure backticks arent removed by telegram
-        counter = len(txt) - len(raw_text)  # set correct offset relative to command + notename
+        offset = len(txt) - len(raw_text)  # set correct offset relative to command + notename
+        markdown_note = markdown_parser(txt, entities=msg.parse_entities(), offset=offset)
+        sql.add_note_to_db(chat_id, notename, markdown_note, is_reply=False)
 
-        sql.add_note_to_db(chat_id, notename,
-                           markdown_parser(txt, entities=msg.parse_entities(), offset=counter),
-                           is_reply=False)
-        update.effective_message.reply_text("yas! added " + notename)
+        update.effective_message.reply_text("Yas! Added " + notename)
 
     else:
-        update.effective_message.reply_text("Dude, theres no note")
+        update.effective_message.reply_text("Dude, there's no note")
 
 
 def clear(bot, update, args):
@@ -94,7 +92,7 @@ def clear(bot, update, args):
         notename = args[0]
 
         if sql.rm_note(chat_id, notename):
-            update.effective_message.reply_text("Successfully removed note")
+            update.effective_message.reply_text("Successfully removed note.")
         else:
             update.effective_message.reply_text("That's not a note in my database!")
 

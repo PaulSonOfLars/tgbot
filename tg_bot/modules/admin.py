@@ -247,10 +247,10 @@ def adminlist(bot, update):
     text = "Admins in *{}*:".format(update.effective_chat.title or "this chat")
     for admin in administrators:
         user = admin.user
-        name = user.first_name + (user.last_name or "")
+        name = "[{}](tg://user?id={})".format(user.first_name + (user.last_name or ""), user.id)
         if user.username:
-            name = "@" + user.username
-        text += "\n - {}".format(escape_markdown(name))
+            name = escape_markdown("@" + user.username)
+        text += "\n - {}".format(name)
 
     update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
