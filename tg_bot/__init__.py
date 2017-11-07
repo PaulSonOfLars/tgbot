@@ -20,7 +20,7 @@ if not HEROKU:
 
 else:
     TOKEN = os.environ.get('TOKEN', None)
-    OWNER_ID = os.environ.get('OWNER_ID', None)
+    OWNER_ID = int(os.environ.get('OWNER_ID', None))
     MESSAGE_DUMP = os.environ.get('MESSAGE_DUMP', None)
 
 updater = Updater(TOKEN, workers=6)
