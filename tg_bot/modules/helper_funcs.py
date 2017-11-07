@@ -3,7 +3,8 @@ from functools import wraps
 
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot.config import Development as Config
+
+from tg_bot import OWNER_ID
 
 
 def can_delete(chat, bot_id):
@@ -12,7 +13,7 @@ def can_delete(chat, bot_id):
 
 def is_user_admin(chat, user_id):
     return chat.get_member(user_id).status == 'administrator' or chat.get_member(
-        user_id).status == 'creator' or user_id == Config.OWNER_ID
+        user_id).status == 'creator' or user_id == OWNER_ID
 
 
 def is_bot_admin(chat, bot_id):

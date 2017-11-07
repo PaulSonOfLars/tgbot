@@ -7,8 +7,7 @@ from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher
-from tg_bot.config import Development as Config
+from tg_bot import dispatcher, OWNER_ID
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -204,7 +203,7 @@ __help__ = """
 
 # TODO: /stats
 id_handler = CommandHandler("id", get_id)
-ip_handler = CommandHandler("ip", get_bot_ip, filters=Filters.chat(Config.OWNER_ID))
+ip_handler = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 
 time_handler = CommandHandler("time", get_time, pass_args=True)
 

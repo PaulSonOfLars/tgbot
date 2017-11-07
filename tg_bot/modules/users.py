@@ -6,8 +6,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.users_sql as sql
-from tg_bot import dispatcher
-from tg_bot.config import Development as Config
+from tg_bot import dispatcher, OWNER_ID
 
 USERS_GROUP = 2
 
@@ -53,7 +52,7 @@ def __migrate__(old_chat_id, new_chat_id):
 
 __help__ = ""  # no help string
 
-BROADCAST_HANDLER = (CommandHandler("broadcast", broadcast, filters=Filters.chat(Config.OWNER_ID)))
+BROADCAST_HANDLER = (CommandHandler("broadcast", broadcast, filters=Filters.chat(OWNER_ID)))
 USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
 
 dispatcher.add_handler(USER_HANDLER, USERS_GROUP)

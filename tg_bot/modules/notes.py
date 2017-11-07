@@ -4,8 +4,7 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
-from tg_bot import dispatcher
-from tg_bot.config import Development as Config
+from tg_bot import dispatcher, MESSAGE_DUMP
 from tg_bot.modules.helper_funcs import markdown_parser, user_admin
 
 
@@ -15,7 +14,7 @@ def get(bot, update, notename, show_none=True):
     note = sql.get_note(chat_id, notename)
     if note:
         if note.is_reply:
-            bot.forward_message(chat_id=chat_id, from_chat_id=Config.MESSAGE_DUMP or chat_id, message_id=note.value)
+            bot.forward_message(chat_id=chat_id, from_chat_id=MESSAGE_DUMP or chat_id, message_id=note.value)
         else:
             update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
                                                 disable_web_page_preview=True)
@@ -57,8 +56,8 @@ def save_replied(bot, update):
 
     msg = update.effective_message.reply_to_message
 
-    if Config.MESSAGE_DUMP:
-        msg = bot.forward_message(chat_id=Config.MESSAGE_DUMP, from_chat_id=chat_id, message_id=msg.message_id)
+    if MESSAGE_DUMP:
+        msg = bot.forward_message(chat_id=MESSAGE_DUMP, from_chat_id=chat_id, message_id=msg.message_id)
 
     sql.add_note_to_db(chat_id, notename, msg.message_id, is_reply=True)
     update.effective_message.reply_text("yas! added replied message " + notename)
