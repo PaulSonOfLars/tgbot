@@ -55,9 +55,11 @@ def sed(bot, update):
         else:
             t = re.sub(r, rw, update.effective_message.reply_to_message.text)
 
-        update.effective_message.reply_text(t)
+        # empty string errors -_-
+        if t:
+            update.effective_message.reply_text(t)
 
 
-SED_HANDLER = RegexHandler('s/.*?/.*?/', sed)
+SED_HANDLER = RegexHandler('s(/.*?/.*?/|:.*?:.*?:|_.*?_.*?_)', sed)
 
 dispatcher.add_handler(SED_HANDLER)
