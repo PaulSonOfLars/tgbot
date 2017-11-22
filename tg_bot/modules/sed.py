@@ -51,9 +51,9 @@ def sed(bot, update):
     if r:
         r, rw, f = r
         if "I" in f or "i" in f:
-            t = re.sub(r, rw, update.effective_message.reply_to_message.text, flags=re.I)
+            t = re.sub(r, rw, update.effective_message.reply_to_message.text, flags=re.I).strip()
         else:
-            t = re.sub(r, rw, update.effective_message.reply_to_message.text)
+            t = re.sub(r, rw, update.effective_message.reply_to_message.text).strip()
 
         # empty string errors -_-
         if t:
