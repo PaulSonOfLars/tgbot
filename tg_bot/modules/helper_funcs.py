@@ -1,8 +1,8 @@
 import re
 from functools import wraps
 
+import telegram
 from telegram.utils.helpers import escape_markdown
-
 
 from tg_bot import OWNER_ID
 
@@ -158,3 +158,23 @@ def markdown_parser(txt, entities=None, offset=0):
 
     res += _selective_escape(txt[prev:])  # add the rest of the text
     return res
+
+
+def split_message(msg):
+    if len(msg) < telegram.MAX_MESSAGE_LENGTH:
+        return [msg]
+    else:
+        lines = msg.splitlines()
+        small_msg = ""
+        result = []
+        for line in lines:
+            if len(small_msg) + len(line) + 1 < telegram.MAX_MESSAGE_LENGTH:
+                small_msg += line + "\n"
+            else:
+                result.append(small_msg)
+                small_msg = line + "\n"
+        else:
+            # Else statement at the end of the for loop, so append the leftover string.
+            result.append(small_msg)
+
+        return result
