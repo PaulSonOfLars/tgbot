@@ -11,9 +11,10 @@ def can_delete(chat, bot_id):
     return chat.get_member(bot_id).can_delete_messages
 
 
-def is_user_admin(chat, user_id):
-    return chat.get_member(user_id).status == 'administrator' or chat.get_member(
-        user_id).status == 'creator' or user_id == OWNER_ID
+def is_user_admin(chat, user_id, member=None):
+    if not member:
+        member = chat.get_member(user_id)
+    return member.status == 'administrator' or member.status == 'creator' or member.user.id == OWNER_ID
 
 
 def is_bot_admin(chat, bot_id):
