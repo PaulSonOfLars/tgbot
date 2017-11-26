@@ -9,8 +9,8 @@ class Welcome(BASE):
     __tablename__ = "welcome_pref"
     chat_id = Column(String(14), primary_key=True)
     should_welcome = Column(Boolean, default=True)
-    custom_welcome = Column(UnicodeText, default="")
-    custom_leave = Column(UnicodeText, default="")
+    custom_welcome = Column(UnicodeText, default=DEFAULT_WELCOME)
+    custom_leave = Column(UnicodeText, default=DEFAULT_LEAVE)
 
     def __init__(self, chat_id, should_welcome=True):
         self.chat_id = chat_id
@@ -24,6 +24,9 @@ Welcome.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.Lock()
 
+DEFAULT_WELCOME = "Hey {first}, how are you?"
+DEFAULT_LEAVE = "Nice knowing ya!"
+
 
 def get_preference(chat_id):
     welc = SESSION.query(Welcome).get(str(chat_id))
@@ -31,7 +34,7 @@ def get_preference(chat_id):
         return welc.should_welcome, welc.custom_welcome, welc.custom_leave
     else:
         # Welcome by default.
-        return True, "", ""
+        return True, DEFAULT_WELCOME, DEFAULT_LEAVE
 
 
 def set_preference(chat_id, should_welcome):
@@ -51,7 +54,7 @@ def set_custom_welcome(chat_id, custom_welcome):
         welcome_settings = SESSION.query(Welcome).get(str(chat_id))
         if not welcome_settings:
             welcome_settings = Welcome(str(chat_id), True)
-        welcome_settings.custom_welcome = custom_welcome
+        welcome_settings.custom_welcome = custom_welcome or DEFAULT_WELCOME
 
         SESSION.add(welcome_settings)
         SESSION.commit()
@@ -59,7 +62,7 @@ def set_custom_welcome(chat_id, custom_welcome):
 
 def get_custom_welcome(chat_id):
     welcome_settings = SESSION.query(Welcome).get(str(chat_id))
-    ret = ""
+    ret = DEFAULT_WELCOME
     if welcome_settings and welcome_settings.custom_welcome:
         ret = welcome_settings.custom_welcome
 
@@ -72,7 +75,7 @@ def set_custom_leave(chat_id, custom_leave):
         welcome_settings = SESSION.query(Welcome).get(str(chat_id))
         if not welcome_settings:
             welcome_settings = Welcome(str(chat_id), True)
-        welcome_settings.custom_leave = custom_leave
+        welcome_settings.custom_leave = custom_leave or DEFAULT_LEAVE
 
         SESSION.add(welcome_settings)
         SESSION.commit()
@@ -80,7 +83,7 @@ def set_custom_leave(chat_id, custom_leave):
 
 def get_custom_leave(chat_id):
     welcome_settings = SESSION.query(Welcome).get(str(chat_id))
-    ret = ""
+    ret = DEFAULT_LEAVE
     if welcome_settings and welcome_settings.custom_leave:
         ret = welcome_settings.custom_leave
 

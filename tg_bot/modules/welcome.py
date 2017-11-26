@@ -1,3 +1,4 @@
+import telegram
 from telegram import ParseMode
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import escape_markdown
@@ -12,22 +13,27 @@ def new_member(bot, update):
     chat = update.effective_chat
     should_welc, cust_welcome, _ = sql.get_preference(chat.id)
     if should_welc:
-        new_mem = update.effective_message.new_chat_members
-        for member in new_mem:
+        new_members = update.effective_message.new_chat_members
+        for new_mem in new_members:
             # Don't welcome yourself
-            if not member.id == bot.id:
+            if not new_mem.id == bot.id:
                 if cust_welcome:
-                    fullname = "{} {}".format(member.first_name, member.last_name) \
-                        if member.last_name \
-                        else member.first_name
+                    if new_mem.last_name:
+                        fullname = "{} {}".format(new_mem.first_name, new_mem.last_name)
+                    else:
+                        fullname = new_mem.first_name
                     count = chat.get_members_count()
-                    username = ("@" + escape_markdown(member.username)) or "[{}](tg://user?id={})".format(member.first_name, member.id)
-                    res = cust_welcome.format(first=member.first_name,
-                                              last=member.last_name or member.first_name,
+                    if new_mem.username:
+                        username = "@" + escape_markdown(new_mem.username)
+                    else:
+                        username = "[{}](tg://user?id={})".format(new_mem.first_name, new_mem.id)
+
+                    res = cust_welcome.format(first=new_mem.first_name,
+                                              last=new_mem.last_name or new_mem.first_name,
                                               fullname=fullname, username=username,
                                               count=count, chatname=chat.title)
                 else:
-                    res = "Hey {}, how are you?".format(escape_markdown(member.first_name))
+                    res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
 
                 update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
 
@@ -40,30 +46,52 @@ def left_member(bot, update):
         left_mem = update.effective_message.left_chat_member
         if left_mem:
             if cust_leave:
-                fullname = "{} {}".format(left_mem.first_name, left_mem.last_name) \
-                    if left_mem.last_name \
-                    else left_mem.first_name
+                if left_mem.last_name:
+                    fullname = "{} {}".format(left_mem.first_name, left_mem.last_name)
+                else:
+                    fullname = left_mem.first_name
                 count = chat.get_members_count()
-                username = ("@" + escape_markdown(left_mem.username)) or "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
+                if left_mem.username:
+                    username = "@" + escape_markdown(left_mem.username)
+                else:
+                    username = "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
+
                 res = cust_leave.format(first=left_mem.first_name,
                                         last=left_mem.last_name or left_mem.first_name,
                                         fullname=fullname, username=username,
                                         count=count, chatname=chat.title)
             else:
-                res = "Nice knowing ya!"
+                res = sql.DEFAULT_LEAVE
+
             update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
 @user_admin
-def change_preference(bot, update, args):
+def welcome(bot, update, args):
     chat = update.effective_chat
-    if len(args) >= 1:
-        if args[0].lower() == "on" or args[0].lower() == "yes":
+    # if no args, show current replies.
+    if len(args) == 0:
+        pref, welcome_m, leave_m = sql.get_preference(chat.id)
+        reply_setting = "This chat has it's welcome setting set to: {}.".format(pref)
+        reply_welcome = "This chat has it's welcome setting set to: {}, the welcome message is:\n{}, and the leave \
+            message is too long to display.".format(pref, welcome_m)
+        reply_both = "This chat has it's welcome setting set to: {}, the welcome message is:\n'{}', and the leave \
+            message is:'{}'.".format(pref, welcome_m, leave_m)
+
+        if len(reply_both) < telegram.MAX_MESSAGE_LENGTH:
+            update.effective_message.reply_text(reply_both)
+        elif len(reply_welcome) < telegram.MAX_MESSAGE_LENGTH:
+            update.effective_message.reply_text(reply_welcome)
+        else:
+            update.effective_message.reply_text(reply_setting)
+
+    elif len(args) >= 1:
+        if args[0].lower() in ("on", "yes"):
             sql.set_preference(str(chat.id), True)
             update.effective_message.reply_text("I'll be polite!")
 
-        elif args[0].lower() == "off" or args[0].lower() == "no":
+        elif args[0].lower() in ("off", "no"):
             sql.set_preference(str(chat.id), False)
             update.effective_message.reply_text("I'm sulking, not saying hello anymore.")
 
@@ -156,7 +184,7 @@ __help__ = """
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)
-PREF_HANDLER = CommandHandler("welcome", change_preference, pass_args=True, filters=Filters.group)
+PREF_HANDLER = CommandHandler("welcome", welcome, pass_args=True, filters=Filters.group)
 SET_WELCOME = CommandHandler("setwelcome", set_welcome, filters=Filters.group)
 SET_LEAVE = CommandHandler("setleave", set_leave, filters=Filters.group)
 RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
