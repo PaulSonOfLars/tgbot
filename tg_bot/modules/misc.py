@@ -193,7 +193,11 @@ def get_time(bot, update, args):
                 update.message.reply_text("It's {} in {}".format(time_there, location))
 
 
-# /ip is for private use, and /runs is better left undocumented...
+def echo(bot, update):
+    args = update.effective_message.text.split(None, 1)
+    update.effective_message.reply_text(args[1])
+
+# /ip is for private use
 __help__ = """
  - /id: get the current group id. If used by replying to a message, gets that user's id.
  - /runs: reply a random string from an array of replies.
@@ -210,8 +214,11 @@ TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 RUNS_HANDLER = CommandHandler("runs", runs)
 SLAP_HANDLER = CommandHandler("slap", slap)
 
+ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
+
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(IP_HANDLER)
 dispatcher.add_handler(TIME_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
+dispatcher.add_handler(ECHO_HANDLER)
