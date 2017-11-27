@@ -1,7 +1,6 @@
 import importlib
 import os
 
-import telegram
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
@@ -10,6 +9,7 @@ from tg_bot import dispatcher, updater, TOKEN, HEROKU
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
+from tg_bot.modules.helper_funcs import split_message
 
 HELP_STRINGS = """
 Commands available:
@@ -73,27 +73,6 @@ def error_callback(bot, update, error):
     except TelegramError:
         print(error)
         # handle all other telegram related errors
-
-
-def split_message(msg):
-    if len(msg) < telegram.MAX_MESSAGE_LENGTH:
-        return [msg]
-    else:
-        lines = HELP_STRINGS.splitlines()
-        small_help = ""
-        result = []
-        for line in lines:
-            newline = line + "\n"
-            if len(small_help) + len(newline) < telegram.MAX_MESSAGE_LENGTH:
-                small_help += newline
-            else:
-                result.append(small_help)
-                small_help = newline
-        else:
-            # Else statement at the end of the for loop, to append leftover string.
-            result.append(small_help)
-
-        return result
 
 
 @run_async

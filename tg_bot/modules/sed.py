@@ -1,6 +1,7 @@
 import re
 
-from telegram.ext import MessageHandler, RegexHandler, run_async
+import telegram
+from telegram.ext import RegexHandler, run_async
 
 from tg_bot import dispatcher
 
@@ -56,9 +57,18 @@ def sed(bot, update):
             t = re.sub(r, rw, update.effective_message.reply_to_message.text).strip()
 
         # empty string errors -_-
-        if t:
+        if len(t) >= telegram.MAX_MESSAGE_LENGTH:
+            update.effective_message.reply_text("The result of the sed command was too long for telegram!")
+        elif t:
             update.effective_message.reply_text(t)
 
+
+__help__ = f"""
+ - s/<text1>/<text2>/<flag>: Reply to a message with this to perform a sed operation on that message, replacing all \
+occurrences of 'text1' with 'text2'. Flags are optional, and currently include 'i' for ignore case, or nothing. \
+Delimiters include '/', '_' and ':'. Text grouping is supported. The resulting message cannot be larger than \
+{telegram.MAX_MESSAGE_LENGTH}
+"""
 
 SED_HANDLER = RegexHandler('s(/.*?/.*?/|:.*?:.*?:|_.*?_.*?_)', sed)
 
