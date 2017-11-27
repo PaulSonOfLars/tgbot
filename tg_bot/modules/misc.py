@@ -202,16 +202,16 @@ __help__ = """
 """
 
 # TODO: /stats
-id_handler = CommandHandler("id", get_id)
-ip_handler = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
+ID_HANDLER = CommandHandler("id", get_id)
+IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 
-time_handler = CommandHandler("time", get_time, pass_args=True)
+TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
-runs_handler = CommandHandler("runs", runs)
-slap_handler = CommandHandler("slap", slap)
+RUNS_HANDLER = CommandHandler("runs", runs)
+SLAP_HANDLER = CommandHandler("slap", slap)
 
-dispatcher.add_handler(id_handler)
-dispatcher.add_handler(time_handler)
-dispatcher.add_handler(runs_handler)
-dispatcher.add_handler(slap_handler)
-dispatcher.add_handler(ip_handler)
+dispatcher.add_handler(ID_HANDLER)
+dispatcher.add_handler(IP_HANDLER)
+dispatcher.add_handler(TIME_HANDLER)
+dispatcher.add_handler(RUNS_HANDLER)
+dispatcher.add_handler(SLAP_HANDLER)

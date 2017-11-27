@@ -158,7 +158,7 @@ def unpin(bot, update):
 @run_async
 @bot_admin
 @user_admin
-def kick(bot, update, args):
+def ban(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
     prev_message = message.reply_to_message
@@ -184,14 +184,14 @@ def kick(bot, update, args):
         return
 
     if is_user_admin(chat, user_id):
-        message.reply_text("I really wish I could kick admins...")
+        message.reply_text("I really wish I could ban admins...")
         return
     res = update.effective_chat.kick_member(user_id)
     if res:
         bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')  # banhammer marie sticker
-        message.reply_text("Kicked!")
+        message.reply_text("Banned!")
     else:
-        message.reply_text("Well damn, I can't kick that user.")
+        message.reply_text("Well damn, I can't ban that user.")
 
 
 @run_async
@@ -211,7 +211,7 @@ def kickme(bot, update):
 @run_async
 @bot_admin
 @user_admin
-def unkick(bot, update, args):
+def unban(bot, update, args):
     message = update.effective_message
 
     if len(args) >= 1 and args[0][0] == '@':
@@ -279,8 +279,8 @@ __help__ = """
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
 UNPIN_HANDLER = CommandHandler("unpin", unpin)
 
-KICK_HANDLER = CommandHandler("ban", kick, pass_args=True)
-UNKICK_HANDLER = CommandHandler("unban", unkick, pass_args=True)
+KICK_HANDLER = CommandHandler("ban", ban, pass_args=True)
+UNKICK_HANDLER = CommandHandler("unban", unban, pass_args=True)
 KICKME_HANDLER = CommandHandler("kickme", kickme)
 
 INVITE_HANDLER = CommandHandler("invitelink", invite)

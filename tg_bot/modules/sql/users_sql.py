@@ -35,8 +35,7 @@ class Chats(BASE):
 class ChatMembers(BASE):
     __tablename__ = "chat_members"
     priv_chat_id = Column(Integer, primary_key=True)
-    # chat = relationship("Chats", order_by="chats.chat_id", cascade="all, delete-orphan")
-    # user = relationship("Users", order_by="users.user_id", cascade="all, delete-orphan")
+    # NOTE: Use dual primary key instead of private primary key?
     chat = Column(String(14),
                   ForeignKey("chats.chat_id",
                              onupdate="CASCADE",
