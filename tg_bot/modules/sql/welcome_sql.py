@@ -4,6 +4,9 @@ from sqlalchemy import Column, String, Boolean, UnicodeText
 
 from tg_bot.modules.sql import SESSION, BASE
 
+DEFAULT_WELCOME = "Hey {first}, how are you?"
+DEFAULT_LEAVE = "Nice knowing ya!"
+
 
 class Welcome(BASE):
     __tablename__ = "welcome_pref"
@@ -23,9 +26,6 @@ class Welcome(BASE):
 Welcome.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.Lock()
-
-DEFAULT_WELCOME = "Hey {first}, how are you?"
-DEFAULT_LEAVE = "Nice knowing ya!"
 
 
 def get_preference(chat_id):
