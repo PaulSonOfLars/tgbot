@@ -17,9 +17,11 @@ class Warns(BASE):
     def __init__(self, user_id, chat_id):
         self.user_id = user_id
         self.chat_id = str(chat_id)
+        self.num_warns = 0
+        self.reasons = []
 
     def __repr__(self):
-        return "<{} warns for {} in {}>".format(self.num_warns, self.user_id, self.chat_id)
+        return "<{} warns for {} in {} for reasons {}>".format(self.num_warns, self.user_id, self.chat_id, self.reasons)
 
 
 Warns.__table__.create(checkfirst=True)
@@ -27,14 +29,15 @@ Warns.__table__.create(checkfirst=True)
 INSERTION_LOCK = threading.Lock()
 
 
-def warn_user(user_id, chat_id, reason):
+def warn_user(user_id, chat_id, reason=None):
     with INSERTION_LOCK:
-        warned_user = SESSION.query(Warns).get(user_id, str(chat_id))
+        warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
         if not warned_user:
             warned_user = Warns(user_id, str(chat_id))
 
         warned_user.num_warns += 1
-        warned_user.reasons.append(reason)
+        if reason:
+            warned_user.reasons = warned_user.reasons + [reason]  # TODO:: double check this wizardry
 
         SESSION.add(warned_user)
         SESSION.commit()
@@ -44,7 +47,7 @@ def warn_user(user_id, chat_id, reason):
 
 def reset_warns(user_id, chat_id):
     with INSERTION_LOCK:
-        warned_user = SESSION.query(Warns).get(user_id, str(chat_id))
+        warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
 
         warned_user.num_warns = 0
         warned_user.reasons = []
@@ -54,4 +57,4 @@ def reset_warns(user_id, chat_id):
 
 
 def get_warns(user_id, chat_id):
-    return SESSION.query(Warns).get(user_id, str(chat_id))
+    return SESSION.query(Warns).get((user_id, str(chat_id)))
