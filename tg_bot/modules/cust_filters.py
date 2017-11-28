@@ -113,13 +113,16 @@ def stop_filter(bot, update, args):
 def reply_filter(bot, update):
     chat_filters = sql.get_chat_filters(update.effective_chat.id)
     message = update.effective_message
+    to_match = message.text or message.sticker or message.caption
+    if not to_match:
+        return
     for filt in chat_filters:
         pattern = "( |^|[^\w])" + re.escape(filt.keyword) + "( |$|[^\w])"
-        if re.search(pattern, message.text, flags=re.IGNORECASE):
+        if re.search(pattern, to_match, flags=re.IGNORECASE):
             if filt.is_sticker:
-                update.effective_message.reply_sticker(filt.reply)
+                message.reply_sticker(filt.reply)
             else:
-                update.effective_message.reply_text(filt.reply)
+                message.reply_text(filt.reply)
             break
 
 
@@ -137,7 +140,7 @@ __help__ = """
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter, pass_args=True)
 LIST_HANDLER = CommandHandler("filters", list_handlers)
-CUST_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command, reply_filter)
+CUST_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
 
 dispatcher.add_handler(FILTER_HANDLER)
 dispatcher.add_handler(STOP_HANDLER)
