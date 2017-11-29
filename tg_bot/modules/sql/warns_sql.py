@@ -58,3 +58,11 @@ def reset_warns(user_id, chat_id):
 
 def get_warns(user_id, chat_id):
     return SESSION.query(Warns).get((user_id, str(chat_id)))
+
+
+def migrate_chat(old_chat_id, new_chat_id):
+    with INSERTION_LOCK:
+        chat_notes = SESSION.query(Warns).filter(Warns.chat_id == str(old_chat_id)).all()
+        for note in chat_notes:
+            note.chat_id = str(new_chat_id)
+        SESSION.commit()
