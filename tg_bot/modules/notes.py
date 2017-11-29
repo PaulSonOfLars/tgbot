@@ -1,4 +1,5 @@
-from telegram import MAX_MESSAGE_LENGTH, ParseMode
+import re
+from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, RegexHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
@@ -15,6 +16,16 @@ def get(bot, update, notename, show_none=True):
     if note:
         if note.is_reply:
             bot.forward_message(chat_id=chat_id, from_chat_id=MESSAGE_DUMP or chat_id, message_id=note.value)
+        elif note.has_buttons:
+            buttons = sql.get_buttons(chat_id, notename)
+            keyb = []
+            for b in buttons:
+                keyb.append([InlineKeyboardButton(b.name, url=b.url)])
+
+            keyboard = InlineKeyboardMarkup(keyb)
+            update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
+                                                disable_web_page_preview=True,
+                                                reply_markup=keyboard)
         else:
             update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
                                                 disable_web_page_preview=True)
@@ -72,14 +83,33 @@ def save(bot, update):
     args = raw_text.split(None, 2)  # use python's maxsplit to separate Cmd, note_name, and data
 
     if len(args) >= 3:
-        notename = args[1]
+        note_name = args[1]
         txt = args[2]
 
         offset = len(txt) - len(raw_text)  # set correct offset relative to command + notename
         markdown_note = markdown_parser(txt, entities=msg.parse_entities(), offset=offset)
-        sql.add_note_to_db(chat_id, notename, markdown_note, is_reply=False)
 
-        update.effective_message.reply_text("Yas! Added " + notename)
+        prev = 0
+        note_data = ""
+        buttons = []
+        for x in re.finditer("(\[([^\[]+?)\]\(buttonurl://(.+?)\))", markdown_note):
+            buttons.append((x.group(2), x.group(3)))
+            note_data += markdown_note[prev:x.start(1)]
+            prev = x.end(1)
+        else:
+            note_data += markdown_note[prev:]
+
+        note_data = note_data.strip()
+        if not note_data:
+            update.effective_message.reply_text("You can't save an empty message! If you added a button, you MUST \
+                                                 have some text in the message too.")
+            return
+        sql.add_note_to_db(chat_id, note_name, note_data, is_reply=False, has_buttons=bool(buttons))
+
+        for b_name, url in buttons:
+            sql.add_note_button_to_db(chat_id, note_name, b_name, url)
+
+        update.effective_message.reply_text("Yas! Added " + note_name)
 
     else:
         update.effective_message.reply_text("Dude, there's no note")

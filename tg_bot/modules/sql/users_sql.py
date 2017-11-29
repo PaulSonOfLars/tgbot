@@ -111,6 +111,7 @@ def get_all_chats():
     return SESSION.query(Chats).all()
 
 
+# TODO: migrate chat_members too
 def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:
         chat = SESSION.query(Chats).get(str(old_chat_id))
