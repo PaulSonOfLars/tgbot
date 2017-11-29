@@ -195,7 +195,9 @@ def get_time(bot, update, args):
 
 def echo(bot, update):
     args = update.effective_message.text.split(None, 1)
-    update.effective_message.reply_text(args[1])
+    update.effective_message.reply_text(args[1], quote=False)
+    update.effective_message.delete()
+
 
 # /ip is for private use
 __help__ = """

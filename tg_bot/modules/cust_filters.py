@@ -113,7 +113,7 @@ def stop_filter(bot, update, args):
 def reply_filter(bot, update):
     chat_filters = sql.get_chat_filters(update.effective_chat.id)
     message = update.effective_message
-    to_match = message.text or message.caption or message.sticker.emoji
+    to_match = message.text or message.caption or (message.sticker.emoji if message.sticker else None)
     if not to_match:
         return
     for filt in chat_filters:

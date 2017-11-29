@@ -1,6 +1,7 @@
 {
   "load": [],
   "no_load": [
-    "translation"
+    "translation",
+    "warns"
   ]
 }
