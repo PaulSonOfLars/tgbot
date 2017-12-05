@@ -1,7 +1,7 @@
 import re
 from functools import wraps
 
-import telegram
+from telegram import MAX_MESSAGE_LENGTH
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import OWNER_ID
@@ -144,7 +144,7 @@ def markdown_parser(txt, entities=None, offset=0):
         # URL handling
         if ent.type == "url":
             # if a markdown link starts at the same point as an entity URL link, don't escape it
-            if any(match.start(1) == start for match in re.finditer(pattern, txt)):
+            if any(match.start(1) <= start and end <= match.end(1) for match in pattern.finditer(txt)):
                 continue
             # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
             else:
@@ -162,14 +162,14 @@ def markdown_parser(txt, entities=None, offset=0):
 
 
 def split_message(msg):
-    if len(msg) < telegram.MAX_MESSAGE_LENGTH:
+    if len(msg) < MAX_MESSAGE_LENGTH:
         return [msg]
     else:
         lines = msg.splitlines()
         small_msg = ""
         result = []
         for line in lines:
-            if len(small_msg) + len(line) + 1 < telegram.MAX_MESSAGE_LENGTH:
+            if len(small_msg) + len(line) + 1 < MAX_MESSAGE_LENGTH:
                 small_msg += line + "\n"
             else:
                 result.append(small_msg)

@@ -1,11 +1,13 @@
 import re
+
 from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, RegexHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
-from tg_bot import dispatcher, MESSAGE_DUMP
+from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME
 from tg_bot.modules.helper_funcs import markdown_parser, user_admin
 
 
@@ -23,12 +25,20 @@ def get(bot, update, notename, show_none=True):
                 keyb.append([InlineKeyboardButton(b.name, url=b.url)])
 
             keyboard = InlineKeyboardMarkup(keyb)
-            update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
-                                                disable_web_page_preview=True,
-                                                reply_markup=keyboard)
+            try:
+                update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
+                                                    disable_web_page_preview=True,
+                                                    reply_markup=keyboard)
+            except BadRequest:
+                update.effective_message.reply_text("This note is not formatted correctly. Could not send. Contact @{}"
+                                                    " if you can't figure out why!".format(OWNER_USERNAME))
         else:
-            update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
-                                                disable_web_page_preview=True)
+            try:
+                update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
+                                                    disable_web_page_preview=True)
+            except BadRequest:
+                update.effective_message.reply_text("This note is not formatted correctly. Could not send. Contact @{}"
+                                                    " if you can't figure out why!".format(OWNER_USERNAME))
         return
     elif show_none:
         update.effective_message.reply_text("This note doesn't exist")
@@ -92,7 +102,7 @@ def save(bot, update):
         prev = 0
         note_data = ""
         buttons = []
-        for x in re.finditer("(\[([^\[]+?)\]\(buttonurl://(.+?)\))", markdown_note):
+        for x in re.finditer("(\[([^\[]+?)\]\(buttonurl:(.+?)\))", markdown_note):
             buttons.append((x.group(2), x.group(3)))
             note_data += markdown_note[prev:x.start(1)]
             prev = x.end(1)
@@ -101,8 +111,8 @@ def save(bot, update):
 
         note_data = note_data.strip()
         if not note_data:
-            update.effective_message.reply_text("You can't save an empty message! If you added a button, you MUST \
-                                                 have some text in the message too.")
+            update.effective_message.reply_text("You can't save an empty message! If you added a button, you MUST "
+                                                "have some text in the message too.")
             return
         sql.add_note_to_db(chat_id, note_name, note_data, is_reply=False, has_buttons=bool(buttons))
 
@@ -153,13 +163,15 @@ __help__ = """
  - /get  <notename>: get the note with this notename
  - #<notename>: same as /get
  - /save <notename> <notedata>: saves notedata as a note with name notename
+A button can be added to a botton by using standard markdown link syntax - the link should just be prepended with a \
+`buttonurl:` section, as such: `[somelink](buttonurl:example.com)`
  - /save <notename>: save the replied message as a note with name notename
  - /notes or /saved: list all saved notes in this chat
  - /clear <notename>: clear note with this name
 """
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
-HASH_GET_HANDLER = RegexHandler(r"^#([^\s])+", hash_get)
+HASH_GET_HANDLER = RegexHandler(r"^#[^\s]+", hash_get)
 
 SAVE_HANDLER = CommandHandler("save", save, filters=~Filters.reply)
 REPL_SAVE_HANDLER = CommandHandler("save", save_replied, filters=Filters.reply)

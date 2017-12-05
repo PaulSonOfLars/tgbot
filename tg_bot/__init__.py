@@ -17,11 +17,13 @@ if not HEROKU:
     TOKEN = Config.API_KEY
     OWNER_ID = Config.OWNER_ID
     MESSAGE_DUMP = Config.MESSAGE_DUMP
+    OWNER_USERNAME = Config.OWNER_USERNAME
 
 else:
     TOKEN = os.environ.get('TOKEN', None)
     OWNER_ID = int(os.environ.get('OWNER_ID', None))
     MESSAGE_DUMP = os.environ.get('MESSAGE_DUMP', None)
+    OWNER_USERNAME = os.environ.get("OWNER_USERNAME", None)
 
 updater = Updater(TOKEN, workers=6)
 
