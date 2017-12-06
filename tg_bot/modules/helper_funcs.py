@@ -95,11 +95,11 @@ def user_not_admin(func):
 # match ` (code)
 # match []() (markdown link)
 # else, escape *, _, `, and [
-MATCH_MD = r'\*(.*?)\*|' \
-           r'_(.*?)_|' \
-           r'`(.*?)`|' \
-           r'(?<!\\)(\[.*?\])(\(.*?\))|' \
-           r'(?P<esc>[\*_`\[])'
+MATCH_MD = re.compile(r'\*(.*?)\*|'
+                      r'_(.*?)_|'
+                      r'`(.*?)`|'
+                      r'(?<!\\)(\[.*?\])(\(.*?\))|'
+                      r'(?P<esc>[\*_`\[])')
 
 
 def _selective_escape(to_parse):
@@ -110,7 +110,7 @@ def _selective_escape(to_parse):
     :return: valid markdown string
     """
     offset = 0  # offset to be used as adding a \ character causes the string to shift
-    for e in re.finditer(MATCH_MD, to_parse):
+    for e in MATCH_MD.finditer(to_parse):
         if e.group('esc'):
             ent_start = e.start()
             to_parse = to_parse[:ent_start + offset] + '\\' + to_parse[ent_start + offset:]

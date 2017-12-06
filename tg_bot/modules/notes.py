@@ -10,6 +10,7 @@ import tg_bot.modules.sql.notes_sql as sql
 from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME
 from tg_bot.modules.helper_funcs import markdown_parser, user_admin
 
+BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\(buttonurl:(.+?)\))")
 
 # Do not async
 def get(bot, update, notename, show_none=True):
@@ -102,7 +103,7 @@ def save(bot, update):
         prev = 0
         note_data = ""
         buttons = []
-        for x in re.finditer("(\[([^\[]+?)\]\(buttonurl:(.+?)\))", markdown_note):
+        for x in BTN_URL_REGEX.finditer(markdown_note):
             buttons.append((x.group(2), x.group(3)))
             note_data += markdown_note[prev:x.start(1)]
             prev = x.end(1)
