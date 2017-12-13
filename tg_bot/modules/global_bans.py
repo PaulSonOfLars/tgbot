@@ -1,5 +1,5 @@
 import time
-from telegram.error import Unauthorized, RetryAfter
+from telegram.error import Unauthorized, RetryAfter, BadRequest
 from telegram.ext import run_async, CommandHandler
 
 from tg_bot import dispatcher
@@ -51,6 +51,9 @@ def gban(bot, update, args):
         except RetryAfter as e:
             time.sleep(e.retry_after)
             bot.kick_chat_member(chat_id, user_id)
+        except BadRequest as e:
+            message.reply_text("Could not gban due to: {}".format(e.message))
+            return
 
     message.reply_text("Person has been gbanned.")
 
@@ -94,6 +97,9 @@ def ungban(bot, update, args):
         except RetryAfter as e:
             time.sleep(e.retry_after)
             bot.unban_chat_member(chat_id, user_id)
+        except BadRequest as e:
+            message.reply_text("Could not un-gban due to: {}".format(e.message))
+            return
 
     message.reply_text("Person has been un-gbanned.")
 
