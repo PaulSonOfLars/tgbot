@@ -13,24 +13,30 @@ def ban(bot, update, args):
     message = update.effective_message
     prev_message = message.reply_to_message
 
-    if len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return
-    elif prev_message:
-        user_id = prev_message.from_user.id
-
-    elif message.entities and message.parse_entities('text_mention'):
+    if message.entities and message.parse_entities('text_mention'):
         entities = message.parse_entities('text_mention')
         for e in entities:
             user_id = e.user.id
             break
         else:
             return
+
+    elif len(args) >= 1 and args[0][0] == '@':
+        user = args[0]
+        user_id = get_user_id(user)
+        if not user_id:
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
+                               "you reply to that person's message instead.")
+            return
+
+    elif len(args) >= 1 and args[0].isdigit():
+        user_id = int(args[0])
+
+    elif prev_message:
+        user_id = prev_message.from_user.id
+
     else:
+        message.reply_text("You don't seem to be referring to a user.")
         return
 
     if is_user_admin(chat, user_id):
@@ -63,8 +69,17 @@ def kickme(bot, update):
 @user_admin
 def unban(bot, update, args):
     message = update.effective_message
+    prev_message = message.reply_to_message
 
-    if len(args) >= 1 and args[0][0] == '@':
+    if message.entities and message.parse_entities('text_mention'):
+        entities = message.parse_entities('text_mention')
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
+
+    elif len(args) >= 1 and args[0][0] == '@':
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
@@ -72,22 +87,24 @@ def unban(bot, update, args):
                                "you reply to that person's message instead.")
             return
 
-    elif message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
+    elif len(args) >= 1 and args[0].isdigit():
+        user_id = int(args[0])
+
+    elif prev_message:
+        user_id = prev_message.from_user.id
+
     else:
+        message.reply_text("You don't seem to be referring to a user.")
         return
+
     res = update.effective_chat.unban_member(user_id)
     if res:
         message.reply_text("Yep, this user can join!")
     else:
         message.reply_text("Hm, couldn't unban this person.")
 
-__help__= """
+
+__help__ = """
  - /ban <userhandle>: bans a user. (via handle, or reply)
  - /unban <userhandle>: unbans a user. (via handle, or reply)
  - /kickme: kicks the user who issued the command

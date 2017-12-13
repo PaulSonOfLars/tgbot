@@ -2,9 +2,10 @@ import re
 from functools import wraps
 
 from telegram import MAX_MESSAGE_LENGTH
+from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import OWNER_ID
+from tg_bot import OWNER_ID, SUDO_USERS
 
 
 def can_delete(chat, bot_id):
@@ -99,7 +100,7 @@ MATCH_MD = re.compile(r'\*(.*?)\*|'
                       r'_(.*?)_|'
                       r'`(.*?)`|'
                       r'(?<!\\)(\[.*?\])(\(.*?\))|'
-                      r'(?P<esc>[\*_`\[])')
+                      r'(?P<esc>[*_`\[])')
 
 
 def _selective_escape(to_parse):
@@ -179,3 +180,11 @@ def split_message(msg):
             result.append(small_msg)
 
         return result
+
+
+class _Sudoers(BaseFilter):
+    def filter(self, message):
+        return bool(message.from_user and message.from_user.id in SUDO_USERS)
+
+
+SudoFilter = _Sudoers()

@@ -6,6 +6,7 @@ class Config(object):
     LOGGER = True
     SQLALCHEMY_DATABASE_URI = 'sqldbtype://username:pw@hostname:port/db_name'
     MESSAGE_DUMP = None
+    SUDO_USERS = []  # List of id's (not usernames) for users which have sudo access to the bot.
 
 
 class Production(Config):
