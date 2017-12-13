@@ -1,7 +1,7 @@
 import time
 
 from telegram import MessageEntity
-from telegram.error import Unauthorized, RetryAfter, BadRequest
+from telegram.error import Unauthorized, RetryAfter, BadRequest, ChatMigrated, TelegramError
 from telegram.ext import run_async, CommandHandler
 
 from tg_bot import dispatcher
@@ -50,17 +50,20 @@ def gban(bot, update, args):
         chat_id = chat.chat_id
         try:
             bot.kick_chat_member(chat_id, user_id)
-        except Unauthorized:
-            pass
-        except RetryAfter as e:
-            time.sleep(e.retry_after)
-            bot.kick_chat_member(chat_id, user_id)
         except BadRequest as e:
             if e.message == "User is an administrator of the chat":
+                pass
+            elif e.message == "Chat not found":
+                pass
+            elif e.message == "Not enough rights to restrict/unrestrict chat member":
+                pass
+            elif e.message == "User_not_participant":
                 pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(e.message))
                 return
+        except TelegramError:
+            pass
 
     message.reply_text("Person has been gbanned.")
 
@@ -103,17 +106,20 @@ def ungban(bot, update, args):
         chat_id = chat.chat_id
         try:
             bot.unban_chat_member(chat_id, user_id)
-        except Unauthorized:
-            pass
-        except RetryAfter as e:
-            time.sleep(e.retry_after)
-            bot.unban_chat_member(chat_id, user_id)
         except BadRequest as e:
             if e.message == "User is an administrator of the chat":
+                pass
+            elif e.message == "Chat not found":
+                pass
+            elif e.message == "Not enough rights to restrict/unrestrict chat member":
+                pass
+            elif e.message == "User_not_participant":
                 pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(e.message))
                 return
+        except TelegramError:
+            pass
 
     message.reply_text("Person has been un-gbanned.")
 
