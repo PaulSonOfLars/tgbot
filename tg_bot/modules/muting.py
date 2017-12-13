@@ -1,3 +1,4 @@
+from telegram import MessageEntity
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 
@@ -12,8 +13,17 @@ from tg_bot.modules.users import get_user_id
 def mute(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
+    prev_message = message.reply_to_message
 
-    if len(args) >= 1 and args[0][0] == '@':
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
+
+    elif len(args) >= 1 and args[0][0] == '@':
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
@@ -21,16 +31,11 @@ def mute(bot, update, args):
                                "you reply to that person's message instead.")
             return
 
-    elif message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
+    elif len(args) >= 1 and args[0].isdigit():
+        user_id = int(args[0])
 
-    elif message.reply_to_message:
-        user_id = message.reply_to_message.from_user.id
+    elif prev_message:
+        user_id = prev_message.from_user.id
 
     else:
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
@@ -65,8 +70,17 @@ def mute(bot, update, args):
 def unmute(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
+    prev_message = message.reply_to_message
 
-    if len(args) >= 1 and args[0][0] == '@':
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        for e in entities:
+            user_id = e.user.id
+            break
+        else:
+            return
+
+    elif len(args) >= 1 and args[0][0] == '@':
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
@@ -74,16 +88,11 @@ def unmute(bot, update, args):
                                "you reply to that person's message instead.")
             return
 
-    elif message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
+    elif len(args) >= 1 and args[0].isdigit():
+        user_id = int(args[0])
 
-    elif message.reply_to_message:
-        user_id = message.reply_to_message.from_user.id
+    elif prev_message:
+        user_id = prev_message.from_user.id
 
     else:
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")

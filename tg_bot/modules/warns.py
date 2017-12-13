@@ -1,3 +1,4 @@
+from telegram import MessageEntity
 from telegram.ext import CommandHandler, run_async
 
 from tg_bot import dispatcher
@@ -6,6 +7,7 @@ from tg_bot.modules.sql import warns_sql as sql
 from tg_bot.modules.users import get_user_id
 
 
+# TODO: Make a single user_id and argument extraction function! this one is inaccurate
 def extract_userid(message):
     args = message.text.split(None, 2)  # use python's maxsplit to separate Cmd, warn recipient, and warn reason
 
@@ -17,10 +19,11 @@ def extract_userid(message):
                                "you reply to that person's message instead.")
             return
         return user_id, args[2]
-    elif message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
+
+    elif message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for e in entities:
-            return e.user.id, message.text.split(None, 1)[1]
+            return e.user.id, message.text.split(None, 1)[1]  # TODO: User entity offset here to account for split names
 
     elif message.reply_to_message:
         return message.reply_to_message.from_user.id, message.text.split(None, 1)[1]

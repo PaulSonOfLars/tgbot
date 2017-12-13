@@ -1,4 +1,6 @@
 import time
+
+from telegram import MessageEntity
 from telegram.error import Unauthorized, RetryAfter, BadRequest
 from telegram.ext import run_async, CommandHandler
 
@@ -13,11 +15,13 @@ def gban(bot, update, args):
     message = update.effective_message
     prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        print(entities)
         for e in entities:
             user_id = e.user.id
-            break
+            message.reply_text(user_id)
+            return
         else:
             return
 
@@ -52,8 +56,11 @@ def gban(bot, update, args):
             time.sleep(e.retry_after)
             bot.kick_chat_member(chat_id, user_id)
         except BadRequest as e:
-            message.reply_text("Could not gban due to: {}".format(e.message))
-            return
+            if e.message == "User is an administrator of the chat":
+                pass
+            else:
+                message.reply_text("Could not un-gban due to: {}".format(e.message))
+                return
 
     message.reply_text("Person has been gbanned.")
 
@@ -61,9 +68,10 @@ def gban(bot, update, args):
 @run_async
 def ungban(bot, update, args):
     message = update.effective_message
+    prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for e in entities:
             user_id = e.user.id
             break
@@ -80,6 +88,9 @@ def ungban(bot, update, args):
 
     elif len(args) >= 1 and args[0].isdigit():
         user_id = int(args[0])
+
+    elif prev_message:
+        user_id = prev_message.from_user.id
 
     else:
         message.reply_text("You don't seem to be referring to a user.")
@@ -98,8 +109,11 @@ def ungban(bot, update, args):
             time.sleep(e.retry_after)
             bot.unban_chat_member(chat_id, user_id)
         except BadRequest as e:
-            message.reply_text("Could not un-gban due to: {}".format(e.message))
-            return
+            if e.message == "User is an administrator of the chat":
+                pass
+            else:
+                message.reply_text("Could not un-gban due to: {}".format(e.message))
+                return
 
     message.reply_text("Person has been un-gbanned.")
 

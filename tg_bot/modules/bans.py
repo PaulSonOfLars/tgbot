@@ -1,3 +1,4 @@
+from telegram import MessageEntity
 from telegram.ext import run_async, CommandHandler
 
 from tg_bot import dispatcher
@@ -13,8 +14,8 @@ def ban(bot, update, args):
     message = update.effective_message
     prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for e in entities:
             user_id = e.user.id
             break
@@ -71,8 +72,8 @@ def unban(bot, update, args):
     message = update.effective_message
     prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities('text_mention'):
-        entities = message.parse_entities('text_mention')
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for e in entities:
             user_id = e.user.id
             break
