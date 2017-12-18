@@ -1,3 +1,4 @@
+import collections
 import threading
 
 from sqlalchemy import Column, UnicodeText, Boolean, Integer
@@ -23,7 +24,7 @@ class AFK(BASE):
 
 AFK.__table__.create(checkfirst=True)
 INSERTION_LOCK = threading.Lock()
-KEYSTORE = {}
+KEYSTORE = collections.defaultdict(list)
 
 
 # check if need insertion lock

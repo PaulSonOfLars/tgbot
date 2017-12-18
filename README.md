@@ -52,7 +52,7 @@ Change YOUR_USER and YOUR_DB_NAME appropriately.
 
 - finally:
 
-`psql YOUR_USER -h YOUR_HOST OUR_DB_NAME`
+`psql YOUR_DB_NAME -h YOUR_HOST YOUR_USER`
 
 This will allow you to connect to your database via your terminal.
 By default, YOUR_HOST should be 0.0.0.0:5432.

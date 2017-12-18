@@ -1,7 +1,7 @@
 from telegram import MessageEntity
 
 from tg_bot.modules.sql import afk_sql as sql
-from telegram.ext import CommandHandler, Filters, MessageHandler, run_async
+from telegram.ext import CommandHandler, Filters, MessageHandler, run_async, RegexHandler
 from tg_bot import dispatcher
 from tg_bot.modules.users import get_user_id
 
@@ -18,7 +18,7 @@ def afk(bot, update):
         reason = ""
 
     sql.set_afk(update.effective_user.id, reason)
-    update.effective_message.reply_text("No problem {}, you've been set as AFK!".format(update.effective_user.first_name))
+    update.effective_message.reply_text("{} is now AFK!".format(update.effective_user.first_name))
 
 
 @run_async
@@ -72,9 +72,11 @@ keyboard!
 """
 
 AFK_HANDLER = CommandHandler("afk", afk)
+AFK_REGEX_HANDLER = RegexHandler("brb", afk)
 NO_AFK_HANDLER = MessageHandler(Filters.all, no_longer_afk)
 AFK_REPLY_HANDLER = MessageHandler(Filters.entity(MessageEntity.MENTION) | Filters.entity(MessageEntity.TEXT_MENTION), reply_afk)
 
 dispatcher.add_handler(AFK_HANDLER, AFK_GROUP)
+dispatcher.add_handler(AFK_REGEX_HANDLER, AFK_GROUP)
 dispatcher.add_handler(NO_AFK_HANDLER, AFK_GROUP)
 dispatcher.add_handler(AFK_REPLY_HANDLER, AFK_REPLY_GROUP)
