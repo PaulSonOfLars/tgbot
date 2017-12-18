@@ -1,7 +1,5 @@
-import time
-
 from telegram import MessageEntity
-from telegram.error import Unauthorized, RetryAfter, BadRequest, ChatMigrated, TelegramError
+from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler
 
 from tg_bot import dispatcher

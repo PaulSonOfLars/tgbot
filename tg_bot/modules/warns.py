@@ -1,10 +1,15 @@
+import re
+
+import telegram
 from telegram import MessageEntity
-from telegram.ext import CommandHandler, run_async
+from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import user_admin, bot_admin
 from tg_bot.modules.sql import warns_sql as sql
 from tg_bot.modules.users import get_user_id
+
+WARN_HANDLER_GROUP = 9
 
 
 # TODO: Make a single user_id and argument extraction function! this one is inaccurate
@@ -69,6 +74,7 @@ def reset_warns(bot, update):
         message.reply_text("No user has been designated!")
 
 
+@run_async
 def warns(bot, update):
     message = update.effective_message
     user_id, _ = extract_userid(message) or update.effective_user.id, None
@@ -87,6 +93,93 @@ def warns(bot, update):
         update.effective_message.reply_text("This user hasn't got any warnings!")
 
 
+@run_async
+@user_admin
+def add_warn_filter(bot, update):
+    chat = update.effective_chat
+    msg = update.effective_message
+    args = msg.text.split(None, 2)  # use python's maxsplit to separate Cmd, keyword, and reply_text
+
+    if len(args) >= 3:
+        keyword = args[1]
+        content = args[2]
+
+    else:
+        return
+
+    # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
+    for handler in dispatcher.handlers.get(WARN_HANDLER_GROUP, []):
+        if handler.filters == (keyword, chat.id):
+            dispatcher.remove_handler(handler, WARN_HANDLER_GROUP)
+
+    sql.add_warn_filter(chat.id, keyword, content)
+
+    update.effective_message.reply_text("Warn handler added for {}!".format(keyword))
+    raise DispatcherHandlerStop
+
+
+@run_async
+@user_admin
+def remove_warn_filter(bot, update, args):
+    chat = update.effective_chat
+
+    if len(args) < 1:
+        return
+
+    chat_filters = sql.get_chat_filters(chat.id)
+
+    if not chat_filters:
+        update.effective_message.reply_text("No filters are active here!")
+        return
+
+    for filt in chat_filters:
+        if filt.chat_id == str(chat.id) and filt.keyword == args[0]:
+            sql.remove_warn_filter(chat.id, args[0])
+            update.effective_message.reply_text("Yep, I'll stop replying to that.")
+            return
+
+    update.effective_message.reply_text("That's not a current filter - run /filters for all active filters.")
+
+
+@run_async
+def list_warn_filters(bot, update):
+    chat = update.effective_chat
+    all_handlers = sql.get_chat_filters(chat.id)
+
+    if not all_handlers:
+        update.effective_message.reply_text("No filters are active here!")
+        return
+
+    filter_list = "Current warn filters in this chat:\n"
+    for handler in all_handlers:
+        entry = " - {}\n".format(handler.keyword)
+        if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
+            update.effective_message.reply_text(filter_list)
+            filter_list = entry
+        else:
+            filter_list += entry
+
+    if not filter_list == "Current warn filters in this chat:\n":
+        update.effective_message.reply_text(filter_list)
+
+
+@run_async
+def reply_filter(bot, update):
+    chat_filters = sql.get_chat_filters(update.effective_chat.id)
+    message = update.effective_message
+    to_match = message.text or message.caption or (message.sticker.emoji if message.sticker else None)
+    if not to_match:
+        return
+    for filt in chat_filters:
+        pattern = "( |^|[^\w])" + re.escape(filt.keyword) + "( |$|[^\w])"
+        if re.search(pattern, to_match, flags=re.IGNORECASE):
+            if filt.is_sticker:
+                message.reply_sticker(filt.reply)
+            else:
+                message.reply_text(filt.reply)
+            break
+
+
 def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
@@ -95,12 +188,23 @@ __help__ = """
  - /warn <userhandle>: warn a user. After 3 warns, the user will be banned from the group. Can also be used as a reply.
  - /resetwarn <userhandle>: reset the warnings for a user. Can also be used as a reply.
  - /warns <userhandle>: get a user's number, and reason, of warnings.
+ - /addwarn <keyword> <reply message>: set a warning filter on a certain keyword
+ - /nowarn <keyword>: stop a warning filter
 """
 
+# TODO: remove warn button.
 WARN_HANDLER = CommandHandler("warn", warn)
 RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns)
 MYWARNS_HANDLER = CommandHandler("warns", warns)
+ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
+RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter)
+LIST_WARN_HANDLER = CommandHandler("listwarn", list_warn_filters)
+WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
 
 dispatcher.add_handler(WARN_HANDLER)
 dispatcher.add_handler(RESET_WARN_HANDLER)
 dispatcher.add_handler(MYWARNS_HANDLER)
+dispatcher.add_handler(ADD_WARN_HANDLER)
+dispatcher.add_handler(RM_WARN_HANDLER)
+dispatcher.add_handler(LIST_WARN_HANDLER)
+dispatcher.add_handler(WARN_FILTER_HANDLER, WARN_HANDLER_GROUP)

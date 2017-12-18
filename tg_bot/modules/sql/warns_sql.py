@@ -1,5 +1,6 @@
 import threading
 
+import collections
 from sqlalchemy import Integer, Column, String, UnicodeText
 from sqlalchemy.dialects import postgresql
 
@@ -24,13 +25,36 @@ class Warns(BASE):
         return "<{} warns for {} in {} for reasons {}>".format(self.num_warns, self.user_id, self.chat_id, self.reasons)
 
 
-Warns.__table__.create(checkfirst=True)
+class WarnFilters(BASE):
+    __tablename__ = "warn_filters"
+    chat_id = Column(String(14), primary_key=True)
+    keyword = Column(UnicodeText, primary_key=True, nullable=False)
+    reply = Column(UnicodeText, nullable=False)
 
-INSERTION_LOCK = threading.Lock()
+    def __init__(self, chat_id, keyword, reply):
+        self.chat_id = str(chat_id)  # ensure string
+        self.keyword = keyword
+        self.reply = reply
+
+    def __repr__(self):
+        return "<Permissions for %s>" % self.chat_id
+
+    def __eq__(self, other):
+        return bool(isinstance(other, WarnFilters)
+                    and self.chat_id == other.chat_id
+                    and self.keyword == other.keyword)
+
+
+Warns.__table__.create(checkfirst=True)
+WarnFilters.__table__.create(checkfirst=True)
+
+WARN_INSERTION_LOCK = threading.Lock()
+WARN_FILTER_INSERTION_LOCK = threading.Lock()
+WARN_FILTER_KEYSTORE = collections.defaultdict(list)
 
 
 def warn_user(user_id, chat_id, reason=None):
-    with INSERTION_LOCK:
+    with WARN_INSERTION_LOCK:
         warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
         if not warned_user:
             warned_user = Warns(user_id, str(chat_id))
@@ -46,7 +70,7 @@ def warn_user(user_id, chat_id, reason=None):
 
 
 def reset_warns(user_id, chat_id):
-    with INSERTION_LOCK:
+    with WARN_INSERTION_LOCK:
         warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
 
         warned_user.num_warns = 0
@@ -60,9 +84,52 @@ def get_warns(user_id, chat_id):
     return SESSION.query(Warns).get((user_id, str(chat_id)))
 
 
+def add_warn_filter(chat_id, keyword, reply):
+    with WARN_FILTER_INSERTION_LOCK:
+        filt = WarnFilters(str(chat_id), keyword, reply)
+
+        if filt in WARN_FILTER_KEYSTORE[filt.chat_id]:  # if there already is a filter on that kw, remove it
+            WARN_FILTER_KEYSTORE[filt.chat_id].remove(filt)
+
+        WARN_FILTER_KEYSTORE[filt.chat_id].append(filt)
+        SESSION.merge(filt)  # merge to avoid duplicate key issues
+        SESSION.commit()
+
+
+def remove_warn_filter(chat_id, keyword):
+    with WARN_FILTER_INSERTION_LOCK:
+        filt = SESSION.query(WarnFilters).get((str(chat_id), keyword))
+        if filt:
+            WARN_FILTER_KEYSTORE[filt.chat_id].remove(filt)
+            SESSION.delete(filt)
+            SESSION.commit()
+            return True
+        return False
+
+
+def get_chat_filters(chat_id):
+    return WARN_FILTER_KEYSTORE[str(chat_id)]
+
+
+def load_keystore():
+    with WARN_FILTER_INSERTION_LOCK:
+        all_filters = SESSION.query(WarnFilters).all()
+        for filt in all_filters:
+            WARN_FILTER_KEYSTORE[filt.chat_id].append(filt)
+        SESSION.close()
+        print("{} total warning filters added to {} chats.".format(len(all_filters), len(WARN_FILTER_KEYSTORE)))
+
+
 def migrate_chat(old_chat_id, new_chat_id):
-    with INSERTION_LOCK:
+    with WARN_INSERTION_LOCK:
         chat_notes = SESSION.query(Warns).filter(Warns.chat_id == str(old_chat_id)).all()
         for note in chat_notes:
             note.chat_id = str(new_chat_id)
         SESSION.commit()
+    with WARN_FILTER_INSERTION_LOCK:
+        chat_filters = SESSION.query(WarnFilters).filter(WarnFilters.chat_id == str(old_chat_id)).all()
+        for filt in chat_filters:
+            filt.chat_id = str(new_chat_id)
+        SESSION.commit()
+
+load_keystore()

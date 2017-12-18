@@ -10,28 +10,6 @@ from tg_bot.modules.sql import cust_filters_sql as sql
 HANDLER_GROUP = 10
 
 
-class CustSearcher(BaseFilter):
-    def __init__(self, chat_id, keyword):
-        super().__init__()
-        self.keyword = keyword
-        self.pattern = "( |^|[^\w])" + re.escape(self.keyword) + "( |$|[^\w])"
-        self.chat_id = chat_id
-
-    def filter(self, message):
-        return bool(message.text
-                    and message.chat_id == self.chat_id
-                    and re.search(self.pattern, message.text, flags=re.IGNORECASE))
-
-    def __eq__(self, other):
-        return other == (self.keyword, self.chat_id)
-
-    def __str__(self):
-        return self.keyword
-
-    def __repr__(self):
-        return "<RegexSearcher for {} by {} in chat {}>".format(self.keyword, self.pattern, self.chat_id)
-
-
 def save_filter(chat_id, keyword, content, is_sticker=False):
     # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
     for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
@@ -63,6 +41,7 @@ def list_handlers(bot, update):
         update.effective_message.reply_text(filter_list)
 
 
+@run_async
 @user_admin
 def filters(bot, update):
     chat = update.effective_chat
@@ -87,6 +66,7 @@ def filters(bot, update):
     raise DispatcherHandlerStop
 
 
+@run_async
 @user_admin
 def stop_filter(bot, update, args):
     chat = update.effective_chat
