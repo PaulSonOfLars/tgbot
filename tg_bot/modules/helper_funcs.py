@@ -64,7 +64,7 @@ def bot_admin(func):
         if is_bot_admin(update.effective_chat, bot.id):
             func(bot, update, *args, **kwargs)
         else:
-            update.effective_message.reply_text("I ain't admin!")
+            update.effective_message.reply_text("I'm not admin!")
 
     return is_admin
 
