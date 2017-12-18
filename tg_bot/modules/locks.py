@@ -1,3 +1,4 @@
+from telegram import TelegramError
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
@@ -35,25 +36,37 @@ def lock(bot, update, args):
                 members = users_sql.get_chat_members(chat.id)
                 if args[0] == "messages":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=True)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=True)
+                        except TelegramError:
+                            pass
                 elif args[0] == "media":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=True,
-                                                 can_send_media_messages=True)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=True,
+                                                     can_send_media_messages=True)
+                        except TelegramError:
+                            pass
                 elif args[0] == "other":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=True,
-                                                 can_send_media_messages=True,
-                                                 can_send_other_messages=True)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=True,
+                                                     can_send_media_messages=True,
+                                                     can_send_other_messages=True)
+                        except TelegramError:
+                            pass
                 elif args[0] == "previews":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=True,
-                                                 can_send_media_messages=True,
-                                                 can_add_web_page_previews=True)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=True,
+                                                     can_send_media_messages=True,
+                                                     can_add_web_page_previews=True)
+                        except TelegramError:
+                            pass
 
     else:
         message.reply_text("I'm not an administrator, or haven't got delete rights.")
