@@ -72,7 +72,7 @@ keyboard!
 """
 
 AFK_HANDLER = CommandHandler("afk", afk)
-AFK_REGEX_HANDLER = RegexHandler("brb", afk)
+AFK_REGEX_HANDLER = RegexHandler("(?i)brb", afk)
 NO_AFK_HANDLER = MessageHandler(Filters.all, no_longer_afk)
 AFK_REPLY_HANDLER = MessageHandler(Filters.entity(MessageEntity.MENTION) | Filters.entity(MessageEntity.TEXT_MENTION), reply_afk)
 
