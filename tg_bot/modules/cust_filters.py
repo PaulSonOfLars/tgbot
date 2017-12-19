@@ -41,7 +41,6 @@ def list_handlers(bot, update):
         update.effective_message.reply_text(filter_list)
 
 
-@run_async
 @user_admin
 def filters(bot, update):
     chat = update.effective_chat

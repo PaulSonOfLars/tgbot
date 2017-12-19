@@ -229,7 +229,7 @@ RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button)
 MYWARNS_HANDLER = CommandHandler("warns", warns)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
-RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter)
+RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True)
 LIST_WARN_HANDLER = CommandHandler("warnlist", list_warn_filters)
 WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
 
