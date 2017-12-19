@@ -69,6 +69,23 @@ def warn_user(user_id, chat_id, reason=None):
         return warned_user
 
 
+def remove_warn(user_id, chat_id):
+    with WARN_INSERTION_LOCK:
+        warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
+        if not warned_user:
+            return None
+
+        if warned_user.num_warns >= 0:
+            warned_user.num_warns -= 1
+
+            SESSION.add(warned_user)
+            SESSION.commit()
+
+            return warned_user
+
+        SESSION.close()
+
+
 def reset_warns(user_id, chat_id):
     with WARN_INSERTION_LOCK:
         warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))

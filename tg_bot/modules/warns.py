@@ -1,11 +1,11 @@
 import re
 
 import telegram
-from telegram import MessageEntity
-from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters
+from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin
+from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin, user_admin_no_reply
 from tg_bot.modules.sql import warns_sql as sql
 from tg_bot.modules.users import get_user_id
 
@@ -56,10 +56,25 @@ def warn(user_id, chat, reason, bot, message):
         else:
             message.reply_text("An error occurred, I couldn't ban this person!")
     else:
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user_id))]])
         if reason:
-            message.reply_text("{}/3 warnings... watch out! Latest one was because:\n{}".format(user_warned.num_warns, reason))
+            message.reply_text("{}/3 warnings... watch out! Latest one was because:\n{}".format(user_warned.num_warns, reason), reply_markup=keyboard)
         else:
-            message.reply_text("{}/3 warnings... watch out!".format(user_warned.num_warns))
+            message.reply_text("{}/3 warnings... watch out!".format(user_warned.num_warns), reply_markup=keyboard)
+
+
+@run_async
+@user_admin_no_reply
+@bot_admin
+def button(bot, update):
+    query = update.callback_query
+    r = re.match("rm_warn\((.+?)\)", query.data)
+    if r:
+        user_id = r.group(1)
+        chat_id = update.effective_chat.id
+        res = sql.remove_warn(user_id, chat_id)
+        if res:
+            update.effective_message.edit_text("Warn removed.")
 
 
 @run_async
@@ -211,6 +226,7 @@ __help__ = """
 # TODO: remove warn button.
 WARN_HANDLER = CommandHandler("warn", warn_user)
 RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns)
+CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button)
 MYWARNS_HANDLER = CommandHandler("warns", warns)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
 RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter)
@@ -218,6 +234,7 @@ LIST_WARN_HANDLER = CommandHandler("warnlist", list_warn_filters)
 WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
 
 dispatcher.add_handler(WARN_HANDLER)
+dispatcher.add_handler(CALLBACK_QUERY_HANDLER)
 dispatcher.add_handler(RESET_WARN_HANDLER)
 dispatcher.add_handler(MYWARNS_HANDLER)
 dispatcher.add_handler(ADD_WARN_HANDLER)
