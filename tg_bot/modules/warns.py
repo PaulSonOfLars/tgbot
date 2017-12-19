@@ -78,7 +78,7 @@ def reset_warns(bot, update):
     message = update.effective_message
     chat = update.effective_chat
 
-    user_id, _ = extract_userid(message) or None, None
+    user_id, _ = extract_userid(message)
     if user_id:
         sql.reset_warns(user_id, chat.id)
         message.reply_text("Warnings have been reset!")
