@@ -16,23 +16,29 @@ WARN_HANDLER_GROUP = 9
 def extract_userid(message):
     args = message.text.split(None, 2)  # use python's maxsplit to separate Cmd, warn recipient, and warn reason
 
-    if len(args) >= 2 and args[1][0] == '@':
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        for e in entities:
+            return e.user.id, message.text[e.offset+e.length]
+
+    elif len(args) >= 2 and args[1][0] == '@':
         user = args[1]
         user_id = get_user_id(user)
         if not user_id:
             message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
             return
-        return user_id, args[2]
+        return user_id, (args[2] if len(args) >= 3 else "")
 
-    elif message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            return e.user.id, message.text[e.offset+e.length]
+    elif len(args) >= 2 and args[0].isdigit():
+        return int(args[0]), (args[2] if len(args) >= 3 else "")
 
     elif message.reply_to_message:
         split = message.text.split(None, 1)
-        return message.reply_to_message.from_user.id, (split[1] if len(split) > 1 else "")
+        return message.reply_to_message.from_user.id, (split[1] if len(split) >= 2 else "")
+
+    else:
+        return None, ""
 
 
 def warn(user_id, chat, reason, bot, message):

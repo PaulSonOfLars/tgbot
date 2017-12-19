@@ -22,6 +22,10 @@ def is_bot_admin(chat, bot_id):
     return chat.get_member(bot_id).status == 'administrator' or chat.get_member(bot_id).status == 'creator'
 
 
+def is_user_in_chat(chat, user_id):
+    return chat.get_member(user_id)
+
+
 def bot_can_delete(func):
     @wraps(func)
     def delete_rights(bot, update, *args, **kwargs):
