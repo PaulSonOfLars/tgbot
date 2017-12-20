@@ -1,6 +1,6 @@
+import collections
 import threading
 
-import collections
 from sqlalchemy import Integer, Column, String, UnicodeText
 from sqlalchemy.dialects import postgresql
 
@@ -104,38 +104,38 @@ def get_warns(user_id, chat_id):
 
 def add_warn_filter(chat_id, keyword, reply):
     with WARN_FILTER_INSERTION_LOCK:
-        filt = WarnFilters(str(chat_id), keyword, reply)
+        warn_filt = WarnFilters(str(chat_id), keyword, reply)
 
-        if filt in WARN_FILTER_KEYSTORE[filt.chat_id]:  # if there already is a filter on that kw, remove it
-            WARN_FILTER_KEYSTORE[filt.chat_id].remove(filt)
+        if warn_filt in WARN_FILTER_KEYSTORE[warn_filt.chat_id]:  # if there already is a filter on that kw, remove it
+            WARN_FILTER_KEYSTORE[warn_filt.chat_id].remove(warn_filt)
 
-        WARN_FILTER_KEYSTORE[filt.chat_id].append(filt)
-        SESSION.merge(filt)  # merge to avoid duplicate key issues
+        WARN_FILTER_KEYSTORE[warn_filt.chat_id].append(warn_filt)
+        SESSION.merge(warn_filt)  # merge to avoid duplicate key issues
         SESSION.commit()
 
 
 def remove_warn_filter(chat_id, keyword):
     with WARN_FILTER_INSERTION_LOCK:
-        filt = SESSION.query(WarnFilters).get((str(chat_id), keyword))
-        if filt:
-            WARN_FILTER_KEYSTORE[filt.chat_id].remove(filt)
-            SESSION.delete(filt)
+        warn_filt = SESSION.query(WarnFilters).get((str(chat_id), keyword))
+        if warn_filt:
+            WARN_FILTER_KEYSTORE[warn_filt.chat_id].remove(warn_filt)
+            SESSION.delete(warn_filt)
             SESSION.commit()
             return True
         return False
 
 
-def get_chat_filters(chat_id):
+def get_chat_warn_filters(chat_id):
     return WARN_FILTER_KEYSTORE[str(chat_id)]
 
 
 def load_keystore():
     with WARN_FILTER_INSERTION_LOCK:
-        all_filters = SESSION.query(WarnFilters).all()
-        for filt in all_filters:
-            WARN_FILTER_KEYSTORE[filt.chat_id].append(filt)
+        all_warn_filters = SESSION.query(WarnFilters).all()
+        for warn_filt in all_warn_filters:
+            WARN_FILTER_KEYSTORE[warn_filt.chat_id].append(warn_filt)
         SESSION.close()
-        print("{} total warning filters added to {} chats.".format(len(all_filters), len(WARN_FILTER_KEYSTORE)))
+        print("{} total warning filters added to {} chats.".format(len(all_warn_filters), len(WARN_FILTER_KEYSTORE)))
 
 
 def migrate_chat(old_chat_id, new_chat_id):

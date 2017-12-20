@@ -1,10 +1,8 @@
-from telegram import MessageEntity
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin
-from tg_bot.modules.users import get_user_id
+from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, extract_user
 
 
 @bot_admin
@@ -13,31 +11,9 @@ from tg_bot.modules.users import get_user_id
 def mute(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
-    prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
-
-    elif len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return
-
-    elif len(args) >= 1 and args[0].isdigit():
-        user_id = int(args[0])
-
-    elif prev_message:
-        user_id = prev_message.from_user.id
-
-    else:
+    user_id = extract_user(message, args)
+    if not user_id:
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
         return
 
@@ -70,32 +46,10 @@ def mute(bot, update, args):
 def unmute(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
-    prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
-
-    elif len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return
-
-    elif len(args) >= 1 and args[0].isdigit():
-        user_id = int(args[0])
-
-    elif prev_message:
-        user_id = prev_message.from_user.id
-
-    else:
-        message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
+    user_id = extract_user(message, args)
+    if not user_id:
+        message.reply_text("You'll need to either give me a username to unmute, or reply to someone to be unmuted.")
         return
 
     member = chat.get_member(int(user_id))

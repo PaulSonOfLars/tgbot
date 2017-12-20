@@ -1,12 +1,11 @@
-from telegram import ParseMode, MessageEntity
+from telegram import ParseMode
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, bot_admin, can_pin, can_promote
-from tg_bot.modules.users import get_user_id
+from tg_bot.modules.helper_funcs import user_admin, bot_admin, can_pin, can_promote, extract_user
 
 
 @run_async
@@ -16,36 +15,14 @@ from tg_bot.modules.users import get_user_id
 def promote(bot, update, args):
     chat_id = update.effective_chat.id
     message = update.effective_message
-    prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
-
-    elif len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return
-
-    elif len(args) >= 1 and args[0].isdigit():
-        user_id = int(args[0])
-
-    elif prev_message:
-        user_id = prev_message.from_user.id
-
-    else:
+    user_id = extract_user(message, args)
+    if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
         return
 
     if user_id == bot.id:
-        update.effective_message.reply_text("I can't promote myself! Get an admin to do it for me.")
+        message.reply_text("I can't promote myself! Get an admin to do it for me.")
         return
 
     # set same perms as bot - bot can't assign higher perms than itself!
@@ -79,31 +56,9 @@ def promote(bot, update, args):
 def demote(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
-    prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
-
-    elif len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return
-
-    elif len(args) >= 1 and args[0].isdigit():
-        user_id = int(args[0])
-
-    elif prev_message:
-        user_id = prev_message.from_user.id
-
-    else:
+    user_id = extract_user(message, args)
+    if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
         return
 

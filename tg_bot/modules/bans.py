@@ -1,38 +1,7 @@
-from telegram import MessageEntity
 from telegram.ext import run_async, CommandHandler
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat
-from tg_bot.modules.users import get_user_id
-
-
-def extract_user(message, args):
-    prev_message = message.reply_to_message
-
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            return e.user.id
-
-    elif len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return None
-        else:
-            return user_id
-
-    elif len(args) >= 1 and args[0].isdigit():
-        return int(args[0])
-
-    elif prev_message:
-        return prev_message.from_user.id
-
-    else:
-        message.reply_text("You don't seem to be referring to a user.")
-        return None
+from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat, extract_user
 
 
 @run_async
@@ -44,6 +13,7 @@ def ban(bot, update, args):
 
     user_id = extract_user(message, args)
     if not user_id:
+        message.reply_text("You don't seem to be referring to a user.")
         return
 
     if is_user_admin(chat, user_id):

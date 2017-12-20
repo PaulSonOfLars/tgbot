@@ -1,11 +1,12 @@
 import re
 from functools import wraps
 
-from telegram import MAX_MESSAGE_LENGTH
+from telegram import MAX_MESSAGE_LENGTH, MessageEntity
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import OWNER_ID, SUDO_USERS
+from tg_bot.modules.users import get_user_id
 
 
 def can_delete(chat, bot_id):
@@ -107,6 +108,38 @@ def user_not_admin(func):
     return is_not_admin
 
 
+def extract_user(message, args):
+    prev_message = message.reply_to_message
+
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        for e in entities:
+            return e.user.id
+
+    elif len(args) >= 1 and args[0][0] == '@':
+        user = args[0]
+        user_id = get_user_id(user)
+        if not user_id:
+            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
+                               "you reply to that person's message instead.")
+            return None
+        else:
+            return user_id
+
+    elif len(args) >= 1 and args[0].isdigit():
+        return int(args[0])
+
+    elif prev_message:
+        return prev_message.from_user.id
+
+    else:
+        return None
+
+
+def extract_text(message):
+    return message.text or message.caption or (message.sticker.emoji if message.sticker else None)
+
+
 # match * (bold) (don't escape if in url)
 # match _ (italics) (don't escape if in url)
 # match ` (code)
@@ -203,4 +236,4 @@ class _Sudoers(BaseFilter):
         return bool(message.from_user and message.from_user.id in SUDO_USERS)
 
 
-SudoFilter = _Sudoers()
+sudo_filter = _Sudoers()

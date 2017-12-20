@@ -1,15 +1,17 @@
 import re
 
 import telegram
-from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin, user_admin_no_reply
+from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin, user_admin_no_reply, extract_text
 from tg_bot.modules.sql import warns_sql as sql
 from tg_bot.modules.users import get_user_id
 
 WARN_HANDLER_GROUP = 9
+CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
 
 
 # TODO: Make a single user_id and argument extraction function! this one is inaccurate
@@ -68,7 +70,7 @@ def warn(user_id, chat, reason, bot, message):
 @bot_admin
 def button(bot, update):
     query = update.callback_query
-    r = re.match("rm_warn\((.+?)\)", query.data)
+    r = re.match(r"rm_warn\((.+?)\)", query.data)
     if r:
         user_id = r.group(1)
         chat_id = update.effective_chat.id
@@ -158,56 +160,58 @@ def remove_warn_filter(bot, update, args):
     if len(args) < 1:
         return
 
-    chat_filters = sql.get_chat_filters(chat.id)
+    chat_filters = sql.get_chat_warn_filters(chat.id)
 
     if not chat_filters:
-        update.effective_message.reply_text("No filters are active here!")
+        update.effective_message.reply_text("No warning filters are active here!")
         return
 
     for filt in chat_filters:
         if filt.chat_id == str(chat.id) and filt.keyword == args[0]:
             sql.remove_warn_filter(chat.id, args[0])
-            update.effective_message.reply_text("Yep, I'll stop replying to that.")
+            update.effective_message.reply_text("Yep, I'll stop warning people for that.")
             return
 
-    update.effective_message.reply_text("That's not a current warning filter - run /warnlist for all active warning filters.")
+    update.effective_message.reply_text("That's not a current warning filter - run /warnlist for all \
+    active warning filters.")
 
 
 @run_async
 def list_warn_filters(bot, update):
     chat = update.effective_chat
-    all_handlers = sql.get_chat_filters(chat.id)
+    all_handlers = sql.get_chat_warn_filters(chat.id)
 
     if not all_handlers:
         update.effective_message.reply_text("No warning filters are active here!")
         return
 
-    filter_list = "Current warn filters in this chat:\n"
+    filter_list = CURRENT_WARNING_FILTER_STRING
     for handler in all_handlers:
-        entry = " - {}\n".format(handler.keyword)
+        entry = " - {}\n".format(escape_markdown(handler.keyword))
         if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
-            update.effective_message.reply_text(filter_list)
+            update.effective_message.reply_text(filter_list, parse_mode=ParseMode.MARKDOWN)
             filter_list = entry
         else:
             filter_list += entry
 
-    if not filter_list == "Current warn filters in this chat:\n":
-        update.effective_message.reply_text(filter_list)
+    if not filter_list == CURRENT_WARNING_FILTER_STRING:
+        update.effective_message.reply_text(filter_list, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
 def reply_filter(bot, update):
-    chat_filters = sql.get_chat_filters(update.effective_chat.id)
+    chat_warn_filters = sql.get_chat_warn_filters(update.effective_chat.id)
     message = update.effective_message
-    to_match = message.text or message.caption or (message.sticker.emoji if message.sticker else None)
+    to_match = extract_text(message)
     if not to_match:
         return
-    for filt in chat_filters:
-        pattern = "( |^|[^\w])" + re.escape(filt.keyword) + "( |$|[^\w])"
+
+    for warn_filter in chat_warn_filters:
+        pattern = r"( |^|[^\w])" + re.escape(warn_filter.keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             user_id = update.effective_user.id
             chat = update.effective_chat
-            warn(user_id, chat, filt.reply, bot, message)
+            warn(user_id, chat, warn_filter.reply, bot, message)
 
 
 def __migrate__(old_chat_id, new_chat_id):

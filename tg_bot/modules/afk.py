@@ -1,8 +1,8 @@
 from telegram import MessageEntity
-
-from tg_bot.modules.sql import afk_sql as sql
 from telegram.ext import CommandHandler, Filters, MessageHandler, run_async, RegexHandler
+
 from tg_bot import dispatcher
+from tg_bot.modules.sql import afk_sql as sql
 from tg_bot.modules.users import get_user_id
 
 AFK_GROUP = 7

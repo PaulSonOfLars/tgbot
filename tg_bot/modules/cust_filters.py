@@ -5,7 +5,7 @@ from telegram.ext import CommandHandler, MessageHandler, DispatcherHandlerStop, 
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin
+from tg_bot.modules.helper_funcs import user_admin, extract_text
 from tg_bot.modules.sql import cust_filters_sql as sql
 
 HANDLER_GROUP = 10
@@ -98,11 +98,12 @@ def stop_filter(bot, update, args):
 def reply_filter(bot, update):
     chat_filters = sql.get_chat_filters(update.effective_chat.id)
     message = update.effective_message
-    to_match = message.text or message.caption or (message.sticker.emoji if message.sticker else None)
+    to_match = extract_text(message)
     if not to_match:
         return
+
     for filt in chat_filters:
-        pattern = "( |^|[^\w])" + re.escape(filt.keyword) + "( |$|[^\w])"
+        pattern = r"( |^|[^\w])" + re.escape(filt.keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             if filt.is_sticker:
                 message.reply_sticker(filt.reply)
