@@ -19,7 +19,8 @@ def is_user_admin(chat, user_id, member=None):
 
 
 def is_bot_admin(chat, bot_id):
-    return chat.get_member(bot_id).status == 'administrator' or chat.get_member(bot_id).status == 'creator'
+    bot_member = chat.get_member(bot_id)
+    return bot_member.status == 'administrator' or bot_member.status == 'creator'
 
 
 def is_user_in_chat(chat, user_id):
