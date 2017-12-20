@@ -18,8 +18,7 @@ def gban(bot, update, args):
         print(entities)
         for e in entities:
             user_id = e.user.id
-            message.reply_text(user_id)
-            return
+            break
         else:
             return
 
