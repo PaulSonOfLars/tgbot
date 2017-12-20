@@ -43,8 +43,7 @@ def reply_afk(bot, update):
                 else:
                     res = "{} is AFK! says its because of:\n{}".format(ent.user.first_name, user.reason)
                 message.reply_text(res)
-        else:
-            return
+
     elif message.entities and message.parse_entities([MessageEntity.MENTION]):
         entities = message.parse_entities([MessageEntity.MENTION])
         for ent in entities:
@@ -60,8 +59,7 @@ def reply_afk(bot, update):
                 else:
                     res = "{} is AFK! says its because of:\n{}".format(chat.first_name, user.reason)
                 message.reply_text(res)
-        else:
-            return
+
     else:
         return
 

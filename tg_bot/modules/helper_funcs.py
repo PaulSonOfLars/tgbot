@@ -122,7 +122,7 @@ def extract_user(message, args):
         if not user_id:
             message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
-            return None
+            return
         else:
             return user_id
 
@@ -133,7 +133,7 @@ def extract_user(message, args):
         return prev_message.from_user.id
 
     else:
-        return None
+        return
 
 
 def extract_text(message):
@@ -214,16 +214,17 @@ def markdown_parser(txt, entities=None, offset=0):
 def split_message(msg):
     if len(msg) < MAX_MESSAGE_LENGTH:
         return [msg]
+
     else:
-        lines = msg.splitlines()
+        lines = msg.splitlines(True)
         small_msg = ""
         result = []
         for line in lines:
-            if len(small_msg) + len(line) + 1 < MAX_MESSAGE_LENGTH:
-                small_msg += line + "\n"
+            if len(small_msg) + len(line) < MAX_MESSAGE_LENGTH:
+                small_msg += line
             else:
                 result.append(small_msg)
-                small_msg = line + "\n"
+                small_msg = line
         else:
             # Else statement at the end of the for loop, so append the leftover string.
             result.append(small_msg)
