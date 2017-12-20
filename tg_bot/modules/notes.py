@@ -83,7 +83,7 @@ def save_replied(bot, update):
         msg = bot.forward_message(chat_id=MESSAGE_DUMP, from_chat_id=chat_id, message_id=msg.message_id)
 
     sql.add_note_to_db(chat_id, notename, msg.message_id, is_reply=True)
-    update.effective_message.reply_text("yas! added replied message " + notename)
+    update.effective_message.reply_text("Yas! Added replied message " + notename)
 
 
 @run_async

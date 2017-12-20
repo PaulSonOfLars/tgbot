@@ -77,7 +77,7 @@ def bot_admin(func):
 def user_admin(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):
-        user_id = update.effective_message.from_user.id
+        user_id = update.effective_user.id
         if is_user_admin(update.effective_chat, user_id):
             func(bot, update, *args, **kwargs)
         else:
@@ -89,7 +89,7 @@ def user_admin(func):
 def user_admin_no_reply(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):
-        user_id = update.effective_message.from_user.id
+        user_id = update.effective_user.id
         if is_user_admin(update.effective_chat, user_id):
             func(bot, update, *args, **kwargs)
 
@@ -99,7 +99,7 @@ def user_admin_no_reply(func):
 def user_not_admin(func):
     @wraps(func)
     def is_not_admin(bot, update, *args, **kwargs):
-        user_id = update.effective_message.from_user.id
+        user_id = update.effective_user.id
         if not is_user_admin(update.effective_chat, user_id):
             func(bot, update, *args, **kwargs)
 

@@ -70,15 +70,15 @@ def kick(bot, update, args):
         return
 
     if is_user_admin(chat, user_id):
-        message.reply_text("I really wish I could ban admins...")
+        message.reply_text("I really wish I could kick admins...")
         return
 
     res = update.effective_chat.unban_member(user_id)  # unban on current user = kick
     if res:
         bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')  # banhammer marie sticker
-        message.reply_text("Banned!")
+        message.reply_text("Kicked!")
     else:
-        message.reply_text("Well damn, I can't ban that user.")
+        message.reply_text("Well damn, I can't kick that user.")
 
 
 @run_async
