@@ -24,7 +24,8 @@ def is_bot_admin(chat, bot_id):
 
 
 def is_user_in_chat(chat, user_id):
-    return chat.get_member(user_id)
+    member = chat.get_member(user_id)
+    return member.status != 'left' and member.status != 'kicked'
 
 
 def bot_can_delete(func):

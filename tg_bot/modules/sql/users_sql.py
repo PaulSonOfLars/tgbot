@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, Integer, UnicodeText, String, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, UnicodeText, String, ForeignKey, UniqueConstraint, func
 
 from tg_bot import dispatcher
 from tg_bot.modules.sql import BASE, SESSION
@@ -100,7 +100,7 @@ def update_user(user_id, username, chat_id, chat_name):
 
 
 def get_user_by_name(username):
-    return SESSION.query(Users).filter(Users.username == username).first()
+    return SESSION.query(Users).filter(func.lower(Users.username) == username.lower()).first()
 
 
 def get_chat_members(chat_id):
