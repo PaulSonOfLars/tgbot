@@ -9,7 +9,7 @@ DELIMITERS = ("/", ":", "|", "_")
 
 
 def separate_sed(s):
-    if len(s) > 4 and s[1] in DELIMITERS and s.count(s[1]) >= 3:
+    if len(s) > 4 and s[1] in DELIMITERS and s.count(s[1]) >= 2:
         delim = s[1]
         start = counter = 2
         while counter < len(s):
@@ -21,13 +21,14 @@ def separate_sed(s):
                 counter += 1
                 start = counter
                 break
+
             counter += 1
 
         else:
             return None
 
-        while counter-1 < len(s):
-            if s[counter] == "\\" and s[counter+1] == delim:
+        while counter < len(s):
+            if s[counter] == "\\" and counter + 1 < len(s) and s[counter + 1] == delim:
                 s = s[:counter] + s[counter + 1:]
 
             elif s[counter] == delim:
@@ -37,7 +38,7 @@ def separate_sed(s):
 
             counter += 1
         else:
-            return None
+            return replace, s[start:], ""
 
         flags = ""
         if counter < len(s):
@@ -64,12 +65,12 @@ def sed(bot, update):
 
 
 __help__ = """
- - s/<text1>/<text2>/<flag>: Reply to a message with this to perform a sed operation on that message, replacing all \
+ - s/<text1>/<text2>(/<flag>): Reply to a message with this to perform a sed operation on that message, replacing all \
 occurrences of 'text1' with 'text2'. Flags are optional, and currently include 'i' for ignore case, or nothing. \
-Delimiters include '/', '_' and ':'. Text grouping is supported. The resulting message cannot be larger than \
+Delimiters include '/', '_', '|' and ':'. Text grouping is supported. The resulting message cannot be larger than \
 {}
 """.format(telegram.MAX_MESSAGE_LENGTH)
 
-SED_HANDLER = RegexHandler(r's([{}]).*?\1.*?\1'.format("".join(DELIMITERS)), sed)
+SED_HANDLER = RegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed)
 
 dispatcher.add_handler(SED_HANDLER)

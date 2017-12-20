@@ -65,7 +65,6 @@ def filters(bot, update):
     raise DispatcherHandlerStop
 
 
-@run_async
 @user_admin
 def stop_filter(bot, update, args):
     chat = update.effective_chat
