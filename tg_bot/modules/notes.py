@@ -23,8 +23,8 @@ def get(bot, update, notename, show_none=True):
         elif note.has_buttons:
             buttons = sql.get_buttons(chat_id, notename)
             keyb = []
-            for b in buttons:
-                keyb.append([InlineKeyboardButton(b.name, url=b.url)])
+            for btn in buttons:
+                keyb.append([InlineKeyboardButton(btn.name, url=btn.url)])
 
             keyboard = InlineKeyboardMarkup(keyb)
             try:
@@ -104,10 +104,10 @@ def save(bot, update):
         prev = 0
         note_data = ""
         buttons = []
-        for x in BTN_URL_REGEX.finditer(markdown_note):
-            buttons.append((x.group(2), x.group(3)))
-            note_data += markdown_note[prev:x.start(1)]
-            prev = x.end(1)
+        for match in BTN_URL_REGEX.finditer(markdown_note):
+            buttons.append((match.group(2), match.group(3)))
+            note_data += markdown_note[prev:match.start(1)]
+            prev = match.end(1)
         else:
             note_data += markdown_note[prev:]
 

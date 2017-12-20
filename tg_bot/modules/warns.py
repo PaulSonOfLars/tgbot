@@ -20,8 +20,8 @@ def extract_userid(message):
 
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
         entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            return e.user.id, message.text[e.offset+e.length]
+        for ent in entities:
+            return ent.user.id, message.text[ent.offset+ent.length]
 
     elif len(args) >= 2 and args[1][0] == '@':
         user = args[1]
@@ -70,9 +70,9 @@ def warn(user_id, chat, reason, bot, message):
 @bot_admin
 def button(bot, update):
     query = update.callback_query
-    r = re.match(r"rm_warn\((.+?)\)", query.data)
-    if r:
-        user_id = r.group(1)
+    match = re.match(r"rm_warn\((.+?)\)", query.data)
+    if match:
+        user_id = match.group(1)
         chat_id = update.effective_chat.id
         res = sql.remove_warn(user_id, chat_id)
         if res:

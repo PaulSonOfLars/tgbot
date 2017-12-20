@@ -14,8 +14,8 @@ def __list_all_modules():
     filepath = join(dirname(__file__), "load.json")
 
     if isfile(filepath):
-        with open(join(dirname(__file__), "load.json")) as f:
-            data = json.load(f)
+        with open(join(dirname(__file__), "load.json")) as to_load:
+            data = json.load(to_load)
 
         if "load" in data and data.get("load"):
             to_load = data.get("load")

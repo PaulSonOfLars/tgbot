@@ -22,17 +22,17 @@ def gban(bot, update, args):
         chat_id = chat.chat_id
         try:
             bot.kick_chat_member(chat_id, user_id)
-        except BadRequest as e:
-            if e.message == "User is an administrator of the chat":
+        except BadRequest as excp:
+            if excp.message == "User is an administrator of the chat":
                 pass
-            elif e.message == "Chat not found":
+            elif excp.message == "Chat not found":
                 pass
-            elif e.message == "Not enough rights to restrict/unrestrict chat member":
+            elif excp.message == "Not enough rights to restrict/unrestrict chat member":
                 pass
-            elif e.message == "User_not_participant":
+            elif excp.message == "User_not_participant":
                 pass
             else:
-                message.reply_text("Could not un-gban due to: {}".format(e.message))
+                message.reply_text("Could not un-gban due to: {}".format(excp.message))
                 return
         except TelegramError:
             pass
@@ -56,17 +56,17 @@ def ungban(bot, update, args):
         chat_id = chat.chat_id
         try:
             bot.unban_chat_member(chat_id, user_id)
-        except BadRequest as e:
-            if e.message == "User is an administrator of the chat":
+        except BadRequest as excp:
+            if excp.message == "User is an administrator of the chat":
                 pass
-            elif e.message == "Chat not found":
+            elif excp.message == "Chat not found":
                 pass
-            elif e.message == "Not enough rights to restrict/unrestrict chat member":
+            elif excp.message == "Not enough rights to restrict/unrestrict chat member":
                 pass
-            elif e.message == "User_not_participant":
+            elif excp.message == "User_not_participant":
                 pass
             else:
-                message.reply_text("Could not un-gban due to: {}".format(e.message))
+                message.reply_text("Could not un-gban due to: {}".format(excp.message))
                 return
         except TelegramError:
             pass

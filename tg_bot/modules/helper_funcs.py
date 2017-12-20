@@ -113,8 +113,8 @@ def extract_user(message, args):
 
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
         entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            return e.user.id
+        for ent in entities:
+            return ent.user.id
 
     elif len(args) >= 1 and args[0][0] == '@':
         user = args[0]
@@ -160,9 +160,9 @@ def _selective_escape(to_parse):
     :return: valid markdown string
     """
     offset = 0  # offset to be used as adding a \ character causes the string to shift
-    for e in MATCH_MD.finditer(to_parse):
-        if e.group('esc'):
-            ent_start = e.start()
+    for match in MATCH_MD.finditer(to_parse):
+        if match.group('esc'):
+            ent_start = match.start()
             to_parse = to_parse[:ent_start + offset] + '\\' + to_parse[ent_start + offset:]
             offset += 1
     return to_parse

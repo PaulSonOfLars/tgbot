@@ -54,8 +54,8 @@ def add_note_to_db(chat_id, note_name, note_data, is_reply=False, has_buttons=Fa
             with BUTTONS_INSERTION_LOCK:
                 prev_buttons = SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id),
                                                              Buttons.note_name == note_name).all()
-                for b in prev_buttons:
-                    SESSION.delete(b)
+                for btn in prev_buttons:
+                    SESSION.delete(btn)
             SESSION.delete(prev)
         note = Notes(str(chat_id), note_name, note_data, is_reply=is_reply, has_buttons=has_buttons)
 
@@ -74,8 +74,8 @@ def rm_note(chat_id, note_name):
             with BUTTONS_INSERTION_LOCK:
                 buttons = SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id),
                                                         Buttons.note_name == note_name).all()
-                for b in buttons:
-                    SESSION.delete(b)
+                for btn in buttons:
+                    SESSION.delete(btn)
             SESSION.delete(note)
             SESSION.commit()
             return True
