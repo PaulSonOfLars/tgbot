@@ -223,7 +223,6 @@ __help__ = """
  - /warnlist: list of all current warning filters
 """
 
-# TODO: remove warn button.
 WARN_HANDLER = CommandHandler("warn", warn_user)
 RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button)

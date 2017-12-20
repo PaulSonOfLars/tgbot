@@ -12,12 +12,14 @@ class CustomFilters(BASE):
     keyword = Column(UnicodeText, primary_key=True, nullable=False)
     reply = Column(UnicodeText, nullable=False)
     is_sticker = Column(Boolean, nullable=False, default=False)
+    is_document = Column(Boolean, nullable=False, default=False)
 
-    def __init__(self, chat_id, keyword, reply, is_sticker=False):
+    def __init__(self, chat_id, keyword, reply, is_sticker=False, is_document=False):
         self.chat_id = str(chat_id)  # ensure string
         self.keyword = keyword
         self.reply = reply
         self.is_sticker = is_sticker
+        self.is_document = is_document
 
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
@@ -39,9 +41,9 @@ def get_all_filters():
     return SESSION.query(CustomFilters).all()
 
 
-def add_filter(chat_id, keyword, reply, is_sticker=False):
+def add_filter(chat_id, keyword, reply, is_sticker=False, is_document=False):
     with INSERTION_LOCK:
-        filt = CustomFilters(str(chat_id), keyword, reply, is_sticker)
+        filt = CustomFilters(str(chat_id), keyword, reply, is_sticker, is_document)
 
         if filt in FILTER_KEYSTORE[filt.chat_id]:  # if there already is a filter on that kw, remove it
             FILTER_KEYSTORE[filt.chat_id].remove(filt)
