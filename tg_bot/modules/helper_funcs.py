@@ -232,9 +232,18 @@ def split_message(msg):
         return result
 
 
-class _Sudoers(BaseFilter):
-    def filter(self, message):
-        return bool(message.from_user and message.from_user.id in SUDO_USERS)
+class CustomFilters:
+    class _Sudoers(BaseFilter):
+        def filter(self, message):
+            return bool(message.from_user and message.from_user.id in SUDO_USERS)
 
+    sudo_filter = _Sudoers()
 
-sudo_filter = _Sudoers()
+    class _MimeType(BaseFilter):
+        def __init__(self, mimetype):
+            self.mime_type = mimetype
+
+        def filter(self, message):
+            return bool(message.document and message.document.mime_type == self.mime_type)
+
+    mime_type = _MimeType

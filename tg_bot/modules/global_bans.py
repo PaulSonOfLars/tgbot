@@ -2,7 +2,7 @@ from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import sudo_filter, extract_user
+from tg_bot.modules.helper_funcs import CustomFilters, extract_user
 from tg_bot.modules.sql.users_sql import get_all_chats
 
 
@@ -76,8 +76,8 @@ def ungban(bot, update, args):
 
 __help__ = ""  # Sudo only module, no help.
 
-GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True, filters=sudo_filter)
-UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True, filters=sudo_filter)
+GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True, filters=CustomFilters.sudo_filter)
+UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True, filters=CustomFilters.sudo_filter)
 
 dispatcher.add_handler(GBAN_HANDLER)
 dispatcher.add_handler(UNGBAN_HANDLER)

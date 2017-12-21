@@ -4,10 +4,11 @@ from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.locks_sql as sql
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import can_delete, is_user_admin, bot_can_delete, user_admin, user_not_admin
+from tg_bot.modules.helper_funcs import can_delete, is_user_admin, bot_can_delete, user_admin, user_not_admin, \
+    CustomFilters
 from tg_bot.modules.sql import users_sql
 
-LOCK_TYPES = ["sticker", "audio", "voice", "document", "video", "contact", "photo"]
+LOCK_TYPES = ["sticker", "audio", "voice", "document", "video", "contact", "photo", "gif"]
 
 RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews']
 
@@ -173,6 +174,13 @@ def del_photo(bot, update):
 
 
 @run_async
+def del_gif(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "gif") and can_delete(chat, bot.id):
+        update.effective_message.delete()
+
+
+@run_async
 @user_not_admin
 def rest_msg(bot, update):
     msg = update.effective_message
@@ -240,7 +248,8 @@ VOICE_HANDLER = MessageHandler(Filters.voice, del_voice)
 DOCUMENT_HANDLER = MessageHandler(Filters.document, del_document)
 VIDEO_HANDLER = MessageHandler(Filters.video, del_video)
 CONTACT_HANDLER = MessageHandler(Filters.contact, del_contact)
-PHOTO_HANDLER = MessageHandler(Filters.photo, del_photo)  # TODO: gif detection -> mime_type?
+PHOTO_HANDLER = MessageHandler(Filters.photo, del_photo)
+GIF_HANDLER = MessageHandler(Filters.document & CustomFilters.mime_type("video/mp4"), del_gif)
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(UNLOCK_HANDLER)
@@ -250,6 +259,7 @@ dispatcher.add_handler(REST_MSG_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_MEDIA_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_OTHERS_HANDLER, REST_GROUP)
 
+dispatcher.add_handler(GIF_HANDLER)
 dispatcher.add_handler(STICKER_HANDLER)
 dispatcher.add_handler(AUDIO_HANDLER)
 dispatcher.add_handler(VOICE_HANDLER)

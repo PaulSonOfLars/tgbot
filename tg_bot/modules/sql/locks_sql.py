@@ -6,7 +6,6 @@ from sqlalchemy import Column, String, Boolean
 from tg_bot.modules.sql import SESSION, BASE
 
 
-# TODO: add gifs
 class Permissions(BASE):
     __tablename__ = "permissions"
     chat_id = Column(String(14), primary_key=True)
@@ -17,6 +16,7 @@ class Permissions(BASE):
     document = Column(Boolean, default=False)
     photo = Column(Boolean, default=False)
     sticker = Column(Boolean, default=False)
+    gif = Column(Boolean, default=False)
 
     def __init__(self, chat_id):
         self.chat_id = str(chat_id)  # ensure string
@@ -27,6 +27,7 @@ class Permissions(BASE):
         self.document = False
         self.photo = False
         self.sticker = False
+        self.gif = False
 
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
@@ -105,6 +106,8 @@ def update_lock(chat_id, lock_type, locked):
             curr_perm.photo = locked
         elif lock_type == "sticker":
             curr_perm.sticker = locked
+        elif lock_type == "gif":
+            curr_perm.gif = locked
 
         SESSION.add(curr_perm)
         SESSION.commit()
@@ -149,6 +152,8 @@ def is_locked(chat_id, lock_type):
         return curr_perm.video
     elif lock_type == "document":
         return curr_perm.document
+    elif lock_type == "gif":
+        return curr_perm.gif
 
 
 def is_restr_locked(chat_id, lock_type):

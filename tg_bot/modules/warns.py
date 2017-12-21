@@ -6,7 +6,8 @@ from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, Messa
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin, user_admin_no_reply, extract_text
+from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin, user_admin_no_reply, extract_text, \
+    split_message
 from tg_bot.modules.sql import warns_sql as sql
 from tg_bot.modules.users import get_user_id
 
@@ -119,8 +120,10 @@ def warns(bot, update):
             text = "This user has {} warnings, for the following reasons:".format(warned_user.num_warns)
             for reason in warned_user.reasons:
                 text += "\n - {}".format(reason)
-            # TODO: Check length of text to send.
-            update.effective_message.reply_text(text)
+
+            msgs = split_message(text)
+            for msg in msgs:
+                update.effective_message.reply_text(msg)
         else:
             update.effective_message.reply_text(
                 "User has {} warnings, but no reasons for any of them.".format(warned_user.num_warns))

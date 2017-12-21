@@ -69,11 +69,14 @@ def get_chat_filters(chat_id):
 
 
 def migrate_chat(old_chat_id, new_chat_id):
+    global FILTER_KEYSTORE
     with INSERTION_LOCK:
         chat_filters = SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(old_chat_id)).all()
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
         SESSION.commit()
+        FILTER_KEYSTORE = collections.defaultdict(list)
+        load_keystore()
 
 
 def load_keystore():
