@@ -5,7 +5,7 @@ from telegram import MAX_MESSAGE_LENGTH, MessageEntity
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import OWNER_ID, SUDO_USERS
+from tg_bot import SUDO_USERS
 from tg_bot.modules.users import get_user_id
 
 
@@ -16,7 +16,7 @@ def can_delete(chat, bot_id):
 def is_user_admin(chat, user_id, member=None):
     if not member:
         member = chat.get_member(user_id)
-    return member.status == 'administrator' or member.status == 'creator' or member.user.id == OWNER_ID
+    return member.status == 'administrator' or member.status == 'creator' or member.user.id in SUDO_USERS
 
 
 def is_bot_admin(chat, bot_id):
