@@ -15,7 +15,10 @@ HEROKU = bool(os.environ.get('HEROKU', False))
 if not HEROKU:
     from tg_bot.config import Development as Config
     TOKEN = Config.API_KEY
-    OWNER_ID = Config.OWNER_ID
+    try:
+        OWNER_ID = int(Config.OWNER_ID)
+    except ValueError:
+        raise Exception("Your OWNER_ID variable is not a valid integer.")
     MESSAGE_DUMP = Config.MESSAGE_DUMP
     OWNER_USERNAME = Config.OWNER_USERNAME
 
