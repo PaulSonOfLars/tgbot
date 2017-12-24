@@ -151,7 +151,7 @@ def pin(bot, update, args):
 
     is_silent = True
     if len(args) >= 1:
-        is_silent = not (args[0].lower() == 'notify' or args[0].lower() == 'loud')
+        is_silent = not (args[0].lower() == 'notify' or args[0].lower() == 'loud' or args[0].lower() == 'violent')
 
     if prev_message and is_group:
         bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
