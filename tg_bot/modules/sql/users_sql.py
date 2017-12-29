@@ -99,8 +99,12 @@ def update_user(user_id, username, chat_id, chat_name):
         SESSION.commit()
 
 
-def get_user_by_name(username):
+def get_userid_by_name(username):
     return SESSION.query(Users).filter(func.lower(Users.username) == username.lower()).first()
+
+
+def get_name_by_userid(user_id):
+    return SESSION.query(Users).get(Users.user_id == int(user_id)).first()
 
 
 def get_chat_members(chat_id):

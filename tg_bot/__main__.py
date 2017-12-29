@@ -5,11 +5,21 @@ from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, Cha
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
 
-from tg_bot import dispatcher, updater, TOKEN, HEROKU
+from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
 from tg_bot.modules.helper_funcs import split_message
+PM_START_TEXT = """
+Hi {}, my name is {}! I'm a group manager bot maintained by [this wonderful person](tg://user?id={}).
+I'm built in python3, using the python-telegram-bot library, and am fully opensource - you can find what makes me tick \
+[here](github.com/PaulSonOfLars/tgbot)!
+
+Feel free to submit pull requests on github, or to contact my creator, @SonOfLars, with any bugs, questions or \
+feature requests you might have :)
+
+You can find the list of available commands with /help.
+"""
 
 HELP_STRINGS = """
 Commands available:
@@ -42,8 +52,11 @@ def test(bot, update):
 
 
 def start(bot, update):
-    # sql.init_permissions(update.effective_chat.id)
-    update.effective_message.reply_text("Yo, whadup?")
+    if update.effective_chat.type == "private":
+        first_name = update.effective_user.first_name
+        update.effective_message.reply_text(PM_START_TEXT.format(first_name, bot.first_name, OWNER_ID))
+    else:
+        update.effective_message.reply_text("Yo, whadup?")
 
 
 # for test purposes
@@ -125,12 +138,14 @@ def main():
 
     # dispatcher.add_error_handler(error_callback)
 
-    if HEROKU:
+    if WEBHOOK:
         port = int(os.environ.get('PORT', 5000))
         updater.start_webhook(listen="0.0.0.0",
                               port=port,
                               url_path=TOKEN)
-        updater.bot.set_webhook("https://tgpolbot.herokuapp.com/" + TOKEN)
+
+        from tg_bot import URL
+        updater.bot.set_webhook(URL + TOKEN)
     else:
         updater.start_polling()
     updater.idle()

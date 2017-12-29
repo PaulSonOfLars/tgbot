@@ -10,26 +10,9 @@ logging.basicConfig(
 
 LOGGER = logging.getLogger(__name__)
 
-HEROKU = bool(os.environ.get('HEROKU', False))
+WEBHOOK = bool(os.environ.get('WEBHOOK', False))
 
-if not HEROKU:
-    from tg_bot.config import Development as Config
-    TOKEN = Config.API_KEY
-    try:
-        OWNER_ID = int(Config.OWNER_ID)
-    except ValueError:
-        raise Exception("Your OWNER_ID variable is not a valid integer.")
-    MESSAGE_DUMP = Config.MESSAGE_DUMP
-    OWNER_USERNAME = Config.OWNER_USERNAME
-
-    try:
-        SUDO_USERS = set(int(x) for x in Config.SUDO_USERS or [])
-    except ValueError:
-        raise Exception("Your sudo users list does not contain valid integers.")
-
-    SUDO_USERS.add(OWNER_ID)
-
-else:
+if WEBHOOK:
     TOKEN = os.environ.get('TOKEN', None)
     try:
         OWNER_ID = int(os.environ.get('OWNER_ID', None))
@@ -45,6 +28,26 @@ else:
         raise Exception("Your sudo users list does not contain valid integers.")
 
     SUDO_USERS.add(OWNER_ID)
+    URL = os.environ.get('URL', "")  # Does not contain token
+    DB_URI = os.environ.get('DATABASE_URL')
+
+else:
+    from tg_bot.config import Development as Config
+    TOKEN = Config.API_KEY
+    try:
+        OWNER_ID = int(Config.OWNER_ID)
+    except ValueError:
+        raise Exception("Your OWNER_ID variable is not a valid integer.")
+    MESSAGE_DUMP = Config.MESSAGE_DUMP
+    OWNER_USERNAME = Config.OWNER_USERNAME
+
+    try:
+        SUDO_USERS = set(int(x) for x in Config.SUDO_USERS or [])
+    except ValueError:
+        raise Exception("Your sudo users list does not contain valid integers.")
+
+    SUDO_USERS.add(OWNER_ID)
+    DB_URI = Config.SQLALCHEMY_DATABASE_URI
 
 updater = Updater(TOKEN, workers=8)
 

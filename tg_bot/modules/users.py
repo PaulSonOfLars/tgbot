@@ -13,9 +13,9 @@ USERS_GROUP = 2
 
 def get_user_id(username):
     if username.startswith('@'):
-        user = sql.get_user_by_name(username[1:])
+        user = sql.get_userid_by_name(username[1:])
     else:
-        user = sql.get_user_by_name(username)
+        user = sql.get_userid_by_name(username)
 
     if user:
         return user.user_id
