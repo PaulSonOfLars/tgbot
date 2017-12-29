@@ -4,13 +4,17 @@ from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
-from tg_bot import dispatcher
+from tg_bot import dispatcher, OWNER_ID
 from tg_bot.modules.helper_funcs import user_admin, markdown_parser
 
 
 @run_async
 def new_member(bot, update):
     chat = update.effective_chat
+    if update.effective_user.id == OWNER_ID:
+        update.effective_message.reply_text("Master is in the houseeee, let's get this party started!")
+        return
+
     should_welc, cust_welcome, _ = sql.get_preference(chat.id)
     if should_welc:
         new_members = update.effective_message.new_chat_members
