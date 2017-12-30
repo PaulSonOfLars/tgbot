@@ -144,8 +144,17 @@ def get_bot_ip(bot, update):
 @run_async
 def get_id(bot, update):
     if update.effective_message.reply_to_message:
-        user = update.effective_message.reply_to_message.from_user
-        update.effective_message.reply_text(user.username + "'s id is " + str(user.id))
+        if update.effective_message.reply_to_message.forward_from:
+            user1 = update.effective_message.reply_to_message.from_user
+            user2 = update.effective_message.reply_to_message.forward_from
+            update.effective_message.reply_text(
+                "The original sender, {}, has an ID of {}.\nThe forwarder, {}, has an ID of {}.".format(user2.first_name,
+                                                                                                       user2.id,
+                                                                                                       user1.first_name,
+                                                                                                       user1.id))
+        else:
+            user = update.effective_message.reply_to_message.from_user
+            update.effective_message.reply_text("{}'s id is {}".format(user.first_name, user.id))
     else:
         chat = update.effective_chat
         update.effective_message.reply_text("This group's id is " + str(chat.id))
