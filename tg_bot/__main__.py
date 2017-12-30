@@ -1,6 +1,7 @@
 import importlib
 import os
 
+from telegram import ParseMode
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
@@ -54,7 +55,8 @@ def test(bot, update):
 def start(bot, update):
     if update.effective_chat.type == "private":
         first_name = update.effective_user.first_name
-        update.effective_message.reply_text(PM_START_TEXT.format(first_name, bot.first_name, OWNER_ID))
+        update.effective_message.reply_text(PM_START_TEXT.format(first_name, bot.first_name, OWNER_ID),
+                                            parse_mode=ParseMode.MARKDOWN)
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
