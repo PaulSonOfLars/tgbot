@@ -1,7 +1,9 @@
+from telegram import ParseMode
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler
+from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher
+from tg_bot import dispatcher, OWNER_ID
 from tg_bot.modules.helper_funcs import CustomFilters, extract_user
 from tg_bot.modules.sql.users_sql import get_all_chats
 
@@ -15,7 +17,22 @@ def gban(bot, update, args):
         message.reply_text("You don't seem to be referring to a user.")
         return
 
-    message.reply_text("*Blows dust off of banhammer* 😉")  # TODO: get user name from tg?
+    user_chat = bot.get_chat(user_id)
+    if user_chat.type != 'private':
+        message.reply_text("That's not a user!")
+        return
+
+    message.reply_text("*Blows dust off of banhammer* 😉")
+
+    banner = update.effective_user
+
+    bot.send_message(OWNER_ID,
+                     "[{}](tg://user?id={}) has gbanned user [{}](tg://user?id={})".format(
+                         escape_markdown(banner.first_name),
+                         banner.id,
+                         escape_markdown(user_chat.first_name),
+                         user_chat.id),
+                     parse_mode=ParseMode.MARKDOWN)
 
     chats = get_all_chats()
     for chat in chats:
@@ -49,7 +66,22 @@ def ungban(bot, update, args):
         message.reply_text("You don't seem to be referring to a user.")
         return
 
-    message.reply_text("I'll give them a second chance, globally.")  # TODO: get user name from tg?
+    user_chat = bot.get_chat(user_id)
+    if user_chat.type != 'private':
+        message.reply_text("That's not a user!")
+        return
+
+    message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
+
+    banner = update.effective_user
+
+    bot.send_message(OWNER_ID,
+                     "[{}](tg://user?id={}) has ungbanned user [{}](tg://user?id={})".format(
+                         escape_markdown(banner.first_name),
+                         banner.id,
+                         escape_markdown(user_chat.first_name),
+                         user_chat.id),
+                     parse_mode=ParseMode.MARKDOWN)
 
     chats = get_all_chats()
     for chat in chats:

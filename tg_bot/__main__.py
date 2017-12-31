@@ -5,12 +5,14 @@ from telegram import ParseMode
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
 from tg_bot.modules.helper_funcs import split_message
+
 PM_START_TEXT = """
 Hi {}, my name is {}! I'm a group manager bot maintained by [this wonderful person](tg://user?id={}).
 I'm built in python3, using the python-telegram-bot library, and am fully opensource - you can find what makes me tick \
@@ -55,8 +57,9 @@ def test(bot, update):
 def start(bot, update):
     if update.effective_chat.type == "private":
         first_name = update.effective_user.first_name
-        update.effective_message.reply_text(PM_START_TEXT.format(first_name, bot.first_name, OWNER_ID),
-                                            parse_mode=ParseMode.MARKDOWN)
+        update.effective_message.reply_text(
+            PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
+            parse_mode=ParseMode.MARKDOWN)
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
