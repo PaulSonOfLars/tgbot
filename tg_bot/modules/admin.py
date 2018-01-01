@@ -28,14 +28,6 @@ def promote(bot, update, args):
     # set same perms as bot - bot can't assign higher perms than itself!
     bot_member = update.effective_chat.get_member(bot.id)
 
-    print("info {}".format(bot_member.can_change_info))
-    print("post {}".format(bot_member.can_post_messages))
-    print("edit {}".format(bot_member.can_edit_messages))
-    print("del {}".format(bot_member.can_delete_messages))
-    print("inv  {}".format(bot_member.can_invite_users))
-    print("rest {}".format(bot_member.can_restrict_members))
-    print("pin {}".format(bot_member.can_pin_messages))
-    print("prom {}".format(bot_member.can_promote_members))
     res = bot.promoteChatMember(chat_id, user_id,
                                 can_change_info=bot_member.can_change_info,
                                 can_post_messages=bot_member.can_post_messages,
