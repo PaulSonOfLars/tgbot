@@ -91,9 +91,7 @@ def unlock(bot, update, args):
                     for mem in members:
                         try:
                             bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=False,
-                                                     can_send_media_messages=False,
-                                                     can_send_other_messages=False)
+                                                     can_send_messages=True)
                         except TelegramError:
                             pass
                 elif args[0] == "media":
@@ -101,7 +99,7 @@ def unlock(bot, update, args):
                         try:
                             bot.restrict_chat_member(chat.id, mem.user,
                                                      can_send_messages=True,
-                                                     can_send_media_messages=False)
+                                                     can_send_media_messages=True)
                         except TelegramError:
                             pass
                 elif args[0] == "other":
@@ -110,7 +108,7 @@ def unlock(bot, update, args):
                             bot.restrict_chat_member(chat.id, mem.user,
                                                      can_send_messages=True,
                                                      can_send_media_messages=True,
-                                                     can_send_other_messages=False)
+                                                     can_send_other_messages=True)
                         except TelegramError:
                             pass
                 elif args[0] == "previews":
@@ -119,7 +117,7 @@ def unlock(bot, update, args):
                             bot.restrict_chat_member(chat.id, mem.user,
                                                      can_send_messages=True,
                                                      can_send_media_messages=True,
-                                                     can_add_web_page_previews=False)
+                                                     can_add_web_page_previews=True)
                         except TelegramError:
                             pass
 
