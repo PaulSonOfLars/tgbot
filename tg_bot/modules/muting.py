@@ -54,7 +54,7 @@ def unmute(bot, update, args):
 
     member = chat.get_member(int(user_id))
 
-    if member:
+    if member.status != 'kicked' and member.status != 'left':
         if member.can_send_messages and member.can_send_media_messages \
                 and member.can_send_other_messages and member.can_add_web_page_previews:
             message.reply_text("This user already has the right to speak.")
@@ -70,7 +70,7 @@ def unmute(bot, update, args):
             else:
                 message.reply_text("Uh... I couldn't unmute this one")
     else:
-        message.reply_text("This user isn't even in the chat, unmuting him won't help!")
+        message.reply_text("This user isn't even in the chat, unmuting him/her won't make him say any more!")
 
 
 __help__ = """

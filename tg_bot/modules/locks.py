@@ -33,7 +33,6 @@ def lock(bot, update, args):
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
-                message.reply_text("locked {}".format(args[0]))
                 members = users_sql.get_chat_members(chat.id)
                 if args[0] == "messages":
                     for mem in members:
@@ -68,6 +67,7 @@ def lock(bot, update, args):
                                                      can_add_web_page_previews=True)
                         except TelegramError:
                             pass
+                message.reply_text("Locked {} for all non-admins!".format(args[0]))
 
     else:
         message.reply_text("I'm not an administrator, or haven't got delete rights.")
@@ -88,27 +88,41 @@ def unlock(bot, update, args):
                 members = users_sql.get_chat_members(chat.id)
                 if args[0] == "messages":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=False,
-                                                 can_send_media_messages=False,
-                                                 can_send_other_messages=False)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=False,
+                                                     can_send_media_messages=False,
+                                                     can_send_other_messages=False)
+                        except TelegramError:
+                            pass
                 elif args[0] == "media":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=True,
-                                                 can_send_media_messages=False)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=True,
+                                                     can_send_media_messages=False)
+                        except TelegramError:
+                            pass
                 elif args[0] == "other":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=True,
-                                                 can_send_media_messages=True,
-                                                 can_send_other_messages=False)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=True,
+                                                     can_send_media_messages=True,
+                                                     can_send_other_messages=False)
+                        except TelegramError:
+                            pass
                 elif args[0] == "previews":
                     for mem in members:
-                        bot.restrict_chat_member(chat.id, mem.user,
-                                                 can_send_messages=True,
-                                                 can_send_media_messages=True,
-                                                 can_add_web_page_previews=False)
+                        try:
+                            bot.restrict_chat_member(chat.id, mem.user,
+                                                     can_send_messages=True,
+                                                     can_send_media_messages=True,
+                                                     can_add_web_page_previews=False)
+                        except TelegramError:
+                            pass
+
+                message.reply_text("Unlocked {} for everyone!".format(args[0]))
 
             else:
                 message.reply_text("What are you trying to unlock...? Try /locktypes for the list of locks")
