@@ -73,6 +73,7 @@ def lock(bot, update, args):
         message.reply_text("I'm not an administrator, or haven't got delete rights.")
 
 
+@run_async
 @user_admin
 def unlock(bot, update, args):
     chat = update.effective_chat
