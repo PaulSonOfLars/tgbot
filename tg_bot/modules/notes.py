@@ -1,5 +1,3 @@
-import re
-
 from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, RegexHandler, Filters
@@ -8,9 +6,7 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
 from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME
-from tg_bot.modules.helper_funcs import markdown_parser, user_admin
-
-BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\(buttonurl:(.+?)\))")
+from tg_bot.modules.helper_funcs import user_admin, button_markdown_parser
 
 
 # Do not async
@@ -96,30 +92,18 @@ def save(bot, update):
 
     if len(args) >= 3:
         note_name = args[1]
-        txt = args[2]
+        note = args[2]
 
-        offset = len(txt) - len(raw_text)  # set correct offset relative to command + notename
-        markdown_note = markdown_parser(txt, entities=msg.parse_entities(), offset=offset)
+        offset = len(note) - len(raw_text)  # set correct offset relative to command + notename
+        markdown_note, buttons = button_markdown_parser(note, entities=msg.parse_entities(), offset=offset)
 
-        prev = 0
-        note_data = ""
-        buttons = []
-        for match in BTN_URL_REGEX.finditer(markdown_note):
-            buttons.append((match.group(2), match.group(3)))
-            note_data += markdown_note[prev:match.start(1)]
-            prev = match.end(1)
-        else:
-            note_data += markdown_note[prev:]
-
-        note_data = note_data.strip()
+        note_data = markdown_note.strip()
         if not note_data:
             update.effective_message.reply_text("You can't save an empty message! If you added a button, you MUST "
                                                 "have some text in the message too.")
             return
-        sql.add_note_to_db(chat_id, note_name, note_data, is_reply=False, has_buttons=bool(buttons))
 
-        for b_name, url in buttons:
-            sql.add_note_button_to_db(chat_id, note_name, b_name, url)
+        sql.add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=buttons)
 
         update.effective_message.reply_text("Yas! Added " + note_name)
 

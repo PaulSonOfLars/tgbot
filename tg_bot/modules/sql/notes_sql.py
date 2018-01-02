@@ -47,7 +47,10 @@ NOTES_INSERTION_LOCK = threading.Lock()
 BUTTONS_INSERTION_LOCK = threading.Lock()
 
 
-def add_note_to_db(chat_id, note_name, note_data, is_reply=False, has_buttons=False):
+def add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=None):
+    if not buttons:
+        buttons = []
+
     with NOTES_INSERTION_LOCK:
         prev = SESSION.query(Notes).get((str(chat_id), note_name))
         if prev:
@@ -57,10 +60,13 @@ def add_note_to_db(chat_id, note_name, note_data, is_reply=False, has_buttons=Fa
                 for btn in prev_buttons:
                     SESSION.delete(btn)
             SESSION.delete(prev)
-        note = Notes(str(chat_id), note_name, note_data, is_reply=is_reply, has_buttons=has_buttons)
+        note = Notes(str(chat_id), note_name, note_data, is_reply=is_reply, has_buttons=bool(buttons))
 
         SESSION.add(note)
         SESSION.commit()
+
+    for b_name, url in buttons:
+        add_note_button_to_db(chat_id, note_name, b_name, url)
 
 
 def get_note(chat_id, note_name):

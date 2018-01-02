@@ -1,24 +1,17 @@
 import re
 
 import telegram
+from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, DispatcherHandlerStop, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, extract_text
+from tg_bot import dispatcher, OWNER_USERNAME
+from tg_bot.modules.helper_funcs import user_admin, extract_text, button_markdown_parser
 from tg_bot.modules.sql import cust_filters_sql as sql
 
 HANDLER_GROUP = 10
 BASIC_FILTER_STRING = "*Filters in this chat:*\n"
-
-
-def save_filter(chat_id, keyword, content, is_sticker=False, is_document=False):
-    # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
-    for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
-        if handler.filters == (keyword, chat_id):
-            dispatcher.remove_handler(handler, HANDLER_GROUP)
-
-    sql.add_filter(chat_id, keyword, content, is_sticker, is_document)
 
 
 @run_async
@@ -49,12 +42,23 @@ def filters(bot, update):
     msg = update.effective_message
     args = msg.text.split(None, 2)  # use python's maxsplit to separate Cmd, keyword, and reply_text
 
+    if len(args) < 2:
+        return
+
+    # set trigger
     keyword = args[1]
+
     is_sticker = False
     is_document = False
+    is_image = False
+    is_voice = False
+    is_audio = False
+    is_video = False
 
+    # determine what the contents of the filter are - text, image, sticker, etc
     if len(args) >= 3:
-        content = args[2]
+        offset = len(args[2]) - len(msg.text)  # set correct offset relative to command + notename
+        content, buttons = button_markdown_parser(args[2], entities=msg.parse_entities(), offset=offset)
 
     elif msg.reply_to_message and msg.reply_to_message.sticker:
         content = msg.reply_to_message.sticker.file_id
@@ -64,11 +68,36 @@ def filters(bot, update):
         content = msg.reply_to_message.document.file_id
         is_document = True
 
+    elif msg.reply_to_message and msg.reply_to_message.photo:
+        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
+        is_image = True
+
+    elif msg.reply_to_message and msg.reply_to_message.audio:
+        content = msg.reply_to_message.audio.file_id
+        is_audio = True
+
+    elif msg.reply_to_message and msg.reply_to_message.voice:
+        content = msg.reply_to_message.voice.file_id
+        is_voice = True
+
+    elif msg.reply_to_message and msg.reply_to_message.video:
+        content = msg.reply_to_message.video.file_id
+        is_video = True
+
     else:
+        msg.reply_text("You didn't specify what to reply with!")
         return
 
-    save_filter(chat.id, keyword, content, is_sticker, is_document)
-    update.effective_message.reply_text("Handler {} added!".format(keyword))
+    # Add the filter
+    # Note: perhaps handlers can be removed somehow using sql.get_chat_filters
+    for handler in dispatcher.handlers.get(HANDLER_GROUP, []):
+        if handler.filters == (keyword, chat.id):
+            dispatcher.remove_handler(handler, HANDLER_GROUP)
+
+    sql.add_filter(chat.id, keyword, content, is_sticker, is_document, is_image, is_audio, is_voice, is_video,
+                   buttons)
+
+    msg.reply_text("Handler {} added!".format(keyword))
     raise DispatcherHandlerStop
 
 
@@ -96,8 +125,9 @@ def stop_filter(bot, update, args):
 
 @run_async
 def reply_filter(bot, update):
-    chat_filters = sql.get_chat_filters(update.effective_chat.id)
+    chat = update.effective_chat
     message = update.effective_message
+    chat_filters = sql.get_chat_filters(chat.id)
     to_match = extract_text(message)
     if not to_match:
         return
@@ -109,6 +139,39 @@ def reply_filter(bot, update):
                 message.reply_sticker(filt.reply)
             elif filt.is_document:
                 message.reply_document(filt.reply)
+            elif filt.is_image:
+                message.reply_photo(filt.reply)
+            elif filt.is_audio:
+                message.reply_audio(filt.reply)
+            elif filt.is_voice:
+                message.reply_voice(filt.reply)
+            elif filt.is_video:
+                message.reply_video(filt.reply)
+            elif filt.has_markdown:
+                if filt.has_buttons:
+                    buttons = sql.get_buttons(chat.id, filt.keyword)
+                    keyb = []
+                    for btn in buttons:
+                        keyb.append([InlineKeyboardButton(btn.name, url=btn.url)])
+
+                    keyboard = InlineKeyboardMarkup(keyb)
+                    try:
+                        message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
+                                           disable_web_page_preview=True,
+                                           reply_markup=keyboard)
+                    except BadRequest:
+                        message.reply_text(
+                            "This note is not formatted correctly. Could not send. Contact @{}"
+                            " if you can't figure out why!".format(OWNER_USERNAME))
+                else:
+                    try:
+                        message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
+                                           disable_web_page_preview=True)
+                    except BadRequest:
+                        message.reply_text(
+                            "This note is not formatted correctly. Could not send. Contact @{}"
+                            " if you can't figure out why!".format(OWNER_USERNAME))
+
             else:
                 message.reply_text(filt.reply)
             break

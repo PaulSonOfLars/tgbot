@@ -16,12 +16,17 @@ def can_delete(chat, bot_id):
 def is_user_admin(chat, user_id, member=None):
     if not member:
         member = chat.get_member(user_id)
-    return member.status == 'administrator' or member.status == 'creator' or member.user.id in SUDO_USERS
+    return chat.type == 'private' \
+           or member.status == 'administrator' \
+           or member.status == 'creator' \
+           or member.user.id in SUDO_USERS
 
 
 def is_bot_admin(chat, bot_id):
     bot_member = chat.get_member(bot_id)
-    return bot_member.status == 'administrator' or bot_member.status == 'creator'
+    return chat.type == 'private' \
+           or bot_member.status == 'administrator' \
+           or bot_member.status == 'creator'
 
 
 def is_user_in_chat(chat, user_id):
@@ -209,6 +214,24 @@ def markdown_parser(txt, entities=None, offset=0):
 
     res += _selective_escape(txt[prev:])  # add the rest of the text
     return res
+
+
+BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\(buttonurl:(.+?)\))")
+
+
+def button_markdown_parser(txt, entities=None, offset=0):
+    markdown_note = markdown_parser(txt, entities, offset)
+    prev = 0
+    note_data = ""
+    buttons = []
+    for match in BTN_URL_REGEX.finditer(markdown_note):
+        buttons.append((match.group(2), match.group(3)))
+        note_data += markdown_note[prev:match.start(1)]
+        prev = match.end(1)
+    else:
+        note_data += markdown_note[prev:]
+
+    return note_data, buttons
 
 
 def split_message(msg):
