@@ -38,8 +38,18 @@ def new_member(bot, update):
                                               count=count, chatname=chat.title)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
-
-                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+                try:
+                    update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+                except IndexError:
+                    update.effective_message.reply_text(
+                        sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
+                        "\nNote: the current welcome message is invalid. Please update.",
+                        parse_mode=ParseMode.MARKDOWN)
+                except KeyError:
+                    update.effective_message.reply_text(
+                        sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
+                        "\nNote: the current welcome message is invalid. Please update.",
+                        parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -67,7 +77,16 @@ def left_member(bot, update):
             else:
                 res = sql.DEFAULT_LEAVE
 
-            update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+            try:
+                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+            except IndexError:
+                update.effective_message.reply_text(
+                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update.",
+                    parse_mode=ParseMode.MARKDOWN)
+            except KeyError:
+                update.effective_message.reply_text(
+                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update.",
+                    parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async

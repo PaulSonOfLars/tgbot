@@ -70,6 +70,18 @@ def can_promote(func):
     return promote_rights
 
 
+def can_restrict(func):
+    @wraps(func)
+    def promote_rights(bot, update, *args, **kwargs):
+        if update.effective_chat.get_member(bot.id).can_restrict_members:
+            func(bot, update, *args, **kwargs)
+        else:
+            update.effective_message.reply_text("I can't restrict people here! "
+                                                "Make sure I'm admin and can appoint new admins.")
+
+    return promote_rights
+
+
 def bot_admin(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):

@@ -1,7 +1,8 @@
 from telegram.ext import run_async, CommandHandler
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat, extract_user
+from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat, extract_user, \
+    can_restrict
 
 
 @run_async
@@ -30,6 +31,7 @@ def ban(bot, update, args):
 
 @run_async
 @bot_admin
+@can_restrict
 @user_admin
 def kick(bot, update, args):
     chat = update.effective_chat
@@ -53,6 +55,7 @@ def kick(bot, update, args):
 
 @run_async
 @bot_admin
+@can_restrict
 def kickme(bot, update):
     user_id = update.effective_message.from_user.id
     if is_user_admin(update.effective_chat, user_id):

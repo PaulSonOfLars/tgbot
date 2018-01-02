@@ -237,6 +237,8 @@ EG: [This is a button](buttonurl:example.com)
 
 Note: this message has had markdown disabled, to allow you to see what the characters are.
 """.format(bot.first_name))
+    update.effective_message.reply_text("Try forwarding the following message to me, and you'll see!")
+    update.effective_message.reply_text("/save test This is a markdown test. _italics_, *bold*, `code`, [URL](example.com) [button](buttonurl:github.com)")
 
 
 # /ip is for private use

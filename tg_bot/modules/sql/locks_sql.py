@@ -58,7 +58,8 @@ Restrictions.__table__.create(checkfirst=True)
 LOCK_KEYSTORE = {}
 RESTR_KEYSTORE = {}
 
-INSERTION_LOCK = threading.Lock()
+PERM_LOCK = threading.Lock()
+RESTR_LOCK = threading.Lock()
 
 
 def init_permissions(chat_id, reset=False):
@@ -86,7 +87,7 @@ def init_restrictions(chat_id, reset=False):
 
 
 def update_lock(chat_id, lock_type, locked):
-    with INSERTION_LOCK:
+    with PERM_LOCK:
         curr_perm = LOCK_KEYSTORE.get(str(chat_id))
         if not curr_perm:
             print("Perms didnt exist for {}! creating".format(chat_id))
@@ -114,7 +115,7 @@ def update_lock(chat_id, lock_type, locked):
 
 
 def update_restriction(chat_id, restr_type, locked):
-    with INSERTION_LOCK:
+    with RESTR_LOCK:
         curr_restr = RESTR_KEYSTORE.get(str(chat_id))
         if not curr_restr:
             print("Restr didnt exist for {}! creating".format(chat_id))
@@ -172,31 +173,39 @@ def is_restr_locked(chat_id, lock_type):
 
 
 def load_ks():
-    all_perms = SESSION.query(Permissions).all()
-    for chat in all_perms:
-        LOCK_KEYSTORE[chat.chat_id] = chat
-    all_restr = SESSION.query(Restrictions).all()
-    for chat in all_restr:
-        RESTR_KEYSTORE[chat.chat_id] = chat
+    with PERM_LOCK:
+        all_perms = SESSION.query(Permissions).all()
+        for chat in all_perms:
+            LOCK_KEYSTORE[chat.chat_id] = chat
+        SESSION.close()
+
+    with RESTR_LOCK:
+        all_restr = SESSION.query(Restrictions).all()
+        for chat in all_restr:
+            RESTR_KEYSTORE[chat.chat_id] = chat
+        SESSION.close()
+
     print("Locked types keystore loaded, length " + str(len(LOCK_KEYSTORE)))
-    SESSION.close()
 
 
 def migrate_chat(old_chat_id, new_chat_id):
     global LOCK_KEYSTORE
     global RESTR_KEYSTORE
-    with INSERTION_LOCK:
+    with PERM_LOCK:
         perms = SESSION.query(Permissions).get(str(old_chat_id))
         if perms:
             perms.chat_id = str(new_chat_id)
+        SESSION.commit()
 
+    with RESTR_LOCK:
         rest = SESSION.query(Restrictions).get(str(old_chat_id))
         if rest:
             rest.chat_id = str(new_chat_id)
         SESSION.commit()
-        LOCK_KEYSTORE = {}
-        RESTR_KEYSTORE = {}
-        load_ks()
+
+    LOCK_KEYSTORE = {}
+    RESTR_KEYSTORE = {}
+    load_ks()
 
 
 # LOAD KEYSTORE ON BOT START

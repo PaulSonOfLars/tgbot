@@ -22,7 +22,7 @@ def extract_userid(message):
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
         entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for ent in entities:
-            return ent.user.id, message.text[ent.offset + ent.length]
+            return ent.user.id, message.text[ent.offset + ent.length:]
 
     elif len(args) >= 2 and args[1][0] == '@':
         user = args[1]
