@@ -173,18 +173,21 @@ def reset_leave(bot, update):
 
 WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in multiple ways. If you want the messages " \
                 "to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
-                " - `{first}`: this represents the new user's *first* name\n" \
-                " - `{last}`: this represents the new user's *last* name. Defaults to first name if user has no " \
+                " - `{first}`: this represents the user's *first* name\n" \
+                " - `{last}`: this represents the user's *last* name. Defaults to first name if user has no " \
                 "last name.\n" \
-                " - `{fullname}`: this represents the new user's *full* name. Defaults to first name if user has no " \
+                " - `{fullname}`: this represents the user's *full* name. Defaults to first name if user has no " \
                 "last name.\n" \
-                " - `{username}`: this represents the new user's *username*. Defaults to a mention of the user's " \
+                " - `{username}`: this represents the user's *username*. Defaults to a mention of the user's " \
                 "first name.\n" \
-                " - `{id}`: this represents the new user's *id*\n" \
-                " - `{count}`: this represents the new user's *member number*.\n" \
+                " - `{id}`: this represents the user's *id*\n" \
+                " - `{count}`: this represents the user's *member number*.\n" \
                 " - `{chatname}`: this represents the *current chat name*.\n" \
                 "\nEach variable MUST be surrounded by {} to be replaced." \
-                "\nWelcome messages also support markdown, so you can make any elements bold/italic/code/links."
+                "\nWelcome messages also support markdown, so you can make any elements bold/italic/code/links." \
+                "\nIf you want to have curly braces in your welcome, please put two in a row, as such: `{{` - this" \
+                " will only show as a single curly brace in the actual message. Failure to escape your curly brackets" \
+                " will result in the welcome/leave message not showing."
 
 
 @run_async
