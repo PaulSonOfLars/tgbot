@@ -5,7 +5,9 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID
-from tg_bot.modules.helper_funcs import user_admin, markdown_parser
+from tg_bot.modules.helper_funcs import user_admin, markdown_parser, escape_invalid_curly_brackets
+
+VALID_WELCOME_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'count', 'chatname']
 
 
 @run_async
@@ -32,7 +34,8 @@ def new_member(bot, update):
                     else:
                         username = "[{}](tg://user?id={})".format(new_mem.first_name, new_mem.id)
 
-                    res = cust_welcome.format(first=new_mem.first_name,
+                    valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
+                    res = valid_format.format(first=new_mem.first_name,
                                               last=new_mem.last_name or new_mem.first_name,
                                               fullname=fullname, username=username,
                                               count=count, chatname=chat.title, id=new_mem.id)
@@ -70,10 +73,11 @@ def left_member(bot, update):
                 else:
                     username = "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
 
-                res = cust_leave.format(first=left_mem.first_name,
-                                        last=left_mem.last_name or left_mem.first_name,
-                                        fullname=fullname, username=username,
-                                        count=count, chatname=chat.title, id=left_mem.id)
+                valid_format = escape_invalid_curly_brackets(cust_leave, VALID_WELCOME_FORMATTERS)
+                res = valid_format.format(first=left_mem.first_name,
+                                          last=left_mem.last_name or left_mem.first_name,
+                                          fullname=fullname, username=username,
+                                          count=count, chatname=chat.title, id=left_mem.id)
             else:
                 res = sql.DEFAULT_LEAVE
 
