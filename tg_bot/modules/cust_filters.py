@@ -160,10 +160,15 @@ def reply_filter(bot, update):
                         message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
                                            disable_web_page_preview=True,
                                            reply_markup=keyboard)
-                    except BadRequest:
-                        message.reply_text(
-                            "This note is not formatted correctly. Could not send. Contact @{}"
-                            " if you can't figure out why!".format(OWNER_USERNAME))
+                    except BadRequest as e:
+                        if e.message == "Unsupported url protocol":
+                            message.reply_text("You seem to be trying to use an unsupported url protocol. Telegram "
+                                               "doesn't support buttons for some protocols, such as tg://. Please try "
+                                               "again, or ask @{} for help.".format(OWNER_USERNAME))
+                        else:
+                            message.reply_text(
+                                "This note is not formatted correctly. Could not send. Contact @{}"
+                                " if you can't figure out why!".format(OWNER_USERNAME))
                 else:
                     try:
                         message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
