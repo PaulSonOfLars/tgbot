@@ -11,14 +11,13 @@ from tg_bot import dispatcher, OWNER_ID
 
 RUN_STRINGS = (
     "Where do you think you're going?",
-    "Huh? what? did he get away?",
-    "ZZzzZZzz... Huh? what? oh, just him again, nevermind.",
+    "Huh? what? did they get away?",
+    "ZZzzZZzz... Huh? what? oh, just them again, nevermind.",
     "Get back here!",
     "Not so fast...",
     "Look out for the wall!",
     "Don't leave me alone with them!!",
     "You run, you die.",
-    "Run fatboy, run!",
     "Jokes on you, I'm everywhere",
     "You're gonna regret that...",
     "You could also try /kickme, I hear that's fun.",
@@ -29,19 +28,23 @@ RUN_STRINGS = (
     "That's definitely the droid we're looking for.",
     "May the odds be ever in your favour.",
     "Famous last words.",
-    "And he disappeared forever, never to be seen again.",
-    "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this guy",
+    "And they disappeared forever, never to be seen again.",
+    "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this person",
     "Yeah yeah, just tap /kickme already.",
     "Here, take this ring and head to Mordor while you're at it.",
     "Legend has it, he's still running...",
     "Unlike Harry Potter, your parents can't protect you from me.",
-    "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might "
-    "be the next Vader.",
-    "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0."
+    "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might \
+    be the next Vader.",
+    "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0.",
+    "Legend has it, they're still running.",
+    "Keep it up, not sure we want you here anyway",
+
 )
 
 SLAP_TEMPLATES = (
     "{user1} {hits} {user2} with a {item}.",
+    "{user1} {hits} {user2} in the face with a {item}.",
     "{user1} {hits} {user2} around a bit with a {item}.",
     "{user1} {throws} a {item} at {user2}.",
     "{user1} grabs a {item} and {throws} it at {user2}'s face.",
@@ -51,6 +54,7 @@ SLAP_TEMPLATES = (
     "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
     "{user1} grabs up a {item} and {hits} {user2} with it.",
     "{user1} ties {user2} to a chair and {throws} a {item} at them.",
+    "{user1} gave a friendly push to help {user2} learn to swim in lava."
 )
 
 ITEMS = (
@@ -78,13 +82,17 @@ ITEMS = (
     "spiked bat",
     "fire extinguisher",
     "heavy rock",
-    "chunk of dirt"
+    "chunk of dirt",
+    "beehive",
+    "piece of rotten meat",
+    "bear",
 )
 
 THROW = (
     "throws",
     "flings",
-    "chucks")
+    "chucks"
+)
 
 HIT = (
     "hits",
@@ -105,11 +113,13 @@ def runs(bot, update):
 def slap(bot, update):
     msg = update.effective_message
 
+    # get user who sent message
     if msg.from_user.username:
         curr_user = "@" + escape_markdown(msg.from_user.username)
     else:
         curr_user = "[{}](tg://user?id={})".format(msg.from_user.first_name, msg.from_user.id)
 
+    # sender targets the person he replied to
     if msg.reply_to_message:
         user1 = curr_user
         if msg.reply_to_message.from_user.username:
@@ -118,6 +128,7 @@ def slap(bot, update):
             user2 = "[{}](tg://user?id={})".format(msg.reply_to_message.from_user.first_name,
                                                    msg.from_user.id)
 
+    # if no target found, bot targets the sender
     else:
         user1 = "[{}](tg://user?id={})".format(bot.first_name, bot.id)
         user2 = curr_user
@@ -148,10 +159,11 @@ def get_id(bot, update):
             user1 = update.effective_message.reply_to_message.from_user
             user2 = update.effective_message.reply_to_message.forward_from
             update.effective_message.reply_text(
-                "The original sender, {}, has an ID of {}.\nThe forwarder, {}, has an ID of {}.".format(user2.first_name,
-                                                                                                       user2.id,
-                                                                                                       user1.first_name,
-                                                                                                       user1.id))
+                "The original sender, {}, has an ID of {}.\nThe forwarder, {}, has an ID of {}.".format(
+                    user2.first_name,
+                    user2.id,
+                    user1.first_name,
+                    user1.id))
         else:
             user = update.effective_message.reply_to_message.from_user
             update.effective_message.reply_text("{}'s id is {}".format(user.first_name, user.id))
