@@ -54,6 +54,7 @@ def filters(bot, update):
     is_voice = False
     is_audio = False
     is_video = False
+    buttons = []
 
     # determine what the contents of the filter are - text, image, sticker, etc
     if len(args) >= 3:
