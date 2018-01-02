@@ -22,7 +22,7 @@ def extract_userid(message):
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
         entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for ent in entities:
-            return ent.user.id, message.text[ent.offset+ent.length]
+            return ent.user.id, message.text[ent.offset + ent.length]
 
     elif len(args) >= 2 and args[1][0] == '@':
         user = args[1]
@@ -59,9 +59,12 @@ def warn(user_id, chat, reason, bot, message):
         else:
             message.reply_text("An error occurred, I couldn't ban this person!")
     else:
-        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user_id))]])
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user_id))]])
         if reason:
-            message.reply_text("{}/3 warnings... watch out! Latest one was because:\n{}".format(user_warned.num_warns, reason), reply_markup=keyboard)
+            message.reply_text(
+                "{}/3 warnings... watch out! Latest one was because:\n{}".format(user_warned.num_warns, reason),
+                reply_markup=keyboard)
         else:
             message.reply_text("{}/3 warnings... watch out!".format(user_warned.num_warns), reply_markup=keyboard)
 
