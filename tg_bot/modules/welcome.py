@@ -188,10 +188,7 @@ WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in mult
                 " - `{count}`: this represents the user's *member number*.\n" \
                 " - `{chatname}`: this represents the *current chat name*.\n" \
                 "\nEach variable MUST be surrounded by {} to be replaced." \
-                "\nWelcome messages also support markdown, so you can make any elements bold/italic/code/links." \
-                "\nIf you want to have curly braces in your welcome, please put two in a row, as such: `{{` - this" \
-                " will only show as a single curly brace in the actual message. Failure to escape your curly brackets" \
-                " will result in the welcome/leave message not showing."
+                "\nWelcome messages also support markdown, so you can make any elements bold/italic/code/links."
 
 
 @run_async
