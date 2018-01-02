@@ -35,7 +35,7 @@ def new_member(bot, update):
                     res = cust_welcome.format(first=new_mem.first_name,
                                               last=new_mem.last_name or new_mem.first_name,
                                               fullname=fullname, username=username,
-                                              count=count, chatname=chat.title)
+                                              count=count, chatname=chat.title, id=new_mem.id)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
                 try:
@@ -73,7 +73,7 @@ def left_member(bot, update):
                 res = cust_leave.format(first=left_mem.first_name,
                                         last=left_mem.last_name or left_mem.first_name,
                                         fullname=fullname, username=username,
-                                        count=count, chatname=chat.title)
+                                        count=count, chatname=chat.title, id=left_mem.id)
             else:
                 res = sql.DEFAULT_LEAVE
 
@@ -180,6 +180,7 @@ WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in mult
                 "last name.\n" \
                 " - `{username}`: this represents the new user's *username*. Defaults to a mention of the user's " \
                 "first name.\n" \
+                " - `{id}`: this represents the new user's *id*\n" \
                 " - `{count}`: this represents the new user's *member number*.\n" \
                 " - `{chatname}`: this represents the *current chat name*.\n" \
                 "\nEach variable MUST be surrounded by {} to be replaced." \
