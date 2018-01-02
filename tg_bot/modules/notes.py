@@ -141,6 +141,10 @@ def list_notes(bot, update):
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
 
+def __stats__():
+    return "{} notes, across {} chats.".format(sql.num_notes(), sql.num_chats())
+
+
 def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 

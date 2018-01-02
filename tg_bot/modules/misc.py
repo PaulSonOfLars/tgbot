@@ -8,6 +8,7 @@ from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID
+from tg_bot.__main__ import STATS
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -214,12 +215,14 @@ def get_time(bot, update, args):
                 update.message.reply_text("It's {} in {}".format(time_there, location))
 
 
+@run_async
 def echo(bot, update):
     args = update.effective_message.text.split(None, 1)
     update.effective_message.reply_text(args[1], quote=False)
     update.effective_message.delete()
 
 
+@run_async
 def markdown_help(bot, update):
     update.effective_message.reply_text("""
 Markdown is a very powerful formatting tool supported by telegram. {} has some enhancements, to make sure that \
@@ -238,7 +241,13 @@ EG: [This is a button](buttonurl:example.com)
 Note: this message has had markdown disabled, to allow you to see what the characters are.
 """.format(bot.first_name))
     update.effective_message.reply_text("Try forwarding the following message to me, and you'll see!")
-    update.effective_message.reply_text("/save test This is a markdown test. _italics_, *bold*, `code`, [URL](example.com) [button](buttonurl:github.com)")
+    update.effective_message.reply_text("/save test This is a markdown test. _italics_, *bold*, `code`, "
+                                        "[URL](example.com) [button](buttonurl:github.com)")
+
+
+@run_async
+def stats(bot, update):
+    update.effective_message.reply_text("Current stats:\n" + "\n".join([module.__stats__() for module in STATS]))
 
 
 # /ip is for private use
@@ -250,7 +259,6 @@ __help__ = """
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats
 """
 
-# TODO: /stats
 ID_HANDLER = CommandHandler("id", get_id)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 
@@ -262,6 +270,8 @@ SLAP_HANDLER = CommandHandler("slap", slap)
 ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
 
+STATS_HANDLER = CommandHandler("stats", stats, filters=Filters.user(OWNER_ID))
+
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(IP_HANDLER)
 dispatcher.add_handler(TIME_HANDLER)
@@ -269,3 +279,4 @@ dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
+dispatcher.add_handler(STATS_HANDLER)

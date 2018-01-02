@@ -183,6 +183,10 @@ def reply_filter(bot, update):
             break
 
 
+def __stats__():
+    return "{} filters, across {} chats.".format(sql.num_filters(), sql.num_chats())
+
+
 def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 

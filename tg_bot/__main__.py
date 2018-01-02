@@ -31,6 +31,7 @@ Commands available:
 """
 
 MIGRATEABLE = []
+STATS = []
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
@@ -42,8 +43,8 @@ for module_name in ALL_MODULES:
     # Chats to migrate on chat_migrated events
     if hasattr(imported_module, "__migrate__"):
         MIGRATEABLE.append(imported_module)
-
-print("Successfully loaded modules: " + str(ALL_MODULES))
+    if hasattr(imported_module, "__stats__"):
+        STATS.append(imported_module)
 
 
 @run_async
@@ -157,4 +158,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print("Successfully loaded modules: " + str(ALL_MODULES))
     main()

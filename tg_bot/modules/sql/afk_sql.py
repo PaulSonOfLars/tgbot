@@ -72,6 +72,7 @@ def load_keystore():
         for user in all_users:
             KEYSTORE[user.user_id].append(user)
         SESSION.close()
-        print("{} total warning filters added to {} chats.".format(len(all_users), len(KEYSTORE)))
+        print("{} total afk users added to {} chats.".format(len(all_users), len(KEYSTORE)))
+
 
 load_keystore()

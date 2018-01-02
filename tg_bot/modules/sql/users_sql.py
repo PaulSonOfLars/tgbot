@@ -115,6 +115,14 @@ def get_all_chats():
     return SESSION.query(Chats).all()
 
 
+def num_chats():
+    return SESSION.query(Chats).count()
+
+
+def num_users():
+    return SESSION.query(Users).count()
+
+
 # TODO: migrate chat_members too
 def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:

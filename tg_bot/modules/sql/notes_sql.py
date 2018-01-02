@@ -1,7 +1,7 @@
 # Note: chat_id's are stored as strings because the int is too large to be stored in a PSQL database.
 import threading
 
-from sqlalchemy import Column, String, Boolean, UnicodeText, Integer
+from sqlalchemy import Column, String, Boolean, UnicodeText, Integer, func, distinct
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -102,6 +102,14 @@ def add_note_button_to_db(chat_id, note_name, b_name, url):
 
 def get_buttons(chat_id, note_name):
     return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.note_name == note_name).all()
+
+
+def num_notes():
+    return SESSION.query(Notes).count()
+
+
+def num_chats():
+    return SESSION.query(func.count(distinct(Notes.chat_id))).scalar()
 
 
 def migrate_chat(old_chat_id, new_chat_id):

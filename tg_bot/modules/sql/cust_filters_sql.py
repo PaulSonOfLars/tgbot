@@ -1,7 +1,7 @@
 import collections
 import threading
 
-from sqlalchemy import Column, String, UnicodeText, Boolean, Integer
+from sqlalchemy import Column, String, UnicodeText, Boolean, Integer, distinct, func
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -128,6 +128,14 @@ def add_note_button_to_db(chat_id, keyword, b_name, url):
 
 def get_buttons(chat_id, keyword):
     return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.keyword == keyword).all()
+
+
+def num_filters():
+    return SESSION.query(CustomFilters).count()
+
+
+def num_chats():
+    return SESSION.query(func.count(distinct(CustomFilters.chat_id))).scalar()
 
 
 def migrate_chat(old_chat_id, new_chat_id):
