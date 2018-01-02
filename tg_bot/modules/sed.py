@@ -50,11 +50,18 @@ def separate_sed(sed_string):
 def sed(bot, update):
     sed_result = separate_sed(update.effective_message.text)
     if sed_result and update.effective_message.reply_to_message:
+        if update.effective_message.reply_to_message.text:
+            to_fix = update.effective_message.reply_to_message.text
+        elif update.effective_message.reply_to_message.caption:
+            to_fix = update.effective_message.reply_to_message.caption
+        else:
+            return
+
         repl, repl_with, flags = sed_result
         if "i" in flags.lower():
-            text = re.sub(repl, repl_with, update.effective_message.reply_to_message.text, flags=re.I).strip()
+            text = re.sub(repl, repl_with, to_fix, flags=re.I).strip()
         else:
-            text = re.sub(repl, repl_with, update.effective_message.reply_to_message.text).strip()
+            text = re.sub(repl, repl_with, to_fix).strip()
 
         # empty string errors -_-
         if len(text) >= telegram.MAX_MESSAGE_LENGTH:
