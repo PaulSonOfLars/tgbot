@@ -44,10 +44,11 @@ def reply_afk(bot, update):
                     res = "{} is AFK! says its because of:\n{}".format(ent.user.first_name, user.reason)
                 message.reply_text(res)
 
+
     elif message.entities and message.parse_entities([MessageEntity.MENTION]):
         entities = message.parse_entities([MessageEntity.MENTION])
         for ent in entities:
-            user_id = get_user_id(message.text[ent.offset:ent.offset+ent.length])
+            user_id = get_user_id(message.text[ent.offset:ent.offset + ent.length])
             if not user_id:
                 # Should never happen, since for a user to become AFK they must have spoken. Maybe changed username?
                 return
@@ -57,7 +58,7 @@ def reply_afk(bot, update):
                 if not user.reason:
                     res = "{} is AFK!".format(chat.first_name)
                 else:
-                    res = "{} is AFK! says its because of:\n{}".format(chat.first_name, user.reason)
+                    res = "{} is AFK!\nReason: {}".format(chat.first_name, user.reason)
                 message.reply_text(res)
 
     else:
@@ -65,14 +66,15 @@ def reply_afk(bot, update):
 
 
 __help__ = """
- - /afk <reason>: mark yourself as AFK - any mentions will be replied to with a message to say you're away from \
-keyboard!
+ - /afk <reason>: mark yourself as AFK - any mentions will be replied to with a message to say you're not available!
+ - brb <reason>: same as the afk command - but not a command.
 """
 
 AFK_HANDLER = CommandHandler("afk", afk)
 AFK_REGEX_HANDLER = RegexHandler("(?i)brb", afk)
 NO_AFK_HANDLER = MessageHandler(Filters.all, no_longer_afk)
-AFK_REPLY_HANDLER = MessageHandler(Filters.entity(MessageEntity.MENTION) | Filters.entity(MessageEntity.TEXT_MENTION), reply_afk)
+AFK_REPLY_HANDLER = MessageHandler(Filters.entity(MessageEntity.MENTION) | Filters.entity(MessageEntity.TEXT_MENTION),
+                                   reply_afk)
 
 dispatcher.add_handler(AFK_HANDLER, AFK_GROUP)
 dispatcher.add_handler(AFK_REGEX_HANDLER, AFK_GROUP)
