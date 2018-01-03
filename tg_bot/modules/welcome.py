@@ -42,16 +42,17 @@ def new_member(bot, update):
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
                 try:
-                    update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+                    update.effective_message.reply_text(markdown_parser(res), parse_mode=ParseMode.MARKDOWN)
                 except IndexError:
-                    update.effective_message.reply_text(
+
+                    update.effective_message.reply_text(markdown_parser(
                         sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
-                        "\nNote: the current welcome message is invalid. Please update.",
+                        "\nNote: the current welcome message is invalid. Please update."),
                         parse_mode=ParseMode.MARKDOWN)
                 except KeyError:
-                    update.effective_message.reply_text(
+                    update.effective_message.reply_text(markdown_parser(
                         sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
-                        "\nNote: the current welcome message is invalid. Please update.",
+                        "\nNote: the current welcome message is invalid. Please update."),
                         parse_mode=ParseMode.MARKDOWN)
 
 
@@ -82,14 +83,14 @@ def left_member(bot, update):
                 res = sql.DEFAULT_LEAVE
 
             try:
-                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+                update.effective_message.reply_text(markdown_parser(res), parse_mode=ParseMode.MARKDOWN)
             except IndexError:
-                update.effective_message.reply_text(
-                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update.",
+                update.effective_message.reply_text(markdown_parser(
+                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update."),
                     parse_mode=ParseMode.MARKDOWN)
             except KeyError:
-                update.effective_message.reply_text(
-                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update.",
+                update.effective_message.reply_text(markdown_parser(
+                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update."),
                     parse_mode=ParseMode.MARKDOWN)
 
 
