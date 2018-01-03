@@ -15,7 +15,27 @@ def get(bot, update, notename, show_none=True):
     note = sql.get_note(chat_id, notename)
     if note:
         if note.is_reply:
-            bot.forward_message(chat_id=chat_id, from_chat_id=MESSAGE_DUMP or chat_id, message_id=note.value)
+            if MESSAGE_DUMP:
+                try:
+                    bot.forward_message(chat_id=chat_id, from_chat_id=MESSAGE_DUMP, message_id=note.value)
+                except BadRequest as e:
+                    if e.message == "Message to forward not found":
+                        update.effective_message.reply_text("This message seems to have been lost - I'll remove it "
+                                                            "from your notes list.")
+                        sql.rm_note(chat_id, notename)
+                    else:
+                        raise
+            else:
+                try:
+                    bot.forward_message(chat_id=chat_id, from_chat_id=chat_id, message_id=note.value)
+                except BadRequest as e:
+                    if e.message == "Message to forward not found":
+                        update.effective_message.reply_text("Looks like the original sender of this note has deleted "
+                                                            "his message - sorry! Get your bot admin to start using a "
+                                                            "message dump to avoid this.")
+                        sql.rm_note(chat_id, notename)
+                    else:
+                        raise
         elif note.has_buttons:
             buttons = sql.get_buttons(chat_id, notename)
             keyb = []
@@ -111,6 +131,8 @@ def save(bot, update):
         update.effective_message.reply_text("Dude, there's no note")
 
 
+@run_async
+@user_admin
 def clear(bot, update, args):
     chat_id = update.effective_chat.id
     if len(args) >= 1:
@@ -122,6 +144,7 @@ def clear(bot, update, args):
             update.effective_message.reply_text("That's not a note in my database!")
 
 
+@run_async
 def list_notes(bot, update):
     chat_id = update.effective_chat.id
     note_list = sql.get_all_chat_notes(chat_id)
