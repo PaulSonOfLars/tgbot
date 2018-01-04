@@ -43,8 +43,8 @@ class Buttons(BASE):
 Notes.__table__.create(checkfirst=True)
 Buttons.__table__.create(checkfirst=True)
 
-NOTES_INSERTION_LOCK = threading.Lock()
-BUTTONS_INSERTION_LOCK = threading.Lock()
+NOTES_INSERTION_LOCK = threading.RLock()
+BUTTONS_INSERTION_LOCK = threading.RLock()
 
 
 def add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=None):
@@ -70,7 +70,10 @@ def add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=None):
 
 
 def get_note(chat_id, note_name):
-    return SESSION.query(Notes).get((str(chat_id), note_name))
+    try:
+        return SESSION.query(Notes).get((str(chat_id), note_name))
+    finally:
+        SESSION.close()
 
 
 def rm_note(chat_id, note_name):
@@ -86,11 +89,15 @@ def rm_note(chat_id, note_name):
             SESSION.commit()
             return True
         else:
+            SESSION.close()
             return False
 
 
 def get_all_chat_notes(chat_id):
-    return SESSION.query(Notes).filter(Notes.chat_id == str(chat_id)).all()
+    try:
+        return SESSION.query(Notes).filter(Notes.chat_id == str(chat_id)).all()
+    finally:
+        SESSION.close()
 
 
 def add_note_button_to_db(chat_id, note_name, b_name, url):
@@ -101,15 +108,24 @@ def add_note_button_to_db(chat_id, note_name, b_name, url):
 
 
 def get_buttons(chat_id, note_name):
-    return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.note_name == note_name).all()
+    try:
+        return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.note_name == note_name).all()
+    finally:
+        SESSION.close()
 
 
 def num_notes():
-    return SESSION.query(Notes).count()
+    try:
+        return SESSION.query(Notes).count()
+    finally:
+        SESSION.close()
 
 
 def num_chats():
-    return SESSION.query(func.count(distinct(Notes.chat_id))).scalar()
+    try:
+        return SESSION.query(func.count(distinct(Notes.chat_id))).scalar()
+    finally:
+        SESSION.close()
 
 
 def migrate_chat(old_chat_id, new_chat_id):
@@ -118,10 +134,9 @@ def migrate_chat(old_chat_id, new_chat_id):
         for note in chat_notes:
             note.chat_id = str(new_chat_id)
 
-        # TODO: test this more
-        # with BUTTONS_INSERTION_LOCK:
-        #     chat_buttons = SESSION.query(Buttons).filter(Buttons.chat_id == str(old_chat_id)).all()
-        #     for b in chat_buttons:
-        #         b.chat_id = str(new_chat_id)
+        with BUTTONS_INSERTION_LOCK:
+            chat_buttons = SESSION.query(Buttons).filter(Buttons.chat_id == str(old_chat_id)).all()
+            for b in chat_buttons:
+                b.chat_id = str(new_chat_id)
 
         SESSION.commit()

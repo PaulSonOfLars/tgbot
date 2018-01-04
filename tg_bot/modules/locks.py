@@ -38,7 +38,7 @@ def lock(bot, update, args):
                     for mem in members:
                         try:
                             bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True)
+                                                     can_send_messages=False)
                         except TelegramError:
                             pass
                 elif args[0] == "media":
@@ -46,7 +46,7 @@ def lock(bot, update, args):
                         try:
                             bot.restrict_chat_member(chat.id, mem.user,
                                                      can_send_messages=True,
-                                                     can_send_media_messages=True)
+                                                     can_send_media_messages=False)
                         except TelegramError:
                             pass
                 elif args[0] == "other":
@@ -55,7 +55,7 @@ def lock(bot, update, args):
                             bot.restrict_chat_member(chat.id, mem.user,
                                                      can_send_messages=True,
                                                      can_send_media_messages=True,
-                                                     can_send_other_messages=True)
+                                                     can_send_other_messages=False)
                         except TelegramError:
                             pass
                 elif args[0] == "previews":
@@ -64,7 +64,8 @@ def lock(bot, update, args):
                             bot.restrict_chat_member(chat.id, mem.user,
                                                      can_send_messages=True,
                                                      can_send_media_messages=True,
-                                                     can_add_web_page_previews=True)
+                                                     can_send_other_messages=True,
+                                                     can_add_web_page_previews=False)
                         except TelegramError:
                             pass
                 message.reply_text("Locked {} for all non-admins!".format(args[0]))
@@ -117,6 +118,7 @@ def unlock(bot, update, args):
                             bot.restrict_chat_member(chat.id, mem.user,
                                                      can_send_messages=True,
                                                      can_send_media_messages=True,
+                                                     can_send_other_messages=True,
                                                      can_add_web_page_previews=True)
                         except TelegramError:
                             pass

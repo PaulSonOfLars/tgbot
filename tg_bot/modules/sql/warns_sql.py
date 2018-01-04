@@ -48,8 +48,9 @@ class WarnFilters(BASE):
 Warns.__table__.create(checkfirst=True)
 WarnFilters.__table__.create(checkfirst=True)
 
-WARN_INSERTION_LOCK = threading.Lock()
-WARN_FILTER_INSERTION_LOCK = threading.Lock()
+WARN_INSERTION_LOCK = threading.RLock()
+WARN_FILTER_INSERTION_LOCK = threading.RLock()
+
 WARN_FILTER_KEYSTORE = collections.defaultdict(list)
 
 
@@ -73,6 +74,7 @@ def remove_warn(user_id, chat_id):
     with WARN_INSERTION_LOCK:
         warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
         if not warned_user:
+            SESSION.close()
             return None
 
         if warned_user.num_warns >= 0:
@@ -99,7 +101,10 @@ def reset_warns(user_id, chat_id):
 
 
 def get_warns(user_id, chat_id):
-    return SESSION.query(Warns).get((user_id, str(chat_id)))
+    try:
+        return SESSION.query(Warns).get((user_id, str(chat_id)))
+    finally:
+        SESSION.close()
 
 
 def add_warn_filter(chat_id, keyword, reply):
@@ -122,20 +127,27 @@ def remove_warn_filter(chat_id, keyword):
             SESSION.delete(warn_filt)
             SESSION.commit()
             return True
+        SESSION.close()
         return False
 
 
 def get_chat_warn_filters(chat_id):
-    return WARN_FILTER_KEYSTORE[str(chat_id)]
+    try:
+        return WARN_FILTER_KEYSTORE[str(chat_id)]
+    finally:
+        SESSION.close()
 
 
 def load_keystore():
+    global WARN_FILTER_KEYSTORE
+    WARN_FILTER_KEYSTORE = collections.defaultdict(list)
+
     with WARN_FILTER_INSERTION_LOCK:
         all_warn_filters = SESSION.query(WarnFilters).all()
         for warn_filt in all_warn_filters:
             WARN_FILTER_KEYSTORE[warn_filt.chat_id].append(warn_filt)
         SESSION.close()
-        print("{} total warning filters added to {} chats.".format(len(all_warn_filters), len(WARN_FILTER_KEYSTORE)))
+    print("{} total warning filters added to {} chats.".format(len(all_warn_filters), len(WARN_FILTER_KEYSTORE)))
 
 
 def migrate_chat(old_chat_id, new_chat_id):
@@ -144,10 +156,14 @@ def migrate_chat(old_chat_id, new_chat_id):
         for note in chat_notes:
             note.chat_id = str(new_chat_id)
         SESSION.commit()
+
     with WARN_FILTER_INSERTION_LOCK:
         chat_filters = SESSION.query(WarnFilters).filter(WarnFilters.chat_id == str(old_chat_id)).all()
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
         SESSION.commit()
+
+    load_keystore()
+
 
 load_keystore()

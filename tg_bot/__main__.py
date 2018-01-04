@@ -128,6 +128,7 @@ def migrate_chats(bot, update):
     for mod in MIGRATEABLE:
         mod.__migrate__(old_chat, new_chat)
 
+    print("Successfully migrated!")
     raise DispatcherHandlerStop
 
 
@@ -153,7 +154,7 @@ def main():
         from tg_bot import URL
         updater.bot.set_webhook(URL + TOKEN)
     else:
-        updater.start_polling()
+        updater.start_polling(timeout=15, read_latency=4)
     updater.idle()
 
 

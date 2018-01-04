@@ -63,16 +63,18 @@ class Buttons(BASE):
 CustomFilters.__table__.create(checkfirst=True)
 Buttons.__table__.create(checkfirst=True)
 
-CUST_FILT_LOCK = threading.Lock()
-BUTTON_LOCK = threading.Lock()
+CUST_FILT_LOCK = threading.RLock()
+BUTTON_LOCK = threading.RLock()
 
-# TODO: button keystore
 FILTER_KEYSTORE = collections.defaultdict(list)
 BUTTON_KEYSTORE = collections.defaultdict(list)
 
 
 def get_all_filters():
-    return SESSION.query(CustomFilters).all()
+    try:
+        return SESSION.query(CustomFilters).all()
+    finally:
+        SESSION.close()
 
 
 def add_filter(chat_id, keyword, reply, is_sticker=False, is_document=False, is_image=False, is_audio=False,
@@ -112,6 +114,7 @@ def remove_filter(chat_id, keyword):
             SESSION.delete(filt)
             SESSION.commit()
             return True
+        SESSION.close()
         return False
 
 
@@ -127,53 +130,62 @@ def add_note_button_to_db(chat_id, keyword, b_name, url):
 
 
 def get_buttons(chat_id, keyword):
-    return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.keyword == keyword).all()
+    try:
+        return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.keyword == keyword).all()
+    finally:
+        SESSION.close()
 
 
 def num_filters():
-    return SESSION.query(CustomFilters).count()
+    try:
+        return SESSION.query(CustomFilters).count()
+    finally:
+        SESSION.close()
 
 
 def num_chats():
-    return SESSION.query(func.count(distinct(CustomFilters.chat_id))).scalar()
+    try:
+        return SESSION.query(func.count(distinct(CustomFilters.chat_id))).scalar()
+    finally:
+        SESSION.close()
 
 
 def migrate_chat(old_chat_id, new_chat_id):
-    global FILTER_KEYSTORE
-    global BUTTON_KEYSTORE
-
     with CUST_FILT_LOCK:
         chat_filters = SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(old_chat_id)).all()
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
-
-        # TODO: test this more
-        # with BUTTON_LOCK:
-        #     chat_buttons = SESSION.query(Buttons).filter(Buttons.chat_id == str(old_chat_id)).all()
-        #     for b in chat_buttons:
-        #         b.chat_id = str(new_chat_id)
-
         SESSION.commit()
-        FILTER_KEYSTORE = collections.defaultdict(list)
-        BUTTON_KEYSTORE = collections.defaultdict(list)
+
+        with BUTTON_LOCK:
+            chat_buttons = SESSION.query(Buttons).filter(Buttons.chat_id == str(old_chat_id)).all()
+            for b in chat_buttons:
+                b.chat_id = str(new_chat_id)
+            SESSION.commit()
+
         load_keystore()
 
 
 def load_keystore():
+    global FILTER_KEYSTORE
+    global BUTTON_KEYSTORE
+
+    FILTER_KEYSTORE = collections.defaultdict(list)
+    BUTTON_KEYSTORE = collections.defaultdict(list)
+
     with CUST_FILT_LOCK:
         all_filters = SESSION.query(CustomFilters).all()
         for filt in all_filters:
             FILTER_KEYSTORE[filt.chat_id].append(filt)
-        print("{} total filters added to {} chats.".format(len(all_filters), len(FILTER_KEYSTORE)))
         SESSION.close()
+    print("{} total filters added to {} chats.".format(len(all_filters), len(FILTER_KEYSTORE)))
 
     with BUTTON_LOCK:
         all_buttons = SESSION.query(Buttons).all()
         for btn in all_buttons:
             BUTTON_KEYSTORE[btn.chat_id].append(btn)
-        print("{} total filter buttons added to {} chats.".format(len(all_buttons), len(BUTTON_KEYSTORE)))
-
         SESSION.close()
+    print("{} total filter buttons added to {} chats.".format(len(all_buttons), len(BUTTON_KEYSTORE)))
 
 
 load_keystore()

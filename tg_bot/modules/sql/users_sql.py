@@ -61,7 +61,7 @@ Users.__table__.create(checkfirst=True)
 Chats.__table__.create(checkfirst=True)
 ChatMembers.__table__.create(checkfirst=True)
 
-INSERTION_LOCK = threading.Lock()
+INSERTION_LOCK = threading.RLock()
 
 
 def ensure_bot_in_db():
@@ -100,27 +100,45 @@ def update_user(user_id, username, chat_id, chat_name):
 
 
 def get_userid_by_name(username):
-    return SESSION.query(Users).filter(func.lower(Users.username) == username.lower()).first()
+    try:
+        return SESSION.query(Users).filter(func.lower(Users.username) == username.lower()).first()
+    finally:
+        SESSION.close()
 
 
 def get_name_by_userid(user_id):
-    return SESSION.query(Users).get(Users.user_id == int(user_id)).first()
+    try:
+        return SESSION.query(Users).get(Users.user_id == int(user_id)).first()
+    finally:
+        SESSION.close()
 
 
 def get_chat_members(chat_id):
-    return SESSION.query(ChatMembers).filter(ChatMembers.chat == str(chat_id)).all()
+    try:
+        return SESSION.query(ChatMembers).filter(ChatMembers.chat == str(chat_id)).all()
+    finally:
+        SESSION.close()
 
 
 def get_all_chats():
-    return SESSION.query(Chats).all()
+    try:
+        return SESSION.query(Chats).all()
+    finally:
+        SESSION.close()
 
 
 def num_chats():
-    return SESSION.query(Chats).count()
+    try:
+        return SESSION.query(Chats).count()
+    finally:
+        SESSION.close()
 
 
 def num_users():
-    return SESSION.query(Users).count()
+    try:
+        return SESSION.query(Users).count()
+    finally:
+        SESSION.close()
 
 
 # TODO: migrate chat_members too

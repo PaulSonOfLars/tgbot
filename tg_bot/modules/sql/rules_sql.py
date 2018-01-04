@@ -19,7 +19,7 @@ class Rules(BASE):
 
 Rules.__table__.create(checkfirst=True)
 
-INSERTION_LOCK = threading.Lock()
+INSERTION_LOCK = threading.RLock()
 
 
 def set_rules(chat_id, rules_text):

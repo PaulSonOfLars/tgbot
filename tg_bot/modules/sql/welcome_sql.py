@@ -25,11 +25,12 @@ class Welcome(BASE):
 
 Welcome.__table__.create(checkfirst=True)
 
-INSERTION_LOCK = threading.Lock()
+INSERTION_LOCK = threading.RLock()
 
 
 def get_preference(chat_id):
     welc = SESSION.query(Welcome).get(str(chat_id))
+    SESSION.close()
     if welc:
         return welc.should_welcome, welc.custom_welcome, welc.custom_leave
     else:

@@ -228,7 +228,7 @@ def markdown_parser(txt, entities=None, offset=0):
     return res
 
 
-BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\(buttonurl:(.+?)\))")
+BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)\))")
 
 
 def button_markdown_parser(txt, entities=None, offset=0):

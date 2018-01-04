@@ -58,8 +58,8 @@ Restrictions.__table__.create(checkfirst=True)
 LOCK_KEYSTORE = {}
 RESTR_KEYSTORE = {}
 
-PERM_LOCK = threading.Lock()
-RESTR_LOCK = threading.Lock()
+PERM_LOCK = threading.RLock()
+RESTR_LOCK = threading.RLock()
 
 
 def init_permissions(chat_id, reset=False):
@@ -136,6 +136,7 @@ def update_restriction(chat_id, restr_type, locked):
 
 def is_locked(chat_id, lock_type):
     curr_perm = LOCK_KEYSTORE.get(str(chat_id))
+    SESSION.close()
     if not curr_perm:
         return False
 
@@ -159,6 +160,8 @@ def is_locked(chat_id, lock_type):
 
 def is_restr_locked(chat_id, lock_type):
     curr_restr = RESTR_KEYSTORE.get(str(chat_id))
+    SESSION.close()
+
     if not curr_restr:
         return False
 
@@ -172,7 +175,13 @@ def is_restr_locked(chat_id, lock_type):
         return curr_restr.previews
 
 
-def load_ks():
+def load_keystore():
+    global LOCK_KEYSTORE
+    global RESTR_KEYSTORE
+
+    LOCK_KEYSTORE = {}
+    RESTR_KEYSTORE = {}
+
     with PERM_LOCK:
         all_perms = SESSION.query(Permissions).all()
         for chat in all_perms:
@@ -189,8 +198,6 @@ def load_ks():
 
 
 def migrate_chat(old_chat_id, new_chat_id):
-    global LOCK_KEYSTORE
-    global RESTR_KEYSTORE
     with PERM_LOCK:
         perms = SESSION.query(Permissions).get(str(old_chat_id))
         if perms:
@@ -203,10 +210,8 @@ def migrate_chat(old_chat_id, new_chat_id):
             rest.chat_id = str(new_chat_id)
         SESSION.commit()
 
-    LOCK_KEYSTORE = {}
-    RESTR_KEYSTORE = {}
-    load_ks()
+    load_keystore()
 
 
 # LOAD KEYSTORE ON BOT START
-load_ks()
+load_keystore()
