@@ -187,6 +187,7 @@ def del_photo(bot, update):
 
 
 @run_async
+@user_not_admin
 def del_gif(bot, update):
     chat = update.effective_chat
     if sql.is_locked(chat.id, "gif") and can_delete(chat, bot.id):

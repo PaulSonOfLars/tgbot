@@ -6,8 +6,8 @@ from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import can_delete, user_admin
 
 
-@user_admin
 @run_async
+@user_admin
 def purge(bot, update):
     curr_message = update.effective_message
     chat = update.effective_chat
@@ -22,8 +22,8 @@ def purge(bot, update):
         bot.send_message(chat.id, "Purge complete.", 'Markdown')
 
 
-@user_admin
 @run_async
+@user_admin
 def del_message(bot, update):
     chat = update.effective_chat
     if can_delete(chat, bot.id):

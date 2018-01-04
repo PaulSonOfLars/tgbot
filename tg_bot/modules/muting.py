@@ -5,9 +5,9 @@ from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, extract_user
 
 
+@run_async
 @bot_admin
 @user_admin
-@run_async
 def mute(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
@@ -40,9 +40,9 @@ def mute(bot, update, args):
         message.reply_text("This user isn't in the chat!")
 
 
+@run_async
 @bot_admin
 @user_admin
-@run_async
 def unmute(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message

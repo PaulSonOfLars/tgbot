@@ -111,6 +111,7 @@ def runs(bot, update):
     update.effective_message.reply_text(random.choice(RUN_STRINGS))
 
 
+@run_async
 def slap(bot, update):
     msg = update.effective_message
 

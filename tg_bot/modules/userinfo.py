@@ -28,6 +28,7 @@ def about_me(bot, update):
         update.effective_message.reply_text("You haven't set an info message about yourself yet!")
 
 
+@run_async
 def set_about_me(bot, update):
     message = update.effective_message
     user_id = message.from_user.id
@@ -38,6 +39,7 @@ def set_about_me(bot, update):
         update.effective_message.reply_text("Updated your info!")
 
 
+@run_async
 def about_bio(bot, update):
     message = update.effective_message
     is_reply = message.reply_to_message is not None
@@ -58,6 +60,7 @@ def about_bio(bot, update):
         update.effective_message.reply_text("You haven't had a bio set about yourself yet!")
 
 
+@run_async
 def set_about_bio(bot, update):
     message = update.effective_message
     if message.reply_to_message:

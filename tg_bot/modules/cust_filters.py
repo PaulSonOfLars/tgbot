@@ -36,6 +36,7 @@ def list_handlers(bot, update):
         update.effective_message.reply_text(filter_list, parse_mode=telegram.ParseMode.MARKDOWN)
 
 
+# NOT ASYNC BECAUSE DISPATCHER HANDLER RAISED
 @user_admin
 def filters(bot, update):
     chat = update.effective_chat
@@ -102,6 +103,7 @@ def filters(bot, update):
     raise DispatcherHandlerStop
 
 
+# NOT ASYNC BECAUSE DISPATCHER HANDLER RAISED
 @user_admin
 def stop_filter(bot, update, args):
     chat = update.effective_chat
