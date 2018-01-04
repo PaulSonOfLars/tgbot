@@ -30,7 +30,7 @@ def extract_userid(message):
         if not user_id:
             message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
                                "you reply to that person's message instead.")
-            return
+            return None, ""
         return user_id, (args[2] if len(args) >= 3 else "")
 
     elif len(args) >= 2 and args[0].isdigit():

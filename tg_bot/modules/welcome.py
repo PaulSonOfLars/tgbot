@@ -63,6 +63,11 @@ def left_member(bot, update):
     if should_welc:
         left_mem = update.effective_message.left_chat_member
         if left_mem:
+            if left_mem.id == bot.id:
+                bot.send_message(OWNER_ID, "I've just been kicked from {}.".format(chat.title
+                                                                                   or chat.first_name
+                                                                                   or chat.id))
+                return
             if cust_leave:
                 if left_mem.last_name:
                     fullname = "{} {}".format(left_mem.first_name, left_mem.last_name)
