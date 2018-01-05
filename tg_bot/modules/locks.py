@@ -79,6 +79,9 @@ def lock(bot, update, args):
 
                 message.reply_text("Locked {} for all non-admins!".format(args[0]))
 
+            else:
+                message.reply_text("What are you trying to lock...? Try /locktypes for the list of lockables")
+
     else:
         message.reply_text("I'm not an administrator, or haven't got delete rights.")
 
@@ -116,7 +119,7 @@ def unlock(bot, update, args):
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
 
             else:
-                message.reply_text("What are you trying to unlock...? Try /locktypes for the list of locks")
+                message.reply_text("What are you trying to unlock...? Try /locktypes for the list of lockables")
 
         else:
             bot.sendMessage(chat.id, "What are you trying to unlock...?")
@@ -245,20 +248,35 @@ def rest_previews(bot, update):
 
 
 @run_async
+@user_admin
 def list_locks(bot, update):
-    pass
-    # TODO
-    # chat = update.effective_chat
-    # res = ""
-    # locks = sql.get_locks(chat.id)
-    # restr = sql.get_restr(chat.id)
-    # if not (locks or restr):
-    #     res += "There are no current locks."
-    # else:
-    #     if locks:
-    #         pass
-    #     if restr:
-    #         pass
+    chat = update.effective_chat
+
+    locks = sql.get_locks(chat.id)
+    restr = sql.get_restr(chat.id)
+    if not (locks or restr):
+        res = "There are no current locks in this chat."
+    else:
+        res = "This is the state of the current chat:\n"
+        if locks:
+            res += "\n - sticker = {}" \
+                   "\n - audio = {}" \
+                   "\n - voice = {}" \
+                   "\n - document = {}" \
+                   "\n - video = {}" \
+                   "\n - contact = {}" \
+                   "\n - photo = {}" \
+                   "\n - gif = {}".format(locks.sticker, locks.audio, locks.voice, locks.document,
+                                          locks.video, locks.contact, locks.photo, locks.gif)
+        if restr:
+            res += "\n - messages = {}" \
+                   "\n - media = {}" \
+                   "\n - other = {}" \
+                   "\n - previews = {}" \
+                   "\n - all = {}".format(restr.messages, restr.media, restr.other, restr.preview,
+                                          all([restr.messages, restr.media, restr.other, restr.preview]))
+
+    update.effective_message.reply_text(res)
 
 
 def __migrate__(old_chat_id, new_chat_id):
@@ -269,6 +287,7 @@ __help__ = """
  - /locktypes: a list of possible locktypes
  - /lock <type>: lock items of a certain type (not available in private)
  - /unlock <type>: unlock items of a certain type (not available in private)
+ - /locks: the current list of locks in this chat.
 """
 GIF = Filters.document & CustomFilters.mime_type("video/mp4")
 OTHER = Filters.game | Filters.sticker | GIF
