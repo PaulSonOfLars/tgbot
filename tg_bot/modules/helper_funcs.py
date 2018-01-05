@@ -304,7 +304,7 @@ def escape_invalid_curly_brackets(text, valids):
     return new_text
 
 
-class CustomFilters:
+class CustomFilters(object):
     class _Sudoers(BaseFilter):
         def filter(self, message):
             return bool(message.from_user and message.from_user.id in SUDO_USERS)
@@ -314,6 +314,7 @@ class CustomFilters:
     class _MimeType(BaseFilter):
         def __init__(self, mimetype):
             self.mime_type = mimetype
+            self.name = "CustomFilters.mime_type({})".format(self.mime_type)
 
         def filter(self, message):
             return bool(message.document and message.document.mime_type == self.mime_type)

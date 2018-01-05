@@ -3,16 +3,44 @@ from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.locks_sql as sql
-from tg_bot import dispatcher
+from tg_bot import dispatcher, SUDO_USERS
 from tg_bot.modules.helper_funcs import can_delete, is_user_admin, bot_can_delete, user_admin, user_not_admin, \
     CustomFilters
 from tg_bot.modules.sql import users_sql
 
-LOCK_TYPES = ["sticker", "audio", "voice", "document", "video", "contact", "photo", "gif"]
+LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif']
 
-RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews']
+RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews', 'all']
 
 REST_GROUP = 1
+
+
+# NOT ASYNC
+def restr_members(bot, chat_id, members, messages=False, media=False, other=False, previews=False):
+    for mem in members:
+        if mem.user in SUDO_USERS:
+            pass
+        try:
+            bot.restrict_chat_member(chat_id, mem.user,
+                                     can_send_messages=messages,
+                                     can_send_media_messages=media,
+                                     can_send_other_messages=other,
+                                     can_add_web_page_previews=previews)
+        except TelegramError:
+            pass
+
+
+# NOT ASYNC
+def unrestr_members(bot, chat_id, members, messages=True, media=True, other=True, previews=True):
+    for mem in members:
+        try:
+            bot.restrict_chat_member(chat_id, mem.user,
+                                     can_send_messages=messages,
+                                     can_send_media_messages=media,
+                                     can_send_other_messages=other,
+                                     can_add_web_page_previews=previews)
+        except TelegramError:
+            pass
 
 
 @run_async
@@ -35,39 +63,20 @@ def lock(bot, update, args):
                 sql.update_restriction(chat.id, args[0], locked=True)
                 members = users_sql.get_chat_members(chat.id)
                 if args[0] == "messages":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=False)
-                        except TelegramError:
-                            pass
+                    restr_members(bot, chat.id, members)
+
                 elif args[0] == "media":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True,
-                                                     can_send_media_messages=False)
-                        except TelegramError:
-                            pass
+                    restr_members(bot, chat.id, members, messages=True)
+
                 elif args[0] == "other":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True,
-                                                     can_send_media_messages=True,
-                                                     can_send_other_messages=False)
-                        except TelegramError:
-                            pass
+                    restr_members(bot, chat.id, members, messages=True, media=True)
+
                 elif args[0] == "previews":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True,
-                                                     can_send_media_messages=True,
-                                                     can_send_other_messages=True,
-                                                     can_add_web_page_previews=False)
-                        except TelegramError:
-                            pass
+                    restr_members(bot, chat.id, members, messages=True, media=True, other=True)
+
+                elif args[0] == "all":
+                    restr_members(bot, chat.id, members)
+
                 message.reply_text("Locked {} for all non-admins!".format(args[0]))
 
     else:
@@ -88,40 +97,21 @@ def unlock(bot, update, args):
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=False)
                 members = users_sql.get_chat_members(chat.id)
+
                 if args[0] == "messages":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True)
-                        except TelegramError:
-                            pass
+                    unrestr_members(bot, chat.id, members, media=False, other=False, previews=False)
+
                 elif args[0] == "media":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True,
-                                                     can_send_media_messages=True)
-                        except TelegramError:
-                            pass
+                    unrestr_members(bot, chat.id, members, other=False, previews=False)
+
                 elif args[0] == "other":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True,
-                                                     can_send_media_messages=True,
-                                                     can_send_other_messages=True)
-                        except TelegramError:
-                            pass
+                    unrestr_members(bot, chat.id, members, previews=False)
+
                 elif args[0] == "previews":
-                    for mem in members:
-                        try:
-                            bot.restrict_chat_member(chat.id, mem.user,
-                                                     can_send_messages=True,
-                                                     can_send_media_messages=True,
-                                                     can_send_other_messages=True,
-                                                     can_add_web_page_previews=True)
-                        except TelegramError:
-                            pass
+                    unrestr_members(bot, chat.id, members)
+
+                elif args[0] == "all":
+                    unrestr_members(bot, chat.id, members, True, True, True, True)
 
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
 
@@ -201,13 +191,12 @@ def del_gif(bot, update):
 def rest_msg(bot, update):
     msg = update.effective_message
     chat = update.effective_chat
-    if sql.is_restr_locked(chat.id, "messages") and can_delete(chat, bot.id) and not is_user_admin(chat,
-                                                                                                   msg.from_user.id):
+    if sql.is_restr_locked(chat.id, "messages") \
+            and can_delete(chat, bot.id) \
+            and not is_user_admin(chat, msg.from_user.id):
         msg.delete()
         bot.restrict_chat_member(chat.id, msg.from_user.id,
-                                 can_send_messages=False,
-                                 can_send_media_messages=False,
-                                 can_send_other_messages=False)
+                                 can_send_messages=False)
 
 
 @run_async
@@ -215,12 +204,13 @@ def rest_msg(bot, update):
 def rest_media(bot, update):
     msg = update.effective_message
     chat = update.effective_chat
-    if sql.is_restr_locked(chat.id, "media") and can_delete(chat, bot.id) and not is_user_admin(chat, msg.from_user.id):
+    if sql.is_restr_locked(chat.id, "media") \
+            and can_delete(chat, bot.id) \
+            and not is_user_admin(chat, msg.from_user.id):
         msg.delete()
         bot.restrict_chat_member(chat.id, msg.from_user.id,
                                  can_send_messages=True,
-                                 can_send_media_messages=False,
-                                 can_send_other_messages=False)
+                                 can_send_media_messages=False)
 
 
 @run_async
@@ -228,12 +218,47 @@ def rest_media(bot, update):
 def rest_other(bot, update):
     msg = update.effective_message
     chat = update.effective_chat
-    if sql.is_restr_locked(chat.id, "other") and can_delete(chat, bot.id) and not is_user_admin(chat, msg.from_user.id):
+    if sql.is_restr_locked(chat.id, "other") \
+            and can_delete(chat, bot.id) \
+            and not is_user_admin(chat, msg.from_user.id):
         msg.delete()
         bot.restrict_chat_member(chat.id, msg.from_user.id,
                                  can_send_messages=True,
                                  can_send_media_messages=True,
                                  can_send_other_messages=False)
+
+
+@run_async
+@user_not_admin
+def rest_previews(bot, update):
+    msg = update.effective_message
+    chat = update.effective_chat
+    if sql.is_restr_locked(chat.id, "previews") \
+            and can_delete(chat, bot.id) \
+            and not is_user_admin(chat, msg.from_user.id):
+        msg.delete()
+        bot.restrict_chat_member(chat.id, msg.from_user.id,
+                                 can_send_messages=True,
+                                 can_send_media_messages=True,
+                                 can_send_other_messages=True,
+                                 can_add_web_page_previews=False)
+
+
+@run_async
+def list_locks(bot, update):
+    pass
+    # TODO
+    # chat = update.effective_chat
+    # res = ""
+    # locks = sql.get_locks(chat.id)
+    # restr = sql.get_restr(chat.id)
+    # if not (locks or restr):
+    #     res += "There are no current locks."
+    # else:
+    #     if locks:
+    #         pass
+    #     if restr:
+    #         pass
 
 
 def __migrate__(old_chat_id, new_chat_id):
@@ -245,18 +270,21 @@ __help__ = """
  - /lock <type>: lock items of a certain type (not available in private)
  - /unlock <type>: unlock items of a certain type (not available in private)
 """
-
-MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue
+GIF = Filters.document & CustomFilters.mime_type("video/mp4")
+OTHER = Filters.game | Filters.sticker | GIF
 MEDIA = Filters.audio | Filters.document | Filters.video | Filters.voice | Filters.photo
-OTHER = Filters.game | Filters.sticker  # NOTE: GIFS too
+MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | MEDIA | OTHER
+PREVIEWS = Filters.entity("url")
 
 LOCKTYPES_HANDLER = CommandHandler("locktypes", locktypes)
 LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=~Filters.private)
 UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True, filters=~Filters.private)
+LOCKED_HANDLER = CommandHandler("locks", list_locks, filters=~Filters.private)
 
 REST_MSG_HANDLER = MessageHandler(MESSAGES, rest_msg)
 REST_MEDIA_HANDLER = MessageHandler(MEDIA, rest_media)
 REST_OTHERS_HANDLER = MessageHandler(OTHER, rest_other)
+REST_PREVIEWS_HANDLER = MessageHandler(PREVIEWS, rest_previews)
 
 STICKER_HANDLER = MessageHandler(Filters.sticker, del_sticker)
 AUDIO_HANDLER = MessageHandler(Filters.audio, del_audio)
@@ -265,15 +293,17 @@ DOCUMENT_HANDLER = MessageHandler(Filters.document, del_document)
 VIDEO_HANDLER = MessageHandler(Filters.video, del_video)
 CONTACT_HANDLER = MessageHandler(Filters.contact, del_contact)
 PHOTO_HANDLER = MessageHandler(Filters.photo, del_photo)
-GIF_HANDLER = MessageHandler(Filters.document & CustomFilters.mime_type("video/mp4"), del_gif)
+GIF_HANDLER = MessageHandler(GIF, del_gif)
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(UNLOCK_HANDLER)
 dispatcher.add_handler(LOCKTYPES_HANDLER)
+dispatcher.add_handler(LOCKED_HANDLER)
 
 dispatcher.add_handler(REST_MSG_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_MEDIA_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_OTHERS_HANDLER, REST_GROUP)
+# dispatcher.add_handler(REST_PREVIEWS_HANDLER, REST_GROUP) # NOTE: disable, checking for URL's will trigger all urls,
 
 dispatcher.add_handler(GIF_HANDLER)
 dispatcher.add_handler(STICKER_HANDLER)

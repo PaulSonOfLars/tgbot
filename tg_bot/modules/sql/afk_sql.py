@@ -25,10 +25,7 @@ class AFK(BASE):
 AFK.__table__.create(checkfirst=True)
 INSERTION_LOCK = threading.RLock()
 
-KEYSTORE = collections.defaultdict(list)
 
-
-# check if need insertion lock
 def check_afk_status(user_id):
     try:
         return SESSION.query(AFK).get(user_id)
@@ -69,18 +66,3 @@ def toggle_afk(user_id, reason=""):
             curr.is_afk = True
         SESSION.add(curr)
         SESSION.commit()
-
-
-def load_keystore():
-    global KEYSTORE
-
-    KEYSTORE = collections.defaultdict(list)
-    with INSERTION_LOCK:
-        all_users = SESSION.query(AFK).all()
-        for user in all_users:
-            KEYSTORE[user.user_id].append(user)
-        SESSION.close()
-    print("{} total afk users added to {} chats.".format(len(all_users), len(KEYSTORE)))
-
-
-load_keystore()
