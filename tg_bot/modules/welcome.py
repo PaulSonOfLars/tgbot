@@ -13,21 +13,18 @@ VALID_WELCOME_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'coun
 @run_async
 def new_member(bot, update):
     chat = update.effective_chat
-    if update.effective_user.id == OWNER_ID:
-        update.effective_message.reply_text("Master is in the houseeee, let's get this party started!")
-        return
 
     should_welc, cust_welcome, _ = sql.get_preference(chat.id)
     if should_welc:
         new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
+            # Give the owner a special welcome
+            if new_mem.id == OWNER_ID:
+                update.effective_message.reply_text("Master is in the houseeee, let's get this party started!")
+                continue
             # Don't welcome yourself
-            if not new_mem.id == bot.id:
+            elif not new_mem.id == bot.id:
                 if cust_welcome:
-                    if new_mem.last_name:
-                        fullname = "{} {}".format(new_mem.first_name, new_mem.last_name)
-                    else:
-                        fullname = new_mem.first_name
                     count = chat.get_members_count()
                     if new_mem.username:
                         username = "@" + escape_markdown(new_mem.username)
@@ -37,7 +34,7 @@ def new_member(bot, update):
                     valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
                     res = valid_format.format(first=new_mem.first_name,
                                               last=new_mem.last_name or new_mem.first_name,
-                                              fullname=fullname, username=username,
+                                              fullname=new_mem.full_name, username=username,
                                               count=count, chatname=chat.title, id=new_mem.id)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
@@ -63,16 +60,17 @@ def left_member(bot, update):
     if should_welc:
         left_mem = update.effective_message.left_chat_member
         if left_mem:
+            # inform owner about kick
             if left_mem.id == bot.id:
                 bot.send_message(OWNER_ID, "I've just been kicked from {}.".format(chat.title
                                                                                    or chat.first_name
                                                                                    or chat.id))
                 return
+            # Give the owner a special goodbye
+            if left_mem.id == OWNER_ID:
+                update.effective_message.reply_text("RIP Master")
+                return
             if cust_leave:
-                if left_mem.last_name:
-                    fullname = "{} {}".format(left_mem.first_name, left_mem.last_name)
-                else:
-                    fullname = left_mem.first_name
                 count = chat.get_members_count()
                 if left_mem.username:
                     username = "@" + escape_markdown(left_mem.username)
@@ -82,7 +80,7 @@ def left_member(bot, update):
                 valid_format = escape_invalid_curly_brackets(cust_leave, VALID_WELCOME_FORMATTERS)
                 res = valid_format.format(first=left_mem.first_name,
                                           last=left_mem.last_name or left_mem.first_name,
-                                          fullname=fullname, username=username,
+                                          fullname=left_mem.full_name, username=username,
                                           count=count, chatname=chat.title, id=left_mem.id)
             else:
                 res = sql.DEFAULT_LEAVE
