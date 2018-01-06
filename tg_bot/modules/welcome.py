@@ -24,36 +24,37 @@ def new_member(bot, update):
                 continue
             # Don't welcome yourself
             elif not new_mem.id == bot.id:
+                first_name = new_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
                 if cust_welcome:
                     if new_mem.last_name:
-                        fullname = "{} {}".format(new_mem.first_name, new_mem.last_name)
+                        fullname = "{} {}".format(first_name, new_mem.last_name)
                     else:
-                        fullname = new_mem.first_name
+                        fullname = first_name
                     count = chat.get_members_count()
-                    mention = "[{}](tg://user?id={})".format(new_mem.first_name, new_mem.id)
+                    mention = "[{}](tg://user?id={})".format(first_name, new_mem.id)
                     if new_mem.username:
                         username = "@" + escape_markdown(new_mem.username)
                     else:
                         username = mention
 
                     valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
-                    res = valid_format.format(first=new_mem.first_name,
-                                              last=new_mem.last_name or new_mem.first_name,
-                                              fullname=fullname, username=escape_markdown(username), mention=mention,
+                    res = valid_format.format(first=first_name,
+                                              last=new_mem.last_name or first_name,
+                                              fullname=fullname, username=username, mention=mention,
                                               count=count, chatname=chat.title, id=new_mem.id)
                 else:
-                    res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
+                    res = sql.DEFAULT_WELCOME.format(first=first_name)
                 try:
-                    update.effective_message.reply_text(markdown_parser(res), parse_mode=ParseMode.MARKDOWN)
+                    update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
                 except IndexError:
 
                     update.effective_message.reply_text(markdown_parser(
-                        sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
+                        sql.DEFAULT_WELCOME.format(first=first_name) +
                         "\nNote: the current welcome message is invalid due to markdown issues. Please update."),
                         parse_mode=ParseMode.MARKDOWN)
                 except KeyError:
                     update.effective_message.reply_text(markdown_parser(
-                        sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
+                        sql.DEFAULT_WELCOME.format(first=first_name) +
                         "\nNote: the current welcome message is invalid due to an issue with some misplaced curly "
                         "brackets. Please update."),
                         parse_mode=ParseMode.MARKDOWN)
@@ -76,28 +77,29 @@ def left_member(bot, update):
             if left_mem.id == OWNER_ID:
                 update.effective_message.reply_text("RIP Master")
                 return
+            first_name = left_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
             if cust_leave:
                 if left_mem.last_name:
-                    fullname = "{} {}".format(left_mem.first_name, left_mem.last_name)
+                    fullname = "{} {}".format(first_name, left_mem.last_name)
                 else:
-                    fullname = left_mem.first_name
+                    fullname = first_name
                 count = chat.get_members_count()
-                mention = "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
+                mention = "[{}](tg://user?id={})".format(first_name, left_mem.id)
                 if left_mem.username:
                     username = "@" + escape_markdown(left_mem.username)
                 else:
                     username = mention
 
                 valid_format = escape_invalid_curly_brackets(cust_leave, VALID_WELCOME_FORMATTERS)
-                res = valid_format.format(first=left_mem.first_name,
-                                          last=left_mem.last_name or left_mem.first_name,
+                res = valid_format.format(first=first_name,
+                                          last=left_mem.last_name or first_name,
                                           fullname=fullname, username=username, mention=mention,
                                           count=count, chatname=chat.title, id=left_mem.id)
             else:
                 res = sql.DEFAULT_LEAVE
 
             try:
-                update.effective_message.reply_text(markdown_parser(res), parse_mode=ParseMode.MARKDOWN)
+                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
             except IndexError:
                 update.effective_message.reply_text(markdown_parser(
                     sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid due to markdown issues."
