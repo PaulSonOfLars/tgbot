@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, MessageHandler, DispatcherHandlerStop, 
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_USERNAME
-from tg_bot.modules.helper_funcs import user_admin, extract_text, button_markdown_parser
+from tg_bot.modules.helper_funcs import user_admin, extract_text, button_markdown_parser, split_quotes
 from tg_bot.modules.sql import cust_filters_sql as sql
 
 HANDLER_GROUP = 10
@@ -41,13 +41,16 @@ def list_handlers(bot, update):
 def filters(bot, update):
     chat = update.effective_chat
     msg = update.effective_message
-    args = msg.text.split(None, 2)  # use python's maxsplit to separate Cmd, keyword, and reply_text
+    args = msg.text.split(None, 1)  # use python's maxsplit to separate Cmd, keyword, and reply_text
 
     if len(args) < 2:
         return
 
+    extracted = split_quotes(args[1])
+    if len(extracted) < 1:
+        return
     # set trigger -> lower, so as to avoid adding duplicate filters with different cases
-    keyword = args[1].lower()
+    keyword = extracted[0].lower()
 
     is_sticker = False
     is_document = False
@@ -58,9 +61,11 @@ def filters(bot, update):
     buttons = []
 
     # determine what the contents of the filter are - text, image, sticker, etc
-    if len(args) >= 3:
-        offset = len(args[2]) - len(msg.text)  # set correct offset relative to command + notename
-        content, buttons = button_markdown_parser(args[2], entities=msg.parse_entities(), offset=offset)
+    if len(extracted) >= 2:
+        offset = len(extracted[1]) - len(msg.text)  # set correct offset relative to command + notename
+        print(extracted[1])
+        content, buttons = button_markdown_parser(extracted[1], entities=msg.parse_entities(), offset=offset)
+        print(content)
 
     elif msg.reply_to_message and msg.reply_to_message.sticker:
         content = msg.reply_to_message.sticker.file_id
@@ -105,10 +110,11 @@ def filters(bot, update):
 
 # NOT ASYNC BECAUSE DISPATCHER HANDLER RAISED
 @user_admin
-def stop_filter(bot, update, args):
+def stop_filter(bot, update):
     chat = update.effective_chat
+    args = update.effective_message.text.split(None, 1)
 
-    if len(args) < 1:
+    if len(args) < 2:
         return
 
     chat_filters = sql.get_chat_filters(chat.id)
@@ -118,8 +124,8 @@ def stop_filter(bot, update, args):
         return
 
     for filt in chat_filters:
-        if filt.chat_id == str(chat.id) and filt.keyword == args[0]:
-            sql.remove_filter(chat.id, args[0])
+        if filt.chat_id == str(chat.id) and filt.keyword == args[1]:
+            sql.remove_filter(chat.id, args[1])
             update.effective_message.reply_text("Yep, I'll stop replying to that.")
             raise DispatcherHandlerStop
 
@@ -196,13 +202,14 @@ def __migrate__(old_chat_id, new_chat_id):
 __help__ = """
  - /filter <keyword> <reply message>: add a filter to this chat. The bot will now reply that message whenever 'keyword'\
   is mentioned. If you reply to a sticker with a keyword, the bot will reply with that sticker. NOTE: all filter \
-  keywords are in lowercase.
+  keywords are in lowercase. If you want your keyword to be a sentence, use quotes. eg: /filter "hey there" How you \
+  doin?
  - /stop <filter keyword>: stop that filter.
  - /filters: list all active filters in this chat.
 """
 
 FILTER_HANDLER = CommandHandler("filter", filters)
-STOP_HANDLER = CommandHandler("stop", stop_filter, pass_args=True)
+STOP_HANDLER = CommandHandler("stop", stop_filter)
 LIST_HANDLER = CommandHandler("filters", list_handlers)
 CUST_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
 
