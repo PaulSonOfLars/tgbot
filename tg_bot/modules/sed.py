@@ -43,7 +43,7 @@ def separate_sed(sed_string):
         flags = ""
         if counter < len(sed_string):
             flags = sed_string[counter:]
-        return replace, replace_with, flags
+        return replace, replace_with, flags.lower()
 
 
 @run_async
@@ -58,10 +58,14 @@ def sed(bot, update):
             return
 
         repl, repl_with, flags = sed_result
-        if "i" in flags.lower():
+        if 'i' in flags and 'g' in flags:
             text = re.sub(repl, repl_with, to_fix, flags=re.I).strip()
-        else:
+        elif 'i' in flags:
+            text = re.sub(repl, repl_with, to_fix, count=1, flags=re.I).strip()
+        elif 'g' in flags:
             text = re.sub(repl, repl_with, to_fix).strip()
+        else:
+            text = re.sub(repl, repl_with, to_fix, count=1).strip()
 
         # empty string errors -_-
         if len(text) >= telegram.MAX_MESSAGE_LENGTH:
@@ -73,9 +77,9 @@ def sed(bot, update):
 
 __help__ = """
  - s/<text1>/<text2>(/<flag>): Reply to a message with this to perform a sed operation on that message, replacing all \
-occurrences of 'text1' with 'text2'. Flags are optional, and currently include 'i' for ignore case, or nothing. \
-Delimiters include '/', '_', '|' and ':'. Text grouping is supported. The resulting message cannot be larger than \
-{}
+occurrences of 'text1' with 'text2'. Flags are optional, and currently include 'i' for ignore case, 'g' for global, \
+or nothing. Delimiters include '/', '_', '|' and ':'. Text grouping is supported. The resulting message cannot be \
+larger than {}
 """.format(telegram.MAX_MESSAGE_LENGTH)
 
 SED_HANDLER = RegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed)

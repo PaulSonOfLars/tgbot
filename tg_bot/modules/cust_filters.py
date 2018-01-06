@@ -187,6 +187,7 @@ def reply_filter(bot, update):
                             " if you can't figure out why!".format(OWNER_USERNAME))
 
             else:
+                # LEGACY - all new filters will have has_markdown set to True.
                 message.reply_text(filt.reply)
             break
 
