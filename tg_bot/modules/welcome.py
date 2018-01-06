@@ -25,6 +25,10 @@ def new_member(bot, update):
             # Don't welcome yourself
             elif not new_mem.id == bot.id:
                 if cust_welcome:
+                    if new_mem.last_name:
+                        fullname = "{} {}".format(new_mem.first_name, new_mem.last_name)
+                    else:
+                        fullname = new_mem.first_name
                     count = chat.get_members_count()
                     mention = "[{}](tg://user?id={})".format(new_mem.first_name, new_mem.id)
                     if new_mem.username:
@@ -35,7 +39,7 @@ def new_member(bot, update):
                     valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
                     res = valid_format.format(first=new_mem.first_name,
                                               last=new_mem.last_name or new_mem.first_name,
-                                              fullname=new_mem.full_name, username=username, mention=mention,
+                                              fullname=fullname, username=escape_markdown(username), mention=mention,
                                               count=count, chatname=chat.title, id=new_mem.id)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
@@ -73,6 +77,10 @@ def left_member(bot, update):
                 update.effective_message.reply_text("RIP Master")
                 return
             if cust_leave:
+                if left_mem.last_name:
+                    fullname = "{} {}".format(left_mem.first_name, left_mem.last_name)
+                else:
+                    fullname = left_mem.first_name
                 count = chat.get_members_count()
                 mention = "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
                 if left_mem.username:
@@ -83,7 +91,7 @@ def left_member(bot, update):
                 valid_format = escape_invalid_curly_brackets(cust_leave, VALID_WELCOME_FORMATTERS)
                 res = valid_format.format(first=left_mem.first_name,
                                           last=left_mem.last_name or left_mem.first_name,
-                                          fullname=left_mem.full_name, username=username, mention=mention,
+                                          fullname=fullname, username=username, mention=mention,
                                           count=count, chatname=chat.title, id=left_mem.id)
             else:
                 res = sql.DEFAULT_LEAVE
