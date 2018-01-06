@@ -38,10 +38,10 @@ def new_member(bot, update):
                         username = mention
 
                     valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
-                    res = valid_format.format(first=first_name,
-                                              last=new_mem.last_name or first_name,
-                                              fullname=fullname, username=username, mention=mention,
-                                              count=count, chatname=chat.title, id=new_mem.id)
+                    res = valid_format.format(first=escape_markdown(first_name),
+                                              last=escape_markdown(new_mem.last_name or first_name),
+                                              fullname=escape_markdown(fullname), username=username, mention=mention,
+                                              count=count, chatname=escape_markdown(chat.title), id=new_mem.id)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=first_name)
                 try:
@@ -50,13 +50,14 @@ def new_member(bot, update):
 
                     update.effective_message.reply_text(markdown_parser(
                         sql.DEFAULT_WELCOME.format(first=first_name) +
-                        "\nNote: the current welcome message is invalid due to markdown issues. Please update."),
+                        "\nNote: the current welcome message was invalid due to markdown issues. Could be due to the "
+                        "user's name."),
                         parse_mode=ParseMode.MARKDOWN)
                 except KeyError:
                     update.effective_message.reply_text(markdown_parser(
                         sql.DEFAULT_WELCOME.format(first=first_name) +
                         "\nNote: the current welcome message is invalid due to an issue with some misplaced curly "
-                        "brackets. Please update."),
+                        "brackets. Please update"),
                         parse_mode=ParseMode.MARKDOWN)
 
 
@@ -91,10 +92,10 @@ def left_member(bot, update):
                     username = mention
 
                 valid_format = escape_invalid_curly_brackets(cust_leave, VALID_WELCOME_FORMATTERS)
-                res = valid_format.format(first=first_name,
-                                          last=left_mem.last_name or first_name,
-                                          fullname=fullname, username=username, mention=mention,
-                                          count=count, chatname=chat.title, id=left_mem.id)
+                res = valid_format.format(first=escape_markdown(first_name),
+                                          last=escape_markdown(left_mem.last_name or first_name),
+                                          fullname=escape_markdown(fullname), username=username, mention=mention,
+                                          count=count, chatname=escape_markdown(chat.title), id=left_mem.id)
             else:
                 res = sql.DEFAULT_LEAVE
 
