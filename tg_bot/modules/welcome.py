@@ -26,15 +26,16 @@ def new_member(bot, update):
             elif not new_mem.id == bot.id:
                 if cust_welcome:
                     count = chat.get_members_count()
+                    mention = "[{}](tg://user?id={})".format(new_mem.first_name, new_mem.id)
                     if new_mem.username:
                         username = "@" + escape_markdown(new_mem.username)
                     else:
-                        username = "[{}](tg://user?id={})".format(new_mem.first_name, new_mem.id)
+                        username = mention
 
                     valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
                     res = valid_format.format(first=new_mem.first_name,
                                               last=new_mem.last_name or new_mem.first_name,
-                                              fullname=new_mem.full_name, username=username,
+                                              fullname=new_mem.full_name, username=username, mention=mention,
                                               count=count, chatname=chat.title, id=new_mem.id)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=new_mem.first_name)
@@ -44,12 +45,13 @@ def new_member(bot, update):
 
                     update.effective_message.reply_text(markdown_parser(
                         sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
-                        "\nNote: the current welcome message is invalid. Please update."),
+                        "\nNote: the current welcome message is invalid due to markdown issues. Please update."),
                         parse_mode=ParseMode.MARKDOWN)
                 except KeyError:
                     update.effective_message.reply_text(markdown_parser(
                         sql.DEFAULT_WELCOME.format(first=new_mem.first_name) +
-                        "\nNote: the current welcome message is invalid. Please update."),
+                        "\nNote: the current welcome message is invalid due to an issue with some misplaced curly "
+                        "brackets. Please update."),
                         parse_mode=ParseMode.MARKDOWN)
 
 
@@ -72,15 +74,16 @@ def left_member(bot, update):
                 return
             if cust_leave:
                 count = chat.get_members_count()
+                mention = "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
                 if left_mem.username:
                     username = "@" + escape_markdown(left_mem.username)
                 else:
-                    username = "[{}](tg://user?id={})".format(left_mem.first_name, left_mem.id)
+                    username = mention
 
                 valid_format = escape_invalid_curly_brackets(cust_leave, VALID_WELCOME_FORMATTERS)
                 res = valid_format.format(first=left_mem.first_name,
                                           last=left_mem.last_name or left_mem.first_name,
-                                          fullname=left_mem.full_name, username=username,
+                                          fullname=left_mem.full_name, username=username, mention=mention,
                                           count=count, chatname=chat.title, id=left_mem.id)
             else:
                 res = sql.DEFAULT_LEAVE
@@ -89,11 +92,13 @@ def left_member(bot, update):
                 update.effective_message.reply_text(markdown_parser(res), parse_mode=ParseMode.MARKDOWN)
             except IndexError:
                 update.effective_message.reply_text(markdown_parser(
-                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update."),
+                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid due to markdown issues."
+                                        " Please update."),
                     parse_mode=ParseMode.MARKDOWN)
             except KeyError:
                 update.effective_message.reply_text(markdown_parser(
-                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid. Please update."),
+                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid due to misplaced curly brackets."
+                                        " Please update."),
                     parse_mode=ParseMode.MARKDOWN)
 
 
@@ -182,12 +187,13 @@ def reset_leave(bot, update):
 WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in multiple ways. If you want the messages " \
                 "to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
                 " - `{first}`: this represents the user's *first* name\n" \
-                " - `{last}`: this represents the user's *last* name. Defaults to first name if user has no " \
+                " - `{last}`: this represents the user's *last* name. Defaults to *first name* if user has no " \
                 "last name.\n" \
-                " - `{fullname}`: this represents the user's *full* name. Defaults to first name if user has no " \
+                " - `{fullname}`: this represents the user's *full* name. Defaults to *first name* if user has no " \
                 "last name.\n" \
-                " - `{username}`: this represents the user's *username*. Defaults to a mention of the user's " \
-                "first name.\n" \
+                " - `{username}`: this represents the user's *username*. Defaults to a *mention* of the user's " \
+                "first name if has no username.\n" \
+                " - `{mention}`: this simply *mentions* a user - tagging him with his first name." \
                 " - `{id}`: this represents the user's *id*\n" \
                 " - `{count}`: this represents the user's *member number*.\n" \
                 " - `{chatname}`: this represents the *current chat name*.\n" \
