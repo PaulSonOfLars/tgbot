@@ -51,8 +51,6 @@ WarnFilters.__table__.create(checkfirst=True)
 WARN_INSERTION_LOCK = threading.RLock()
 WARN_FILTER_INSERTION_LOCK = threading.RLock()
 
-WARN_FILTER_KEYSTORE = collections.defaultdict(list)
-
 
 def warn_user(user_id, chat_id, reason=None):
     with WARN_INSERTION_LOCK:
@@ -111,10 +109,6 @@ def add_warn_filter(chat_id, keyword, reply):
     with WARN_FILTER_INSERTION_LOCK:
         warn_filt = WarnFilters(str(chat_id), keyword, reply)
 
-        if warn_filt in WARN_FILTER_KEYSTORE[warn_filt.chat_id]:  # if there already is a filter on that kw, remove it
-            WARN_FILTER_KEYSTORE[warn_filt.chat_id].remove(warn_filt)
-
-        WARN_FILTER_KEYSTORE[warn_filt.chat_id].append(warn_filt)
         SESSION.merge(warn_filt)  # merge to avoid duplicate key issues
         SESSION.commit()
 
@@ -123,7 +117,6 @@ def remove_warn_filter(chat_id, keyword):
     with WARN_FILTER_INSERTION_LOCK:
         warn_filt = SESSION.query(WarnFilters).get((str(chat_id), keyword))
         if warn_filt:
-            WARN_FILTER_KEYSTORE[warn_filt.chat_id].remove(warn_filt)
             SESSION.delete(warn_filt)
             SESSION.commit()
             return True
@@ -133,21 +126,9 @@ def remove_warn_filter(chat_id, keyword):
 
 def get_chat_warn_filters(chat_id):
     try:
-        return WARN_FILTER_KEYSTORE[str(chat_id)]
+        return SESSION.query(WarnFilters).filter(WarnFilters.chat_id == str(chat_id)).all()
     finally:
         SESSION.close()
-
-
-def load_keystore():
-    global WARN_FILTER_KEYSTORE
-    WARN_FILTER_KEYSTORE = collections.defaultdict(list)
-
-    with WARN_FILTER_INSERTION_LOCK:
-        all_warn_filters = SESSION.query(WarnFilters).all()
-        for warn_filt in all_warn_filters:
-            WARN_FILTER_KEYSTORE[warn_filt.chat_id].append(warn_filt)
-        SESSION.close()
-    print("{} total warning filters added to {} chats.".format(len(all_warn_filters), len(WARN_FILTER_KEYSTORE)))
 
 
 def migrate_chat(old_chat_id, new_chat_id):
@@ -162,8 +143,3 @@ def migrate_chat(old_chat_id, new_chat_id):
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
         SESSION.commit()
-
-    load_keystore()
-
-
-load_keystore()
