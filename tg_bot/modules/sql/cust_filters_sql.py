@@ -1,4 +1,3 @@
-import collections
 import threading
 
 from sqlalchemy import Column, String, UnicodeText, Boolean, Integer, distinct, func

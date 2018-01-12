@@ -1,18 +1,27 @@
 # tgbot
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
-Originally a simple group management bot with multiple admin features, it has now become extremely modular and simple to use.
+Originally a simple group management bot with multiple admin features, it has evolved, becoming extremely modular and 
+simple to use.
 
 Can be found on telegram as [Marie](https://t.me/BanhammerMarie_bot).
-Alternatively, [find me on telegram](https://t.me/SonOfLars) for any help/questions about this bot!
+Alternatively, [find me on telegram](https://t.me/SonOfLars) for any help/questions!
 
 ## Setting up the bot (Read this before trying to use!):
-Please make sure you have python3 installed, as I cannot guarantee everything will work as expected with python2!
+Please make sure to use python3.6, as I cannot guarantee everything will work as expected on older python versions!
+This is because markdown parsing is done by iterating through a dict, which are ordered by default in 3.6.
 
 ### config.py
 
-Make sure you have a config.py file in your tg_bot folder. This is where your bot token will be loaded from, as well as your databse URI (if you're using a database).
+Make sure you have a config.py file in your tg_bot folder. This is where your bot token will be loaded from, as well 
+as your database URI (if you're using a database).
 Have a look at sample_config.py for an idea of what it must contain.
+
+It is recommended to import sample_config and extend the Config class, as this will ensure your config contains all 
+defaults set in the sample_config.
+
+If you can't have a config.py file, it is also possible to use environment variables - see `./tg_bot/__init__.py` for 
+a list of possible ENV variables.
 
 ### Python dependencies
 
@@ -24,9 +33,8 @@ This will install all necessary python packages.
 
 ### Database
 
-If you wish to use a database-dependent module (eg: locks, notes, userinfo, finance),
-you'll need to have a database installed on your system. I use postgres, but other
-databases should be compatible, as I don't use any postgres-specific types.
+If you wish to use a database-dependent module (eg: locks, notes, userinfo, users, filters, welcomes),
+you'll need to have a database installed on your system. I use postgres, so I recommend using it for optimal compatibility.
 
 In the case of postgres, this is how you would set up a the database on a debian/ubuntu system. Other distributions may vary.
 
@@ -94,3 +102,8 @@ You can then add commands using the usual
 Assigning the `__help__` variable to a string describing this modules' available
 commands will allow the bot to load it and add the documentation for
 your module to the /help command.
+
+The `__migrate__()` function is used for migrating chats - when a chat is upgraded to a supergroup, the ID changes, so 
+it is necessary to migrate it in the db.
+
+The `__stats__()` function is for retrieving module statistics, eg number of users, number of chats.
