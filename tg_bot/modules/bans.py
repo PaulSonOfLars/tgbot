@@ -1,4 +1,4 @@
-from telegram.ext import run_async, CommandHandler
+from telegram.ext import run_async, CommandHandler, Filters
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat, extract_user, \
@@ -98,10 +98,10 @@ __help__ = """
  - /kickme: kicks the user who issued the command
  """
 
-BAN_HANDLER = CommandHandler("ban", ban, pass_args=True)
-KICK_HANDLER = CommandHandler("kick", kick, pass_args=True)
-UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True)
-KICKME_HANDLER = CommandHandler("kickme", kickme)
+BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=~Filters.private)
+KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=~Filters.private)
+UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=~Filters.private)
+KICKME_HANDLER = CommandHandler("kickme", kickme, filters=~Filters.private)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(KICK_HANDLER)
