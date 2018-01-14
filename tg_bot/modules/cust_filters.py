@@ -63,9 +63,7 @@ def filters(bot, update):
     # determine what the contents of the filter are - text, image, sticker, etc
     if len(extracted) >= 2:
         offset = len(extracted[1]) - len(msg.text)  # set correct offset relative to command + notename
-        print(extracted[1])
         content, buttons = button_markdown_parser(extracted[1], entities=msg.parse_entities(), offset=offset)
-        print(content)
 
     elif msg.reply_to_message and msg.reply_to_message.sticker:
         content = msg.reply_to_message.sticker.file_id
