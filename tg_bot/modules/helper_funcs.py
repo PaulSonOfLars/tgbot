@@ -215,7 +215,8 @@ def markdown_parser(txt, entities=None, offset=0):
                 continue
             # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
             else:
-                res += _selective_escape(txt[prev:start] or "") + escape_markdown(ent_text)
+                # NOTE: -1 is necessary, or a duplicate letter is shown!
+                res += _selective_escape(txt[prev:start-1] or "") + escape_markdown(ent_text)
         # code handling
         elif ent.type == "code":
             res += _selective_escape(txt[prev:start]) + '`' + ent_text + '`'

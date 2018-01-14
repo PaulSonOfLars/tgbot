@@ -120,18 +120,23 @@ def welcome(bot, update, args):
     # if no args, show current replies.
     if len(args) == 0:
         pref, welcome_m, leave_m = sql.get_preference(chat.id)
-        reply_setting = "This chat has it's welcome setting set to: {}.".format(pref)
-        reply_welcome = "This chat has it's welcome setting set to: {}, the welcome message is:\n{}, and the leave \
-            message is too long to display.".format(pref, welcome_m)
-        reply_both = "This chat has it's welcome setting set to: {}, the welcome message is:\n'{}', and the leave \
-            message is:'{}'.".format(pref, welcome_m, leave_m)
+        reply_setting_too_long = "This chat has it's welcome setting set to: {}.\n" \
+                                 "Both messages are too long to display".format(pref)
+        reply_welcome = "This chat has it's welcome setting set to: {}.\n\nThe welcome message is:\n'{}'.\n\n" \
+                        "The leave message is too long to display.".format(pref, welcome_m)
+        reply_leave = "This chat has it's welcome setting set to: {}.\n\nThe welcome message is too long to " \
+                      "display.\n\nThe leave message is:\n'{}'.".format(pref, leave_m)
+        reply_both = "This chat has it's welcome setting set to: {}.\n\nThe welcome message is:\n'{}'.\n\nThe leave " \
+                     "message is:\n'{}'.".format(pref, welcome_m, leave_m)
 
         if len(reply_both) < telegram.MAX_MESSAGE_LENGTH:
             update.effective_message.reply_text(reply_both)
         elif len(reply_welcome) < telegram.MAX_MESSAGE_LENGTH:
             update.effective_message.reply_text(reply_welcome)
+        elif len(reply_leave) < telegram.MAX_MESSAGE_LENGTH:
+            update.effective_message.reply_text(reply_leave)
         else:
-            update.effective_message.reply_text(reply_setting)
+            update.effective_message.reply_text(reply_setting_too_long)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
@@ -223,7 +228,7 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 __help__ = """
- - /welcome <on/off>: enable/disable welcome and goodbye messages
+ - /welcome <on/off>: enable/disable welcome and goodbye messages. If used with no arg, shows current settings.
  - /setwelcome <sometext>: set a custom welcome message.
  - /setleave <sometext>: set a custom leaving message.
  - /resetwelcome: reset to the default welcome message.
