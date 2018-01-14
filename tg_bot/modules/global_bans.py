@@ -3,7 +3,7 @@ from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, OWNER_ID
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS
 from tg_bot.modules.helper_funcs import CustomFilters, extract_user
 from tg_bot.modules.sql.users_sql import get_all_chats
 
@@ -15,6 +15,10 @@ def gban(bot, update, args):
     user_id = extract_user(message, args)
     if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
+        return
+
+    if int(user_id) in SUDO_USERS:
+        message.reply_text("I spy, with my little eye... a sudo user war! Why are you guys turning on each other?")
         return
 
     user_chat = bot.get_chat(user_id)
