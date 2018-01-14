@@ -120,9 +120,15 @@ def invite(bot, update):
     chat = update.effective_chat
     if chat.username:
         update.effective_message.reply_text(chat.username)
+    elif chat.type == chat.SUPERGROUP or chat.type == chat.CHANNEL:
+        bot_member = chat.get_member(bot.id)
+        if bot_member.can_invite_users:
+            invitelink = bot.exportChatInviteLink(chat.id)
+            update.effective_message.reply_text(invitelink)
+        else:
+            update.effective_message.reply_text("I don't have access to the invite link, try changing my permissions!")
     else:
-        invitelink = bot.exportChatInviteLink(chat.id)
-        update.effective_message.reply_text(invitelink)
+        update.effective_message.reply_text("I can only give you invite links for supergroups and channels, sorry!")
 
 
 @run_async

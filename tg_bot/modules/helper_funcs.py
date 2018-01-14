@@ -319,7 +319,7 @@ def split_quotes(text):
         # 1 to avoid starting quote, and counter is exclusive so avoids ending
         key = remove_escapes(text[1:counter].strip())
         # index will be in range, or `else` would have been executed and returned
-        rest = text[counter+1:].strip()
+        rest = text[counter + 1:].strip()
         if not key:
             key = text[0] + text[0]
         return list(filter(None, [key, rest]))
