@@ -74,20 +74,18 @@ To start the bot, simply run:
 ## Modules
 ### Setting load order.
 
-The module load order can be changed via `modules/load.json`.
-The file should contain ONLY one json object.
-Two variables are looked for:
-- `load`: a list of elements to load, and in which order to load them.
-- `no_load`: a list of elements NOT to load.
+The module load order can be changed via the `LOAD` and `NO_LOAD` configuration settings.
+These should both represent lists.
 
-If `load` is not present, or is an empty list, all modules in `modules/` will be selected for loading by default.
+If `LOAD` is an empty list, all modules in `modules/` will be selected for loading by default.
 
-If `no_load` is not present, or is an empty list, all modules selected for loading will be loaded.
+If `NO_LOAD` is not present, or is an empty list, all modules selected for loading will be loaded.
 
-If a module is in both `load` and `no_load`, the module will not be loaded - `no_load` takes priority.
+If a module is in both `LOAD` and `NO_LOAD`, the module will not be loaded - `NO_LOAD` takes priority.
+
 ### Creating your own modules.
 
-Creating a module has been simplified as much as possible - but do not hesitate to suggest more ways of simplifying.
+Creating a module has been simplified as much as possible - but do not hesitate to suggest further simplification.
 
 All that is needed is that your .py file be in the modules folder.
 
@@ -101,9 +99,10 @@ You can then add commands using the usual
 
 Assigning the `__help__` variable to a string describing this modules' available
 commands will allow the bot to load it and add the documentation for
-your module to the /help command.
+your module to the `/help` command.
 
 The `__migrate__()` function is used for migrating chats - when a chat is upgraded to a supergroup, the ID changes, so 
 it is necessary to migrate it in the db.
 
-The `__stats__()` function is for retrieving module statistics, eg number of users, number of chats.
+The `__stats__()` function is for retrieving module statistics, eg number of users, number of chats. This is accessed 
+through the `/stats` command, which is only available to the bot owner.
