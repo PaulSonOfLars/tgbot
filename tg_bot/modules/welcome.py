@@ -5,16 +5,29 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID
-from tg_bot.modules.helper_funcs import user_admin, markdown_parser, escape_invalid_curly_brackets
+from tg_bot.modules.helper_funcs import user_admin, markdown_parser, escape_invalid_curly_brackets, \
+    button_markdown_parser
 
 VALID_WELCOME_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'count', 'chatname']
+
+
+ENUM_FUNC_MAP = {
+    sql.Types.TEXT.value: dispatcher.bot.send_message,
+    sql.Types.BUTTON_TEXT.value: dispatcher.bot.send_message,
+    sql.Types.STICKER.value: dispatcher.bot.send_sticker,
+    sql.Types.DOCUMENT.value: dispatcher.bot.send_document,
+    sql.Types.PHOTO.value: dispatcher.bot.send_photo,
+    sql.Types.AUDIO.value: dispatcher.bot.send_audio,
+    sql.Types.VOICE.value: dispatcher.bot.send_voice,
+    sql.Types.VIDEO.value: dispatcher.bot.send_video
+}
 
 
 @run_async
 def new_member(bot, update):
     chat = update.effective_chat
 
-    should_welc, cust_welcome, _ = sql.get_preference(chat.id)
+    should_welc, cust_welcome, _, welc_type, _ = sql.get_preference(chat.id)
     if should_welc:
         new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
@@ -24,6 +37,10 @@ def new_member(bot, update):
                 continue
             # Don't welcome yourself
             elif not new_mem.id == bot.id:
+                if welc_type != sql.Types.TEXT or welc_type != sql.Types.BUTTON_TEXT:
+                    ENUM_FUNC_MAP[welc_type](chat.id, cust_welcome)
+                    return
+
                 first_name = new_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
                 if cust_welcome:
                     if new_mem.last_name:
@@ -44,6 +61,7 @@ def new_member(bot, update):
                                               count=count, chatname=escape_markdown(chat.title), id=new_mem.id)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=first_name)
+
                 try:
                     update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
                 except IndexError:
@@ -64,7 +82,7 @@ def new_member(bot, update):
 @run_async
 def left_member(bot, update):
     chat = update.effective_chat
-    should_welc, _, cust_leave = sql.get_preference(chat.id)
+    should_welc, _, cust_leave, _, leave_type = sql.get_preference(chat.id)
     if should_welc:
         left_mem = update.effective_message.left_chat_member
         if left_mem:
@@ -78,6 +96,11 @@ def left_member(bot, update):
             if left_mem.id == OWNER_ID:
                 update.effective_message.reply_text("RIP Master")
                 return
+
+            if leave_type != sql.Types.TEXT or leave_type != sql.Types.BUTTON_TEXT:
+                ENUM_FUNC_MAP[leave_type](chat.id, cust_leave)
+                return
+
             first_name = left_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
             if cust_leave:
                 if left_mem.last_name:
@@ -119,24 +142,12 @@ def welcome(bot, update, args):
     chat = update.effective_chat
     # if no args, show current replies.
     if len(args) == 0:
-        pref, welcome_m, leave_m = sql.get_preference(chat.id)
-        reply_setting_too_long = "This chat has it's welcome setting set to: {}.\n" \
-                                 "Both messages are too long to display".format(pref)
-        reply_welcome = "This chat has it's welcome setting set to: {}.\n\nThe welcome message is:\n'{}'.\n\n" \
-                        "The leave message is too long to display.".format(pref, welcome_m)
-        reply_leave = "This chat has it's welcome setting set to: {}.\n\nThe welcome message is too long to " \
-                      "display.\n\nThe leave message is:\n'{}'.".format(pref, leave_m)
-        reply_both = "This chat has it's welcome setting set to: {}.\n\nThe welcome message is:\n'{}'.\n\nThe leave " \
-                     "message is:\n'{}'.".format(pref, welcome_m, leave_m)
-
-        if len(reply_both) < telegram.MAX_MESSAGE_LENGTH:
-            update.effective_message.reply_text(reply_both)
-        elif len(reply_welcome) < telegram.MAX_MESSAGE_LENGTH:
-            update.effective_message.reply_text(reply_welcome)
-        elif len(reply_leave) < telegram.MAX_MESSAGE_LENGTH:
-            update.effective_message.reply_text(reply_leave)
-        else:
-            update.effective_message.reply_text(reply_setting_too_long)
+        pref, welcome_m, leave_m, welcome_type, leave_type = sql.get_preference(chat.id)
+        update.effective_message.reply_text("This chat has it's welcome setting set to: {}.".format(pref))
+        bot.send_message(chat.id, "*The welcome message is:*", parse_mode=ParseMode.MARKDOWN)
+        ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
+        bot.send_message(chat.id, "*The leave message is:*", parse_mode=ParseMode.MARKDOWN)
+        ENUM_FUNC_MAP[leave_type](chat.id, leave_m)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
@@ -159,20 +170,53 @@ def set_welcome(bot, update):
     msg = update.effective_message
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
-    if len(args) == 2:
-        txt = args[1]
-        offset = len(txt) - len(raw_text)  # set correct offset relative to command
-        markdown_welcome_message = markdown_parser(txt, entities=msg.parse_entities(), offset=offset)
 
-        sql.set_custom_welcome(chat_id, markdown_welcome_message)
-        update.effective_message.reply_text("Successfully set custom welcome message!")
+    # determine what the contents of the filter are - text, image, sticker, etc
+    if len(args) >= 2:
+        offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
+        content, buttons = button_markdown_parser(args[1], entities=msg.parse_entities(), offset=offset)
+        if buttons:
+            data_type = sql.Types.BUTTON_TEXT
+        else:
+            data_type = sql.Types.TEXT
+
+    elif msg.reply_to_message and msg.reply_to_message.sticker:
+        content = msg.reply_to_message.sticker.file_id
+        data_type = sql.Types.STICKER
+
+    elif msg.reply_to_message and msg.reply_to_message.document:
+        content = msg.reply_to_message.document.file_id
+        data_type = sql.Types.DOCUMENT
+
+    elif msg.reply_to_message and msg.reply_to_message.photo:
+        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
+        data_type = sql.Types.PHOTO
+
+    elif msg.reply_to_message and msg.reply_to_message.audio:
+        content = msg.reply_to_message.audio.file_id
+        data_type = sql.Types.AUDIO
+
+    elif msg.reply_to_message and msg.reply_to_message.voice:
+        content = msg.reply_to_message.voice.file_id
+        data_type = sql.Types.VOICE
+
+    elif msg.reply_to_message and msg.reply_to_message.video:
+        content = msg.reply_to_message.video.file_id
+        data_type = sql.Types.VIDEO
+
+    else:
+        msg.reply_text("You didn't specify what to reply with!")
+        return
+
+    sql.set_custom_welcome(chat_id, content, data_type)
+    update.effective_message.reply_text("Successfully set custom welcome message!")
 
 
 @run_async
 @user_admin
 def reset_welcome(bot, update):
     chat_id = update.effective_chat.id
-    sql.set_custom_welcome(chat_id, "")
+    sql.set_custom_welcome(chat_id, sql.DEFAULT_WELCOME, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset welcome message to default!")
 
 
@@ -183,20 +227,53 @@ def set_leave(bot, update):
     msg = update.effective_message
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
-    if len(args) == 2:
-        txt = args[1]
-        offset = len(txt) - len(raw_text)  # set correct offset relative to command
-        markdown_leave_message = markdown_parser(txt, entities=msg.parse_entities(), offset=offset)
 
-        sql.set_custom_leave(chat_id, markdown_leave_message)
-        update.effective_message.reply_text("Successfully set custom leave message!")
+    # determine what the contents of the filter are - text, image, sticker, etc
+    if len(args) >= 2:
+        offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
+        content, buttons = button_markdown_parser(args[1], entities=msg.parse_entities(), offset=offset)
+        if buttons:
+            data_type = sql.Types.BUTTON_TEXT
+        else:
+            data_type = sql.Types.TEXT
+
+    elif msg.reply_to_message and msg.reply_to_message.sticker:
+        content = msg.reply_to_message.sticker.file_id
+        data_type = sql.Types.STICKER
+
+    elif msg.reply_to_message and msg.reply_to_message.document:
+        content = msg.reply_to_message.document.file_id
+        data_type = sql.Types.DOCUMENT
+
+    elif msg.reply_to_message and msg.reply_to_message.photo:
+        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
+        data_type = sql.Types.PHOTO
+
+    elif msg.reply_to_message and msg.reply_to_message.audio:
+        content = msg.reply_to_message.audio.file_id
+        data_type = sql.Types.AUDIO
+
+    elif msg.reply_to_message and msg.reply_to_message.voice:
+        content = msg.reply_to_message.voice.file_id
+        data_type = sql.Types.VOICE
+
+    elif msg.reply_to_message and msg.reply_to_message.video:
+        content = msg.reply_to_message.video.file_id
+        data_type = sql.Types.VIDEO
+
+    else:
+        msg.reply_text("You didn't specify what to reply with!")
+        return
+
+    sql.set_custom_leave(chat_id, content, data_type)
+    update.effective_message.reply_text("Successfully set custom leave message!")
 
 
 @run_async
 @user_admin
 def reset_leave(bot, update):
     chat_id = update.effective_chat.id
-    sql.set_custom_leave(chat_id, "")
+    sql.set_custom_leave(chat_id, sql.DEFAULT_LEAVE, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset leave message to default!")
 
 
