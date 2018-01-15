@@ -158,7 +158,6 @@ def add_warn_filter(bot, update):
     raise DispatcherHandlerStop
 
 
-@run_async
 @user_admin
 def remove_warn_filter(bot, update, args):
     chat = update.effective_chat
@@ -176,7 +175,7 @@ def remove_warn_filter(bot, update, args):
         if filt.chat_id == str(chat.id) and filt.keyword == args[0]:
             sql.remove_warn_filter(chat.id, args[0])
             update.effective_message.reply_text("Yep, I'll stop warning people for that.")
-            return
+            raise DispatcherHandlerStop
 
     update.effective_message.reply_text("That's not a current warning filter - run /warnlist for all \
     active warning filters.")
