@@ -157,9 +157,7 @@ def reply_filter(bot, update):
             elif filt.has_markdown:
                 if filt.has_buttons:
                     buttons = sql.get_buttons(chat.id, filt.keyword)
-                    keyb = []
-                    for btn in buttons:
-                        keyb.append([InlineKeyboardButton(btn.name, url=btn.url)])
+                    keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
 
                     keyboard = InlineKeyboardMarkup(keyb)
                     try:

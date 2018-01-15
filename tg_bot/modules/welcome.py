@@ -1,5 +1,4 @@
-import telegram
-from telegram import ParseMode
+from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import escape_markdown
 
@@ -8,8 +7,7 @@ from tg_bot import dispatcher, OWNER_ID
 from tg_bot.modules.helper_funcs import user_admin, markdown_parser, escape_invalid_curly_brackets, \
     button_markdown_parser
 
-VALID_WELCOME_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'count', 'chatname']
-
+VALID_WELCOME_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'count', 'chatname', 'mention']
 
 ENUM_FUNC_MAP = {
     sql.Types.TEXT.value: dispatcher.bot.send_message,
@@ -27,7 +25,7 @@ ENUM_FUNC_MAP = {
 def new_member(bot, update):
     chat = update.effective_chat
 
-    should_welc, cust_welcome, _, welc_type, _ = sql.get_preference(chat.id)
+    should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     if should_welc:
         new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
@@ -37,7 +35,7 @@ def new_member(bot, update):
                 continue
             # Don't welcome yourself
             elif not new_mem.id == bot.id:
-                if welc_type != sql.Types.TEXT or welc_type != sql.Types.BUTTON_TEXT:
+                if welc_type != sql.Types.TEXT and welc_type != sql.Types.BUTTON_TEXT:
                     ENUM_FUNC_MAP[welc_type](chat.id, cust_welcome)
                     return
 
@@ -62,8 +60,12 @@ def new_member(bot, update):
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=first_name)
 
+                buttons = sql.get_welc_buttons(chat.id)
+                keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+                keyboard = InlineKeyboardMarkup(keyb)
+
                 try:
-                    update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+                    update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
                 except IndexError:
 
                     update.effective_message.reply_text(markdown_parser(
@@ -82,7 +84,7 @@ def new_member(bot, update):
 @run_async
 def left_member(bot, update):
     chat = update.effective_chat
-    should_welc, _, cust_leave, _, leave_type = sql.get_preference(chat.id)
+    should_welc, cust_leave, leave_type = sql.get_leave_pref(chat.id)
     if should_welc:
         left_mem = update.effective_message.left_chat_member
         if left_mem:
@@ -97,7 +99,7 @@ def left_member(bot, update):
                 update.effective_message.reply_text("RIP Master")
                 return
 
-            if leave_type != sql.Types.TEXT or leave_type != sql.Types.BUTTON_TEXT:
+            if leave_type != sql.Types.TEXT and leave_type != sql.Types.BUTTON_TEXT:
                 ENUM_FUNC_MAP[leave_type](chat.id, cust_leave)
                 return
 
@@ -122,8 +124,12 @@ def left_member(bot, update):
             else:
                 res = sql.DEFAULT_LEAVE
 
+            buttons = sql.get_leave_buttons(chat.id)
+            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+            keyboard = InlineKeyboardMarkup(keyb)
+
             try:
-                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
+                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
             except IndexError:
                 update.effective_message.reply_text(markdown_parser(
                     sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid due to markdown issues."
@@ -143,8 +149,9 @@ def welcome(bot, update, args):
     # if no args, show current replies.
     if len(args) == 0:
         pref, welcome_m, leave_m, welcome_type, leave_type = sql.get_preference(chat.id)
-        update.effective_message.reply_text("This chat has it's welcome setting set to: {}.".format(pref))
-        bot.send_message(chat.id, "*The welcome message is:*", parse_mode=ParseMode.MARKDOWN)
+        update.effective_message.reply_text(
+            "This chat has it's welcome setting set to: {}.\n*The welcome message is:*".format(pref),
+            parse_mode=ParseMode.MARKDOWN)
         ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
         bot.send_message(chat.id, "*The leave message is:*", parse_mode=ParseMode.MARKDOWN)
         ENUM_FUNC_MAP[leave_type](chat.id, leave_m)
@@ -171,6 +178,7 @@ def set_welcome(bot, update):
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
 
+    buttons = []
     # determine what the contents of the filter are - text, image, sticker, etc
     if len(args) >= 2:
         offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
@@ -208,7 +216,7 @@ def set_welcome(bot, update):
         msg.reply_text("You didn't specify what to reply with!")
         return
 
-    sql.set_custom_welcome(chat_id, content, data_type)
+    sql.set_custom_welcome(chat_id, content, data_type, buttons)
     update.effective_message.reply_text("Successfully set custom welcome message!")
 
 
@@ -228,6 +236,7 @@ def set_leave(bot, update):
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
 
+    buttons = []
     # determine what the contents of the filter are - text, image, sticker, etc
     if len(args) >= 2:
         offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
@@ -265,7 +274,7 @@ def set_leave(bot, update):
         msg.reply_text("You didn't specify what to reply with!")
         return
 
-    sql.set_custom_leave(chat_id, content, data_type)
+    sql.set_custom_leave(chat_id, content, data_type, buttons)
     update.effective_message.reply_text("Successfully set custom leave message!")
 
 
@@ -286,7 +295,7 @@ WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in mult
                 "last name.\n" \
                 " - `{username}`: this represents the user's *username*. Defaults to a *mention* of the user's " \
                 "first name if has no username.\n" \
-                " - `{mention}`: this simply *mentions* a user - tagging him with his first name." \
+                " - `{mention}`: this simply *mentions* a user - tagging him with his first name.\n" \
                 " - `{id}`: this represents the user's *id*\n" \
                 " - `{count}`: this represents the user's *member number*.\n" \
                 " - `{chatname}`: this represents the *current chat name*.\n" \

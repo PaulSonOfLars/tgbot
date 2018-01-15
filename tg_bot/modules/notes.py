@@ -38,9 +38,7 @@ def get(bot, update, notename, show_none=True):
                         raise
         elif note.has_buttons:
             buttons = sql.get_buttons(chat_id, notename)
-            keyb = []
-            for btn in buttons:
-                keyb.append([InlineKeyboardButton(btn.name, url=btn.url)])
+            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
 
             keyboard = InlineKeyboardMarkup(keyb)
             try:
