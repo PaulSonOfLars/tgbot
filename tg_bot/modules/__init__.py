@@ -1,8 +1,8 @@
-import json
+from tg_bot import LOAD, NO_LOAD
 
 
 def __list_all_modules():
-    from os.path import dirname, basename, isfile, join
+    from os.path import dirname, basename, isfile
     import glob
     # This generates a list of modules in this folder for the * in __main__ to work.
     mod_paths = glob.glob(dirname(__file__) + "/*.py")
@@ -11,15 +11,9 @@ def __list_all_modules():
                    and not f.endswith('__init__.py')
                    and not f.endswith('helper_funcs.py')]
 
-    filepath = join(dirname(__file__), "load.json")
-
-    if isfile(filepath):
-        with open(join(dirname(__file__), "load.json")) as to_load:
-            data = json.load(to_load)
-
-        if "load" in data and data.get("load"):
-            to_load = data.get("load")
-
+    if LOAD or NO_LOAD:
+        to_load = LOAD
+        if to_load:
             if not all(any(mod == module_name for module_name in all_modules) for mod in to_load):
                 print("Invalid loadorder names. Quitting.")
                 quit(1)
@@ -27,12 +21,12 @@ def __list_all_modules():
         else:
             to_load = all_modules
 
-        if "no_load" in data and data.get("no_load"):
-            not_to_load = data.get("no_load")
-            print("Not loading: {}".format(not_to_load))
-            return [item for item in to_load if item not in not_to_load]
+        if NO_LOAD:
+            print("Not loading: {}".format(NO_LOAD))
+            return [item for item in to_load if item not in NO_LOAD]
 
         return to_load
+
     return all_modules
 
 

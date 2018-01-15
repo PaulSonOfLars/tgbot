@@ -31,6 +31,8 @@ if WEBHOOK:
     URL = os.environ.get('URL', "")  # Does not contain token
     DB_URI = os.environ.get('DATABASE_URL')
     DONATION_LINK = os.environ.get('DONATION_LINK')
+    LOAD = os.environ.get("LOAD", "").split()
+    NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
 
 else:
     from tg_bot.config import Development as Config
@@ -39,6 +41,7 @@ else:
         OWNER_ID = int(Config.OWNER_ID)
     except ValueError:
         raise Exception("Your OWNER_ID variable is not a valid integer.")
+
     MESSAGE_DUMP = Config.MESSAGE_DUMP
     OWNER_USERNAME = Config.OWNER_USERNAME
 
@@ -50,6 +53,8 @@ else:
     SUDO_USERS.add(OWNER_ID)
     DB_URI = Config.SQLALCHEMY_DATABASE_URI
     DONATION_LINK = Config.DONATION_LINK
+    LOAD = Config.LOAD
+    NO_LOAD = Config.NO_LOAD
 
 updater = Updater(TOKEN, workers=8)
 

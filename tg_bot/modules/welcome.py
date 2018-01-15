@@ -299,8 +299,12 @@ WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in mult
                 " - `{id}`: this represents the user's *id*\n" \
                 " - `{count}`: this represents the user's *member number*.\n" \
                 " - `{chatname}`: this represents the *current chat name*.\n" \
-                "\nEach variable MUST be surrounded by {} to be replaced." \
-                "\nWelcome messages also support markdown, so you can make any elements bold/italic/code/links."
+                "\nEach variable MUST be surrounded by {} to be replaced.\n" \
+                "Welcome messages also support markdown, so you can make any elements bold/italic/code/links." \
+                "Buttons are also supported, so you can make your welcomes look damn good with some sexy intro " \
+                "buttons.\n" \
+                "If you're feeling fun, you can even set images/gifs/videos/voice messages as the welcome message by " \
+                "replying to the desired media, and calling /setwelcome."
 
 
 @run_async
@@ -315,11 +319,11 @@ def __migrate__(old_chat_id, new_chat_id):
 
 __help__ = """
  - /welcome <on/off>: enable/disable welcome and goodbye messages. If used with no arg, shows current settings.
- - /setwelcome <sometext>: set a custom welcome message.
- - /setleave <sometext>: set a custom leaving message.
+ - /setwelcome <sometext>: set a custom welcome message. If used replying to media, uses that media.
+ - /setleave <sometext>: set a custom leaving message. If used replying to media, uses that media.
  - /resetwelcome: reset to the default welcome message.
  - /resetleave: reset to the default leaving message.
- - /welcomehelp: view formatting information for custom welcome messages.
+ - /welcomehelp: view more formatting information for custom welcome messages.
 """
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
