@@ -30,6 +30,7 @@ if WEBHOOK:
     SUDO_USERS.add(OWNER_ID)
     URL = os.environ.get('URL', "")  # Does not contain token
     DB_URI = os.environ.get('DATABASE_URL')
+    DONATION_LINK = os.environ.get('DONATION_LINK')
 
 else:
     from tg_bot.config import Development as Config
@@ -48,6 +49,7 @@ else:
 
     SUDO_USERS.add(OWNER_ID)
     DB_URI = Config.SQLALCHEMY_DATABASE_URI
+    DONATION_LINK = Config.DONATION_LINK
 
 updater = Updater(TOKEN, workers=8)
 
