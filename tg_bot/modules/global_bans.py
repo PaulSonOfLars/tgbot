@@ -4,7 +4,7 @@ from telegram.ext import run_async, CommandHandler
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS
-from tg_bot.modules.helper_funcs import CustomFilters, extract_user
+from tg_bot.modules.helper_funcs import CustomFilters, extract_user, is_user_in_chat
 from tg_bot.modules.sql.users_sql import get_all_chats
 
 
@@ -91,7 +91,9 @@ def ungban(bot, update, args):
     for chat in chats:
         chat_id = chat.chat_id
         try:
-            bot.unban_chat_member(chat_id, user_id)
+            if not is_user_in_chat(chat, user_id):
+                bot.unban_chat_member(chat_id, user_id)
+
         except BadRequest as excp:
             if excp.message == "User is an administrator of the chat":
                 pass

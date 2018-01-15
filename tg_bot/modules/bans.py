@@ -81,7 +81,7 @@ def unban(bot, update, args):
         return
 
     if is_user_in_chat(chat, user_id):
-        update.effective_message.reply_text("Why are you trying to ban someone that's already in the chat?")
+        update.effective_message.reply_text("Why are you trying to unban someone that's already in the chat?")
         return
 
     res = update.effective_chat.unban_member(user_id)
