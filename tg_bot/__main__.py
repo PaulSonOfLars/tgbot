@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, Filters, MessageHandler
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID
+from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
@@ -28,6 +28,7 @@ HELP_STRINGS = """
 Commands available:
  - /start: start the bot
  - /help: PM's you this message.
+ - /donate: information about how to donate!
 """
 
 MIGRATEABLE = []
@@ -113,6 +114,35 @@ def get_help(bot, update):
             update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
 
 
+DONATE_STRING = """Heya, glad to hear you want to donate!
+It took lots of work for [my creator](tg://user?id=254318997) to get me to where I am now, and every donation helps \
+motivate him to make me even better. All the donation money will go to a better VPS to host me, and/or beer \
+(see his bio!). He's just a poor student, so every little helps!
+There are two ways of paying him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
+
+
+@run_async
+def donate(bot, update):
+    user = update.effective_message.from_user
+    chat = update.effective_chat
+
+    if chat.type == "private":
+            update.effective_message.reply_text(DONATE_STRING, parse_mode=ParseMode.MARKDOWN)
+
+            if OWNER_ID != 254318997 and DONATION_LINK:
+                update.effective_message.reply_text("You can also donate to the person currently running me "
+                                                    "[here]({})".format(DONATION_LINK),
+                                                    parse_mode=ParseMode.MARKDOWN)
+
+    else:
+        try:
+            bot.send_message(user.id, DONATE_STRING, parse_mode=ParseMode.MARKDOWN)
+
+            update.effective_message.reply_text("I've PM'ed you about donating to my creator!")
+        except Unauthorized:
+            update.effective_message.reply_text("Contact me in PM first to get donation information.")
+
+
 def migrate_chats(bot, update):
     msg = update.effective_message
     if msg.migrate_to_chat_id:
@@ -136,12 +166,14 @@ def main():
     test_handler = MessageHandler(Filters.all, test, edited_updates=True, message_updates=False)
     start_handler = CommandHandler("start", start)
     help_handler = CommandHandler("help", get_help)
+    donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
     dispatcher.add_handler(migrate_handler)
+    dispatcher.add_handler(donate_handler)
 
     # dispatcher.add_error_handler(error_callback)
 

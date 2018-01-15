@@ -4,11 +4,10 @@ from datetime import datetime
 
 import requests
 from telegram import ParseMode
-from telegram.error import Unauthorized
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, OWNER_ID, DONATION_LINK
+from tg_bot import dispatcher, OWNER_ID
 from tg_bot.__main__ import STATS
 
 RUN_STRINGS = (
@@ -247,35 +246,6 @@ Note: this message has had markdown disabled, to allow you to see what the chara
                                         "[URL](example.com) [button](buttonurl:github.com)")
 
 
-DONATE_STRING = """Heya, glad to hear you want to donate!
-It took lots of work for [my creator](tg://user?id=254318997) to get me to where I am now, and every donation helps \
-motivate him to make me even better. All the donation money will go to a better VPS to host me, and/or beer \
-(see his bio!). He's just a poor student, so every little helps!
-There are two ways of paying him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
-
-
-@run_async
-def donate(bot, update):
-    user = update.effective_message.from_user
-    chat = update.effective_chat
-
-    if chat.type == "private":
-            update.effective_message.reply_text(DONATE_STRING, parse_mode=ParseMode.MARKDOWN)
-
-            if OWNER_ID != 254318997 and DONATION_LINK:
-                update.effective_message.reply_text("You can also donate to the person currently running me "
-                                                    "[here]({})".format(DONATION_LINK),
-                                                    parse_mode=ParseMode.MARKDOWN)
-
-    else:
-        try:
-            bot.send_message(user.id, DONATE_STRING, parse_mode=ParseMode.MARKDOWN)
-
-            update.effective_message.reply_text("I've PM'ed you about donating to my creator!")
-        except Unauthorized:
-            update.effective_message.reply_text("Contact me in PM first to get donation information.")
-
-
 @run_async
 def stats(bot, update):
     update.effective_message.reply_text("Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS]))
@@ -302,7 +272,6 @@ ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
 
 STATS_HANDLER = CommandHandler("stats", stats, filters=Filters.user(OWNER_ID))
-DONATE_HANDLER = CommandHandler("donate", donate)
 
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(IP_HANDLER)
@@ -312,4 +281,3 @@ dispatcher.add_handler(SLAP_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
 dispatcher.add_handler(STATS_HANDLER)
-dispatcher.add_handler(DONATE_HANDLER)
