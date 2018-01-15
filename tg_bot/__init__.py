@@ -10,9 +10,9 @@ logging.basicConfig(
 
 LOGGER = logging.getLogger(__name__)
 
-WEBHOOK = bool(os.environ.get('WEBHOOK', False))
+ENV = bool(os.environ.get('ENV', False))
 
-if WEBHOOK:
+if ENV:
     TOKEN = os.environ.get('TOKEN', None)
     try:
         OWNER_ID = int(os.environ.get('OWNER_ID', None))
@@ -33,6 +33,7 @@ if WEBHOOK:
     DONATION_LINK = os.environ.get('DONATION_LINK')
     LOAD = os.environ.get("LOAD", "").split()
     NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
+    WEBHOOK = bool(os.environ.get('WEBHOOK', False))
 
 else:
     from tg_bot.config import Development as Config
@@ -55,6 +56,8 @@ else:
     DONATION_LINK = Config.DONATION_LINK
     LOAD = Config.LOAD
     NO_LOAD = Config.NO_LOAD
+    WEBHOOK = Config.WEBHOOK
+    URL = Config.URL
 
 updater = Updater(TOKEN, workers=8)
 
