@@ -82,7 +82,7 @@ or nothing. Delimiters include '/', '_', '|' and ':'. Text grouping is supported
 larger than {}
 """.format(telegram.MAX_MESSAGE_LENGTH)
 
-__name__ = "sed/regex"
+__name__ = "Sed/Regex"
 
 
 SED_HANDLER = RegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed)

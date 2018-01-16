@@ -1,9 +1,11 @@
 import importlib
 import os
 
-from telegram import ParseMode
+import re
+
+from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
-from telegram.ext import CommandHandler, Filters, MessageHandler
+from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryHandler
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
 from telegram.utils.helpers import escape_markdown
 
@@ -11,7 +13,7 @@ from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
-from tg_bot.modules.helper_funcs import split_message
+from tg_bot.modules.helper_funcs import split_message, paginate_modules
 
 PM_START_TEXT = """
 Hi {}, my name is {}! I'm a group manager bot maintained by [this wonderful person](tg://user?id={}).
@@ -27,25 +29,43 @@ If you're enjoying using me, and/or would like to help me survive in the wild, h
 """
 
 HELP_STRINGS = """
-Commands available:
+Hey there! My name is *{}*.
+I'm a modular group management bot with a few fun extras! Have a look at the following for an idea of some of \
+the things I can help you with.
+
+*Main* commands available:
  - /start: start the bot
  - /help: PM's you this message.
  - /donate: information about how to donate!
-"""
 
+And the following:
+""".format(dispatcher.bot.first_name)
+
+DONATE_STRING = """Heya, glad to hear you want to donate!
+It took lots of work for [my creator](tg://user?id=254318997) to get me to where I am now, and every donation helps \
+motivate him to make me even better. All the donation money will go to a better VPS to host me, and/or beer \
+(see his bio!). He's just a poor student, so every little helps!
+There are two ways of paying him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
+
+IMPORTED = []
 MIGRATEABLE = []
+HELPABLE = {}
 STATS = []
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
-    if hasattr(imported_module, "__help__"):
-        HELP_STRINGS += imported_module.__help__
-    else:
-        HELP_STRINGS += "\n {} module has no help docs, but is loaded. \n".format(module_name)
+    IMPORTED.append(imported_module)
+
+    if hasattr(imported_module, "__help__") and imported_module.__help__:
+        if imported_module.__name__.lower() in HELPABLE:
+            raise Exception("Can't have two modules with the same name!")
+
+        HELPABLE[imported_module.__name__.lower()] = imported_module
 
     # Chats to migrate on chat_migrated events
     if hasattr(imported_module, "__migrate__"):
         MIGRATEABLE.append(imported_module)
+
     if hasattr(imported_module, "__stats__"):
         STATS.append(imported_module)
 
@@ -98,31 +118,71 @@ def error_callback(bot, update, error):
 
 
 @run_async
-def get_help(bot, update, args):
+def help_button(bot, update):
+    query = update.callback_query
+    mod_match = re.match(r"help_module\((.+?)\)", query.data)
+    prev_match = re.match(r"help_prev\((.+?)\)", query.data)
+    next_match = re.match(r"help_next\((.+?)\)", query.data)
+    back_match = re.match(r"help_back", query.data)
+    try:
+        if mod_match:
+            module = mod_match.group(1)
+            text = "Here is the help for the *{}* module:\n".format(HELPABLE[module].__name__) \
+                   + escape_markdown(HELPABLE[module].__help__)
+            query.message.edit_text(text=text,
+                                    parse_mode=ParseMode.MARKDOWN,
+                                    reply_markup=InlineKeyboardMarkup(
+                                        [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
+
+        elif prev_match:
+            curr_page = int(prev_match.group(1))
+            query.message.edit_reply_markup(
+                reply_markup=InlineKeyboardMarkup(paginate_modules(curr_page - 1, HELPABLE)))
+
+        elif next_match:
+            next_page = int(next_match.group(1))
+            query.message.edit_reply_markup(
+                reply_markup=InlineKeyboardMarkup(paginate_modules(next_page + 1, HELPABLE)))
+
+        elif back_match:
+            query.message.edit_text(text=HELP_STRINGS,
+                                    parse_mode=ParseMode.MARKDOWN,
+                                    reply_markup=InlineKeyboardMarkup(paginate_modules(0, HELPABLE)))
+
+        # ensure no spinny white circle
+        bot.answer_callback_query(query.id)
+    except BadRequest as e:
+        if e.message == "Message is not modified":
+            pass
+        else:
+            raise
+
+
+@run_async
+def get_help(bot, update):
     user = update.effective_message.from_user
     chat = update.effective_chat
+    args = update.effective_message.text.split(None, 1)
 
     # ONLY send help in PM
     if chat.type != chat.PRIVATE:
-        try:
-            for msg in split_message(HELP_STRINGS):
-                bot.send_message(user.id, msg)
-
-            update.effective_message.reply_text("I've PM'ed you about me.")
-        except Unauthorized:
-            update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
+        update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
         return
 
+    elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
+        module = args[1].lower()
+        text = "Here is the available help for the *{}* module:\n".format(HELPABLE[module].__name__) \
+               + escape_markdown(HELPABLE[module].__help__)
+        update.effective_message.reply_text(text=text,
+                                            parse_mode=ParseMode.MARKDOWN,
+                                            reply_markup=InlineKeyboardMarkup(
+                                                [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
+
     else:
-        for msg in split_message(HELP_STRINGS):
-            update.effective_message.reply_text(msg)
-
-
-DONATE_STRING = """Heya, glad to hear you want to donate!
-It took lots of work for [my creator](tg://user?id=254318997) to get me to where I am now, and every donation helps \
-motivate him to make me even better. All the donation money will go to a better VPS to host me, and/or beer \
-(see his bio!). He's just a poor student, so every little helps!
-There are two ways of paying him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
+        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE))
+        update.effective_message.reply_text(text=HELP_STRINGS,
+                                            parse_mode=ParseMode.MARKDOWN,
+                                            reply_markup=keyboard)
 
 
 @run_async
@@ -131,12 +191,12 @@ def donate(bot, update):
     chat = update.effective_chat
 
     if chat.type == "private":
-            update.effective_message.reply_text(DONATE_STRING, parse_mode=ParseMode.MARKDOWN)
+        update.effective_message.reply_text(DONATE_STRING, parse_mode=ParseMode.MARKDOWN)
 
-            if OWNER_ID != 254318997 and DONATION_LINK:
-                update.effective_message.reply_text("You can also donate to the person currently running me "
-                                                    "[here]({})".format(DONATION_LINK),
-                                                    parse_mode=ParseMode.MARKDOWN)
+        if OWNER_ID != 254318997 and DONATION_LINK:
+            update.effective_message.reply_text("You can also donate to the person currently running me "
+                                                "[here]({})".format(DONATION_LINK),
+                                                parse_mode=ParseMode.MARKDOWN)
 
     else:
         try:
@@ -169,13 +229,15 @@ def migrate_chats(bot, update):
 def main():
     test_handler = MessageHandler(Filters.all, test, edited_updates=True, message_updates=False)
     start_handler = CommandHandler("start", start)
-    help_handler = CommandHandler("help", get_help, pass_args=True)
+    help_handler = CommandHandler("help", get_help)
+    help_callback_handler = CallbackQueryHandler(help_button, pattern=r"help_")
     donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
+    dispatcher.add_handler(help_callback_handler)
     dispatcher.add_handler(migrate_handler)
     dispatcher.add_handler(donate_handler)
 

@@ -237,7 +237,7 @@ __name__ = "Warnings"
 
 WARN_HANDLER = CommandHandler("warn", warn_user)
 RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns)
-CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button)
+CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
 MYWARNS_HANDLER = CommandHandler("warns", warns)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
 RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True)

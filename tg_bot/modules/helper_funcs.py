@@ -1,7 +1,8 @@
 import re
 from functools import wraps
+from math import ceil
 
-from telegram import MAX_MESSAGE_LENGTH, MessageEntity
+from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
@@ -216,7 +217,7 @@ def markdown_parser(txt, entities=None, offset=0):
             # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
             else:
                 # NOTE: -1 is necessary, or a duplicate letter is shown!
-                res += _selective_escape(txt[prev:start-1] or "") + escape_markdown(ent_text)
+                res += _selective_escape(txt[prev:start - 1] or "") + escape_markdown(ent_text)
         # code handling
         elif ent.type == "code":
             res += _selective_escape(txt[prev:start]) + '`' + ent_text + '`'
@@ -344,6 +345,28 @@ def remove_escapes(text):
     return res
 
 
+def paginate_modules(page_n, MODULE_DICT):
+    modules = sorted(
+        [EqInlineKeyboardButton(x.__name__, callback_data="help_module({})".format(x.__name__.lower())) for x in
+         MODULE_DICT.values()])
+
+    pairs = list(zip(modules[::2], modules[1::2]))
+
+    if len(modules) % 2 == 1:
+        pairs.append((modules[-1],))
+
+    max_num_pages = ceil(len(pairs) / 7)
+    modulo_page = page_n % max_num_pages
+
+    # can only have a certain amount of buttons side by side
+    if len(pairs) > 7:
+        pairs = pairs[modulo_page * 7:7 * (modulo_page + 1)] + [
+            (EqInlineKeyboardButton("<", callback_data="help_prev({})".format(modulo_page)),
+             EqInlineKeyboardButton(">", callback_data="help_next({})".format(modulo_page)))]
+
+    return pairs
+
+
 class CustomFilters(object):
     class _Sudoers(BaseFilter):
         def filter(self, message):
@@ -360,3 +383,14 @@ class CustomFilters(object):
             return bool(message.document and message.document.mime_type == self.mime_type)
 
     mime_type = _MimeType
+
+
+class EqInlineKeyboardButton(InlineKeyboardButton):
+    def __eq__(self, other):
+        return self.text == other.text
+
+    def __lt__(self, other):
+        return self.text < other.text
+
+    def __gt__(self, other):
+        return self.text > other.text
