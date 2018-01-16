@@ -14,6 +14,12 @@ def get(bot, update, notename, show_none=True):
     chat_id = update.effective_chat.id
     note = sql.get_note(chat_id, notename)
     if note:
+        # If not is replying to a message, reply to that message (unless its an error)
+        if update.effective_message.reply_to_message:
+            reply_text = update.effective_message.reply_to_message.reply_text
+        else:
+            reply_text = update.effective_message.reply_text
+
         if note.is_reply:
             if MESSAGE_DUMP:
                 try:
@@ -42,16 +48,16 @@ def get(bot, update, notename, show_none=True):
 
             keyboard = InlineKeyboardMarkup(keyb)
             try:
-                update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
-                                                    disable_web_page_preview=True,
-                                                    reply_markup=keyboard)
+                reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
+                           disable_web_page_preview=True,
+                           reply_markup=keyboard)
             except BadRequest:
                 update.effective_message.reply_text("This note is not formatted correctly. Could not send. Contact @{}"
                                                     " if you can't figure out why!".format(OWNER_USERNAME))
         else:
             try:
-                update.effective_message.reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
-                                                    disable_web_page_preview=True)
+                reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
+                           disable_web_page_preview=True)
             except BadRequest:
                 update.effective_message.reply_text("This note is not formatted correctly. Could not send. Contact @{}"
                                                     " if you can't figure out why!".format(OWNER_USERNAME))

