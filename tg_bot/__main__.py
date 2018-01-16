@@ -166,7 +166,7 @@ def get_help(bot, update):
 
     # ONLY send help in PM
     if chat.type != chat.PRIVATE:
-        update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
+        update.effective_message.reply_text("Contact me in PM to get the list of possible commands.")
         return
 
     elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
