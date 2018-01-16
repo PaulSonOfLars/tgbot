@@ -154,6 +154,9 @@ __help__ = """
  - /adminlist: list of admins in the chat
 """
 
+__name__ = "Admin"
+
+
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
 UNPIN_HANDLER = CommandHandler("unpin", unpin)
 

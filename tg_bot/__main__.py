@@ -22,6 +22,8 @@ Feel free to submit pull requests on github, or to contact my creator, @SonOfLar
 feature requests you might have :)
 
 You can find the list of available commands with /help.
+
+If you're enjoying using me, and/or would like to help me survive in the wild, hit /donate to help fund/upgrade my VPS!
 """
 
 HELP_STRINGS = """
@@ -96,15 +98,12 @@ def error_callback(bot, update, error):
 
 
 @run_async
-def get_help(bot, update):
+def get_help(bot, update, args):
     user = update.effective_message.from_user
     chat = update.effective_chat
 
-    if chat.type == "private":
-        for msg in split_message(HELP_STRINGS):
-            update.effective_message.reply_text(msg)
-
-    else:
+    # ONLY send help in PM
+    if chat.type != chat.PRIVATE:
         try:
             for msg in split_message(HELP_STRINGS):
                 bot.send_message(user.id, msg)
@@ -112,6 +111,11 @@ def get_help(bot, update):
             update.effective_message.reply_text("I've PM'ed you about me.")
         except Unauthorized:
             update.effective_message.reply_text("Contact me in PM first to get the list of possible commands.")
+        return
+
+    else:
+        for msg in split_message(HELP_STRINGS):
+            update.effective_message.reply_text(msg)
 
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
@@ -165,7 +169,7 @@ def migrate_chats(bot, update):
 def main():
     test_handler = MessageHandler(Filters.all, test, edited_updates=True, message_updates=False)
     start_handler = CommandHandler("start", start)
-    help_handler = CommandHandler("help", get_help)
+    help_handler = CommandHandler("help", get_help, pass_args=True)
     donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 

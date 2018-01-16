@@ -205,6 +205,9 @@ __help__ = """
  - /filters: list all active filters in this chat.
 """
 
+__name__ = "Filters"
+
+
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter)
 LIST_HANDLER = CommandHandler("filters", list_handlers)

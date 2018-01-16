@@ -36,6 +36,9 @@ __help__ = """
  - /purge: deletes all messages between this and the replied to message
 """
 
+__name__ = "Purges"
+
+
 DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.reply)
 PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.reply)
 

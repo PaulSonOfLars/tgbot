@@ -56,6 +56,9 @@ def __migrate__(old_chat_id, new_chat_id):
 
 __help__ = ""  # no help string
 
+__name__ = "Users"
+
+
 BROADCAST_HANDLER = (CommandHandler("broadcast", broadcast, filters=Filters.user(OWNER_ID)))
 USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
 

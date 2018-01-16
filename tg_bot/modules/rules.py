@@ -51,6 +51,9 @@ __help__ = """
  - /clearrules: clear the rules for this chat.
 """
 
+__name__ = "Rules"
+
+
 GET_RULES_HANDLER = CommandHandler("rules", get_rules, filters=Filters.group)
 SET_RULES_HANDLER = CommandHandler("setrules", set_rules, filters=Filters.group)
 RESET_RULES_HANDLER = CommandHandler("clearrules", clear_rules, filters=Filters.group)

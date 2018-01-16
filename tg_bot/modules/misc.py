@@ -260,6 +260,9 @@ __help__ = """
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats
 """
 
+__name__ = "Misc"
+
+
 ID_HANDLER = CommandHandler("id", get_id)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 

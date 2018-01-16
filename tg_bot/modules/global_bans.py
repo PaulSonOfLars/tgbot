@@ -116,6 +116,9 @@ def ungban(bot, update, args):
 
 __help__ = ""  # Sudo only module, no help.
 
+__name__ = "GBans"
+
+
 GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True, filters=CustomFilters.sudo_filter)
 UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True, filters=CustomFilters.sudo_filter)
 

@@ -9,7 +9,7 @@ DELIMITERS = ("/", ":", "|", "_")
 
 
 def separate_sed(sed_string):
-    if len(sed_string) > 4 and sed_string[1] in DELIMITERS and sed_string.count(sed_string[1]) >= 2:
+    if len(sed_string) >= 3 and sed_string[1] in DELIMITERS and sed_string.count(sed_string[1]) >= 2:
         delim = sed_string[1]
         start = counter = 2
         while counter < len(sed_string):
@@ -81,6 +81,9 @@ occurrences of 'text1' with 'text2'. Flags are optional, and currently include '
 or nothing. Delimiters include '/', '_', '|' and ':'. Text grouping is supported. The resulting message cannot be \
 larger than {}
 """.format(telegram.MAX_MESSAGE_LENGTH)
+
+__name__ = "sed/regex"
+
 
 SED_HANDLER = RegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed)
 

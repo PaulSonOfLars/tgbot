@@ -232,6 +232,9 @@ __help__ = """
  - /warnlist: list of all current warning filters
 """
 
+__name__ = "Warnings"
+
+
 WARN_HANDLER = CommandHandler("warn", warn_user)
 RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button)

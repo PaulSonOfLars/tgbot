@@ -70,6 +70,9 @@ __help__ = """
  - brb <reason>: same as the afk command - but not a command.
 """
 
+__name__ = "AFK"
+
+
 AFK_HANDLER = CommandHandler("afk", afk)
 AFK_REGEX_HANDLER = RegexHandler("(?i)brb", afk)
 NO_AFK_HANDLER = MessageHandler(Filters.all, no_longer_afk)

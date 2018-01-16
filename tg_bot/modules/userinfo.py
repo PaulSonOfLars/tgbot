@@ -85,6 +85,9 @@ __help__ = """
  - /me: will get your or another user's info
 """
 
+__name__ = "Bios and Abouts"
+
+
 SET_BIO_HANDLER = CommandHandler("setbio", set_about_bio)
 GET_BIO_HANDLER = CommandHandler("bio", about_bio)
 

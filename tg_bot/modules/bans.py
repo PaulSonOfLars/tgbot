@@ -98,6 +98,9 @@ __help__ = """
  - /kickme: kicks the user who issued the command
  """
 
+__name__ = "Bans"
+
+
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=~Filters.private)
 KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=~Filters.private)
 UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=~Filters.private)
