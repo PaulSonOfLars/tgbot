@@ -27,10 +27,10 @@ class Welcome(BASE):
     should_welcome = Column(Boolean, default=True)
 
     custom_welcome = Column(UnicodeText, default=DEFAULT_WELCOME)
-    welcome_type = Column(Integer, default=Types.TEXT)
+    welcome_type = Column(Integer, default=Types.TEXT.value)
 
     custom_leave = Column(UnicodeText, default=DEFAULT_LEAVE)
-    leave_type = Column(Integer, default=Types.TEXT)
+    leave_type = Column(Integer, default=Types.TEXT.value)
 
     def __init__(self, chat_id, should_welcome=True):
         self.chat_id = chat_id
@@ -132,7 +132,7 @@ def set_custom_welcome(chat_id, custom_welcome, welcome_type, buttons=None):
 
         else:
             welcome_settings.custom_welcome = DEFAULT_LEAVE
-            welcome_settings.welcome_type = Types.TEXT
+            welcome_settings.welcome_type = Types.TEXT.value
 
         SESSION.add(welcome_settings)
 
@@ -173,7 +173,7 @@ def set_custom_leave(chat_id, custom_leave, leave_type, buttons=None):
 
         else:
             welcome_settings.custom_leave = DEFAULT_LEAVE
-            welcome_settings.leave_type = Types.TEXT
+            welcome_settings.leave_type = Types.TEXT.value
 
         SESSION.add(welcome_settings)
 
