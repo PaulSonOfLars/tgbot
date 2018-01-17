@@ -79,25 +79,14 @@ def set_about_bio(bot, update):
 
 
 def __user_info__(user_id):
-    bio = sql.get_user_bio(user_id)
-    me = sql.get_user_me_info(user_id)
+    bio = escape_markdown(sql.get_user_bio(user_id))
+    me = escape_markdown(sql.get_user_me_info(user_id))
     if bio and me:
-        return """
-        About user:
-        {me}
-        What others say:
-        {bio}
-        """.format(me=me, bio=bio)
+        return "*About user:*\n{me}\n*What others say:*\n{bio}".format(me=me, bio=bio)
     elif bio:
-        return """
-        What others say:
-        {bio}
-        """.format(me=me, bio=bio)
+        return "*What others say:*\n{bio}\n".format(me=me, bio=bio)
     elif me:
-        return """
-        About user:
-        {me}
-        """.format(me=me, bio=bio)
+        return "*About user:*\n{me}""".format(me=me, bio=bio)
     else:
         return ""
 

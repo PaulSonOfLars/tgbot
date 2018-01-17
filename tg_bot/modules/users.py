@@ -56,9 +56,7 @@ def log_user(bot, update):
 
 def __user_info__(user_id):
     num_chats = sql.get_user_num_chats(user_id)
-    return """
-    We have {} chats in common.
-    """.format(num_chats)
+    return """I've seen in you in {} chats in total.""".format(num_chats)
 
 
 def __stats__():

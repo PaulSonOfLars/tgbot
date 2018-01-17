@@ -189,7 +189,7 @@ def info(bot, update):
 
     text = "{} has an id of {}.\n".format(user.first_name, user.id)
     for mod in USER_INFO:
-        text += mod.__user_info__(user.id)
+        text += "\n\n" + mod.__user_info__(user.id).strip()
 
     update.effective_message.reply_text(text)
 
@@ -278,6 +278,7 @@ __help__ = """
  - /slap: slap a user, or get slapped if not a reply
  - /time <place>: gives the local time at the given place
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats
+ - /info: get information about a user
 """
 
 __name__ = "Misc"

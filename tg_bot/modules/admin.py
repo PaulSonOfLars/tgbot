@@ -101,7 +101,13 @@ def pin(bot, update, args):
         is_silent = not (args[0].lower() == 'notify' or args[0].lower() == 'loud' or args[0].lower() == 'violent')
 
     if prev_message and is_group:
-        bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
+        try:
+            bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
+        except BadRequest as e:
+            if e.message == "Chat_not_modified":
+                pass
+            else:
+                raise
 
 
 @run_async
