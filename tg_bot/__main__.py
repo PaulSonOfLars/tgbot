@@ -36,6 +36,7 @@ the things I can help you with.
 *Main* commands available:
  - /start: start the bot
  - /help: PM's you this message.
+ - /help <module name>: PM's you info about that module.
  - /donate: information about how to donate!
 
 And the following:
