@@ -115,6 +115,9 @@ def runs(bot, update):
 def slap(bot, update):
     msg = update.effective_message
 
+    # reply to original message
+    reply_text = msg.reply_text
+
     # get user who sent message
     if msg.from_user.username:
         curr_user = "@" + escape_markdown(msg.from_user.username)
@@ -123,6 +126,8 @@ def slap(bot, update):
 
     # sender targets the person he replied to
     if msg.reply_to_message:
+        # if a reply, reply to original message
+        reply_text = msg.reply_to_message.reply_text
         user1 = curr_user
         if msg.reply_to_message.from_user.username:
             user2 = "@" + escape_markdown(msg.reply_to_message.from_user.username)
@@ -142,7 +147,7 @@ def slap(bot, update):
 
     repl = temp.format(user1=user1, user2=user2, item=item, hits=hit, throws=throw)
 
-    msg.reply_text(repl, parse_mode=ParseMode.MARKDOWN)
+    reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
