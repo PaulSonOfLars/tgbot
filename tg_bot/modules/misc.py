@@ -187,11 +187,11 @@ def info(bot, update):
     else:
         user = msg.from_user
 
-    text = "{} has an id of {}.\n".format(user.first_name, user.id)
+    text = "{} has an id of {}.".format(user.first_name, user.id)
     for mod in USER_INFO:
         text += "\n\n" + mod.__user_info__(user.id).strip()
 
-    update.effective_message.reply_text(text)
+    update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
