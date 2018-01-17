@@ -8,7 +8,7 @@ from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID
-from tg_bot.__main__ import STATS
+from tg_bot.__main__ import STATS, USER_INFO
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -180,6 +180,21 @@ def get_id(bot, update):
 
 
 @run_async
+def info(bot, update):
+    msg = update.effective_message
+    if msg.reply_to_message:
+        user = msg.reply_to_message.from_user
+    else:
+        user = msg.from_user
+
+    text = "{} has an id of {}.\n".format(user.first_name, user.id)
+    for mod in USER_INFO:
+        text += mod.__user_info__(user.id)
+
+    update.effective_message.reply_text(text)
+
+
+@run_async
 def get_time(bot, update, args):
     location = " ".join(args)
     if location.lower() == bot.first_name.lower():
@@ -275,6 +290,7 @@ TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
 RUNS_HANDLER = CommandHandler("runs", runs)
 SLAP_HANDLER = CommandHandler("slap", slap)
+INFO_HANDLER = CommandHandler("info", info)
 
 ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
@@ -286,6 +302,7 @@ dispatcher.add_handler(IP_HANDLER)
 dispatcher.add_handler(TIME_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
+dispatcher.add_handler(INFO_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
 dispatcher.add_handler(STATS_HANDLER)
