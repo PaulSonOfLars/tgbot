@@ -13,7 +13,7 @@ from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
-from tg_bot.modules.helper_funcs import split_message, paginate_modules
+from tg_bot.modules.helper_funcs import paginate_modules
 
 PM_START_TEXT = """
 Hi {}, my name is {}! I'm a group manager bot maintained by [this wonderful person](tg://user?id={}).
@@ -52,6 +52,7 @@ IMPORTED = []
 MIGRATEABLE = []
 HELPABLE = {}
 STATS = []
+USER_INFO = []
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
@@ -69,6 +70,9 @@ for module_name in ALL_MODULES:
 
     if hasattr(imported_module, "__stats__"):
         STATS.append(imported_module)
+
+    if hasattr(imported_module, "__user_info__"):
+        USER_INFO.append(imported_module)
 
 
 @run_async

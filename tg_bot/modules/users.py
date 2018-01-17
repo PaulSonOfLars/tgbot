@@ -12,6 +12,10 @@ USERS_GROUP = 2
 
 
 def get_user_id(username):
+    # ensure valid userid
+    if len(username) <= 5:
+        return None
+
     if username.startswith('@'):
         user = sql.get_userid_by_name(username[1:])
     else:
@@ -28,22 +32,31 @@ def broadcast(bot, update):
     to_send = update.effective_message.text.split(None, 1)
     if len(to_send) >= 2:
         chats = sql.get_all_chats() or []
+        failed = 0
         for chat in chats:
             try:
                 bot.sendMessage(int(chat.chat_id), to_send[1])
                 sleep(0.1)
             except TelegramError:
+                failed += 1
                 print("Couldn't send broadcast to {}, group name {}".format(chat.chat_id, chat.chat_name),
                       file=sys.stderr)
+
+        update.effective_message.reply_text("Broadcast complete. {} groups failed to receive the message, probably "
+                                            "due to being kicked.".format(failed))
 
 
 @run_async
 def log_user(bot, update):
-    if update.effective_message.from_user.username:
-        sql.update_user(update.effective_message.from_user.id,
-                        update.effective_message.from_user.username,
-                        update.effective_chat.id,
-                        update.effective_chat.title)
+    sql.update_user(update.effective_message.from_user.id,
+                    update.effective_message.from_user.username,
+                    update.effective_chat.id,
+                    update.effective_chat.title)
+
+
+def __user_info__(user_id):
+    num_chats = sql.get_user_num_chats(user_id)
+    return """I've seen in you in {} chats in total.""".format(num_chats)
 
 
 def __stats__():

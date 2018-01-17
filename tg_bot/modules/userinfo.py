@@ -23,7 +23,7 @@ def about_me(bot, update):
                                             parse_mode=ParseMode.MARKDOWN)
     elif is_reply:
         username = message.reply_to_message.from_user.first_name
-        update.effective_message.reply_text(username + " hasn't set an info message about himself yet!")
+        update.effective_message.reply_text(username + " hasn't set an info message about themselves  yet!")
     else:
         update.effective_message.reply_text("You haven't set an info message about yourself yet!")
 
@@ -55,7 +55,7 @@ def about_bio(bot, update):
                                             parse_mode=ParseMode.MARKDOWN)
     elif is_reply:
         username = message.reply_to_message.from_user.first_name
-        update.effective_message.reply_text("{} hasn't had a message set about himself yet!".format(username))
+        update.effective_message.reply_text("{} hasn't had a message set about themselves yet!".format(username))
     else:
         update.effective_message.reply_text("You haven't had a bio set about yourself yet!")
 
@@ -78,9 +78,22 @@ def set_about_bio(bot, update):
         message.reply_text("Reply to someone's message to set their bio!")
 
 
+def __user_info__(user_id):
+    bio = escape_markdown(sql.get_user_bio(user_id))
+    me = escape_markdown(sql.get_user_me_info(user_id))
+    if bio and me:
+        return "*About user:*\n{me}\n*What others say:*\n{bio}".format(me=me, bio=bio)
+    elif bio:
+        return "*What others say:*\n{bio}\n".format(me=me, bio=bio)
+    elif me:
+        return "*About user:*\n{me}""".format(me=me, bio=bio)
+    else:
+        return ""
+
+
 __help__ = """
- - /setbio <text>: while replying will save another user's bio
- - /bio: will get your or another user's bio
+ - /setbio <text>: while replying, will save another user's bio
+ - /bio: will get your or another user's bio. This cannot be set by yourself.
  - /setme <text>: will set your info
  - /me: will get your or another user's info
 """

@@ -8,7 +8,7 @@ from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID
-from tg_bot.__main__ import STATS
+from tg_bot.__main__ import STATS, USER_INFO
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -115,6 +115,9 @@ def runs(bot, update):
 def slap(bot, update):
     msg = update.effective_message
 
+    # reply to original message
+    reply_text = msg.reply_text
+
     # get user who sent message
     if msg.from_user.username:
         curr_user = "@" + escape_markdown(msg.from_user.username)
@@ -123,6 +126,8 @@ def slap(bot, update):
 
     # sender targets the person he replied to
     if msg.reply_to_message:
+        # if a reply, reply to original message
+        reply_text = msg.reply_to_message.reply_text
         user1 = curr_user
         if msg.reply_to_message.from_user.username:
             user2 = "@" + escape_markdown(msg.reply_to_message.from_user.username)
@@ -142,7 +147,7 @@ def slap(bot, update):
 
     repl = temp.format(user1=user1, user2=user2, item=item, hits=hit, throws=throw)
 
-    msg.reply_text(repl, parse_mode=ParseMode.MARKDOWN)
+    reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -172,6 +177,21 @@ def get_id(bot, update):
     else:
         chat = update.effective_chat
         update.effective_message.reply_text("This group's id is " + str(chat.id))
+
+
+@run_async
+def info(bot, update):
+    msg = update.effective_message
+    if msg.reply_to_message:
+        user = msg.reply_to_message.from_user
+    else:
+        user = msg.from_user
+
+    text = "{} has an id of {}.".format(user.first_name, user.id)
+    for mod in USER_INFO:
+        text += "\n\n" + mod.__user_info__(user.id).strip()
+
+    update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -258,6 +278,7 @@ __help__ = """
  - /slap: slap a user, or get slapped if not a reply
  - /time <place>: gives the local time at the given place
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats
+ - /info: get information about a user
 """
 
 __name__ = "Misc"
@@ -270,6 +291,7 @@ TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
 RUNS_HANDLER = CommandHandler("runs", runs)
 SLAP_HANDLER = CommandHandler("slap", slap)
+INFO_HANDLER = CommandHandler("info", info)
 
 ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
@@ -281,6 +303,7 @@ dispatcher.add_handler(IP_HANDLER)
 dispatcher.add_handler(TIME_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
+dispatcher.add_handler(INFO_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
 dispatcher.add_handler(STATS_HANDLER)
