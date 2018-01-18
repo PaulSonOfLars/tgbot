@@ -186,6 +186,7 @@ def _selective_escape(to_parse):
     return to_parse
 
 
+# TODO: rework the logic of this. entity parsing is VERY iffy.
 def markdown_parser(txt, entities=None, offset=0):
     """
     Parse a string, escaping all invalid markdown entities.
@@ -201,29 +202,45 @@ def markdown_parser(txt, entities=None, offset=0):
     if not entities:
         entities = {}
 
-    # regex to find []() links
+    # regex to find []() links -> hyperlinks/buttons
     pattern = re.compile(r'(?<!\\)\[.*?\]\((.*?)\)')
     prev = 0
     res = ""
-    # for each message entity, check start pos
+    # Loop over all message entities, and:
+    # reinsert code
+    # escape free-standing urls
     for ent, ent_text in entities.items():
-        start = ent.offset + offset
-        end = ent.length + start
-        # URL handling
+        start = ent.offset + offset  # start of entity
+        end = ent.length + start - 1  # end of entity
+
+        # URL handling -> do not escape if in [](), escape otherwise.
         if ent.type == "url":
-            # if a markdown link starts at the same point as an entity URL link, don't escape it
+            # don't escape links if theyre IN a []()
             if any(match.start(1) <= start and end <= match.end(1) for match in pattern.finditer(txt)):
                 continue
             # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
             else:
-                # NOTE: -1 is necessary, or a duplicate letter is shown!
-                res += _selective_escape(txt[prev:start - 1] or "") + escape_markdown(ent_text)
+                # NOTE: adjusting the start is necessary to avoid duplicate letters
+                # NOTE: This shifting by one stuff is VERY weird
+                if start - 1 > 0 and not txt[start - 1].isspace():
+                    adj = True
+                    adjusted_start = start - 1
+                else:
+                    adj = False
+                    adjusted_start = start
+                res += _selective_escape(txt[prev:adjusted_start] or "") + escape_markdown(ent_text)
+
+                if not adj:
+                    end += 1
+
         # code handling
         elif ent.type == "code":
             res += _selective_escape(txt[prev:start]) + '`' + ent_text + '`'
+
         # anything else
         else:
             continue
+
         prev = end
 
     res += _selective_escape(txt[prev:])  # add the rest of the text
