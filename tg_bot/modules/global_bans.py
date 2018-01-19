@@ -91,7 +91,8 @@ def ungban(bot, update, args):
     for chat in chats:
         chat_id = chat.chat_id
         try:
-            if not is_user_in_chat(chat, user_id):
+            member = bot.get_chat_member(chat_id, user_id)
+            if member.status == 'kicked':
                 bot.unban_chat_member(chat_id, user_id)
 
         except BadRequest as excp:
