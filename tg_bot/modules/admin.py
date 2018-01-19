@@ -15,10 +15,16 @@ from tg_bot.modules.helper_funcs import user_admin, bot_admin, can_pin, can_prom
 def promote(bot, update, args):
     chat_id = update.effective_chat.id
     message = update.effective_message
+    chat = update.effective_chat
 
     user_id = extract_user(message, args)
     if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
+        return
+
+    user_member = chat.get_member(user_id)
+    if user_member.status == 'administrator' or user_member.status == 'creator':
+        message.reply_text("How am I meant to promote someone that's already an admin?")
         return
 
     if user_id == bot.id:
@@ -26,7 +32,7 @@ def promote(bot, update, args):
         return
 
     # set same perms as bot - bot can't assign higher perms than itself!
-    bot_member = update.effective_chat.get_member(bot.id)
+    bot_member = chat.get_member(bot.id)
 
     res = bot.promoteChatMember(chat_id, user_id,
                                 can_change_info=bot_member.can_change_info,
@@ -38,7 +44,7 @@ def promote(bot, update, args):
                                 can_pin_messages=bot_member.can_pin_messages,
                                 can_promote_members=bot_member.can_promote_members)
     if res:
-        update.effective_message.reply_text("Successfully promoted!")
+        message.reply_text("Successfully promoted!")
 
 
 @run_async
