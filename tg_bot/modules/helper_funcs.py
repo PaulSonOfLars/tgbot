@@ -2,6 +2,7 @@ import re
 from functools import wraps
 from math import ceil
 
+import emoji
 from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
@@ -186,7 +187,6 @@ def _selective_escape(to_parse):
     return to_parse
 
 
-# TODO: rework the logic of this. entity parsing is VERY iffy.
 def markdown_parser(txt, entities=None, offset=0):
     """
     Parse a string, escaping all invalid markdown entities.
@@ -205,37 +205,36 @@ def markdown_parser(txt, entities=None, offset=0):
     # regex to find []() links -> hyperlinks/buttons
     pattern = re.compile(r'(?<!\\)\[.*?\]\((.*?)\)')
     prev = 0
+    count = 0
     res = ""
     # Loop over all message entities, and:
     # reinsert code
     # escape free-standing urls
     for ent, ent_text in entities.items():
         start = ent.offset + offset  # start of entity
-        end = ent.length + start - 1  # end of entity
+        end = ent.offset + offset + ent.length - 1  # end of entity
 
-        # URL handling -> do not escape if in [](), escape otherwise.
-        if ent.type == "url":
-            # don't escape links if theyre IN a []()
-            if any(match.start(1) <= start and end <= match.end(1) for match in pattern.finditer(txt)):
-                continue
-            # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
-            else:
-                # NOTE: adjusting the start is necessary to avoid duplicate letters
-                # NOTE: This shifting by one stuff is VERY weird
-                if start - 1 > 0 and not txt[start - 1].isspace():
-                    adj = True
-                    adjusted_start = start - 1
+        # we only care about url and code
+        if ent.type == "url" or ent.type == "code":
+            # count emoji to switch counter
+            emoticons = emoji.get_emoji_regexp().finditer(txt[prev:start])
+            count += sum(1 for _ in emoticons)
+            start -= count
+            end -= count
+
+            # URL handling -> do not escape if in [](), escape otherwise.
+            if ent.type == "url":
+                if any(match.start(1) <= start and end <= match.end(1) for match in pattern.finditer(txt)):
+                    continue
+                # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
                 else:
-                    adj = False
-                    adjusted_start = start
-                res += _selective_escape(txt[prev:adjusted_start] or "") + escape_markdown(ent_text)
+                    res += _selective_escape(txt[prev:start] or "") + escape_markdown(ent_text)
 
-                if not adj:
-                    end += 1
+            # code handling
+            elif ent.type == "code":
+                res += _selective_escape(txt[prev:start]) + '`' + ent_text + '`'
 
-        # code handling
-        elif ent.type == "code":
-            res += _selective_escape(txt[prev:start]) + '`' + ent_text + '`'
+            end += 1
 
         # anything else
         else:
@@ -247,7 +246,7 @@ def markdown_parser(txt, entities=None, offset=0):
     return res
 
 
-BTN_URL_REGEX = re.compile(r"(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)\))")
+BTN_URL_REGEX = re.compile(r"(?<!\\)(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)\))")
 
 
 def button_markdown_parser(txt, entities=None, offset=0):
