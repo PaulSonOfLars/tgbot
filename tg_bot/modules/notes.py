@@ -13,57 +13,61 @@ from tg_bot.modules.helper_funcs import user_admin, button_markdown_parser
 def get(bot, update, notename, show_none=True):
     chat_id = update.effective_chat.id
     note = sql.get_note(chat_id, notename)
+    message = update.effective_message
+
     if note:
         # If not is replying to a message, reply to that message (unless its an error)
-        if update.effective_message.reply_to_message:
-            reply_text = update.effective_message.reply_to_message.reply_text
+        if message.reply_to_message:
+            reply_text = message.reply_to_message.reply_text
         else:
-            reply_text = update.effective_message.reply_text
+            reply_text = message.reply_text
 
         if note.is_reply:
             if MESSAGE_DUMP:
                 try:
                     bot.forward_message(chat_id=chat_id, from_chat_id=MESSAGE_DUMP, message_id=note.value)
-                except BadRequest as e:
-                    if e.message == "Message to forward not found":
-                        update.effective_message.reply_text("This message seems to have been lost - I'll remove it "
-                                                            "from your notes list.")
+                except BadRequest as excp:
+                    if excp.message == "Message to forward not found":
+                        message.reply_text("This message seems to have been lost - I'll remove it "
+                                           "from your notes list.")
                         sql.rm_note(chat_id, notename)
                     else:
                         raise
             else:
                 try:
                     bot.forward_message(chat_id=chat_id, from_chat_id=chat_id, message_id=note.value)
-                except BadRequest as e:
-                    if e.message == "Message to forward not found":
-                        update.effective_message.reply_text("Looks like the original sender of this note has deleted "
-                                                            "his message - sorry! Get your bot admin to start using a "
-                                                            "message dump to avoid this.")
+                except BadRequest as excp:
+                    if excp.message == "Message to forward not found":
+                        message.reply_text("Looks like the original sender of this note has deleted "
+                                           "his message - sorry! Get your bot admin to start using a "
+                                           "message dump to avoid this.")
                         sql.rm_note(chat_id, notename)
                     else:
                         raise
-        elif note.has_buttons:
-            buttons = sql.get_buttons(chat_id, notename)
-            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+        else:
+            keyb = []
+            if note.has_buttons:
+                buttons = sql.get_buttons(chat_id, notename)
+                keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
 
             keyboard = InlineKeyboardMarkup(keyb)
             try:
                 reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
                            disable_web_page_preview=True,
                            reply_markup=keyboard)
-            except BadRequest:
-                update.effective_message.reply_text("This note is not formatted correctly. Could not send. Contact @{}"
-                                                    " if you can't figure out why!".format(OWNER_USERNAME))
-        else:
-            try:
-                reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
-                           disable_web_page_preview=True)
-            except BadRequest:
-                update.effective_message.reply_text("This note is not formatted correctly. Could not send. Contact @{}"
-                                                    " if you can't figure out why!".format(OWNER_USERNAME))
+            except BadRequest as excp:
+                if excp.message == "Entity_mention_user_invalid":
+                    message.reply_text("Looks like you tried to mention someone I've never seen before. If you really "
+                                       "want to mention them, forward one of their messages to me, and I'll be able "
+                                       "to tag them!")
+                else:
+                    message.reply_text("This note is not formatted correctly. Could not send. Contact @{} if you "
+                                       "can't figure out why!".format(OWNER_USERNAME))
+                    print("ERROR: could not parse:" + note.value)
+                    raise
         return
     elif show_none:
-        update.effective_message.reply_text("This note doesn't exist")
+        message.reply_text("This note doesn't exist")
 
 
 @run_async
@@ -188,7 +192,6 @@ A button can be added to a botton by using standard markdown link syntax - the l
 """
 
 __name__ = "Notes"
-
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 HASH_GET_HANDLER = RegexHandler(r"^#[^\s]+", hash_get)
