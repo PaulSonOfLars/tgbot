@@ -33,14 +33,27 @@ RUN_STRINGS = (
     "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this person",
     "Yeah yeah, just tap /kickme already.",
     "Here, take this ring and head to Mordor while you're at it.",
-    "Legend has it, he's still running...",
+    "Legend has it, they're still running...",
     "Unlike Harry Potter, your parents can't protect you from me.",
     "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might "
     "be the next Vader.",
     "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0.",
     "Legend has it, they're still running.",
     "Keep it up, not sure we want you here anyway",
-
+    "You're a wiza- Oh. Wait. You're not Harry, keep moving.",
+    "NO RUNNING IN THE HALLWAYS!",
+    "Hasta la vista, baby.",
+    "Who let the dogs out?",
+    "It's funny, because no one cares.",
+    "Ah, what a waste. I liked that one.",
+    "Frankly, my dear, I don't give a damn.",
+    "My milkshake brings all the boys to yard... So run faster!",
+    "You can't HANDLE the truth!",
+    "A long time ago, in a galaxy far far away... Someone would've cared about that. Not anymore though.",
+    "Hey, look at them! They're running from the inevitable banhammer... Cute.",
+    "Han shot first. So will I.",
+    "What are you running after, a white rabbit?",
+    "As The Doctor would say... RUN!",
 )
 
 SLAP_TEMPLATES = (
@@ -189,7 +202,9 @@ def info(bot, update):
 
     text = "{} has an id of {}.".format(user.first_name, user.id)
     for mod in USER_INFO:
-        text += "\n\n" + mod.__user_info__(user.id).strip()
+        mod_info = mod.__user_info__(user.id).strip()
+        if mod_info:
+            text += "\n\n" + mod_info
 
     update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
