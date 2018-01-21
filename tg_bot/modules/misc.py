@@ -39,7 +39,7 @@ RUN_STRINGS = (
     "be the next Vader.",
     "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0.",
     "Legend has it, they're still running.",
-    "Keep it up, not sure we want you here anyway",
+    "Keep it up, not sure we want you here anyway.",
     "You're a wiza- Oh. Wait. You're not Harry, keep moving.",
     "NO RUNNING IN THE HALLWAYS!",
     "Hasta la vista, baby.",

@@ -4,6 +4,7 @@ from math import ceil
 
 import emoji
 from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton
+from telegram.error import BadRequest
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
@@ -130,10 +131,12 @@ def user_not_admin(func):
 def extract_user(message, args):
     prev_message = message.reply_to_message
 
+    user_id = None
+
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
         entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for ent in entities:
-            return ent.user.id
+            user_id = ent.user.id
 
     elif len(args) >= 1 and args[0][0] == '@':
         user = args[0]
@@ -143,16 +146,24 @@ def extract_user(message, args):
                                "you reply to that person's message instead.")
             return
         else:
-            return user_id
+            user_id = user_id
 
     elif len(args) >= 1 and args[0].isdigit():
-        return int(args[0])
+        user_id = int(args[0])
 
     elif prev_message:
-        return prev_message.from_user.id
+        user_id = prev_message.from_user.id
 
-    else:
-        return
+    try:
+        message.chat.get_member(user_id)
+    except BadRequest as excp:
+        if excp.message == "User_id_invalid":
+            message.reply_text("I don't seem to have interacted with this user before - please forward a message from "
+                               "them to give me control! (like a voodoo doll, I need a piece of them to be able "
+                               "to execute certain commands...)")
+            return
+
+    return user_id
 
 
 def extract_text(message):
