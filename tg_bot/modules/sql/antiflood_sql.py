@@ -6,7 +6,7 @@ from tg_bot.modules.sql import SESSION, BASE
 
 
 class FloodControl(BASE):
-    __tablename__ = "flood_control"
+    __tablename__ = "antiflood"
     chat_id = Column(String(14), primary_key=True)
     user_id = Column(Integer)
     count = Column(Integer, default=0)
@@ -40,15 +40,19 @@ def set_flood(chat_id, amount):
 def update_flood(chat_id, user_id):
     with INSERTION_LOCK:
         flood = SESSION.query(FloodControl).get(str(chat_id))
+
         if flood and flood.limit != 0:
             if flood.user_id != user_id:
-                print("Setting user_id")
                 flood.user_id = user_id
                 flood.count = 0
 
+            if not user_id:
+                SESSION.commit()
+                return False
+
             flood.count += 1
 
-            if flood.count >= flood.limit:
+            if flood.count > flood.limit:
                 flood.user_id = None
                 flood.count = 0
 

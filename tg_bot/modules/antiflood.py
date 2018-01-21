@@ -3,7 +3,7 @@ from telegram.ext import Filters, MessageHandler, CommandHandler, run_async
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import user_admin, can_restrict, is_user_admin
-from tg_bot.modules.sql import flood_control_sql as sql
+from tg_bot.modules.sql import antiflood_sql as sql
 
 FLOOD_GROUP = 3
 
@@ -16,6 +16,7 @@ def check_flood(bot, update):
 
     # ignore admins
     if is_user_admin(chat, user.id):
+        sql.update_flood(chat.id, None)
         return
 
     should_ban = sql.update_flood(chat.id, user.id)
@@ -40,20 +41,20 @@ def set_flood(bot, update, args):
         val = args[0].lower()
         if val == "off" or val == "no" or val == "0":
             sql.set_flood(chat.id, 0)
-            message.reply_text("Flood control has been disabled.")
+            message.reply_text("Antiflood has been disabled.")
 
         elif val.isdigit():
             amount = int(val)
             if amount <= 0:
                 sql.set_flood(chat.id, 0)
-                message.reply_text("Flood control has been disabled.")
+                message.reply_text("Antiflood has been disabled.")
 
             elif amount < 3:
-                message.reply_text("Flood control has to be either 0 (disabled), or a number bigger than 3!")
+                message.reply_text("Antiflood has to be either 0 (disabled), or a number bigger than 3!")
 
             else:
                 sql.set_flood(chat.id, amount)
-                message.reply_text("Flood control has been updated and set to {}".format(amount))
+                message.reply_text("Antiflood has been updated and set to {}".format(amount))
 
         else:
             message.reply_text("Unrecognised argument - please use a number, 'off', or 'no'.")
