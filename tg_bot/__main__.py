@@ -254,14 +254,15 @@ def main():
                               url_path=TOKEN)
 
         if CERT_PATH:
-            updater.bot.set_webhook(webhook_url=URL + TOKEN,
+            updater.bot.set_webhook(url=URL + TOKEN,
                                     certificate=open(CERT_PATH, 'rb'))
         else:
-            updater.bot.set_webhook(webhook_url=URL + TOKEN)
+            updater.bot.set_webhook(url=URL + TOKEN)
 
     else:
         print("Using long polling.")
         updater.start_polling(timeout=15, read_latency=4)
+
     updater.idle()
 
 
