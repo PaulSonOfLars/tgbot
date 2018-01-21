@@ -248,6 +248,7 @@ def main():
     # dispatcher.add_error_handler(error_callback)
 
     if WEBHOOK:
+        print("Using webhooks.")
         updater.start_webhook(listen="127.0.0.1",
                               port=PORT,
                               url_path=TOKEN)
@@ -259,6 +260,7 @@ def main():
             updater.bot.set_webhook(webhook_url=URL + TOKEN)
 
     else:
+        print("Using long polling.")
         updater.start_polling(timeout=15, read_latency=4)
     updater.idle()
 
