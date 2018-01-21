@@ -27,12 +27,15 @@ if ENV:
     except ValueError:
         raise Exception("Your sudo users list does not contain valid integers.")
 
+    WEBHOOK = bool(os.environ.get('WEBHOOK', False))
     URL = os.environ.get('URL', "")  # Does not contain token
+    PORT = int(os.environ.get('PORT', 5000))
+    CERT_PATH = os.environ.get("CERT_PATH")
+
     DB_URI = os.environ.get('DATABASE_URL')
     DONATION_LINK = os.environ.get('DONATION_LINK')
     LOAD = os.environ.get("LOAD", "").split()
     NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
-    WEBHOOK = bool(os.environ.get('WEBHOOK', False))
 
 else:
     from tg_bot.config import Development as Config
@@ -50,12 +53,15 @@ else:
     except ValueError:
         raise Exception("Your sudo users list does not contain valid integers.")
 
+    WEBHOOK = Config.WEBHOOK
+    URL = Config.URL
+    PORT = Config.PORT
+    CERT_PATH = Config.CERT_PATH
+
     DB_URI = Config.SQLALCHEMY_DATABASE_URI
     DONATION_LINK = Config.DONATION_LINK
     LOAD = Config.LOAD
     NO_LOAD = Config.NO_LOAD
-    WEBHOOK = Config.WEBHOOK
-    URL = Config.URL
 
 
 SUDO_USERS.add(OWNER_ID)

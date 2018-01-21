@@ -18,6 +18,8 @@ class Config(object):
     # OPTIONAL
     SUDO_USERS = []  # List of id's (not usernames) for users which have sudo access to the bot.
     DONATION_LINK = None  # EG, paypal
+    CERT_PATH = None
+    PORT = 5000
 
 
 class Production(Config):

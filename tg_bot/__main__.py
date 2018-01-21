@@ -1,5 +1,4 @@
 import importlib
-import os
 
 import re
 
@@ -9,7 +8,7 @@ from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryH
 from telegram.ext.dispatcher import run_async, DispatcherHandlerStop
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK
+from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK, CERT_PATH, PORT, URL
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
@@ -249,13 +248,16 @@ def main():
     # dispatcher.add_error_handler(error_callback)
 
     if WEBHOOK:
-        port = int(os.environ.get('PORT', 5000))
-        updater.start_webhook(listen="0.0.0.0",
-                              port=port,
+        updater.start_webhook(listen="127.0.0.1",
+                              port=PORT,
                               url_path=TOKEN)
 
-        from tg_bot import URL
-        updater.bot.set_webhook(URL + TOKEN)
+        if CERT_PATH:
+            updater.bot.set_webhook(webhook_url=URL + TOKEN,
+                                    certificate=open(CERT_PATH, 'rb'))
+        else:
+            updater.bot.set_webhook(webhook_url=URL + TOKEN)
+
     else:
         updater.start_polling(timeout=15, read_latency=4)
     updater.idle()
