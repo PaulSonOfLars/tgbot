@@ -67,3 +67,13 @@ def get_flood(chat_id):
         return SESSION.query(FloodControl).get(str(chat_id))
     finally:
         SESSION.close()
+
+
+def migrate_chat(old_chat_id, new_chat_id):
+    with INSERTION_LOCK:
+        flood = SESSION.query(FloodControl).get(str(old_chat_id))
+        if flood:
+            flood.chat_id = str(new_chat_id)
+            SESSION.commit()
+
+        SESSION.close()

@@ -72,6 +72,17 @@ def flood(bot, update):
             "I'm currently banning users if they send more than {} consecutive messages.".format(flood_settings.limit))
 
 
+def __migrate__(old_chat_id, new_chat_id):
+    sql.migrate_chat(old_chat_id, new_chat_id)
+
+
+__help__ = """
+ - /setflood <int/'no'/'off'>: enables or disables flood control
+ - /flood: Get the current flood control setting
+"""
+
+__name__ = "AntiFlood"
+
 FLOOD_BAN_HANDLER = MessageHandler(Filters.all, check_flood)
 SET_FLOOD_HANDLER = CommandHandler("setflood", set_flood, pass_args=True)
 FLOOD_HANDLER = CommandHandler("flood", flood)
