@@ -1,10 +1,13 @@
-from telegram import ParseMode
+from io import BytesIO
+
+from telegram import ParseMode, MessageEntity
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS
 from tg_bot.modules.helper_funcs import CustomFilters, extract_user
+import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot.modules.sql.users_sql import get_all_chats
 
 
@@ -35,17 +38,31 @@ def gban(bot, update, args):
         message.reply_text("That's not a user!")
         return
 
+    reason = ""
+
+    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        end = entities[0].offset + entities[0].length
+        reason = message.text[end:].strip()
+
+    else:
+        split_message = message.text.split(None, 2)
+        if len(split_message) >= 3:
+            reason = split_message[2]
+
     message.reply_text("*Blows dust off of banhammer* 😉")
 
     banner = update.effective_user
 
     bot.send_message(OWNER_ID,
-                     "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={})".format(
+                     "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) because:\n".format(
                          escape_markdown(banner.first_name),
                          banner.id,
                          escape_markdown(user_chat.first_name),
-                         user_chat.id),
+                         user_chat.id, reason or "No reason given"),
                      parse_mode=ParseMode.MARKDOWN)
+
+    sql.gban_user(user_id, user_chat.username or user_chat.first_name, reason)
 
     chats = get_all_chats()
     for chat in chats:
@@ -98,6 +115,8 @@ def ungban(bot, update, args):
                          user_chat.id),
                      parse_mode=ParseMode.MARKDOWN)
 
+    sql.ungban_user(user_id)
+
     chats = get_all_chats()
     for chat in chats:
         chat_id = chat.chat_id
@@ -128,15 +147,37 @@ def ungban(bot, update, args):
     message.reply_text("Person has been un-gbanned.")
 
 
+@run_async
+def gbanlist(bot, update):
+    banned_users = sql.get_gban_list()
+
+    if not banned_users:
+        update.effective_message.reply_text("There aren't any gbanned users! You're kinder than I expected...")
+        return
+
+    banfile = 'Screw these guys.\n'
+    for user in banned_users:
+        banfile += "[x] {} - {}\n".format(user["name"], user["user_id"])
+        if user["reason"]:
+            banfile += "Reason: {}\n".format(user["reason"])
+
+    with BytesIO(str.encode(banfile)) as output:
+        output.name = "gbanlist.txt"
+        update.effective_message.reply_document(document=output, filename="gbanlist.txt",
+                                                caption="Here is the list of currently gbanned users.")
+
+
 __help__ = ""  # Sudo only module, no help.
 
 __name__ = "GBans"
-
 
 GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True,
                               filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True,
                                 filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+GBAN_LIST = CommandHandler("gbanlist", gbanlist,
+                           filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
 dispatcher.add_handler(GBAN_HANDLER)
 dispatcher.add_handler(UNGBAN_HANDLER)
+dispatcher.add_handler(GBAN_LIST)
