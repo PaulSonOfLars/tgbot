@@ -3,8 +3,8 @@ from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, OWNER_ID, SUDO_USERS
-from tg_bot.modules.helper_funcs import CustomFilters, extract_user, is_user_in_chat
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS
+from tg_bot.modules.helper_funcs import CustomFilters, extract_user
 from tg_bot.modules.sql.users_sql import get_all_chats
 
 
@@ -19,6 +19,10 @@ def gban(bot, update, args):
 
     if int(user_id) in SUDO_USERS:
         message.reply_text("I spy, with my little eye... a sudo user war! Why are you guys turning on each other?")
+        return
+
+    if int(user_id) in SUPPORT_USERS:
+        message.reply_text("OOOH someone's trying to gban a support user! *grabs popcorn*")
         return
 
     try:
@@ -129,8 +133,10 @@ __help__ = ""  # Sudo only module, no help.
 __name__ = "GBans"
 
 
-GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True, filters=CustomFilters.sudo_filter)
-UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True, filters=CustomFilters.sudo_filter)
+GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True,
+                              filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True,
+                                filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
 dispatcher.add_handler(GBAN_HANDLER)
 dispatcher.add_handler(UNGBAN_HANDLER)

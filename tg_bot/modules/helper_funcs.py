@@ -8,12 +8,22 @@ from telegram.error import BadRequest
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import SUDO_USERS
+from tg_bot import SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS
 from tg_bot.modules.users import get_user_id
 
 
 def can_delete(chat, bot_id):
     return chat.get_member(bot_id).can_delete_messages
+
+
+def is_user_ban_protected(chat, user_id, member=None):
+    if not member:
+        member = chat.get_member(user_id)
+    return chat.type == 'private' \
+           or member.status == 'administrator' \
+           or member.status == 'creator' \
+           or member.user.id in SUDO_USERS \
+           or member.user.id in WHITELIST_USERS
 
 
 def is_user_admin(chat, user_id, member=None):
@@ -395,6 +405,12 @@ def paginate_modules(page_n, MODULE_DICT):
 
 
 class CustomFilters(object):
+    class _Supporters(BaseFilter):
+        def filter(self, message):
+            return bool(message.from_user and message.from_user.id in SUPPORT_USERS)
+
+    support_filter = _Supporters()
+
     class _Sudoers(BaseFilter):
         def filter(self, message):
             return bool(message.from_user and message.from_user.id in SUDO_USERS)

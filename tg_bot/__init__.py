@@ -27,6 +27,16 @@ if ENV:
     except ValueError:
         raise Exception("Your sudo users list does not contain valid integers.")
 
+    try:
+        SUPPORT_USERS = set(int(x) for x in os.environ.get("SUPPORT_USERS", "").split())
+    except ValueError:
+        raise Exception("Your support users list does not contain valid integers.")
+
+    try:
+        WHITELIST_USERS = set(int(x) for x in os.environ.get("WHITELIST_USERS", "").split())
+    except ValueError:
+        raise Exception("Your whitelisted users list does not contain valid integers.")
+
     WEBHOOK = bool(os.environ.get('WEBHOOK', False))
     URL = os.environ.get('URL', "")  # Does not contain token
     PORT = int(os.environ.get('PORT', 5000))
@@ -52,6 +62,16 @@ else:
         SUDO_USERS = set(int(x) for x in Config.SUDO_USERS or [])
     except ValueError:
         raise Exception("Your sudo users list does not contain valid integers.")
+
+    try:
+        SUPPORT_USERS = set(int(x) for x in Config.SUPPORT_USERS or [])
+    except ValueError:
+        raise Exception("Your support users list does not contain valid integers.")
+
+    try:
+        WHITELIST_USERS = set(int(x) for x in Config.WHITELIST_USERS or [])
+    except ValueError:
+        raise Exception("Your whitelisted users list does not contain valid integers.")
 
     WEBHOOK = Config.WEBHOOK
     URL = Config.URL

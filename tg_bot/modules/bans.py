@@ -3,7 +3,7 @@ from telegram.ext import run_async, CommandHandler, Filters
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat, extract_user, \
-    can_restrict
+    can_restrict, is_user_ban_protected
 
 
 @run_async
@@ -27,7 +27,7 @@ def ban(bot, update, args):
         else:
             raise
 
-    if is_user_admin(chat, user_id, member):
+    if is_user_ban_protected(chat, user_id, member):
         message.reply_text("I really wish I could ban admins...")
         return
 
@@ -51,7 +51,7 @@ def kick(bot, update, args):
     if not user_id:
         return
 
-    if is_user_admin(chat, user_id):
+    if is_user_ban_protected(chat, user_id):
         message.reply_text("I really wish I could kick admins...")
         return
 
