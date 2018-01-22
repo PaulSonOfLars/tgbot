@@ -1,3 +1,4 @@
+from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
 
 from tg_bot import dispatcher
@@ -17,7 +18,16 @@ def ban(bot, update, args):
         message.reply_text("You don't seem to be referring to a user.")
         return
 
-    if is_user_admin(chat, user_id):
+    try:
+        member = chat.get_member(user_id)
+    except BadRequest as excp:
+        if excp.message == "User not found":
+            message.reply_text("I can't seem to find this user")
+            return
+        else:
+            raise
+
+    if is_user_admin(chat, user_id, member):
         message.reply_text("I really wish I could ban admins...")
         return
 

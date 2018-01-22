@@ -155,32 +155,28 @@ def reply_filter(bot, update):
             elif filt.is_video:
                 message.reply_video(filt.reply)
             elif filt.has_markdown:
-                if filt.has_buttons:
-                    buttons = sql.get_buttons(chat.id, filt.keyword)
-                    keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+                buttons = sql.get_buttons(chat.id, filt.keyword)
+                keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
 
-                    keyboard = InlineKeyboardMarkup(keyb)
-                    try:
-                        message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
-                                           disable_web_page_preview=True,
-                                           reply_markup=keyboard)
-                    except BadRequest as e:
-                        if e.message == "Unsupported url protocol":
-                            message.reply_text("You seem to be trying to use an unsupported url protocol. Telegram "
-                                               "doesn't support buttons for some protocols, such as tg://. Please try "
-                                               "again, or ask @{} for help.".format(OWNER_USERNAME))
-                        else:
-                            message.reply_text(
-                                "This note is not formatted correctly. Could not send. Contact @{}"
-                                " if you can't figure out why!".format(OWNER_USERNAME))
-                else:
-                    try:
-                        message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
-                                           disable_web_page_preview=True)
-                    except BadRequest:
+                keyboard = InlineKeyboardMarkup(keyb)
+                try:
+                    message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
+                                       disable_web_page_preview=True,
+                                       reply_markup=keyboard)
+                except BadRequest as excp:
+                    if excp.message == "Unsupported url protocol":
+                        message.reply_text("You seem to be trying to use an unsupported url protocol. Telegram "
+                                           "doesn't support buttons for some protocols, such as tg://. Please try "
+                                           "again, or ask @{} for help.".format(OWNER_USERNAME))
+                    elif excp.message == "Reply message not found":
+                        bot.send_message(chat.id, filt.reply, parse_mode=ParseMode.MARKDOWN,
+                                         disable_web_page_preview=True,
+                                         reply_markup=keyboard)
+                    else:
                         message.reply_text(
                             "This note is not formatted correctly. Could not send. Contact @{}"
                             " if you can't figure out why!".format(OWNER_USERNAME))
+                        raise Exception("Could not parse message.\n{}".format(filt.reply))
 
             else:
                 # LEGACY - all new filters will have has_markdown set to True.
@@ -206,7 +202,6 @@ __help__ = """
 """
 
 __name__ = "Filters"
-
 
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter)

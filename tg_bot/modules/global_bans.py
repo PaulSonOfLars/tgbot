@@ -21,7 +21,12 @@ def gban(bot, update, args):
         message.reply_text("I spy, with my little eye... a sudo user war! Why are you guys turning on each other?")
         return
 
-    user_chat = bot.get_chat(user_id)
+    try:
+        user_chat = bot.get_chat(user_id)
+    except BadRequest as excp:
+        message.reply_text(excp.message)
+        return
+
     if user_chat.type != 'private':
         message.reply_text("That's not a user!")
         return
@@ -31,7 +36,7 @@ def gban(bot, update, args):
     banner = update.effective_user
 
     bot.send_message(OWNER_ID,
-                     "[{}](tg://user?id={}) has gbanned user [{}](tg://user?id={})".format(
+                     "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={})".format(
                          escape_markdown(banner.first_name),
                          banner.id,
                          escape_markdown(user_chat.first_name),
@@ -53,11 +58,13 @@ def gban(bot, update, args):
             elif excp.message == "User_not_participant":
                 pass
             else:
-                message.reply_text("Could not un-gban due to: {}".format(excp.message))
+                message.reply_text("Could not gban due to: {}".format(excp.message))
+                bot.send_message(OWNER_ID, "Could not gban due to: {}".format(excp.message))
                 return
         except TelegramError:
             pass
 
+    bot.send_message(OWNER_ID, "gban complete!")
     message.reply_text("Person has been gbanned.")
 
 
@@ -108,10 +115,12 @@ def ungban(bot, update, args):
                 pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
+                bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
                 return
         except TelegramError:
             pass
 
+    bot.send_message(OWNER_ID, "un-gban complete!")
     message.reply_text("Person has been un-gbanned.")
 
 
