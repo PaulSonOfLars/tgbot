@@ -46,6 +46,7 @@ if ENV:
     DONATION_LINK = os.environ.get('DONATION_LINK')
     LOAD = os.environ.get("LOAD", "").split()
     NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
+    DEL_CMDS = bool(os.environ.get('DEL_CMDS', False))
 
 else:
     from tg_bot.config import Development as Config
@@ -82,6 +83,7 @@ else:
     DONATION_LINK = Config.DONATION_LINK
     LOAD = Config.LOAD
     NO_LOAD = Config.NO_LOAD
+    DEL_CMDS = Config.DEL_CMDS
 
 
 SUDO_USERS.add(OWNER_ID)

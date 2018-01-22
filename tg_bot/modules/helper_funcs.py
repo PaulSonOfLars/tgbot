@@ -8,7 +8,7 @@ from telegram.error import BadRequest
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS
+from tg_bot import SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS, DEL_CMDS
 from tg_bot.modules.users import get_user_id
 
 
@@ -112,6 +112,10 @@ def user_admin(func):
         user_id = update.effective_user.id
         if is_user_admin(update.effective_chat, user_id):
             func(bot, update, *args, **kwargs)
+
+        elif DEL_CMDS and " " not in update.effective_message.text:
+            update.effective_message.delete()
+
         else:
             update.effective_message.reply_text("Who dis non-admin telling me what to do?")
 
@@ -124,6 +128,9 @@ def user_admin_no_reply(func):
         user_id = update.effective_user.id
         if is_user_admin(update.effective_chat, user_id):
             func(bot, update, *args, **kwargs)
+
+        elif DEL_CMDS and " " not in update.effective_message.text:
+                update.effective_message.delete()
 
     return is_admin
 

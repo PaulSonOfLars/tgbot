@@ -22,6 +22,7 @@ class Config(object):
     DONATION_LINK = None  # EG, paypal
     CERT_PATH = None
     PORT = 5000
+    DEL_CMDS = False  # Whether or not you should delete "blue text must click" commands
 
 
 class Production(Config):
