@@ -186,10 +186,14 @@ def get_id(bot, update):
                     user1.id))
         else:
             user = update.effective_message.reply_to_message.from_user
-            update.effective_message.reply_text("{}'s id is {}".format(user.first_name, user.id))
+            update.effective_message.reply_text("{}'s id is {}.".format(user.first_name, user.id))
     else:
         chat = update.effective_chat
-        update.effective_message.reply_text("This group's id is " + str(chat.id))
+        if chat.type == "private":
+            update.effective_message.reply_text("Your id is {}.".format(chat.id))
+
+        else:
+            update.effective_message.reply_text("This group's id is {}.".format(chat.id))
 
 
 @run_async
