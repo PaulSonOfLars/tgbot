@@ -49,6 +49,13 @@ def ungban_user(user_id):
         SESSION.commit()
 
 
+def is_user_gbanned(user_id):
+    try:
+        return bool(SESSION.query(GloballyBannedUsers).get(user_id))
+    finally:
+        SESSION.close()
+
+
 def get_gban_list():
     try:
         return [x.to_dict() for x in SESSION.query(GloballyBannedUsers).all()]

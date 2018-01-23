@@ -27,7 +27,7 @@ def __list_all_modules():
 
         return to_load
 
-    return all_modules
+    return sorted(all_modules)
 
 
 ALL_MODULES = __list_all_modules()

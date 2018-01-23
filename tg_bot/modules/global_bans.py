@@ -167,6 +167,10 @@ def gbanlist(bot, update):
                                                 caption="Here is the list of currently gbanned users.")
 
 
+def __user_info__(user_id):
+    return "Globally banned: *{}*".format("Yes" if sql.is_user_gbanned(user_id) else "No")
+
+
 __help__ = ""  # Sudo only module, no help.
 
 __name__ = "GBans"

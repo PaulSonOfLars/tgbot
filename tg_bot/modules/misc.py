@@ -204,7 +204,16 @@ def info(bot, update):
     else:
         user = msg.from_user
 
-    text = "{} has an id of {}.".format(user.first_name, user.id)
+    text = "*User info*:" \
+           "\nID: `{}`" \
+           "\nFirst Name: {}".format(user.id, escape_markdown(user.first_name))
+
+    if user.last_name:
+        text += "\nLast Name: {}".format(escape_markdown(user.last_name))
+
+    if user.username:
+        text += "\nUsername: {}".format(escape_markdown(user.username))
+
     for mod in USER_INFO:
         mod_info = mod.__user_info__(user.id).strip()
         if mod_info:
