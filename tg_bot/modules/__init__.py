@@ -27,9 +27,9 @@ def __list_all_modules():
 
         return to_load
 
-    return sorted(all_modules)
+    return all_modules
 
 
-ALL_MODULES = __list_all_modules()
+ALL_MODULES = sorted(__list_all_modules())
 print("Modules to load: {}".format(ALL_MODULES))
 __all__ = ALL_MODULES + ["ALL_MODULES"]
