@@ -84,7 +84,7 @@ __help__ = """
 
 __name__ = "AntiFlood"
 
-FLOOD_BAN_HANDLER = MessageHandler(Filters.all, check_flood)
+FLOOD_BAN_HANDLER = MessageHandler(Filters.all & ~Filters.status_update, check_flood)
 SET_FLOOD_HANDLER = CommandHandler("setflood", set_flood, pass_args=True)
 FLOOD_HANDLER = CommandHandler("flood", flood)
 
