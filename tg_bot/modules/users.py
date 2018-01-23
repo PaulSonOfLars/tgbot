@@ -56,7 +56,7 @@ def log_user(bot, update):
 
 def __user_info__(user_id):
     num_chats = sql.get_user_num_chats(user_id)
-    return """I've seen in them in {} chats in total.""".format(num_chats)
+    return """I've seen them in {} chats in total.""".format(num_chats)
 
 
 def __stats__():
