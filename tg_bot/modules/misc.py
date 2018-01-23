@@ -7,7 +7,7 @@ from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, OWNER_ID
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS
 from tg_bot.__main__ import STATS, USER_INFO
 
 RUN_STRINGS = (
@@ -212,7 +212,22 @@ def info(bot, update):
         text += "\nLast Name: {}".format(escape_markdown(user.last_name))
 
     if user.username:
-        text += "\nUsername: {}".format(escape_markdown(user.username))
+        text += "\nUsername: @{}".format(escape_markdown(user.username))
+
+    if user.id == OWNER_ID:
+        text += "\n\nThis person is my owner - I would never do anything against them!"
+    else:
+        if user.id in SUDO_USERS:
+            text += "\nThis person is one of my sudo users! " \
+                    "Nearly as powerful as my owner - so watch it."
+
+        if user.id in SUPPORT_USERS:
+            text += "\nThis person is one of my support users! " \
+                    "Not quite a sudo user, but can still gban you off the map."
+
+        if user.id in WHITELIST_USERS:
+            text += "\nThis person has been whitelisted! " \
+                    "That means I'm not allowed to ban/kick them."
 
     for mod in USER_INFO:
         mod_info = mod.__user_info__(user.id).strip()
