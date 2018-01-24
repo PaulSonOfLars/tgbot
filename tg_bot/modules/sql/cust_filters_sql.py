@@ -111,7 +111,8 @@ def remove_filter(chat_id, keyword):
 
 def get_chat_filters(chat_id):
     try:
-        return SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(chat_id)).all()
+        return SESSION.query(CustomFilters).filter(CustomFilters.chat_id == str(chat_id)).order_by(
+            func.length(CustomFilters.keyword).desc()).order_by(CustomFilters.keyword.asc()).all()
     finally:
         SESSION.close()
 

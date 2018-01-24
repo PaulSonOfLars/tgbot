@@ -95,7 +95,7 @@ def rm_note(chat_id, note_name):
 
 def get_all_chat_notes(chat_id):
     try:
-        return SESSION.query(Notes).filter(Notes.chat_id == str(chat_id)).all()
+        return SESSION.query(Notes).filter(Notes.chat_id == str(chat_id)).order_by(Notes.name.asc()).all()
     finally:
         SESSION.close()
 
