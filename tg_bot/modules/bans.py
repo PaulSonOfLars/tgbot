@@ -31,6 +31,10 @@ def ban(bot, update, args):
         message.reply_text("I really wish I could ban admins...")
         return
 
+    if user_id == bot.id:
+        update.effective_message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        return
+
     res = update.effective_chat.kick_member(user_id)
     if res:
         bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')  # banhammer marie sticker
@@ -53,6 +57,10 @@ def kick(bot, update, args):
 
     if is_user_ban_protected(chat, user_id):
         message.reply_text("I really wish I could kick admins...")
+        return
+
+    if user_id == bot.id:
+        update.effective_message.reply_text("Yeahhh I'm not gonna do that")
         return
 
     res = update.effective_chat.unban_member(user_id)  # unban on current user = kick
@@ -88,6 +96,10 @@ def unban(bot, update, args):
 
     user_id = extract_user(message, args)
     if not user_id:
+        return
+
+    if user_id == bot.id:
+        update.effective_message.reply_text("How would I unban myself if I wasn't here...?")
         return
 
     if is_user_in_chat(chat, user_id):

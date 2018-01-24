@@ -70,7 +70,8 @@ def unmute(bot, update, args):
             else:
                 message.reply_text("Uh... I couldn't unmute this one")
     else:
-        message.reply_text("This user isn't even in the chat, unmuting him/her won't make him say any more!")
+        message.reply_text("This user isn't even in the chat, unmuting them won't make them talk more than they "
+                           "already do!")
 
 
 __help__ = """

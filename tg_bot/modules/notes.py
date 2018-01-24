@@ -39,7 +39,7 @@ def get(bot, update, notename, show_none=True):
                 except BadRequest as excp:
                     if excp.message == "Message to forward not found":
                         message.reply_text("Looks like the original sender of this note has deleted "
-                                           "his message - sorry! Get your bot admin to start using a "
+                                           "their message - sorry! Get your bot admin to start using a "
                                            "message dump to avoid this.")
                         sql.rm_note(chat_id, notename)
                     else:

@@ -295,7 +295,7 @@ WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in mult
                 "last name.\n" \
                 " - `{username}`: this represents the user's *username*. Defaults to a *mention* of the user's " \
                 "first name if has no username.\n" \
-                " - `{mention}`: this simply *mentions* a user - tagging him with his first name.\n" \
+                " - `{mention}`: this simply *mentions* a user - tagging them with their first name.\n" \
                 " - `{id}`: this represents the user's *id*\n" \
                 " - `{count}`: this represents the user's *member number*.\n" \
                 " - `{chatname}`: this represents the *current chat name*.\n" \

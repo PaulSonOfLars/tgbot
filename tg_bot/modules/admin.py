@@ -61,7 +61,7 @@ def demote(bot, update, args):
         return
 
     if chat.get_member(user_id).status == 'creator':
-        message.reply_text("This person CREATED the chat, how would I demote him?")
+        message.reply_text("This person CREATED the chat, how would I demote them?")
         return
 
     if not chat.get_member(user_id).status == 'administrator':
@@ -88,7 +88,7 @@ def demote(bot, update, args):
             message.reply_text("Could not demote.")
     except BadRequest:
         message.reply_text("Could not demote. I might not be admin, or the admin status was appointed by another "
-                           "user, so I can't act upon him!")
+                           "user, so I can't act upon them!")
 
 
 @run_async
