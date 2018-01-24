@@ -416,8 +416,8 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False):
     for user_id in set(send_to):
         try:
             bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN if markdown else None)
-        except BadRequest:
-            pass  # ignore users who havent said yes
+        except Exception:
+            pass  # ignore users who fail
 
 
 class CustomFilters(object):
