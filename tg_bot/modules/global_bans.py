@@ -169,6 +169,7 @@ def gbanlist(bot, update):
                                                 caption="Here is the list of currently gbanned users.")
 
 
+@run_async
 @can_restrict
 @user_not_admin
 def enforce_gban(bot, update):
