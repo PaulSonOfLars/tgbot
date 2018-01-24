@@ -58,6 +58,8 @@ def log_user(bot, update):
 
 
 def __user_info__(user_id):
+    if user_id == dispatcher.bot.id:
+        return """I've seen them in... Wow. Are they stalking me? They're in all the same places I am... oh. I'ts me."""
     num_chats = sql.get_user_num_chats(user_id)
     return """I've seen them in {} chats in total.""".format(num_chats)
 
