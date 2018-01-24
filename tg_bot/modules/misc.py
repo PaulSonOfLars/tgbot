@@ -126,11 +126,11 @@ def runs(bot, update):
 
 
 @run_async
-def slap(bot, update):
+def slap(bot, update, args):
     msg = update.effective_message
 
-    # reply to original message
-    reply_text = msg.reply_text
+    # reply to correct message
+    reply_text = msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
 
     # get user who sent message
     if msg.from_user.username:
@@ -138,16 +138,15 @@ def slap(bot, update):
     else:
         curr_user = "[{}](tg://user?id={})".format(msg.from_user.first_name, msg.from_user.id)
 
-    # sender targets the person he replied to
-    if msg.reply_to_message:
-        # if a reply, reply to original message
-        reply_text = msg.reply_to_message.reply_text
+    user_id = extract_user(update.effective_message, args)
+    if user_id:
+        slapped_user = bot.get_chat(user_id)
         user1 = curr_user
-        if msg.reply_to_message.from_user.username:
-            user2 = "@" + escape_markdown(msg.reply_to_message.from_user.username)
+        if slapped_user.username:
+            user2 = "@" + escape_markdown(slapped_user.username)
         else:
-            user2 = "[{}](tg://user?id={})".format(msg.reply_to_message.from_user.first_name,
-                                                   msg.from_user.id)
+            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
+                                                   slapped_user.id)
 
     # if no target found, bot targets the sender
     else:
@@ -203,10 +202,11 @@ def get_id(bot, update, args):
 
 
 @run_async
-def info(bot, update):
+def info(bot, update, args):
     msg = update.effective_message
-    if msg.reply_to_message:
-        user = msg.reply_to_message.from_user
+    user_id = extract_user(update.effective_message, args)
+    if user_id:
+        user = bot.get_chat(user_id)
     else:
         user = msg.from_user
 
@@ -338,8 +338,8 @@ IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
 RUNS_HANDLER = CommandHandler("runs", runs)
-SLAP_HANDLER = CommandHandler("slap", slap)
-INFO_HANDLER = CommandHandler("info", info)
+SLAP_HANDLER = CommandHandler("slap", slap, pass_args=True)
+INFO_HANDLER = CommandHandler("info", info, pass_args=True)
 
 ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
