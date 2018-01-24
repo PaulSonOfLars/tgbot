@@ -52,6 +52,9 @@ def log_user(bot, update):
                     update.effective_message.from_user.username,
                     update.effective_chat.id,
                     update.effective_chat.title)
+    if update.effective_message.forward_from:
+        sql.update_user(update.effective_message.forward_from.id,
+                        update.effective_message.forward_from.username)
 
 
 def __user_info__(user_id):
