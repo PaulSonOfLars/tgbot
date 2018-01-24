@@ -21,7 +21,7 @@ def about_me(bot, update, args):
     info = sql.get_user_me_info(user.id)
 
     if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.name, escape_markdown(info)),
+        update.effective_message.reply_text("*{}*:\n{}".format(user.first_name, escape_markdown(info)),
                                             parse_mode=ParseMode.MARKDOWN)
     elif message.reply_to_message:
         username = message.reply_to_message.from_user.first_name
@@ -54,7 +54,7 @@ def about_bio(bot, update, args):
     info = sql.get_user_bio(user.id)
 
     if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.name, escape_markdown(info)),
+        update.effective_message.reply_text("*{}*:\n{}".format(user.first_name, escape_markdown(info)),
                                             parse_mode=ParseMode.MARKDOWN)
     elif message.reply_to_message:
         username = user.first_name
@@ -77,7 +77,7 @@ def set_about_bio(bot, update):
         bio = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
         if len(bio) == 2:
             sql.set_user_bio(user_id, bio[1])
-            message.reply_text("Updated {}'s bio!".format(repl_message.from_user.name))
+            message.reply_text("Updated {}'s bio!".format(repl_message.from_user.first_name))
     else:
         message.reply_text("Reply to someone's message to set their bio!")
 
