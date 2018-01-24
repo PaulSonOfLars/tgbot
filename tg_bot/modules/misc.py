@@ -9,7 +9,7 @@ from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS
 from tg_bot.__main__ import STATS, USER_INFO
-from tg_bot.modules.helper_funcs import CustomFilters
+from tg_bot.modules.helper_funcs import CustomFilters, extract_user
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -174,9 +174,10 @@ def get_bot_ip(bot, update):
 
 
 @run_async
-def get_id(bot, update):
-    if update.effective_message.reply_to_message:
-        if update.effective_message.reply_to_message.forward_from:
+def get_id(bot, update, args):
+    user_id = extract_user(update.effective_message, args)
+    if user_id:
+        if update.effective_message.reply_to_message and update.effective_message.reply_to_message.forward_from:
             user1 = update.effective_message.reply_to_message.from_user
             user2 = update.effective_message.reply_to_message.forward_from
             update.effective_message.reply_text(
@@ -187,7 +188,7 @@ def get_id(bot, update):
                     user1.id),
                 parse_mode=ParseMode.MARKDOWN)
         else:
-            user = update.effective_message.reply_to_message.from_user
+            user = bot.get_chat(user_id)
             update.effective_message.reply_text("{}'s id is `{}`.".format(escape_markdown(user.first_name), user.id),
                                                 parse_mode=ParseMode.MARKDOWN)
     else:
@@ -225,14 +226,14 @@ def info(bot, update):
         if user.id in SUDO_USERS:
             text += "\nThis person is one of my sudo users! " \
                     "Nearly as powerful as my owner - so watch it."
+        else:
+            if user.id in SUPPORT_USERS:
+                text += "\nThis person is one of my support users! " \
+                        "Not quite a sudo user, but can still gban you off the map."
 
-        if user.id in SUPPORT_USERS:
-            text += "\nThis person is one of my support users! " \
-                    "Not quite a sudo user, but can still gban you off the map."
-
-        if user.id in WHITELIST_USERS:
-            text += "\nThis person has been whitelisted! " \
-                    "That means I'm not allowed to ban/kick them."
+            if user.id in WHITELIST_USERS:
+                text += "\nThis person has been whitelisted! " \
+                        "That means I'm not allowed to ban/kick them."
 
     for mod in USER_INFO:
         mod_info = mod.__user_info__(user.id).strip()
@@ -331,7 +332,7 @@ __help__ = """
 
 __name__ = "Misc"
 
-ID_HANDLER = CommandHandler("id", get_id)
+ID_HANDLER = CommandHandler("id", get_id, pass_args=True)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 
 TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)

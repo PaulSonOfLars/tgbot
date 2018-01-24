@@ -1,9 +1,10 @@
 import re
 from functools import wraps
 from math import ceil
+from typing import List
 
 import emoji
-from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton, Bot, ParseMode
+from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton, Bot, ParseMode, Message
 from telegram.error import BadRequest
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
@@ -145,7 +146,7 @@ def user_not_admin(func):
     return is_not_admin
 
 
-def extract_user(message, args):
+def extract_user(message: Message, args: List[str]):
     prev_message = message.reply_to_message
 
     user_id = None
@@ -160,7 +161,7 @@ def extract_user(message, args):
         user_id = get_user_id(user)
         if not user_id:
             message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
+                               "you reply to that person's message instead, or forward one of that user's messages.")
             return
         else:
             user_id = user_id
@@ -389,10 +390,10 @@ def remove_escapes(text):
     return res
 
 
-def paginate_modules(page_n, MODULE_DICT):
+def paginate_modules(page_n, module_dict):
     modules = sorted(
         [EqInlineKeyboardButton(x.__name__, callback_data="help_module({})".format(x.__name__.lower())) for x in
-         MODULE_DICT.values()])
+         module_dict.values()])
 
     pairs = list(zip(modules[::2], modules[1::2]))
 
@@ -416,7 +417,7 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False):
         try:
             bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN if markdown else None)
         except BadRequest:
-            pass # ignore users who havent said yes
+            pass  # ignore users who havent said yes
 
 
 class CustomFilters(object):
