@@ -179,21 +179,25 @@ def get_id(bot, update):
             user1 = update.effective_message.reply_to_message.from_user
             user2 = update.effective_message.reply_to_message.forward_from
             update.effective_message.reply_text(
-                "The original sender, {}, has an ID of {}.\nThe forwarder, {}, has an ID of {}.".format(
-                    user2.first_name,
+                "The original sender, {}, has an ID of `{}`.\nThe forwarder, {}, has an ID of `{}`.".format(
+                    escape_markdown(user2.first_name),
                     user2.id,
-                    user1.first_name,
-                    user1.id))
+                    escape_markdown(user1.first_name),
+                    user1.id),
+                parse_mode=ParseMode.MARKDOWN)
         else:
             user = update.effective_message.reply_to_message.from_user
-            update.effective_message.reply_text("{}'s id is {}.".format(user.first_name, user.id))
+            update.effective_message.reply_text("{}'s id is `{}`.".format(escape_markdown(user.first_name), user.id),
+                                                parse_mode=ParseMode.MARKDOWN)
     else:
         chat = update.effective_chat
         if chat.type == "private":
-            update.effective_message.reply_text("Your id is {}.".format(chat.id))
+            update.effective_message.reply_text("Your id is `{}`.".format(chat.id),
+                                                parse_mode=ParseMode.MARKDOWN)
 
         else:
-            update.effective_message.reply_text("This group's id is {}.".format(chat.id))
+            update.effective_message.reply_text("This group's id is `{}`.".format(chat.id),
+                                                parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -325,7 +329,6 @@ __help__ = """
 """
 
 __name__ = "Misc"
-
 
 ID_HANDLER = CommandHandler("id", get_id)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
