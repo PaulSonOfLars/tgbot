@@ -1,4 +1,5 @@
 import re
+import sre_constants
 
 import telegram
 from telegram.ext import RegexHandler, run_async
@@ -58,14 +59,18 @@ def sed(bot, update):
             return
 
         repl, repl_with, flags = sed_result
-        if 'i' in flags and 'g' in flags:
-            text = re.sub(repl, repl_with, to_fix, flags=re.I).strip()
-        elif 'i' in flags:
-            text = re.sub(repl, repl_with, to_fix, count=1, flags=re.I).strip()
-        elif 'g' in flags:
-            text = re.sub(repl, repl_with, to_fix).strip()
-        else:
-            text = re.sub(repl, repl_with, to_fix, count=1).strip()
+        try:
+            if 'i' in flags and 'g' in flags:
+                text = re.sub(repl, repl_with, to_fix, flags=re.I).strip()
+            elif 'i' in flags:
+                text = re.sub(repl, repl_with, to_fix, count=1, flags=re.I).strip()
+            elif 'g' in flags:
+                text = re.sub(repl, repl_with, to_fix).strip()
+            else:
+                text = re.sub(repl, repl_with, to_fix, count=1).strip()
+        except sre_constants.error:
+            update.effective_message.reply_text("Do you even sed? Apparently not.")
+            return
 
         # empty string errors -_-
         if len(text) >= telegram.MAX_MESSAGE_LENGTH:
