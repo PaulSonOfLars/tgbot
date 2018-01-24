@@ -1,13 +1,13 @@
 from io import BytesIO
 
-from telegram import ParseMode, MessageEntity
+from telegram import MessageEntity
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import escape_markdown
 
+import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
 from tg_bot.modules.helper_funcs import CustomFilters, extract_user, can_restrict, user_not_admin, send_to_list
-import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot.modules.sql.users_sql import get_all_chats
 
 GBAN_ENFORCE_GROUP = 6

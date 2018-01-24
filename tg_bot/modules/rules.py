@@ -1,5 +1,6 @@
-from telegram import ParseMode
+from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import CommandHandler, run_async, Filters
+from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.rules_sql as sql
 from tg_bot import dispatcher
@@ -9,12 +10,31 @@ from tg_bot.modules.helper_funcs import user_admin, markdown_parser
 @run_async
 def get_rules(bot, update):
     chat_id = update.effective_chat.id
+    send_rules(update, chat_id)
+
+
+def send_rules(update, chat_id, from_pm=False):
+    bot = dispatcher.bot
+    chat = bot.get_chat(chat_id)
+    user = update.effective_user
+
     rules = sql.get_rules(chat_id)
-    if rules:
-        update.effective_message.reply_text(rules, parse_mode=ParseMode.MARKDOWN)
+    text = "The rules for *{}* are:\n\n{}".format(escape_markdown(chat.title), rules)
+
+    if from_pm and rules:
+        bot.send_message(user.id, text, parse_mode=ParseMode.MARKDOWN)
+    elif from_pm:
+        bot.send_message(user.id, "The group admins haven't set any rules for this chat yet. "
+                                  "This probably doesn't mean it's lawless though...!")
+    elif rules:
+        update.effective_message.reply_text("Contact me in PM to get this group's rules.",
+                                            reply_markup=InlineKeyboardMarkup(
+                                                [[InlineKeyboardButton(text="Rules",
+                                                                       url="t.me/{}?start={}".format(bot.username,
+                                                                                                     chat_id))]]))
     else:
         update.effective_message.reply_text("The group admins haven't set any rules for this chat yet. "
-                                            "This probably doesn't  mean it's lawless though...!")
+                                            "This probably doesn't mean it's lawless though...!")
 
 
 @run_async
@@ -52,7 +72,6 @@ __help__ = """
 """
 
 __name__ = "Rules"
-
 
 GET_RULES_HANDLER = CommandHandler("rules", get_rules, filters=Filters.group)
 SET_RULES_HANDLER = CommandHandler("setrules", set_rules, filters=Filters.group)

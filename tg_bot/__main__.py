@@ -1,5 +1,4 @@
 import importlib
-
 import re
 
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
@@ -47,7 +46,7 @@ motivate him to make me even better. All the donation money will go to a better 
 (see his bio!). He's just a poor student, so every little helps!
 There are two ways of paying him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
 
-IMPORTED = []
+IMPORTED = {}
 MIGRATEABLE = []
 HELPABLE = {}
 STATS = []
@@ -55,7 +54,7 @@ USER_INFO = []
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
-    IMPORTED.append(imported_module)
+    IMPORTED[imported_module.__name__.lower()] = imported_module
 
     if hasattr(imported_module, "__help__") and imported_module.__help__:
         if imported_module.__name__.lower() in HELPABLE:
@@ -74,6 +73,16 @@ for module_name in ALL_MODULES:
         USER_INFO.append(imported_module)
 
 
+# do not async
+def send_help(chat_id, text, keyboard=None):
+    if not keyboard:
+        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE))
+    dispatcher.bot.send_message(chat_id=chat_id,
+                                text=text,
+                                parse_mode=ParseMode.MARKDOWN,
+                                reply_markup=keyboard)
+
+
 @run_async
 def test(bot, update):
     # pprint(eval(str(update)))
@@ -82,12 +91,21 @@ def test(bot, update):
     print(update.effective_message)
 
 
-def start(bot, update):
+@run_async
+def start(bot, update, args):
     if update.effective_chat.type == "private":
-        first_name = update.effective_user.first_name
-        update.effective_message.reply_text(
-            PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
-            parse_mode=ParseMode.MARKDOWN)
+        if len(args) >= 1:
+            if args[0].lower() == "help":
+                send_help(update.effective_chat.id, HELP_STRINGS)
+
+            elif args[0][1:].isdigit() and "rules" in IMPORTED:
+                IMPORTED["rules"].send_rules(update, args[0], from_pm=True)
+
+        else:
+            first_name = update.effective_user.first_name
+            update.effective_message.reply_text(
+                PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
+                parse_mode=ParseMode.MARKDOWN)
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
@@ -170,23 +188,21 @@ def get_help(bot, update):
 
     # ONLY send help in PM
     if chat.type != chat.PRIVATE:
-        update.effective_message.reply_text("Contact me in PM to get the list of possible commands.")
+        update.effective_message.reply_text("Contact me in PM to get the list of possible commands.",
+                                            reply_markup=InlineKeyboardMarkup(
+                                                [[InlineKeyboardButton(text="Help",
+                                                                       url="t.me/{}?start=help".format(bot.username))]])
+                                            )
         return
 
     elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
         module = args[1].lower()
         text = "Here is the available help for the *{}* module:\n".format(HELPABLE[module].__name__) \
                + escape_markdown(HELPABLE[module].__help__)
-        update.effective_message.reply_text(text=text,
-                                            parse_mode=ParseMode.MARKDOWN,
-                                            reply_markup=InlineKeyboardMarkup(
-                                                [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
+        send_help(chat.id, text, InlineKeyboardMarkup([[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
 
     else:
-        keyboard = InlineKeyboardMarkup(paginate_modules(0, HELPABLE))
-        update.effective_message.reply_text(text=HELP_STRINGS,
-                                            parse_mode=ParseMode.MARKDOWN,
-                                            reply_markup=keyboard)
+        send_help(chat.id, HELP_STRINGS)
 
 
 @run_async
@@ -232,7 +248,8 @@ def migrate_chats(bot, update):
 
 def main():
     test_handler = MessageHandler(Filters.all, test, edited_updates=True, message_updates=False)
-    start_handler = CommandHandler("start", start)
+    start_handler = CommandHandler("start", start, pass_args=True)
+
     help_handler = CommandHandler("help", get_help)
     help_callback_handler = CallbackQueryHandler(help_button, pattern=r"help_")
     donate_handler = CommandHandler("donate", donate)

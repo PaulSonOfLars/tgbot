@@ -36,7 +36,7 @@ def set_rules(chat_id, rules_text):
 def get_rules(chat_id):
     rules = SESSION.query(Rules).get(str(chat_id))
     ret = ""
-    if rules and rules.rules:
+    if rules:
         ret = rules.rules
 
     SESSION.close()
