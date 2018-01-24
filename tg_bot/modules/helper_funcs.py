@@ -5,7 +5,7 @@ from typing import List
 
 import emoji
 from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton, Bot, ParseMode, Message
-from telegram.error import BadRequest
+from telegram.error import BadRequest, TelegramError
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
 
@@ -416,7 +416,7 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False):
     for user_id in set(send_to):
         try:
             bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN if markdown else None)
-        except Exception:
+        except TelegramError:
             pass  # ignore users who fail
 
 

@@ -7,7 +7,7 @@ from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS, BAN_STICKER
 from tg_bot.__main__ import STATS, USER_INFO
 from tg_bot.modules.helper_funcs import CustomFilters, extract_user
 
@@ -248,7 +248,7 @@ def get_time(bot, update, args):
     location = " ".join(args)
     if location.lower() == bot.first_name.lower():
         update.effective_message.reply_text("Its always banhammer time for me!")
-        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
+        bot.send_sticker(update.effective_chat.id, BAN_STICKER)
         return
 
     res = requests.get(GMAPS_LOC, params=dict(address=location))

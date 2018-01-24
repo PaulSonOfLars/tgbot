@@ -5,7 +5,7 @@ from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup, 
 from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher
+from tg_bot import dispatcher, BAN_STICKER
 from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin, user_admin_no_reply, extract_text, \
     split_message
 from tg_bot.modules.sql import warns_sql as sql
@@ -53,7 +53,7 @@ def warn(user_id, chat, reason, bot, message):
     if user_warned.num_warns >= 3:
         res = chat.kick_member(user_id)
         if res:
-            bot.send_sticker(chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')  # banhammer marie sticker
+            bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
             message.reply_text("3 warnings, this user has been banned!")
             sql.reset_warns(user_id, chat.id)
         else:

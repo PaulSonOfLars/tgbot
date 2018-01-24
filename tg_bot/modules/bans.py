@@ -1,7 +1,7 @@
 from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
 
-from tg_bot import dispatcher
+from tg_bot import dispatcher, BAN_STICKER
 from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat, extract_user, \
     can_restrict, is_user_ban_protected
 
@@ -37,7 +37,7 @@ def ban(bot, update, args):
 
     res = update.effective_chat.kick_member(user_id)
     if res:
-        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')  # banhammer marie sticker
+        bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned!")
     else:
         message.reply_text("Well damn, I can't ban that user.")
@@ -65,7 +65,7 @@ def kick(bot, update, args):
 
     res = update.effective_chat.unban_member(user_id)  # unban on current user = kick
     if res:
-        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')  # banhammer marie sticker
+        bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Kicked!")
     else:
         message.reply_text("Well damn, I can't kick that user.")
