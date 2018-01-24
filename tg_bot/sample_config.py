@@ -23,6 +23,7 @@ class Config(object):
     CERT_PATH = None
     PORT = 5000
     DEL_CMDS = False  # Whether or not you should delete "blue text must click" commands
+    STRICT_GBAN = False
 
 
 class Production(Config):

@@ -2,13 +2,15 @@ from io import BytesIO
 
 from telegram import ParseMode, MessageEntity
 from telegram.error import BadRequest, TelegramError
-from telegram.ext import run_async, CommandHandler
+from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS
-from tg_bot.modules.helper_funcs import CustomFilters, extract_user
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
+from tg_bot.modules.helper_funcs import CustomFilters, extract_user, can_restrict, user_not_admin
 import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot.modules.sql.users_sql import get_all_chats
+
+GBAN_ENFORCE_GROUP = 6
 
 
 @run_async
@@ -167,6 +169,15 @@ def gbanlist(bot, update):
                                                 caption="Here is the list of currently gbanned users.")
 
 
+@can_restrict
+@user_not_admin
+def enforce_gban(bot, update):
+    user = update.effective_message.from_user.id
+    if sql.is_user_gbanned(user.id):
+        update.effective_chat.kick_member(user.id)
+        update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
+
+
 def __user_info__(user_id):
     return "Globally banned: *{}*".format("Yes" if sql.is_user_gbanned(user_id) else "No")
 
@@ -182,6 +193,11 @@ UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True,
 GBAN_LIST = CommandHandler("gbanlist", gbanlist,
                            filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
+GBAN_ENFORCER = MessageHandler(Filters.all & Filters.group, enforce_gban)
+
 dispatcher.add_handler(GBAN_HANDLER)
 dispatcher.add_handler(UNGBAN_HANDLER)
 dispatcher.add_handler(GBAN_LIST)
+
+if STRICT_GBAN:  # enforce GBANS if this is set
+    dispatcher.add_handler(GBAN_ENFORCER, GBAN_ENFORCE_GROUP)

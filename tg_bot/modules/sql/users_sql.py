@@ -71,7 +71,7 @@ def ensure_bot_in_db():
         SESSION.commit()
 
 
-def update_user(user_id, username, chat_id, chat_name):
+def update_user(user_id, username, chat_id=None, chat_name=None):
     with INSERTION_LOCK:
         user = SESSION.query(Users).get(user_id)
         if not user:
@@ -80,6 +80,10 @@ def update_user(user_id, username, chat_id, chat_name):
             SESSION.flush()
         else:
             user.username = username
+
+        if not chat_id or not chat_name:
+            SESSION.commit()
+            return
 
         chat = SESSION.query(Chats).get(str(chat_id))
         if not chat:

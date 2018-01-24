@@ -66,6 +66,8 @@ The following env variables are supported:
  - `DONATION_LINK`: optional: link where you would like to receive donations.
  - `LOAD`: space separated list of modules you would like to load
  - `NO_LOAD`: space separated list of modules you would like NOT to load
+ - `DEL_CMDS`: delete commands from users which don't have rights to use that command
+ - `STRICT_GBAN`: enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.
 
 ### Python dependencies
 

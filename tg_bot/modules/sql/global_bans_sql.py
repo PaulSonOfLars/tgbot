@@ -28,6 +28,7 @@ class GloballyBannedUsers(BASE):
 GloballyBannedUsers.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
+GBANNED_LIST = []
 
 
 def gban_user(user_id, name, reason=None):
@@ -38,6 +39,7 @@ def gban_user(user_id, name, reason=None):
 
         SESSION.merge(user)
         SESSION.commit()
+        load_gbanned_userid_list()
 
 
 def ungban_user(user_id):
@@ -47,11 +49,12 @@ def ungban_user(user_id):
             SESSION.delete(user)
 
         SESSION.commit()
+        load_gbanned_userid_list()
 
 
 def is_user_gbanned(user_id):
     try:
-        return bool(SESSION.query(GloballyBannedUsers).get(user_id))
+        return user_id in GBANNED_LIST
     finally:
         SESSION.close()
 
@@ -61,3 +64,15 @@ def get_gban_list():
         return [x.to_dict() for x in SESSION.query(GloballyBannedUsers).all()]
     finally:
         SESSION.close()
+
+
+def load_gbanned_userid_list():
+    global GBANNED_LIST
+    try:
+        GBANNED_LIST = [x.user_id for x in SESSION.query(GloballyBannedUsers).all()]
+    finally:
+        SESSION.close()
+
+
+# Create in memory userid to avoid disk access
+load_gbanned_userid_list()
