@@ -3,7 +3,7 @@ from functools import wraps
 from math import ceil
 
 import emoji
-from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton
+from telegram import MAX_MESSAGE_LENGTH, MessageEntity, InlineKeyboardButton, Bot, ParseMode
 from telegram.error import BadRequest
 from telegram.ext import BaseFilter
 from telegram.utils.helpers import escape_markdown
@@ -130,7 +130,7 @@ def user_admin_no_reply(func):
             func(bot, update, *args, **kwargs)
 
         elif DEL_CMDS and " " not in update.effective_message.text:
-                update.effective_message.delete()
+            update.effective_message.delete()
 
     return is_admin
 
@@ -409,6 +409,14 @@ def paginate_modules(page_n, MODULE_DICT):
              EqInlineKeyboardButton(">", callback_data="help_next({})".format(modulo_page)))]
 
     return pairs
+
+
+def send_to_list(bot: Bot, send_to: list, message: str, markdown=False):
+    for user_id in send_to:
+        try:
+            bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN if markdown else None)
+        except BadRequest:
+            pass # ignore users who havent said yes
 
 
 class CustomFilters(object):

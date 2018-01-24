@@ -36,10 +36,13 @@ def gban_user(user_id, name, reason=None):
         user = SESSION.query(GloballyBannedUsers).get(user_id)
         if not user:
             user = GloballyBannedUsers(user_id, name, reason)
+        else:
+            user.name = name
+            user.reason = reason
 
         SESSION.merge(user)
         SESSION.commit()
-        load_gbanned_userid_list()
+        __load_gbanned_userid_list()
 
 
 def ungban_user(user_id):
@@ -49,7 +52,7 @@ def ungban_user(user_id):
             SESSION.delete(user)
 
         SESSION.commit()
-        load_gbanned_userid_list()
+        __load_gbanned_userid_list()
 
 
 def is_user_gbanned(user_id):
@@ -66,7 +69,7 @@ def get_gban_list():
         SESSION.close()
 
 
-def load_gbanned_userid_list():
+def __load_gbanned_userid_list():
     global GBANNED_LIST
     try:
         GBANNED_LIST = [x.user_id for x in SESSION.query(GloballyBannedUsers).all()]
@@ -75,4 +78,4 @@ def load_gbanned_userid_list():
 
 
 # Create in memory userid to avoid disk access
-load_gbanned_userid_list()
+__load_gbanned_userid_list()

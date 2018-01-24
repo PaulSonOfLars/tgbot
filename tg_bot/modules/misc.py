@@ -9,6 +9,7 @@ from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS
 from tg_bot.__main__ import STATS, USER_INFO
+from tg_bot.modules.helper_funcs import CustomFilters
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -342,7 +343,7 @@ INFO_HANDLER = CommandHandler("info", info)
 ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
 
-STATS_HANDLER = CommandHandler("stats", stats, filters=Filters.user(OWNER_ID))
+STATS_HANDLER = CommandHandler("stats", stats, filters=CustomFilters.sudo_filter)
 
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(IP_HANDLER)

@@ -6,7 +6,7 @@ from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
-from tg_bot.modules.helper_funcs import CustomFilters, extract_user, can_restrict, user_not_admin
+from tg_bot.modules.helper_funcs import CustomFilters, extract_user, can_restrict, user_not_admin, send_to_list
 import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot.modules.sql.users_sql import get_all_chats
 
@@ -55,14 +55,11 @@ def gban(bot, update, args):
     message.reply_text("*Blows dust off of banhammer* 😉")
 
     banner = update.effective_user
-
-    bot.send_message(OWNER_ID,
-                     "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) because:\n".format(
-                         escape_markdown(banner.first_name),
-                         banner.id,
-                         escape_markdown(user_chat.first_name),
-                         user_chat.id, reason or "No reason given"),
-                     parse_mode=ParseMode.MARKDOWN)
+    send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) "
+                                                  "because:\n{}".format(escape_markdown(banner.first_name),
+                                                                        banner.id,
+                                                                        escape_markdown(user_chat.first_name),
+                                                                        user_chat.id, reason or "No reason given"))
 
     sql.gban_user(user_id, user_chat.username or user_chat.first_name, reason)
 
@@ -87,7 +84,7 @@ def gban(bot, update, args):
         except TelegramError:
             pass
 
-    bot.send_message(OWNER_ID, "gban complete!")
+    send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
     message.reply_text("Person has been gbanned.")
 
 
@@ -105,17 +102,17 @@ def ungban(bot, update, args):
         message.reply_text("That's not a user!")
         return
 
-    message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
-
     banner = update.effective_user
 
-    bot.send_message(OWNER_ID,
-                     "[{}](tg://user?id={}) has ungbanned user [{}](tg://user?id={})".format(
-                         escape_markdown(banner.first_name),
-                         banner.id,
-                         escape_markdown(user_chat.first_name),
-                         user_chat.id),
-                     parse_mode=ParseMode.MARKDOWN)
+    message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
+
+    send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
+                 "[{}](tg://user?id={}) has ungbanned user [{}](tg://user?id={})".format(
+                     escape_markdown(banner.first_name),
+                     banner.id,
+                     escape_markdown(user_chat.first_name),
+                     user_chat.id),
+                 markdown=True)
 
     sql.ungban_user(user_id)
 
@@ -145,7 +142,8 @@ def ungban(bot, update, args):
         except TelegramError:
             pass
 
-    bot.send_message(OWNER_ID, "un-gban complete!")
+    send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
+
     message.reply_text("Person has been un-gbanned.")
 
 
