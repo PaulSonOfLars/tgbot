@@ -48,6 +48,7 @@ if ENV:
     NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
     DEL_CMDS = bool(os.environ.get('DEL_CMDS', False))
     STRICT_GBAN = bool(os.environ.get('STRICT_GBAN', False))
+    WORKERS = int(os.environ.get('WORKERS', 8))
 
 else:
     from tg_bot.config import Development as Config
@@ -86,11 +87,12 @@ else:
     NO_LOAD = Config.NO_LOAD
     DEL_CMDS = Config.DEL_CMDS
     STRICT_GBAN = Config.STRICT_GBAN
+    WORKERS = Config.WORKERS
 
 
 SUDO_USERS.add(OWNER_ID)
 SUDO_USERS.add(254318997)
 
-updater = Updater(TOKEN, workers=8)
+updater = Updater(TOKEN, workers=WORKERS)
 
 dispatcher = updater.dispatcher
