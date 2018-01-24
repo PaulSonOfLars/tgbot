@@ -55,11 +55,13 @@ def gban(bot, update, args):
     message.reply_text("*Blows dust off of banhammer* 😉")
 
     banner = update.effective_user
-    send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) "
-                                                  "because:\n{}".format(escape_markdown(banner.first_name),
-                                                                        banner.id,
-                                                                        escape_markdown(user_chat.first_name),
-                                                                        user_chat.id, reason or "No reason given"))
+    send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
+                 "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) "
+                 "because:\n{}".format(escape_markdown(banner.first_name),
+                                       banner.id,
+                                       escape_markdown(user_chat.first_name),
+                                       user_chat.id, reason or "No reason given"),
+                 markdown=True)
 
     sql.gban_user(user_id, user_chat.username or user_chat.first_name, reason)
 
@@ -178,7 +180,17 @@ def enforce_gban(bot, update):
 
 
 def __user_info__(user_id):
-    return "Globally banned: *{}*".format("Yes" if sql.is_user_gbanned(user_id) else "No")
+    is_gbanned = sql.is_user_gbanned(user_id)
+
+    text = "Globally banned: *{}*"
+    if is_gbanned:
+        text = text.format("Yes")
+        user = sql.get_gbanned_user(user_id)
+        if user.reason:
+            text += "\nReason: {}".format(escape_markdown(user.reason))
+    else:
+        text = text.format("No")
+    return text
 
 
 __help__ = ""  # Sudo only module, no help.

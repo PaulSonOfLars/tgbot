@@ -56,8 +56,12 @@ def ungban_user(user_id):
 
 
 def is_user_gbanned(user_id):
+    return user_id in GBANNED_LIST
+
+
+def get_gbanned_user(user_id):
     try:
-        return user_id in GBANNED_LIST
+        return SESSION.query(GloballyBannedUsers).get(user_id)
     finally:
         SESSION.close()
 

@@ -413,7 +413,7 @@ def paginate_modules(page_n, module_dict):
 
 
 def send_to_list(bot: Bot, send_to: list, message: str, markdown=False):
-    for user_id in send_to:
+    for user_id in set(send_to):
         try:
             bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN if markdown else None)
         except BadRequest:
