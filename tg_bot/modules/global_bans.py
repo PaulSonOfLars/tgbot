@@ -173,7 +173,7 @@ def gbanlist(bot, update):
 @can_restrict
 @user_not_admin
 def enforce_gban(bot, update):
-    user = update.effective_message.from_user.id
+    user = update.effective_message.from_user
     if sql.is_user_gbanned(user.id):
         update.effective_chat.kick_member(user.id)
         update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
