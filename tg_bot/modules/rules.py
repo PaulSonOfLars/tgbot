@@ -1,4 +1,5 @@
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
@@ -15,8 +16,16 @@ def get_rules(bot, update):
 
 def send_rules(update, chat_id, from_pm=False):
     bot = dispatcher.bot
-    chat = bot.get_chat(chat_id)
     user = update.effective_user
+    try:
+        chat = bot.get_chat(chat_id)
+    except BadRequest as excp:
+        if excp.message == "Chat not found" and from_pm:
+            bot.send_message(user.id, "The rules shortcut hasn't been set properly for this chat! Ask admins to "
+                                      "fix this.")
+            return
+        else:
+            raise
 
     rules = sql.get_rules(chat_id)
     text = "The rules for *{}* are:\n\n{}".format(escape_markdown(chat.title), rules)
