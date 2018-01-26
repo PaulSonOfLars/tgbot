@@ -22,7 +22,7 @@ def check_flood(bot, update):
     should_ban = sql.update_flood(chat.id, user.id)
     if should_ban:
         try:
-            res = chat.kick_member(user.id)
+            chat.kick_member(user.id)
             message.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
                                "disappointment. Get out.")
 

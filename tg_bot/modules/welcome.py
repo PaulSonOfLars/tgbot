@@ -68,17 +68,17 @@ def new_member(bot, update):
                     update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
                 except IndexError:
 
-                    update.effective_message.reply_text(markdown_parser(
-                        sql.DEFAULT_WELCOME.format(first=first_name) +
-                        "\nNote: the current welcome message was invalid due to markdown issues. Could be due to the "
-                        "user's name."),
-                        parse_mode=ParseMode.MARKDOWN)
+                    update.effective_message.reply_text(markdown_parser(sql.DEFAULT_WELCOME.format(first=first_name) +
+                                                                        "\nNote: the current welcome message was "
+                                                                        "invalid due to markdown issues. Could be "
+                                                                        "due to the user's name."),
+                                                        parse_mode=ParseMode.MARKDOWN)
                 except KeyError:
-                    update.effective_message.reply_text(markdown_parser(
-                        sql.DEFAULT_WELCOME.format(first=first_name) +
-                        "\nNote: the current welcome message is invalid due to an issue with some misplaced curly "
-                        "brackets. Please update"),
-                        parse_mode=ParseMode.MARKDOWN)
+                    update.effective_message.reply_text(markdown_parser(sql.DEFAULT_WELCOME.format(first=first_name) +
+                                                                        "\nNote: the current welcome message is "
+                                                                        "invalid due to an issue with some misplaced "
+                                                                        "curly brackets. Please update"),
+                                                        parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -131,15 +131,17 @@ def left_member(bot, update):
             try:
                 update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
             except IndexError:
-                update.effective_message.reply_text(markdown_parser(
-                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid due to markdown issues."
-                                        " Please update."),
-                    parse_mode=ParseMode.MARKDOWN)
+                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_LEAVE + "\nNote: the current leave "
+                                                                                        "message is invalid due to "
+                                                                                        "markdown issues. "
+                                                                                        " Please update."),
+                                                    parse_mode=ParseMode.MARKDOWN)
             except KeyError:
-                update.effective_message.reply_text(markdown_parser(
-                    sql.DEFAULT_LEAVE + "\nNote: the current leave message is invalid due to misplaced curly brackets."
-                                        " Please update."),
-                    parse_mode=ParseMode.MARKDOWN)
+                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_LEAVE + "\nNote: the current leave "
+                                                                                        "message is invalid due to "
+                                                                                        "misplaced curly brackets. "
+                                                                                        " Please update."),
+                                                    parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async

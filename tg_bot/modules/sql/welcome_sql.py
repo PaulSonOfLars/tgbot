@@ -221,12 +221,12 @@ def migrate_chat(old_chat_id, new_chat_id):
 
         with WELC_BTN_LOCK:
             chat_buttons = SESSION.query(WelcomeButtons).filter(WelcomeButtons.chat_id == str(old_chat_id)).all()
-            for b in chat_buttons:
-                b.chat_id = str(new_chat_id)
+            for btn in chat_buttons:
+                btn.chat_id = str(new_chat_id)
 
         with LEAVE_BTN_LOCK:
             chat_buttons = SESSION.query(LeaveButtons).filter(LeaveButtons.chat_id == str(old_chat_id)).all()
-            for b in chat_buttons:
-                b.chat_id = str(new_chat_id)
+            for btn in chat_buttons:
+                btn.chat_id = str(new_chat_id)
 
         SESSION.commit()

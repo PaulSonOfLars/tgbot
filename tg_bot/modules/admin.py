@@ -109,8 +109,8 @@ def pin(bot, update, args):
     if prev_message and is_group:
         try:
             bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
-        except BadRequest as e:
-            if e.message == "Chat_not_modified":
+        except BadRequest as excp:
+            if excp.message == "Chat_not_modified":
                 pass
             else:
                 raise

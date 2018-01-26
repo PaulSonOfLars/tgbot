@@ -172,6 +172,9 @@ def extract_user(message: Message, args: List[str]):
     elif prev_message:
         user_id = prev_message.from_user.id
 
+    else:
+        return None
+
     try:
         message.chat.get_member(user_id)
     except BadRequest as excp:
