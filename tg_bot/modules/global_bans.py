@@ -30,6 +30,10 @@ def gban(bot, update, args):
         message.reply_text("OOOH someone's trying to gban a support user! *grabs popcorn*")
         return
 
+    if user_id == bot.id:
+        message.reply_text("-_- So funny, lets gban myself why don't I? Nice try.")
+        return
+
     try:
         user_chat = bot.get_chat(user_id)
     except BadRequest as excp:
@@ -81,7 +85,8 @@ def gban(bot, update, args):
                 pass
             else:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
-                bot.send_message(OWNER_ID, "Could not gban due to: {}".format(excp.message))
+                send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
+                sql.ungban_user(user_id)
                 return
         except TelegramError:
             pass
