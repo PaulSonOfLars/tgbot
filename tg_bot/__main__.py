@@ -54,7 +54,10 @@ USER_INFO = []
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
-    IMPORTED[imported_module.__name__.lower()] = imported_module
+    if not imported_module.__name__.lower() in IMPORTED:
+        IMPORTED[imported_module.__name__.lower()] = imported_module
+    else:
+        raise Exception("Can't have two modules with the same name! Please change one")
 
     if hasattr(imported_module, "__help__") and imported_module.__help__:
         if imported_module.__name__.lower() in HELPABLE:
