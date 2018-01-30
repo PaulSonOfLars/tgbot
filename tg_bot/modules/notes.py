@@ -1,3 +1,6 @@
+import re
+
+from io import BytesIO
 from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, RegexHandler, Filters
@@ -5,7 +8,7 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
-from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME
+from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, OWNER_ID
 from tg_bot.modules.helper_funcs import user_admin, button_markdown_parser
 
 
@@ -170,6 +173,33 @@ def list_notes(bot, update):
 
     elif len(msg) != 0:
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
+
+
+FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
+
+
+def __import_data__(chat_id, data):
+    failures = []
+    for notename, notedata in data.get('extra', {}).items():
+        print(notename[1:])
+        match = FILE_MATCHER.match(notedata)
+
+        if match:
+            failures.append(notename)
+            notedata = notedata[:match.end()].strip()
+            if notedata:
+                sql.add_note_to_db(chat_id, notename[1:], notedata)
+        else:
+            sql.add_note_to_db(chat_id, notename[1:], notedata)
+
+    if failures:
+        with BytesIO(str.encode("\n".join(failures))) as output:
+            output.name = "failed_imports.txt"
+            dispatcher.bot.send_document(chat_id, document=output, filename="failed_imports.txt",
+                                         caption="These files/photos failed to import due to originating "
+                                                 "from another bot. This is a telegram API restriction - each bot sees "
+                                                 "files with a different file_id, to avoid one bot accessing another's "
+                                                 "files. Sorry for the inconvenience!")
 
 
 def __stats__():

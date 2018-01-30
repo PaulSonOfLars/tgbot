@@ -51,6 +51,8 @@ MIGRATEABLE = []
 HELPABLE = {}
 STATS = []
 USER_INFO = []
+DATA_IMPORT = []
+DATA_EXPORT = []
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
@@ -74,6 +76,12 @@ for module_name in ALL_MODULES:
 
     if hasattr(imported_module, "__user_info__"):
         USER_INFO.append(imported_module)
+
+    if hasattr(imported_module, "__import_data__"):
+        DATA_IMPORT.append(imported_module)
+
+    if hasattr(imported_module, "__export_data__"):
+        DATA_EXPORT.append(imported_module)
 
 
 # do not async
@@ -251,7 +259,7 @@ def migrate_chats(bot, update):
 
 
 def main():
-    test_handler = MessageHandler(Filters.all, test, edited_updates=True, message_updates=False)
+    test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start, pass_args=True)
 
     help_handler = CommandHandler("help", get_help)

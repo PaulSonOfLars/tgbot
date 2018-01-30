@@ -70,6 +70,12 @@ def clear_rules(bot, update):
     update.effective_message.reply_text("Successfully cleared rules!")
 
 
+def __import_data__(chat_id, data):
+    # set chat rules
+    rules = data.get('info', {}).get('rules', "")
+    sql.set_rules(chat_id, rules)
+
+
 def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 

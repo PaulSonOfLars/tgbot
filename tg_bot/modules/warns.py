@@ -219,6 +219,12 @@ def reply_filter(bot, update):
             warn(user_id, chat, warn_filter.reply, bot, message)
 
 
+def __import_data__(chat_id, data):
+    for user_id, count in data.get('warns', {}).items():
+        for x in range(count):
+            sql.warn_user(user_id, chat_id)
+
+
 def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
