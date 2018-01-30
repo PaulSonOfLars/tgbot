@@ -2,6 +2,7 @@ import json
 from io import BytesIO
 
 from telegram import Bot
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, run_async
 
 from tg_bot import dispatcher
@@ -17,7 +18,13 @@ def import_data(bot: Bot, update):
     # TODO: allow uploading doc with command, not just as reply
     # only work with a doc
     if msg.reply_to_message and msg.reply_to_message.document:
-        file_info = bot.get_file(msg.reply_to_message.document.file_id)
+        try:
+            file_info = bot.get_file(msg.reply_to_message.document.file_id)
+        except BadRequest:
+            msg.reply_text("Try downloading and reuploading the file as yourself before importing - this one seems "
+                           "to be iffy!")
+            return
+
         with BytesIO() as file:
             file_info.download(out=file)
             file.seek(0)
