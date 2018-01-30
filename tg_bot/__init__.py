@@ -1,6 +1,7 @@
 import logging
 import os
 
+import sys
 from telegram.ext import Updater
 
 # enable logging
@@ -9,6 +10,11 @@ logging.basicConfig(
     level=logging.INFO)
 
 LOGGER = logging.getLogger(__name__)
+
+# if version < 3.6, stop bot.
+if sys.version_info[0] < 3 or sys.version_info[1] < 6:
+    LOGGER.error("You MUST have a python version of at least 3.6! Multiple features depend on this. Bot quitting.")
+    quit(1)
 
 ENV = bool(os.environ.get('ENV', False))
 
