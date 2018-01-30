@@ -61,7 +61,6 @@ def set_flood(bot, update, args):
 
 
 @run_async
-@user_admin
 def flood(bot, update):
     chat = update.effective_chat
 
