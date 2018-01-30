@@ -221,7 +221,7 @@ def reply_filter(bot, update):
 
 def __import_data__(chat_id, data):
     for user_id, count in data.get('warns', {}).items():
-        for x in range(count):
+        for x in range(int(count)):
             sql.warn_user(user_id, chat_id)
 
 
