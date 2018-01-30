@@ -181,7 +181,6 @@ FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
 def __import_data__(chat_id, data):
     failures = []
     for notename, notedata in data.get('extra', {}).items():
-        print(notename[1:])
         match = FILE_MATCHER.match(notedata)
 
         if match:
