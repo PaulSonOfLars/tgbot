@@ -18,6 +18,7 @@ class Permissions(BASE):
     photo = Column(Boolean, default=False)
     sticker = Column(Boolean, default=False)
     gif = Column(Boolean, default=False)
+    url = Column(Boolean, default=False)
 
     def __init__(self, chat_id):
         self.chat_id = str(chat_id)  # ensure string
@@ -29,6 +30,7 @@ class Permissions(BASE):
         self.photo = False
         self.sticker = False
         self.gif = False
+        self.url = False
 
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
@@ -107,6 +109,8 @@ def update_lock(chat_id, lock_type, locked):
             curr_perm.sticker = locked
         elif lock_type == "gif":
             curr_perm.gif = locked
+        elif lock_type == 'url':
+            curr_perm.url = locked
 
         SESSION.add(curr_perm)
         SESSION.commit()
@@ -159,6 +163,8 @@ def is_locked(chat_id, lock_type):
         return curr_perm.document
     elif lock_type == "gif":
         return curr_perm.gif
+    elif lock_type == "url":
+        return curr_perm.url
 
 
 def is_restr_locked(chat_id, lock_type):

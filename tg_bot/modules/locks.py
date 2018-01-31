@@ -1,4 +1,4 @@
-from telegram import TelegramError
+from telegram import TelegramError, MessageEntity
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
@@ -9,7 +9,7 @@ from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, u
 from tg_bot.modules.helper_funcs.cust_filters import CustomFilters
 from tg_bot.modules.sql import users_sql
 
-LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif']
+LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif', 'url']
 
 RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews', 'all']
 
@@ -192,6 +192,14 @@ def del_gif(bot, update):
 
 @run_async
 @user_not_admin
+def del_url(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "url") and can_delete(chat, bot.id):
+        update.effective_message.delete()
+
+
+@run_async
+@user_not_admin
 def rest_msg(bot, update):
     msg = update.effective_message
     chat = update.effective_chat
@@ -318,6 +326,7 @@ VIDEO_HANDLER = MessageHandler(Filters.video, del_video)
 CONTACT_HANDLER = MessageHandler(Filters.contact, del_contact)
 PHOTO_HANDLER = MessageHandler(Filters.photo, del_photo)
 GIF_HANDLER = MessageHandler(GIF, del_gif)
+URL_HANDLER = MessageHandler(Filters.entity(MessageEntity.URL), del_url)
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(UNLOCK_HANDLER)
@@ -329,7 +338,6 @@ dispatcher.add_handler(REST_MEDIA_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_OTHERS_HANDLER, REST_GROUP)
 # dispatcher.add_handler(REST_PREVIEWS_HANDLER, REST_GROUP) # NOTE: disable, checking for URL's will trigger all urls,
 
-dispatcher.add_handler(GIF_HANDLER)
 dispatcher.add_handler(STICKER_HANDLER)
 dispatcher.add_handler(AUDIO_HANDLER)
 dispatcher.add_handler(VOICE_HANDLER)
@@ -337,3 +345,5 @@ dispatcher.add_handler(DOCUMENT_HANDLER)
 dispatcher.add_handler(VIDEO_HANDLER)
 dispatcher.add_handler(CONTACT_HANDLER)
 dispatcher.add_handler(PHOTO_HANDLER)
+dispatcher.add_handler(GIF_HANDLER)
+dispatcher.add_handler(URL_HANDLER)
