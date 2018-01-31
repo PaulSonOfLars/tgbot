@@ -2,7 +2,7 @@ from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 
-from tg_bot import dispatcher
+from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
 
 
@@ -18,7 +18,8 @@ def purge(bot, update):
             try:
                 bot.deleteMessage(chat.id, m_id)
             except BadRequest as err:
-                print(err)
+                if err.message != "Message to delete not found":
+                    LOGGER.exception("Error while purging chat messages.")
         bot.send_message(chat.id, "Purge complete.", 'Markdown')
 
 

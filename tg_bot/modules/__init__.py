@@ -1,4 +1,4 @@
-from tg_bot import LOAD, NO_LOAD
+from tg_bot import LOAD, NO_LOAD, LOGGER
 
 
 def __list_all_modules():
@@ -14,14 +14,14 @@ def __list_all_modules():
         to_load = LOAD
         if to_load:
             if not all(any(mod == module_name for module_name in all_modules) for mod in to_load):
-                print("Invalid loadorder names. Quitting.")
+                LOGGER.error("Invalid loadorder names. Quitting.")
                 quit(1)
 
         else:
             to_load = all_modules
 
         if NO_LOAD:
-            print("Not loading: {}".format(NO_LOAD))
+            LOGGER.info("Not loading: {}".format(NO_LOAD))
             return [item for item in to_load if item not in NO_LOAD]
 
         return to_load
@@ -30,5 +30,5 @@ def __list_all_modules():
 
 
 ALL_MODULES = sorted(__list_all_modules())
-print("Modules to load: {}".format(ALL_MODULES))
+LOGGER.info("Modules to load: {}".format(ALL_MODULES))
 __all__ = ALL_MODULES + ["ALL_MODULES"]

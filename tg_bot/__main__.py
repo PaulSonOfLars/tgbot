@@ -277,7 +277,7 @@ def main():
     # dispatcher.add_error_handler(error_callback)
 
     if WEBHOOK:
-        print("Using webhooks.")
+        LOGGER.info("Using webhooks.")
         updater.start_webhook(listen="127.0.0.1",
                               port=PORT,
                               url_path=TOKEN)
@@ -289,12 +289,12 @@ def main():
             updater.bot.set_webhook(url=URL + TOKEN)
 
     else:
-        print("Using long polling.")
+        LOGGER.info("Using long polling.")
         updater.start_polling(timeout=15, read_latency=4)
 
     updater.idle()
 
 
 if __name__ == '__main__':
-    print("Successfully loaded modules: " + str(ALL_MODULES))
+    LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
     main()

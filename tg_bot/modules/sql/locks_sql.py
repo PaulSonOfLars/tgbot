@@ -90,7 +90,6 @@ def update_lock(chat_id, lock_type, locked):
     with PERM_LOCK:
         curr_perm = SESSION.query(Permissions).get(str(chat_id))
         if not curr_perm:
-            print("Perms didnt exist for {}! creating".format(chat_id))
             curr_perm = init_permissions(chat_id)
 
         if lock_type == "audio":
@@ -120,7 +119,6 @@ def update_restriction(chat_id, restr_type, locked):
     with RESTR_LOCK:
         curr_restr = SESSION.query(Restrictions).get(str(chat_id))
         if not curr_restr:
-            print("Restr didnt exist for {}! creating".format(chat_id))
             curr_restr = init_restrictions(chat_id)
 
         if restr_type == "messages":

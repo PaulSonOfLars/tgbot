@@ -6,7 +6,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.users_sql as sql
-from tg_bot import dispatcher, OWNER_ID
+from tg_bot import dispatcher, OWNER_ID, LOGGER
 
 USERS_GROUP = 2
 
@@ -39,8 +39,7 @@ def broadcast(bot, update):
                 sleep(0.1)
             except TelegramError:
                 failed += 1
-                print("Couldn't send broadcast to {}, group name {}".format(chat.chat_id, chat.chat_name),
-                      file=sys.stderr)
+                LOGGER.warning("Couldn't send broadcast to %s, group name %s", str(chat.chat_id), str(chat.chat_name))
 
         update.effective_message.reply_text("Broadcast complete. {} groups failed to receive the message, probably "
                                             "due to being kicked.".format(failed))
