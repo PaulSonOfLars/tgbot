@@ -5,7 +5,8 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, bot_admin, can_pin, can_promote, extract_user
+from tg_bot.modules.helper_funcs.chat_status import bot_admin, can_promote, user_admin, can_pin
+from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
 @run_async

@@ -1,7 +1,7 @@
 import logging
 import os
-
 import sys
+
 from telegram.ext import Updater
 
 # enable logging

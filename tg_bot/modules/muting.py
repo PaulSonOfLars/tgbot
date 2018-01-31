@@ -2,7 +2,8 @@ from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, extract_user
+from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_admin
+from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
 @run_async

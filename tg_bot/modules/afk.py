@@ -44,7 +44,6 @@ def reply_afk(bot, update):
                     res = "{} is AFK! says its because of:\n{}".format(ent.user.first_name, user.reason)
                 message.reply_text(res)
 
-
     elif message.entities and message.parse_entities([MessageEntity.MENTION]):
         entities = message.parse_entities([MessageEntity.MENTION])
         for ent in entities:
@@ -71,7 +70,6 @@ __help__ = """
 """
 
 __name__ = "AFK"
-
 
 AFK_HANDLER = CommandHandler("afk", afk)
 AFK_REGEX_HANDLER = RegexHandler("(?i)brb", afk)

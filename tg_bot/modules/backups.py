@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, run_async
 
 from tg_bot import dispatcher
 from tg_bot.__main__ import DATA_IMPORT
-from tg_bot.modules.helper_funcs import user_admin
+from tg_bot.modules.helper_funcs.chat_status import user_admin
 
 
 @run_async

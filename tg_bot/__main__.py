@@ -11,7 +11,7 @@ from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK,
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in modules/load.json!
 from tg_bot.modules import ALL_MODULES
-from tg_bot.modules.helper_funcs import paginate_modules
+from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 PM_START_TEXT = """
 Hi {}, my name is {}! I'm a group manager bot maintained by [this wonderful person](tg://user?id={}).

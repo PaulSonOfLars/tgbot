@@ -2,8 +2,9 @@ from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
 
 from tg_bot import dispatcher, BAN_STICKER
-from tg_bot.modules.helper_funcs import bot_admin, user_admin, is_user_admin, is_user_in_chat, extract_user, \
-    can_restrict, is_user_ban_protected
+from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
+    is_user_admin, is_user_in_chat
+from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
 @run_async

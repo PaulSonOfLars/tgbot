@@ -5,7 +5,8 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.rules_sql as sql
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, markdown_parser
+from tg_bot.modules.helper_funcs.chat_status import user_admin
+from tg_bot.modules.helper_funcs.string_handling import markdown_parser
 
 
 @run_async
@@ -14,6 +15,7 @@ def get_rules(bot, update):
     send_rules(update, chat_id)
 
 
+# Do not async - not from a handler
 def send_rules(update, chat_id, from_pm=False):
     bot = dispatcher.bot
     user = update.effective_user

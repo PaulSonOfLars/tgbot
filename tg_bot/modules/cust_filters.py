@@ -7,7 +7,9 @@ from telegram.ext import CommandHandler, MessageHandler, DispatcherHandlerStop, 
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_USERNAME
-from tg_bot.modules.helper_funcs import user_admin, extract_text, button_markdown_parser, split_quotes
+from tg_bot.modules.helper_funcs.chat_status import user_admin
+from tg_bot.modules.helper_funcs.extraction import extract_text
+from tg_bot.modules.helper_funcs.string_handling import split_quotes, button_markdown_parser
 from tg_bot.modules.sql import cust_filters_sql as sql
 
 HANDLER_GROUP = 10

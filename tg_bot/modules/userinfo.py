@@ -5,7 +5,7 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.userinfo_sql as sql
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import extract_user
+from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
 @run_async

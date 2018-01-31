@@ -6,8 +6,9 @@ from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, Messa
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, BAN_STICKER
-from tg_bot.modules.helper_funcs import user_admin, bot_admin, is_user_admin, user_admin_no_reply, extract_text, \
-    split_message
+from tg_bot.modules.helper_funcs.chat_status import is_user_admin, bot_admin, user_admin_no_reply, user_admin
+from tg_bot.modules.helper_funcs.extraction import extract_text
+from tg_bot.modules.helper_funcs.misc import split_message
 from tg_bot.modules.sql import warns_sql as sql
 from tg_bot.modules.users import get_user_id
 

@@ -3,7 +3,7 @@ from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import can_delete, user_admin
+from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
 
 
 @run_async

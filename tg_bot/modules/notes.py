@@ -1,6 +1,6 @@
 import re
-
 from io import BytesIO
+
 from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, RegexHandler, Filters
@@ -8,8 +8,9 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
-from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, OWNER_ID, LOGGER
-from tg_bot.modules.helper_funcs import user_admin, button_markdown_parser
+from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, LOGGER
+from tg_bot.modules.helper_funcs.chat_status import user_admin
+from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser
 
 FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
 

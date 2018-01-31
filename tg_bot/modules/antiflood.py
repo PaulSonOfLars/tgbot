@@ -2,7 +2,7 @@ from telegram.error import BadRequest
 from telegram.ext import Filters, MessageHandler, CommandHandler, run_async
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, can_restrict, is_user_admin
+from tg_bot.modules.helper_funcs.chat_status import is_user_admin, user_admin, can_restrict
 from tg_bot.modules.sql import antiflood_sql as sql
 
 FLOOD_GROUP = 3
