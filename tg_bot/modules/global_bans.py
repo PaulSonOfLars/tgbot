@@ -1,6 +1,5 @@
 from io import BytesIO
 
-from telegram import MessageEntity
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import escape_markdown
@@ -9,7 +8,7 @@ import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
 from tg_bot.modules.helper_funcs.chat_status import can_restrict, user_not_admin, user_admin
 from tg_bot.modules.helper_funcs.cust_filters import CustomFilters
-from tg_bot.modules.helper_funcs.extraction import extract_user
+from tg_bot.modules.helper_funcs.extraction import extract_user, extract_user_and_text
 from tg_bot.modules.helper_funcs.misc import send_to_list
 from tg_bot.modules.sql.users_sql import get_all_chats
 
@@ -20,7 +19,8 @@ GBAN_ENFORCE_GROUP = 6
 def gban(bot, update, args):
     message = update.effective_message
 
-    user_id = extract_user(message, args)
+    user_id, reason = extract_user_and_text(message, args)
+
     if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
         return
@@ -46,18 +46,6 @@ def gban(bot, update, args):
     if user_chat.type != 'private':
         message.reply_text("That's not a user!")
         return
-
-    reason = ""
-
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        end = entities[0].offset + entities[0].length
-        reason = message.text[end:].strip()
-
-    else:
-        split_message = message.text.split(None, 2)
-        if len(split_message) >= 3:
-            reason = split_message[2]
 
     message.reply_text("*Blows dust off of banhammer* 😉")
 

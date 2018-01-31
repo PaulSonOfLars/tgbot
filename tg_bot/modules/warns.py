@@ -1,48 +1,18 @@
 import re
 
 import telegram
-from telegram import MessageEntity, InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, BAN_STICKER
 from tg_bot.modules.helper_funcs.chat_status import is_user_admin, bot_admin, user_admin_no_reply, user_admin
-from tg_bot.modules.helper_funcs.extraction import extract_text
+from tg_bot.modules.helper_funcs.extraction import extract_text, extract_user_and_text, extract_user
 from tg_bot.modules.helper_funcs.misc import split_message
 from tg_bot.modules.sql import warns_sql as sql
-from tg_bot.modules.users import get_user_id
 
 WARN_HANDLER_GROUP = 9
 CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
-
-
-# TODO: Make a single user_id and argument extraction function! this one is inaccurate
-def extract_userid(message):
-    args = message.text.split(None, 2)  # use python's maxsplit to separate Cmd, warn recipient, and warn reason
-
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for ent in entities:
-            return ent.user.id, message.text[ent.offset + ent.length:]
-
-    elif len(args) >= 2 and args[1][0] == '@':
-        user = args[1]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return None, ""
-        return user_id, (args[2] if len(args) >= 3 else "")
-
-    elif len(args) >= 2 and args[0].isdigit():
-        return int(args[0]), (args[2] if len(args) >= 3 else "")
-
-    elif message.reply_to_message:
-        split = message.text.split(None, 1)
-        return message.reply_to_message.from_user.id, (split[1] if len(split) >= 2 else "")
-
-    else:
-        return None, ""
 
 
 def warn(user_id, chat, reason, bot, message):
@@ -87,11 +57,11 @@ def button(bot, update):
 @run_async
 @user_admin
 @bot_admin
-def warn_user(bot, update):
+def warn_user(bot, update, args):
     message = update.effective_message
     chat = update.effective_chat
 
-    user_id, reason = extract_userid(message)
+    user_id, reason = extract_user_and_text(message, args)
 
     if user_id:
         warn(user_id, chat, reason, bot, message)
@@ -102,11 +72,11 @@ def warn_user(bot, update):
 @run_async
 @user_admin
 @bot_admin
-def reset_warns(bot, update):
+def reset_warns(bot, update, args):
     message = update.effective_message
     chat = update.effective_chat
 
-    user_id, _ = extract_userid(message)
+    user_id = extract_user(message, args)
     if user_id:
         sql.reset_warns(user_id, chat.id)
         message.reply_text("Warnings have been reset!")
@@ -115,9 +85,9 @@ def reset_warns(bot, update):
 
 
 @run_async
-def warns(bot, update):
+def warns(bot, update, args):
     message = update.effective_message
-    user_id, _ = extract_userid(message) or (update.effective_user.id, None)
+    user_id = extract_user(message, args) or update.effective_user.id
     warned_user = sql.get_warns(user_id, update.effective_chat.id)
     if warned_user and warned_user.num_warns != 0:
         if warned_user.reasons:
@@ -242,10 +212,10 @@ __help__ = """
 __name__ = "Warnings"
 
 
-WARN_HANDLER = CommandHandler("warn", warn_user)
-RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns)
+WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True)
+RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns, pass_args=True)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
-MYWARNS_HANDLER = CommandHandler("warns", warns)
+MYWARNS_HANDLER = CommandHandler("warns", warns, pass_args=True)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
 RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True)
 LIST_WARN_HANDLER = CommandHandler("warnlist", list_warn_filters)
