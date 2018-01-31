@@ -185,7 +185,7 @@ def __import_data__(chat_id, data):
 
         if match:
             failures.append(notename)
-            notedata = notedata[:match.end()].strip()
+            notedata = notedata[match.end():].strip()
             if notedata:
                 sql.add_note_to_db(chat_id, notename[1:], notedata)
         else:
