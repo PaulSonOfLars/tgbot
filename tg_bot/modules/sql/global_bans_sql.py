@@ -126,5 +126,15 @@ def __load_gbanned_userid_list():
         SESSION.close()
 
 
+def migrate_chat(old_chat_id, new_chat_id):
+    with GBAN_SETTING_LOCK:
+        chat = SESSION.query(GbanSettings).get(str(old_chat_id))
+        if chat:
+            chat.chat_id = new_chat_id
+            SESSION.add(chat)
+
+        SESSION.commit()
+
+
 # Create in memory userid to avoid disk access
 __load_gbanned_userid_list()

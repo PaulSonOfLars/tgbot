@@ -152,13 +152,17 @@ def num_users():
         SESSION.close()
 
 
-# TODO: migrate chat_members too
 def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:
         chat = SESSION.query(Chats).get(str(old_chat_id))
         if chat:
             chat.chat_id = new_chat_id
             SESSION.add(chat)
+
+        chat_members = SESSION.query(ChatMembers).filter(ChatMembers.chat_id == str(old_chat_id)).all()
+        for member in chat_members:
+            member.chat_id = str(new_chat_id)
+            SESSION.add(member)
 
         SESSION.commit()
 
