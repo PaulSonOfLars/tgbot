@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, UnicodeText, Integer
+from sqlalchemy import Column, UnicodeText, Integer, String, Boolean
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -25,14 +25,29 @@ class GloballyBannedUsers(BASE):
                 "reason": self.reason}
 
 
-GloballyBannedUsers.__table__.create(checkfirst=True)
+class GbanSettings(BASE):
+    __tablename__ = "gban_settings"
+    chat_id = Column(String(14), primary_key=True)
+    setting = Column(Boolean, default=True, nullable=False)
 
-INSERTION_LOCK = threading.RLock()
+    def __init__(self, chat_id, enabled):
+        self.chat_id = str(chat_id)
+        self.setting = enabled
+
+    def __repr__(self):
+        return "<Gban setting {} ({})>".format(self.chat_id, self.setting)
+
+
+GloballyBannedUsers.__table__.create(checkfirst=True)
+GbanSettings.__table__.create(checkfirst=True)
+
+GBANNED_USERS_LOCK = threading.RLock()
+GBAN_SETTING_LOCK = threading.RLock()
 GBANNED_LIST = []
 
 
 def gban_user(user_id, name, reason=None):
-    with INSERTION_LOCK:
+    with GBANNED_USERS_LOCK:
         user = SESSION.query(GloballyBannedUsers).get(user_id)
         if not user:
             user = GloballyBannedUsers(user_id, name, reason)
@@ -46,7 +61,7 @@ def gban_user(user_id, name, reason=None):
 
 
 def ungban_user(user_id):
-    with INSERTION_LOCK:
+    with GBANNED_USERS_LOCK:
         user = SESSION.query(GloballyBannedUsers).get(user_id)
         if user:
             SESSION.delete(user)
@@ -69,6 +84,36 @@ def get_gbanned_user(user_id):
 def get_gban_list():
     try:
         return [x.to_dict() for x in SESSION.query(GloballyBannedUsers).all()]
+    finally:
+        SESSION.close()
+
+
+def enable_gbans(chat_id):
+    with GBAN_SETTING_LOCK:
+        chat = SESSION.query(GbanSettings).get(str(chat_id))
+        if not chat:
+            chat = GbanSettings(chat_id, True)
+
+        chat.setting = True
+        SESSION.add(chat)
+        SESSION.commit()
+
+
+def disable_gbans(chat_id):
+    with GBAN_SETTING_LOCK:
+        chat = SESSION.query(GbanSettings).get(str(chat_id))
+        if not chat:
+            chat = GbanSettings(chat_id, False)
+
+        chat.setting = False
+        SESSION.add(chat)
+        SESSION.commit()
+
+
+def does_chat_gban(chat_id):
+    try:
+        chat = SESSION.query(GbanSettings).get(str(chat_id))
+        return bool(not chat or chat.setting)
     finally:
         SESSION.close()
 

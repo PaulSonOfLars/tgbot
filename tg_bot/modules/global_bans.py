@@ -7,7 +7,8 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
-from tg_bot.modules.helper_funcs import CustomFilters, extract_user, can_restrict, user_not_admin, send_to_list
+from tg_bot.modules.helper_funcs import CustomFilters, extract_user, can_restrict, user_not_admin, send_to_list, \
+    user_admin
 from tg_bot.modules.sql.users_sql import get_all_chats
 
 GBAN_ENFORCE_GROUP = 6
@@ -72,6 +73,11 @@ def gban(bot, update, args):
     chats = get_all_chats()
     for chat in chats:
         chat_id = chat.chat_id
+
+        # Check if this group has disabled gbans
+        if not sql.does_chat_gban(chat_id):
+            continue
+
         try:
             bot.kick_chat_member(chat_id, user_id)
         except BadRequest as excp:
@@ -126,6 +132,11 @@ def ungban(bot, update, args):
     chats = get_all_chats()
     for chat in chats:
         chat_id = chat.chat_id
+
+        # Check if this group has disabled gbans
+        if not sql.does_chat_gban(chat_id):
+            continue
+
         try:
             member = bot.get_chat_member(chat_id, user_id)
             if member.status == 'kicked':
@@ -174,14 +185,45 @@ def gbanlist(bot, update):
                                                 caption="Here is the list of currently gbanned users.")
 
 
+def check_and_ban(update, user_id):
+    if sql.is_user_gbanned(user_id):
+        update.effective_chat.kick_member(user_id)
+        update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
+
+
 @run_async
 @can_restrict
 @user_not_admin
 def enforce_gban(bot, update):
-    user = update.effective_message.from_user
-    if sql.is_user_gbanned(user.id):
-        update.effective_chat.kick_member(user.id)
-        update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
+    if sql.does_chat_gban(update.effective_chat.id):
+        user = update.effective_message.from_user
+        check_and_ban(update, user.id)
+
+        if update.effective_message.new_chat_members:
+            new_members = update.effective_message.new_chat_members
+            for mem in new_members:
+                check_and_ban(update, mem.id)
+
+
+@run_async
+@user_admin
+def gbanstat(bot, update, args):
+    if len(args) > 0:
+        if args[0].lower() in ["on", "yes"]:
+            sql.enable_gbans(update.effective_chat.id)
+            update.effective_message.reply_text("I've enabled gbans in this group. This will help protect you "
+                                                "from spammers, unsavoury characters, and the biggest trolls.")
+        elif args[0].lower() in ["off", "no"]:
+            sql.disable_gbans(update.effective_chat.id)
+            update.effective_message.reply_text("I've disabled gbans in this group. GBans wont affect your users "
+                                                "anymore. You'll be less protected from any trolls and spammers "
+                                                "though!")
+    else:
+        update.effective_message.reply_text("Give me some arguments to choose a setting! on/off, yes/no!\n\n"
+                                            "Your current setting is: {}\n"
+                                            "When True, any gbans that happen will also happen in your group. "
+                                            "When False, they won't, leaving you at the possible mercy of "
+                                            "spammers.".format(sql.does_chat_gban(update.effective_chat.id)))
 
 
 def __user_info__(user_id):
@@ -198,9 +240,14 @@ def __user_info__(user_id):
     return text
 
 
-__help__ = ""  # Sudo only module, no help.
+__help__ = """
+Gbans, also known as global bans, are used by the bot owners to ban spammers across all groups. This helps protect \
+you and your groups by removing spam flooders as quickly as possible. If this is not something you want, you can \
+disable it by using:
+ - /gbanstat <on/off/yes/no>: Will disable the effect of global bans on your group, or give your current settings.
+"""
 
-__name__ = "GBans"
+__name__ = "Global Bans"
 
 GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True,
                               filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
@@ -209,11 +256,14 @@ UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True,
 GBAN_LIST = CommandHandler("gbanlist", gbanlist,
                            filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
+GBAN_STATUS = CommandHandler("gbanstat", gbanstat, pass_args=True, filters=Filters.group)
+
 GBAN_ENFORCER = MessageHandler(Filters.all & Filters.group, enforce_gban)
 
 dispatcher.add_handler(GBAN_HANDLER)
 dispatcher.add_handler(UNGBAN_HANDLER)
 dispatcher.add_handler(GBAN_LIST)
+dispatcher.add_handler(GBAN_STATUS)
 
 if STRICT_GBAN:  # enforce GBANS if this is set
     dispatcher.add_handler(GBAN_ENFORCER, GBAN_ENFORCE_GROUP)

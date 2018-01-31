@@ -25,7 +25,7 @@ class Chats(BASE):
     chat_name = Column(UnicodeText, nullable=False)
 
     def __init__(self, chat_id, chat_name):
-        self.chat_id = chat_id
+        self.chat_id = str(chat_id)
         self.chat_name = chat_name
 
     def __repr__(self):
