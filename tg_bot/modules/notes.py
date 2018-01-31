@@ -8,8 +8,10 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
-from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, OWNER_ID
+from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, OWNER_ID, LOGGER
 from tg_bot.modules.helper_funcs import user_admin, button_markdown_parser
+
+FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
 
 
 # Do not async
@@ -43,7 +45,8 @@ def get(bot, update, notename, show_none=True):
                     if excp.message == "Message to forward not found":
                         message.reply_text("Looks like the original sender of this note has deleted "
                                            "their message - sorry! Get your bot admin to start using a "
-                                           "message dump to avoid this.")
+                                           "message dump to avoid this. I'll remove this note from "
+                                           "your saved notes.")
                         sql.rm_note(chat_id, notename)
                     else:
                         raise
@@ -63,11 +66,16 @@ def get(bot, update, notename, show_none=True):
                     message.reply_text("Looks like you tried to mention someone I've never seen before. If you really "
                                        "want to mention them, forward one of their messages to me, and I'll be able "
                                        "to tag them!")
+                elif FILE_MATCHER.match(note.value):
+                    message.reply_text("This note was an incorrectly imported file from another bot - I can't use "
+                                       "it. If you really need it, you'll have to save it again. In "
+                                       "the meantime, I'll remove it from your notes list.")
+                    sql.rm_note(chat_id, notename)
                 else:
                     message.reply_text("This note is not formatted correctly. Could not send. Contact @{} if you "
                                        "can't figure out why!".format(OWNER_USERNAME))
-                    print("ERROR: could not parse:" + note.value)
-                    raise
+                    LOGGER.exception("Could not parse message #%s in chat %s", notename, str(chat_id))
+                    LOGGER.warning("Message was: %s", str(note.value))
         return
     elif show_none:
         message.reply_text("This note doesn't exist")
@@ -173,9 +181,6 @@ def list_notes(bot, update):
 
     elif len(msg) != 0:
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
-
-
-FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
 
 
 def __import_data__(chat_id, data):
