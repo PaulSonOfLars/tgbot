@@ -88,12 +88,10 @@ def left_member(bot, update):
     if should_welc:
         left_mem = update.effective_message.left_chat_member
         if left_mem:
-            # inform owner about kick
+            # Ignore bot being kicked
             if left_mem.id == bot.id:
-                bot.send_message(OWNER_ID, "I've just been kicked from {}.".format(chat.title
-                                                                                   or chat.first_name
-                                                                                   or chat.id))
                 return
+
             # Give the owner a special goodbye
             if left_mem.id == OWNER_ID:
                 update.effective_message.reply_text("RIP Master")
