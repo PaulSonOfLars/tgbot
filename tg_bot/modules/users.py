@@ -1,4 +1,3 @@
-import sys
 from time import sleep
 
 from telegram import TelegramError
@@ -8,7 +7,7 @@ from telegram.ext.dispatcher import run_async
 import tg_bot.modules.sql.users_sql as sql
 from tg_bot import dispatcher, OWNER_ID, LOGGER
 
-USERS_GROUP = 2
+USERS_GROUP = 4
 
 
 def get_user_id(username):

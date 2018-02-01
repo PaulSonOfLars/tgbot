@@ -13,7 +13,8 @@ LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'phot
 
 RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews', 'all']
 
-REST_GROUP = 1
+PERM_GROUP = 1
+REST_GROUP = 2
 
 
 # NOT ASYNC
@@ -338,12 +339,12 @@ dispatcher.add_handler(REST_MEDIA_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_OTHERS_HANDLER, REST_GROUP)
 # dispatcher.add_handler(REST_PREVIEWS_HANDLER, REST_GROUP) # NOTE: disable, checking for URL's will trigger all urls,
 
-dispatcher.add_handler(STICKER_HANDLER)
-dispatcher.add_handler(AUDIO_HANDLER)
-dispatcher.add_handler(VOICE_HANDLER)
-dispatcher.add_handler(DOCUMENT_HANDLER)
-dispatcher.add_handler(VIDEO_HANDLER)
-dispatcher.add_handler(CONTACT_HANDLER)
-dispatcher.add_handler(PHOTO_HANDLER)
-dispatcher.add_handler(GIF_HANDLER)
-dispatcher.add_handler(URL_HANDLER)
+dispatcher.add_handler(STICKER_HANDLER, PERM_GROUP)
+dispatcher.add_handler(AUDIO_HANDLER, PERM_GROUP)
+dispatcher.add_handler(VOICE_HANDLER, PERM_GROUP)
+dispatcher.add_handler(DOCUMENT_HANDLER, PERM_GROUP)
+dispatcher.add_handler(VIDEO_HANDLER, PERM_GROUP)
+dispatcher.add_handler(CONTACT_HANDLER, PERM_GROUP)
+dispatcher.add_handler(PHOTO_HANDLER, PERM_GROUP)
+dispatcher.add_handler(GIF_HANDLER, PERM_GROUP)
+dispatcher.add_handler(URL_HANDLER, PERM_GROUP)
