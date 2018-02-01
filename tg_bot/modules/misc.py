@@ -7,18 +7,20 @@ from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
 
-from tg_bot import dispatcher, OWNER_ID
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS, BAN_STICKER
+from tg_bot.__main__ import STATS, USER_INFO
+from tg_bot.modules.helper_funcs.cust_filters import CustomFilters
+from tg_bot.modules.helper_funcs.extraction import extract_user
 
 RUN_STRINGS = (
     "Where do you think you're going?",
-    "Huh? what? did he get away?",
-    "ZZzzZZzz... Huh? what? oh, just him again, nevermind.",
+    "Huh? what? did they get away?",
+    "ZZzzZZzz... Huh? what? oh, just them again, nevermind.",
     "Get back here!",
     "Not so fast...",
     "Look out for the wall!",
     "Don't leave me alone with them!!",
     "You run, you die.",
-    "Run fatboy, run!",
     "Jokes on you, I'm everywhere",
     "You're gonna regret that...",
     "You could also try /kickme, I hear that's fun.",
@@ -29,19 +31,36 @@ RUN_STRINGS = (
     "That's definitely the droid we're looking for.",
     "May the odds be ever in your favour.",
     "Famous last words.",
-    "And he disappeared forever, never to be seen again.",
-    "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this guy",
+    "And they disappeared forever, never to be seen again.",
+    "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this person",
     "Yeah yeah, just tap /kickme already.",
     "Here, take this ring and head to Mordor while you're at it.",
-    "Legend has it, he's still running...",
+    "Legend has it, they're still running...",
     "Unlike Harry Potter, your parents can't protect you from me.",
     "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might "
     "be the next Vader.",
-    "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0."
+    "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0.",
+    "Legend has it, they're still running.",
+    "Keep it up, not sure we want you here anyway.",
+    "You're a wiza- Oh. Wait. You're not Harry, keep moving.",
+    "NO RUNNING IN THE HALLWAYS!",
+    "Hasta la vista, baby.",
+    "Who let the dogs out?",
+    "It's funny, because no one cares.",
+    "Ah, what a waste. I liked that one.",
+    "Frankly, my dear, I don't give a damn.",
+    "My milkshake brings all the boys to yard... So run faster!",
+    "You can't HANDLE the truth!",
+    "A long time ago, in a galaxy far far away... Someone would've cared about that. Not anymore though.",
+    "Hey, look at them! They're running from the inevitable banhammer... Cute.",
+    "Han shot first. So will I.",
+    "What are you running after, a white rabbit?",
+    "As The Doctor would say... RUN!",
 )
 
 SLAP_TEMPLATES = (
     "{user1} {hits} {user2} with a {item}.",
+    "{user1} {hits} {user2} in the face with a {item}.",
     "{user1} {hits} {user2} around a bit with a {item}.",
     "{user1} {throws} a {item} at {user2}.",
     "{user1} grabs a {item} and {throws} it at {user2}'s face.",
@@ -51,6 +70,7 @@ SLAP_TEMPLATES = (
     "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
     "{user1} grabs up a {item} and {hits} {user2} with it.",
     "{user1} ties {user2} to a chair and {throws} a {item} at them.",
+    "{user1} gave a friendly push to help {user2} learn to swim in lava."
 )
 
 ITEMS = (
@@ -78,13 +98,17 @@ ITEMS = (
     "spiked bat",
     "fire extinguisher",
     "heavy rock",
-    "chunk of dirt"
+    "chunk of dirt",
+    "beehive",
+    "piece of rotten meat",
+    "bear",
 )
 
 THROW = (
     "throws",
     "flings",
-    "chucks")
+    "chucks"
+)
 
 HIT = (
     "hits",
@@ -102,22 +126,30 @@ def runs(bot, update):
     update.effective_message.reply_text(random.choice(RUN_STRINGS))
 
 
-def slap(bot, update):
+@run_async
+def slap(bot, update, args):
     msg = update.effective_message
 
+    # reply to correct message
+    reply_text = msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
+
+    # get user who sent message
     if msg.from_user.username:
         curr_user = "@" + escape_markdown(msg.from_user.username)
     else:
         curr_user = "[{}](tg://user?id={})".format(msg.from_user.first_name, msg.from_user.id)
 
-    if msg.reply_to_message:
+    user_id = extract_user(update.effective_message, args)
+    if user_id:
+        slapped_user = bot.get_chat(user_id)
         user1 = curr_user
-        if msg.reply_to_message.from_user.username:
-            user2 = "@" + escape_markdown(msg.reply_to_message.from_user.username)
+        if slapped_user.username:
+            user2 = "@" + escape_markdown(slapped_user.username)
         else:
-            user2 = "[{}](tg://user?id={})".format(msg.reply_to_message.from_user.first_name,
-                                                   msg.from_user.id)
+            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
+                                                   slapped_user.id)
 
+    # if no target found, bot targets the sender
     else:
         user1 = "[{}](tg://user?id={})".format(bot.first_name, bot.id)
         user2 = curr_user
@@ -129,7 +161,7 @@ def slap(bot, update):
 
     repl = temp.format(user1=user1, user2=user2, item=item, hits=hit, throws=throw)
 
-    msg.reply_text(repl, parse_mode=ParseMode.MARKDOWN)
+    reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -142,13 +174,74 @@ def get_bot_ip(bot, update):
 
 
 @run_async
-def get_id(bot, update):
-    if update.effective_message.reply_to_message:
-        user = update.effective_message.reply_to_message.from_user
-        update.effective_message.reply_text(user.username + "'s id is " + str(user.id))
+def get_id(bot, update, args):
+    user_id = extract_user(update.effective_message, args)
+    if user_id:
+        if update.effective_message.reply_to_message and update.effective_message.reply_to_message.forward_from:
+            user1 = update.effective_message.reply_to_message.from_user
+            user2 = update.effective_message.reply_to_message.forward_from
+            update.effective_message.reply_text(
+                "The original sender, {}, has an ID of `{}`.\nThe forwarder, {}, has an ID of `{}`.".format(
+                    escape_markdown(user2.first_name),
+                    user2.id,
+                    escape_markdown(user1.first_name),
+                    user1.id),
+                parse_mode=ParseMode.MARKDOWN)
+        else:
+            user = bot.get_chat(user_id)
+            update.effective_message.reply_text("{}'s id is `{}`.".format(escape_markdown(user.first_name), user.id),
+                                                parse_mode=ParseMode.MARKDOWN)
     else:
         chat = update.effective_chat
-        update.effective_message.reply_text("This group's id is " + str(chat.id))
+        if chat.type == "private":
+            update.effective_message.reply_text("Your id is `{}`.".format(chat.id),
+                                                parse_mode=ParseMode.MARKDOWN)
+
+        else:
+            update.effective_message.reply_text("This group's id is `{}`.".format(chat.id),
+                                                parse_mode=ParseMode.MARKDOWN)
+
+
+@run_async
+def info(bot, update, args):
+    msg = update.effective_message
+    user_id = extract_user(update.effective_message, args)
+    if user_id:
+        user = bot.get_chat(user_id)
+    else:
+        user = msg.from_user
+
+    text = "*User info*:" \
+           "\nID: `{}`" \
+           "\nFirst Name: {}".format(user.id, escape_markdown(user.first_name))
+
+    if user.last_name:
+        text += "\nLast Name: {}".format(escape_markdown(user.last_name))
+
+    if user.username:
+        text += "\nUsername: @{}".format(escape_markdown(user.username))
+
+    if user.id == OWNER_ID:
+        text += "\n\nThis person is my owner - I would never do anything against them!"
+    else:
+        if user.id in SUDO_USERS:
+            text += "\nThis person is one of my sudo users! " \
+                    "Nearly as powerful as my owner - so watch it."
+        else:
+            if user.id in SUPPORT_USERS:
+                text += "\nThis person is one of my support users! " \
+                        "Not quite a sudo user, but can still gban you off the map."
+
+            if user.id in WHITELIST_USERS:
+                text += "\nThis person has been whitelisted! " \
+                        "That means I'm not allowed to ban/kick them."
+
+    for mod in USER_INFO:
+        mod_info = mod.__user_info__(user.id).strip()
+        if mod_info:
+            text += "\n\n" + mod_info
+
+    update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
@@ -156,7 +249,7 @@ def get_time(bot, update, args):
     location = " ".join(args)
     if location.lower() == bot.first_name.lower():
         update.effective_message.reply_text("Its always banhammer time for me!")
-        bot.send_sticker(update.effective_chat.id, 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
+        bot.send_sticker(update.effective_chat.id, BAN_STICKER)
         return
 
     res = requests.get(GMAPS_LOC, params=dict(address=location))
@@ -193,10 +286,39 @@ def get_time(bot, update, args):
                 update.message.reply_text("It's {} in {}".format(time_there, location))
 
 
+@run_async
 def echo(bot, update):
     args = update.effective_message.text.split(None, 1)
     update.effective_message.reply_text(args[1], quote=False)
     update.effective_message.delete()
+
+
+@run_async
+def markdown_help(bot, update):
+    update.effective_message.reply_text("""
+Markdown is a very powerful formatting tool supported by telegram. {} has some enhancements, to make sure that \
+saved messages are correctly parsed, and to allow you to create buttons.
+
+- _italic_: wrapping text with '_' will produce italic text
+- *bold*: wrapping text with '*' will produce bold text
+- `code`: wrapping text with '`' will produce monospaced text, also known as 'code'
+- [sometext](someURL): this will create a link - the message will just show 'sometext', and tapping on it will open\
+ the page at 'someURL'.
+EG: [test](example.com)
+- [buttontext](buttonurl:someURL): this is a special enhancement to allow users to have telegram buttons in their\
+ markdown. 'buttontext' will be what is displayed on the button, and 'someurl' will be the url which is opened
+EG: [This is a button](buttonurl:example.com)
+
+Note: this message has had markdown disabled, to allow you to see what the characters are.
+""".format(bot.first_name))
+    update.effective_message.reply_text("Try forwarding the following message to me, and you'll see!")
+    update.effective_message.reply_text("/save test This is a markdown test. _italics_, *bold*, `code`, "
+                                        "[URL](example.com) [button](buttonurl:github.com)")
+
+
+@run_async
+def stats(bot, update):
+    update.effective_message.reply_text("Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS]))
 
 
 # /ip is for private use
@@ -205,22 +327,32 @@ __help__ = """
  - /runs: reply a random string from an array of replies.
  - /slap: slap a user, or get slapped if not a reply
  - /time <place>: gives the local time at the given place
+ - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats
+ - /info: get information about a user
 """
 
-# TODO: /stats
-ID_HANDLER = CommandHandler("id", get_id)
+__name__ = "Misc"
+
+ID_HANDLER = CommandHandler("id", get_id, pass_args=True)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 
 TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
 RUNS_HANDLER = CommandHandler("runs", runs)
-SLAP_HANDLER = CommandHandler("slap", slap)
+SLAP_HANDLER = CommandHandler("slap", slap, pass_args=True)
+INFO_HANDLER = CommandHandler("info", info, pass_args=True)
 
 ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
+MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
+
+STATS_HANDLER = CommandHandler("stats", stats, filters=CustomFilters.sudo_filter)
 
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(IP_HANDLER)
 dispatcher.add_handler(TIME_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
+dispatcher.add_handler(INFO_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
+dispatcher.add_handler(MD_HELP_HANDLER)
+dispatcher.add_handler(STATS_HANDLER)

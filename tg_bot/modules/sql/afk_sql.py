@@ -1,4 +1,3 @@
-import collections
 import threading
 
 from sqlalchemy import Column, UnicodeText, Boolean, Integer
@@ -23,13 +22,14 @@ class AFK(BASE):
 
 
 AFK.__table__.create(checkfirst=True)
-INSERTION_LOCK = threading.Lock()
-KEYSTORE = collections.defaultdict(list)
+INSERTION_LOCK = threading.RLock()
 
 
-# check if need insertion lock
 def check_afk_status(user_id):
-    return SESSION.query(AFK).get(user_id)
+    try:
+        return SESSION.query(AFK).get(user_id)
+    finally:
+        SESSION.close()
 
 
 def set_afk(user_id, reason=""):
@@ -50,6 +50,7 @@ def rm_afk(user_id):
             SESSION.delete(curr)
             SESSION.commit()
             return True
+        SESSION.close()
         return False
 
 
@@ -64,14 +65,3 @@ def toggle_afk(user_id, reason=""):
             curr.is_afk = True
         SESSION.add(curr)
         SESSION.commit()
-
-
-def load_keystore():
-    with INSERTION_LOCK:
-        all_users = SESSION.query(AFK).all()
-        for user in all_users:
-            KEYSTORE[user.user_id].append(user)
-        SESSION.close()
-        print("{} total warning filters added to {} chats.".format(len(all_users), len(KEYSTORE)))
-
-load_keystore()

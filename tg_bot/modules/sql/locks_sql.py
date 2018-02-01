@@ -6,10 +6,10 @@ from sqlalchemy import Column, String, Boolean
 from tg_bot.modules.sql import SESSION, BASE
 
 
-# TODO: add gifs
 class Permissions(BASE):
     __tablename__ = "permissions"
     chat_id = Column(String(14), primary_key=True)
+    # Booleans are for "is this locked", _NOT_ "is this allowed"
     audio = Column(Boolean, default=False)
     voice = Column(Boolean, default=False)
     contact = Column(Boolean, default=False)
@@ -17,6 +17,8 @@ class Permissions(BASE):
     document = Column(Boolean, default=False)
     photo = Column(Boolean, default=False)
     sticker = Column(Boolean, default=False)
+    gif = Column(Boolean, default=False)
+    url = Column(Boolean, default=False)
 
     def __init__(self, chat_id):
         self.chat_id = str(chat_id)  # ensure string
@@ -27,6 +29,8 @@ class Permissions(BASE):
         self.document = False
         self.photo = False
         self.sticker = False
+        self.gif = False
+        self.url = False
 
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
@@ -35,6 +39,7 @@ class Permissions(BASE):
 class Restrictions(BASE):
     __tablename__ = "restrictions"
     chat_id = Column(String(14), primary_key=True)
+    # Booleans are for "is this restricted", _NOT_ "is this allowed"
     messages = Column(Boolean, default=False)
     media = Column(Boolean, default=False)
     other = Column(Boolean, default=False)
@@ -54,10 +59,9 @@ class Restrictions(BASE):
 Permissions.__table__.create(checkfirst=True)
 Restrictions.__table__.create(checkfirst=True)
 
-LOCK_KEYSTORE = {}
-RESTR_KEYSTORE = {}
 
-INSERTION_LOCK = threading.Lock()
+PERM_LOCK = threading.RLock()
+RESTR_LOCK = threading.RLock()
 
 
 def init_permissions(chat_id, reset=False):
@@ -66,7 +70,6 @@ def init_permissions(chat_id, reset=False):
         SESSION.delete(curr_perm)
         SESSION.flush()
     perm = Permissions(str(chat_id))
-    LOCK_KEYSTORE[str(chat_id)] = perm
     SESSION.add(perm)
     SESSION.commit()
     return perm
@@ -78,17 +81,15 @@ def init_restrictions(chat_id, reset=False):
         SESSION.delete(curr_restr)
         SESSION.flush()
     restr = Restrictions(str(chat_id))
-    RESTR_KEYSTORE[str(chat_id)] = restr
     SESSION.add(restr)
     SESSION.commit()
     return restr
 
 
 def update_lock(chat_id, lock_type, locked):
-    with INSERTION_LOCK:
-        curr_perm = LOCK_KEYSTORE.get(str(chat_id))
+    with PERM_LOCK:
+        curr_perm = SESSION.query(Permissions).get(str(chat_id))
         if not curr_perm:
-            print("Perms didnt exist for {}! creating".format(chat_id))
             curr_perm = init_permissions(chat_id)
 
         if lock_type == "audio":
@@ -105,16 +106,19 @@ def update_lock(chat_id, lock_type, locked):
             curr_perm.photo = locked
         elif lock_type == "sticker":
             curr_perm.sticker = locked
+        elif lock_type == "gif":
+            curr_perm.gif = locked
+        elif lock_type == 'url':
+            curr_perm.url = locked
 
         SESSION.add(curr_perm)
         SESSION.commit()
 
 
 def update_restriction(chat_id, restr_type, locked):
-    with INSERTION_LOCK:
-        curr_restr = RESTR_KEYSTORE.get(str(chat_id))
+    with RESTR_LOCK:
+        curr_restr = SESSION.query(Restrictions).get(str(chat_id))
         if not curr_restr:
-            print("Restr didnt exist for {}! creating".format(chat_id))
             curr_restr = init_restrictions(chat_id)
 
         if restr_type == "messages":
@@ -125,13 +129,19 @@ def update_restriction(chat_id, restr_type, locked):
             curr_restr.other = locked
         elif restr_type == "previews":
             curr_restr.preview = locked
-
+        elif restr_type == "all":
+            curr_restr.messages = locked
+            curr_restr.media = locked
+            curr_restr.other = locked
+            curr_restr.preview = locked
         SESSION.add(curr_restr)
         SESSION.commit()
 
 
 def is_locked(chat_id, lock_type):
-    curr_perm = LOCK_KEYSTORE.get(str(chat_id))
+    curr_perm = SESSION.query(Permissions).get(str(chat_id))
+    SESSION.close()
+
     if not curr_perm:
         return False
 
@@ -149,10 +159,16 @@ def is_locked(chat_id, lock_type):
         return curr_perm.video
     elif lock_type == "document":
         return curr_perm.document
+    elif lock_type == "gif":
+        return curr_perm.gif
+    elif lock_type == "url":
+        return curr_perm.url
 
 
 def is_restr_locked(chat_id, lock_type):
-    curr_restr = RESTR_KEYSTORE.get(str(chat_id))
+    curr_restr = SESSION.query(Restrictions).get(str(chat_id))
+    SESSION.close()
+
     if not curr_restr:
         return False
 
@@ -164,35 +180,33 @@ def is_restr_locked(chat_id, lock_type):
         return curr_restr.other
     elif lock_type == "previews":
         return curr_restr.previews
+    elif lock_type == "all":
+        return curr_restr.messages and curr_restr.media and curr_restr.other and curr_restr.preview
 
 
-def load_ks():
-    all_perms = SESSION.query(Permissions).all()
-    for chat in all_perms:
-        LOCK_KEYSTORE[chat.chat_id] = chat
-    all_restr = SESSION.query(Restrictions).all()
-    for chat in all_restr:
-        RESTR_KEYSTORE[chat.chat_id] = chat
-    print("Locked types keystore loaded, length " + str(len(LOCK_KEYSTORE)))
-    SESSION.close()
+def get_locks(chat_id):
+    try:
+        return SESSION.query(Permissions).get(str(chat_id))
+    finally:
+        SESSION.close()
+
+
+def get_restr(chat_id):
+    try:
+        return SESSION.query(Restrictions).get(str(chat_id))
+    finally:
+        SESSION.close()
 
 
 def migrate_chat(old_chat_id, new_chat_id):
-    global LOCK_KEYSTORE
-    global RESTR_KEYSTORE
-    with INSERTION_LOCK:
+    with PERM_LOCK:
         perms = SESSION.query(Permissions).get(str(old_chat_id))
         if perms:
             perms.chat_id = str(new_chat_id)
+        SESSION.commit()
 
+    with RESTR_LOCK:
         rest = SESSION.query(Restrictions).get(str(old_chat_id))
         if rest:
             rest.chat_id = str(new_chat_id)
         SESSION.commit()
-        LOCK_KEYSTORE = {}
-        RESTR_KEYSTORE = {}
-        load_ks()
-
-
-# LOAD KEYSTORE ON BOT START
-load_ks()

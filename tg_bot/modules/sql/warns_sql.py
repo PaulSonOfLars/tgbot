@@ -1,6 +1,5 @@
 import threading
 
-import collections
 from sqlalchemy import Integer, Column, String, UnicodeText
 from sqlalchemy.dialects import postgresql
 
@@ -48,9 +47,8 @@ class WarnFilters(BASE):
 Warns.__table__.create(checkfirst=True)
 WarnFilters.__table__.create(checkfirst=True)
 
-WARN_INSERTION_LOCK = threading.Lock()
-WARN_FILTER_INSERTION_LOCK = threading.Lock()
-WARN_FILTER_KEYSTORE = collections.defaultdict(list)
+WARN_INSERTION_LOCK = threading.RLock()
+WARN_FILTER_INSERTION_LOCK = threading.RLock()
 
 
 def warn_user(user_id, chat_id, reason=None):
@@ -73,6 +71,7 @@ def remove_warn(user_id, chat_id):
     with WARN_INSERTION_LOCK:
         warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
         if not warned_user:
+            SESSION.close()
             return None
 
         if warned_user.num_warns >= 0:
@@ -99,43 +98,36 @@ def reset_warns(user_id, chat_id):
 
 
 def get_warns(user_id, chat_id):
-    return SESSION.query(Warns).get((user_id, str(chat_id)))
+    try:
+        return SESSION.query(Warns).get((user_id, str(chat_id)))
+    finally:
+        SESSION.close()
 
 
 def add_warn_filter(chat_id, keyword, reply):
     with WARN_FILTER_INSERTION_LOCK:
-        filt = WarnFilters(str(chat_id), keyword, reply)
+        warn_filt = WarnFilters(str(chat_id), keyword, reply)
 
-        if filt in WARN_FILTER_KEYSTORE[filt.chat_id]:  # if there already is a filter on that kw, remove it
-            WARN_FILTER_KEYSTORE[filt.chat_id].remove(filt)
-
-        WARN_FILTER_KEYSTORE[filt.chat_id].append(filt)
-        SESSION.merge(filt)  # merge to avoid duplicate key issues
+        SESSION.merge(warn_filt)  # merge to avoid duplicate key issues
         SESSION.commit()
 
 
 def remove_warn_filter(chat_id, keyword):
     with WARN_FILTER_INSERTION_LOCK:
-        filt = SESSION.query(WarnFilters).get((str(chat_id), keyword))
-        if filt:
-            WARN_FILTER_KEYSTORE[filt.chat_id].remove(filt)
-            SESSION.delete(filt)
+        warn_filt = SESSION.query(WarnFilters).get((str(chat_id), keyword))
+        if warn_filt:
+            SESSION.delete(warn_filt)
             SESSION.commit()
             return True
+        SESSION.close()
         return False
 
 
-def get_chat_filters(chat_id):
-    return WARN_FILTER_KEYSTORE[str(chat_id)]
-
-
-def load_keystore():
-    with WARN_FILTER_INSERTION_LOCK:
-        all_filters = SESSION.query(WarnFilters).all()
-        for filt in all_filters:
-            WARN_FILTER_KEYSTORE[filt.chat_id].append(filt)
+def get_chat_warn_filters(chat_id):
+    try:
+        return SESSION.query(WarnFilters).filter(WarnFilters.chat_id == str(chat_id)).all()
+    finally:
         SESSION.close()
-        print("{} total warning filters added to {} chats.".format(len(all_filters), len(WARN_FILTER_KEYSTORE)))
 
 
 def migrate_chat(old_chat_id, new_chat_id):
@@ -144,10 +136,9 @@ def migrate_chat(old_chat_id, new_chat_id):
         for note in chat_notes:
             note.chat_id = str(new_chat_id)
         SESSION.commit()
+
     with WARN_FILTER_INSERTION_LOCK:
         chat_filters = SESSION.query(WarnFilters).filter(WarnFilters.chat_id == str(old_chat_id)).all()
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
         SESSION.commit()
-
-load_keystore()

@@ -1,12 +1,12 @@
-from telegram import ParseMode, MessageEntity
+from telegram import ParseMode
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import user_admin, bot_admin, can_pin, can_promote
-from tg_bot.modules.users import get_user_id
+from tg_bot.modules.helper_funcs.chat_status import bot_admin, can_promote, user_admin, can_pin
+from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
 @run_async
@@ -16,49 +16,25 @@ from tg_bot.modules.users import get_user_id
 def promote(bot, update, args):
     chat_id = update.effective_chat.id
     message = update.effective_message
-    prev_message = message.reply_to_message
+    chat = update.effective_chat
 
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
-
-    elif len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return
-
-    elif len(args) >= 1 and args[0].isdigit():
-        user_id = int(args[0])
-
-    elif prev_message:
-        user_id = prev_message.from_user.id
-
-    else:
+    user_id = extract_user(message, args)
+    if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
         return
 
+    user_member = chat.get_member(user_id)
+    if user_member.status == 'administrator' or user_member.status == 'creator':
+        message.reply_text("How am I meant to promote someone that's already an admin?")
+        return
+
     if user_id == bot.id:
-        update.effective_message.reply_text("I can't promote myself! Get an admin to do it for me.")
+        message.reply_text("I can't promote myself! Get an admin to do it for me.")
         return
 
     # set same perms as bot - bot can't assign higher perms than itself!
-    bot_member = update.effective_chat.get_member(bot.id)
+    bot_member = chat.get_member(bot.id)
 
-    print("info {}".format(bot_member.can_change_info))
-    print("post {}".format(bot_member.can_post_messages))
-    print("edit {}".format(bot_member.can_edit_messages))
-    print("del {}".format(bot_member.can_delete_messages))
-    print("inv  {}".format(bot_member.can_invite_users))
-    print("rest {}".format(bot_member.can_restrict_members))
-    print("pin {}".format(bot_member.can_pin_messages))
-    print("prom {}".format(bot_member.can_promote_members))
     res = bot.promoteChatMember(chat_id, user_id,
                                 can_change_info=bot_member.can_change_info,
                                 can_post_messages=bot_member.can_post_messages,
@@ -69,7 +45,7 @@ def promote(bot, update, args):
                                 can_pin_messages=bot_member.can_pin_messages,
                                 can_promote_members=bot_member.can_promote_members)
     if res:
-        update.effective_message.reply_text("Successfully promoted!")
+        message.reply_text("Successfully promoted!")
 
 
 @run_async
@@ -79,36 +55,14 @@ def promote(bot, update, args):
 def demote(bot, update, args):
     chat = update.effective_chat
     message = update.effective_message
-    prev_message = message.reply_to_message
 
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
-        for e in entities:
-            user_id = e.user.id
-            break
-        else:
-            return
-
-    elif len(args) >= 1 and args[0][0] == '@':
-        user = args[0]
-        user_id = get_user_id(user)
-        if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
-                               "you reply to that person's message instead.")
-            return
-
-    elif len(args) >= 1 and args[0].isdigit():
-        user_id = int(args[0])
-
-    elif prev_message:
-        user_id = prev_message.from_user.id
-
-    else:
+    user_id = extract_user(message, args)
+    if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
         return
 
     if chat.get_member(user_id).status == 'creator':
-        message.reply_text("This person CREATED the chat, how would I demote him?")
+        message.reply_text("This person CREATED the chat, how would I demote them?")
         return
 
     if not chat.get_member(user_id).status == 'administrator':
@@ -135,7 +89,7 @@ def demote(bot, update, args):
             message.reply_text("Could not demote.")
     except BadRequest:
         message.reply_text("Could not demote. I might not be admin, or the admin status was appointed by another "
-                           "user, so I can't act upon him!")
+                           "user, so I can't act upon them!")
 
 
 @run_async
@@ -151,10 +105,16 @@ def pin(bot, update, args):
 
     is_silent = True
     if len(args) >= 1:
-        is_silent = not (args[0].lower() == 'notify' or args[0].lower() == 'loud')
+        is_silent = not (args[0].lower() == 'notify' or args[0].lower() == 'loud' or args[0].lower() == 'violent')
 
     if prev_message and is_group:
-        bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
+        try:
+            bot.pinChatMessage(chat_id, prev_message.message_id, disable_notification=is_silent)
+        except BadRequest as excp:
+            if excp.message == "Chat_not_modified":
+                pass
+            else:
+                raise
 
 
 @run_async
@@ -173,9 +133,15 @@ def invite(bot, update):
     chat = update.effective_chat
     if chat.username:
         update.effective_message.reply_text(chat.username)
+    elif chat.type == chat.SUPERGROUP or chat.type == chat.CHANNEL:
+        bot_member = chat.get_member(bot.id)
+        if bot_member.can_invite_users:
+            invitelink = bot.exportChatInviteLink(chat.id)
+            update.effective_message.reply_text(invitelink)
+        else:
+            update.effective_message.reply_text("I don't have access to the invite link, try changing my permissions!")
     else:
-        invitelink = bot.exportChatInviteLink(chat.id)
-        update.effective_message.reply_text(invitelink)
+        update.effective_message.reply_text("I can only give you invite links for supergroups and channels, sorry!")
 
 
 @run_async
@@ -200,6 +166,9 @@ __help__ = """
  - /demote: demotes the user replied to
  - /adminlist: list of admins in the chat
 """
+
+__name__ = "Admin"
+
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
 UNPIN_HANDLER = CommandHandler("unpin", unpin)

@@ -2,12 +2,12 @@ from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 
-from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs import can_delete, user_admin
+from tg_bot import dispatcher, LOGGER
+from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
 
 
-@user_admin
 @run_async
+@user_admin
 def purge(bot, update):
     curr_message = update.effective_message
     chat = update.effective_chat
@@ -18,12 +18,13 @@ def purge(bot, update):
             try:
                 bot.deleteMessage(chat.id, m_id)
             except BadRequest as err:
-                print(err)
+                if err.message != "Message to delete not found":
+                    LOGGER.exception("Error while purging chat messages.")
         bot.send_message(chat.id, "Purge complete.", 'Markdown')
 
 
-@user_admin
 @run_async
+@user_admin
 def del_message(bot, update):
     chat = update.effective_chat
     if can_delete(chat, bot.id):
@@ -35,6 +36,9 @@ __help__ = """
  - /del: deletes the message you replied to
  - /purge: deletes all messages between this and the replied to message
 """
+
+__name__ = "Purges"
+
 
 DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.reply)
 PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.reply)

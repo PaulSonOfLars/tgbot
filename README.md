@@ -1,19 +1,75 @@
 # tgbot
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
-Originally a simple group management bot with multiple admin features, it has now become extremely modular and simple to use.
+Originally a simple group management bot with multiple admin features, it has evolved, becoming extremely modular and 
+simple to use.
 
 Can be found on telegram as [Marie](https://t.me/BanhammerMarie_bot).
-Alternatively, [find me on telegram](https://t.me/SonOfLars) for any help/questions about this bot!
+Alternatively, [find me on telegram](https://t.me/SonOfLars) for any help/questions!
+
+Marie and I are also moderating a [support group](https://t.me/MarieSupport), where you can ask for help setting up your
+bot, discover/request new features, report bugs, and stay in the loop whenever a new update is available. Of course
+I'll also help when a database schema changes, and some table column needs to be modified/added.
+
+## Starting the bot.
+
+Once you've setup your database and your configuration (see below) is complete, simply run:
+
+`python3 -m tg_bot`
+
 
 ## Setting up the bot (Read this before trying to use!):
-Please make sure you have python3 installed, as I cannot guarantee everything will work as expected with python2!
+Please make sure to use python3.6, as I cannot guarantee everything will work as expected on older python versions!
+This is because markdown parsing is done by iterating through a dict, which are ordered by default in 3.6.
 
-### config.py
+### Configuration
 
-Make sure you have a config.py file in your tg_bot folder. This is where your bot token will be loaded from, as well as your databse URI (if you're using a database).
-Have a look at sample_config.py for an idea of what it must contain.
+There are two possible ways of configuring your bot: a config.py file, or ENV variables.
 
+The prefered version is to use a `config.py` file, as it makes it easier to see all your settings grouped together.
+This file should be placed in your `tg_bot` folder, alongside the `__main__.py` file . 
+This is where your bot token will be loaded from, as well as your database URI (if you're using a database), and most of 
+your other settings.
+
+It is recommended to import sample_config and extend the Config class, as this will ensure your config contains all 
+defaults set in the sample_config, hence making it easier to upgrade.
+
+An example `config.py` file could be:
+```
+from tg_bot.sample_config import Config
+
+
+class Development(Config):
+    OWNER_ID = 254318997  # my telegram ID
+    OWNER_USERNAME = "SonOfLars"  # my telegram username
+    API_KEY = "your bot api key"  # my api key, as provided by the botfather
+    SQLALCHEMY_DATABASE_URI = 'postgresql://username:password@localhost:5432/database'  # sample db credentials
+    MESSAGE_DUMP = '-1234567890' # some group chat that your bot is a member of
+    USE_MESSAGE_DUMP = True
+    SUDO_USERS = [18673980, 83489514]  # List of id's for users which have sudo access to the bot.
+    LOAD = []
+    NO_LOAD = ['translation']
+```
+
+If you can't have a config.py file (EG on heroku), it is also possible to use environment variables.
+The following env variables are supported:
+ - `TOKEN`: Your bot token, as a string.
+ - `ENV`: Setting this to ANYTHING will enable env variables
+ - `WEBHOOKS`: Setting this to ANYTHING will enable webhooks when in env mode
+ - `OWNER_ID`: An integer of consisting of your owner ID
+ - `MESSAGE_DUMP`: optional: a chat where your replied saved messages are stored, to stop people deleting their old 
+ messages
+ - `OWNER_USERNAME`: Your username
+ - `SUDO_USERS`: a space separated list of user_ids which should be considered sudo users
+ - `URL`: the URL your webhook should connect to (only needed for webhook mode)
+ - `DATABASE_URL`: your database URL
+ - `DONATION_LINK`: optional: link where you would like to receive donations.
+ - `LOAD`: space separated list of modules you would like to load
+ - `NO_LOAD`: space separated list of modules you would like NOT to load
+ - `DEL_CMDS`: delete commands from users which don't have rights to use that command
+ - `STRICT_GBAN`: enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.
+ - `WORKERS`: Number of threads to use. 8 is the recommended (and default) amount, but your experience may vary.
+ Note that going crazy with more threads wont necessarily speed up your bot, given the large amount of sql data accesses.
 ### Python dependencies
 
 Install the necessary python dependencies by moving to the project directory and running:
@@ -24,9 +80,8 @@ This will install all necessary python packages.
 
 ### Database
 
-If you wish to use a database-dependent module (eg: locks, notes, userinfo, finance),
-you'll need to have a database installed on your system. I use postgres, but other
-databases should be compatible, as I don't use any postgres-specific types.
+If you wish to use a database-dependent module (eg: locks, notes, userinfo, users, filters, welcomes),
+you'll need to have a database installed on your system. I use postgres, so I recommend using it for optimal compatibility.
 
 In the case of postgres, this is how you would set up a the database on a debian/ubuntu system. Other distributions may vary.
 
@@ -57,29 +112,28 @@ Change YOUR_USER and YOUR_DB_NAME appropriately.
 This will allow you to connect to your database via your terminal.
 By default, YOUR_HOST should be 0.0.0.0:5432.
 
-### Starting the bot.
+You should now be able to build your database URI. This will be:
 
-To start the bot, simply run:
+`sqldbtype://username:pw@hostname:port/db_name`
 
-`python3 -m tg_bot`
+Replace sqldbtype with whichever db youre using (eg postgres, mysql, sqllite, etc)
+repeat for your username, password, hostname (localhost?), port (5432?), and db name.
 
 ## Modules
 ### Setting load order.
 
-The module load order can be changed via `modules/load.json`.
-The file should contain ONLY one json object.
-Two variables are looked for:
-- `load`: a list of elements to load, and in which order to load them.
-- `no_load`: a list of elements NOT to load.
+The module load order can be changed via the `LOAD` and `NO_LOAD` configuration settings.
+These should both represent lists.
 
-If `load` is not present, or is an empty list, all modules in `modules/` will be selected for loading by default.
+If `LOAD` is an empty list, all modules in `modules/` will be selected for loading by default.
 
-If `no_load` is not present, or is an empty list, all modules selected for loading will be loaded.
+If `NO_LOAD` is not present, or is an empty list, all modules selected for loading will be loaded.
 
-If a module is in both `load` and `no_load`, the module will not be loaded - `no_load` takes priority.
+If a module is in both `LOAD` and `NO_LOAD`, the module will not be loaded - `NO_LOAD` takes priority.
+
 ### Creating your own modules.
 
-Creating a module has been simplified as much as possible - but do not hesitate to suggest more ways of simplifying.
+Creating a module has been simplified as much as possible - but do not hesitate to suggest further simplification.
 
 All that is needed is that your .py file be in the modules folder.
 
@@ -93,4 +147,11 @@ You can then add commands using the usual
 
 Assigning the `__help__` variable to a string describing this modules' available
 commands will allow the bot to load it and add the documentation for
-your module to the /help command.
+your module to the `/help` command. Setting the `__name__` variable will also allow you to use a nicer, user friendly 
+name for a module.
+
+The `__migrate__()` function is used for migrating chats - when a chat is upgraded to a supergroup, the ID changes, so 
+it is necessary to migrate it in the db.
+
+The `__stats__()` function is for retrieving module statistics, eg number of users, number of chats. This is accessed 
+through the `/stats` command, which is only available to the bot owner.
