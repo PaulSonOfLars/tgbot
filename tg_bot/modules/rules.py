@@ -84,6 +84,8 @@ def __migrate__(old_chat_id, new_chat_id):
 
 __help__ = """
  - /rules: get the rules for this chat.
+
+*Admin only:*
  - /setrules <your rules here>: set the rules for this chat.
  - /clearrules: clear the rules for this chat.
 """

@@ -325,10 +325,10 @@ def stats(bot, update):
 __help__ = """
  - /id: get the current group id. If used by replying to a message, gets that user's id.
  - /runs: reply a random string from an array of replies.
- - /slap: slap a user, or get slapped if not a reply
- - /time <place>: gives the local time at the given place
- - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats
- - /info: get information about a user
+ - /slap: slap a user, or get slapped if not a reply.
+ - /time <place>: gives the local time at the given place.
+ - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
+ - /info: get information about a user.
 """
 
 __name__ = "Misc"

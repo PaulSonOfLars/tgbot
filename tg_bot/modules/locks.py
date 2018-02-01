@@ -295,9 +295,16 @@ def __migrate__(old_chat_id, new_chat_id):
 
 __help__ = """
  - /locktypes: a list of possible locktypes
+
+*Admin only:*
  - /lock <type>: lock items of a certain type (not available in private)
  - /unlock <type>: unlock items of a certain type (not available in private)
  - /locks: the current list of locks in this chat.
+
+Locks can be used to restrict a group's users.
+eg:
+Locking urls will auto-delete all messages with urls which haven't been whitelisted, locking stickers will delete all \
+stickers, etc.
 """
 
 __name__ = "Locks"

@@ -76,6 +76,7 @@ def unmute(bot, update, args):
 
 
 __help__ = """
+*Admin only:*
  - /mute <userhandle>: silences a user. Can also be used as a reply, muting the replied to user.
  - /unmute <userhandle>: unmutes a user. Can also be used as a reply, muting the replied to user.
 """

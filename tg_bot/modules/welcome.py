@@ -334,6 +334,7 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 __help__ = """
+*Admin only:*
  - /welcome <on/off>: enable/disable welcome and goodbye messages. If used with no arg, shows current settings.
  - /setwelcome <sometext>: set a custom welcome message. If used replying to media, uses that media.
  - /setleave <sometext>: set a custom leaving message. If used replying to media, uses that media.

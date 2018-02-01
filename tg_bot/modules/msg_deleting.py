@@ -33,6 +33,7 @@ def del_message(bot, update):
 
 
 __help__ = """
+*Admin only:*
  - /del: deletes the message you replied to
  - /purge: deletes all messages between this and the replied to message
 """

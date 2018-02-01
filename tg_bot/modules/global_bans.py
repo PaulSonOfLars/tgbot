@@ -235,10 +235,12 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 __help__ = """
+*Admin only:*
+ - /gbanstat <on/off/yes/no>: Will disable the effect of global bans on your group, or return your current settings.
+
 Gbans, also known as global bans, are used by the bot owners to ban spammers across all groups. This helps protect \
-you and your groups by removing spam flooders as quickly as possible. If this is not something you want, you can \
-disable it by using:
- - /gbanstat <on/off/yes/no>: Will disable the effect of global bans on your group, or give your current settings.
+you and your groups by removing spam flooders as quickly as possible. They can be disabled for you group by calling \
+/gbanstat
 """
 
 __name__ = "Global Bans"

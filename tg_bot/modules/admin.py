@@ -159,12 +159,14 @@ def adminlist(bot, update):
 
 
 __help__ = """
+ - /adminlist: list of admins in the chat
+
+*Admin only:*
  - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifs to users.
  - /unpin: unpins the currently pinned message
  - /invitelink: gets invitelink
  - /promote: promotes the user replied to
  - /demote: demotes the user replied to
- - /adminlist: list of admins in the chat
 """
 
 __name__ = "Admin"

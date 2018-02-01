@@ -83,7 +83,7 @@ def sed(bot, update):
 __help__ = """
  - s/<text1>/<text2>(/<flag>): Reply to a message with this to perform a sed operation on that message, replacing all \
 occurrences of 'text1' with 'text2'. Flags are optional, and currently include 'i' for ignore case, 'g' for global, \
-or nothing. Delimiters include '/', '_', '|' and ':'. Text grouping is supported. The resulting message cannot be \
+or nothing. Delimiters include '/', '\_', '|' and ':'. Text grouping is supported. The resulting message cannot be \
 larger than {}
 """.format(telegram.MAX_MESSAGE_LENGTH)
 

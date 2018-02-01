@@ -161,7 +161,7 @@ def help_button(bot, update):
         if mod_match:
             module = mod_match.group(1)
             text = "Here is the help for the *{}* module:\n".format(HELPABLE[module].__name__) \
-                   + escape_markdown(HELPABLE[module].__help__)
+                   + HELPABLE[module].__help__
             query.message.edit_text(text=text,
                                     parse_mode=ParseMode.MARKDOWN,
                                     reply_markup=InlineKeyboardMarkup(
@@ -193,7 +193,6 @@ def help_button(bot, update):
 
 @run_async
 def get_help(bot, update):
-    user = update.effective_message.from_user
     chat = update.effective_chat
     args = update.effective_message.text.split(None, 1)
 
@@ -210,7 +209,7 @@ def get_help(bot, update):
     elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
         module = args[1].lower()
         text = "Here is the available help for the *{}* module:\n".format(HELPABLE[module].__name__) \
-               + escape_markdown(HELPABLE[module].__help__)
+               + HELPABLE[module].__help__
         send_help(chat.id, text, InlineKeyboardMarkup([[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
 
     else:

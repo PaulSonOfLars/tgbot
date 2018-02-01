@@ -14,7 +14,7 @@ from tg_bot.modules.sql import warns_sql as sql
 WARN_HANDLER_GROUP = 9
 CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
 
-
+# Not async
 def warn(user_id, chat, reason, bot, message):
     if is_user_admin(chat, user_id):
         message.reply_text("Damn admins, can't even be warned!")
@@ -105,6 +105,7 @@ def warns(bot, update, args):
         update.effective_message.reply_text("This user hasn't got any warnings!")
 
 
+# Dispatcher handler stop - do not async
 @user_admin
 def add_warn_filter(bot, update):
     chat = update.effective_chat
@@ -201,12 +202,14 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 __help__ = """
+ - /warns <userhandle>: get a user's number, and reason, of warnings.
+ - /warnlist: list of all current warning filters
+
+*Admin only:*
  - /warn <userhandle>: warn a user. After 3 warns, the user will be banned from the group. Can also be used as a reply.
  - /resetwarn <userhandle>: reset the warnings for a user. Can also be used as a reply.
- - /warns <userhandle>: get a user's number, and reason, of warnings.
  - /addwarn <keyword> <reply message>: set a warning filter on a certain keyword
  - /nowarn <keyword>: stop a warning filter
- - /warnlist: list of all current warning filters
 """
 
 __name__ = "Warnings"

@@ -77,8 +77,10 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 __help__ = """
- - /setflood <int/'no'/'off'>: enables or disables flood control
  - /flood: Get the current flood control setting
+
+*Admin only:*
+ - /setflood <int/'no'/'off'>: enables or disables flood control
 """
 
 __name__ = "AntiFlood"
