@@ -1,4 +1,4 @@
-from telegram import ParseMode
+from telegram import ParseMode, MAX_MESSAGE_LENGTH
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
@@ -37,8 +37,12 @@ def set_about_me(bot, update):
     text = message.text
     info = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
     if len(info) == 2:
-        sql.set_user_me_info(user_id, info[1])
-        update.effective_message.reply_text("Updated your info!")
+        if len(info[1]) < MAX_MESSAGE_LENGTH // 4:
+            sql.set_user_me_info(user_id, info[1])
+            message.reply_text("Updated your info!")
+        else:
+            message.reply_text(
+                "Your info needs to be under {} characters! You have {}.".format(MAX_MESSAGE_LENGTH // 4, len(info[1])))
 
 
 @run_async
@@ -76,8 +80,13 @@ def set_about_bio(bot, update):
         text = message.text
         bio = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
         if len(bio) == 2:
-            sql.set_user_bio(user_id, bio[1])
-            message.reply_text("Updated {}'s bio!".format(repl_message.from_user.first_name))
+            if len(bio[1]) < MAX_MESSAGE_LENGTH // 4:
+                sql.set_user_bio(user_id, bio[1])
+                message.reply_text("Updated {}'s bio!".format(repl_message.from_user.first_name))
+            else:
+                message.reply_text(
+                    "A bio needs to be under {} characters! You tried to set {}.".format(
+                        MAX_MESSAGE_LENGTH // 4, len(bio[1])))
     else:
         message.reply_text("Reply to someone's message to set their bio!")
 
@@ -103,7 +112,6 @@ __help__ = """
 """
 
 __name__ = "Bios and Abouts"
-
 
 SET_BIO_HANDLER = CommandHandler("setbio", set_about_bio)
 GET_BIO_HANDLER = CommandHandler("bio", about_bio, pass_args=True)
