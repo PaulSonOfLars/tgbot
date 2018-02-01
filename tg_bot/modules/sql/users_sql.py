@@ -159,9 +159,9 @@ def migrate_chat(old_chat_id, new_chat_id):
             chat.chat_id = new_chat_id
             SESSION.add(chat)
 
-        chat_members = SESSION.query(ChatMembers).filter(ChatMembers.chat_id == str(old_chat_id)).all()
+        chat_members = SESSION.query(ChatMembers).filter(ChatMembers.chat == str(old_chat_id)).all()
         for member in chat_members:
-            member.chat_id = str(new_chat_id)
+            member.chat = str(new_chat_id)
             SESSION.add(member)
 
         SESSION.commit()
