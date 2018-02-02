@@ -143,6 +143,8 @@ def ungban(bot, update, args):
                 pass
             elif excp.message == "Method is available for supergroup and channel chats only":
                 pass
+            elif excp.message == "Not in the chat":
+                pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
                 bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
