@@ -3,13 +3,13 @@ from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.locks_sql as sql
-from tg_bot import dispatcher, SUDO_USERS
+from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
-    bot_can_delete
+    bot_can_delete, is_bot_admin
 from tg_bot.modules.helper_funcs.cust_filters import CustomFilters
 from tg_bot.modules.sql import users_sql
 
-LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif', 'url']
+LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif', 'url', 'bots']
 
 RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews', 'all']
 
@@ -171,6 +171,18 @@ def del_url(bot, update):
 
 @run_async
 @user_not_admin
+def remove_bot(bot, update):
+    chat = update.effective_chat
+    if sql.is_locked(chat.id, "bots") and is_bot_admin(chat, bot.id):
+        new_members = update.effective_message.new_chat_members
+        for new_mem in new_members:
+            if new_mem.is_bot:
+                chat.kick_member(new_mem.id)
+                update.effective_message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
+
+
+@run_async
+@user_not_admin
 def rest_msg(bot, update):
     msg = update.effective_message
     chat = update.effective_chat
@@ -281,6 +293,7 @@ Locks can be used to restrict a group's users.
 eg:
 Locking urls will auto-delete all messages with urls which haven't been whitelisted, locking stickers will delete all \
 stickers, etc.
+Locking bots will stop non-admins from adding bots to the chat.
 """
 
 __name__ = "Locks"
@@ -311,6 +324,7 @@ CONTACT_HANDLER = MessageHandler(Filters.contact, del_contact)
 PHOTO_HANDLER = MessageHandler(Filters.photo, del_photo)
 GIF_HANDLER = MessageHandler(GIF, del_gif)
 URL_HANDLER = MessageHandler(Filters.entity(MessageEntity.URL), del_url)
+BOT_HANDLER = MessageHandler(Filters.status_update.new_chat_members, remove_bot)
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(UNLOCK_HANDLER)
@@ -331,3 +345,4 @@ dispatcher.add_handler(CONTACT_HANDLER, PERM_GROUP)
 dispatcher.add_handler(PHOTO_HANDLER, PERM_GROUP)
 dispatcher.add_handler(GIF_HANDLER, PERM_GROUP)
 dispatcher.add_handler(URL_HANDLER, PERM_GROUP)
+dispatcher.add_handler(BOT_HANDLER, PERM_GROUP)
