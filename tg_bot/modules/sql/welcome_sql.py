@@ -6,7 +6,7 @@ from sqlalchemy import Column, String, Boolean, UnicodeText, Integer
 from tg_bot.modules.sql import SESSION, BASE
 
 DEFAULT_WELCOME = "Hey {first}, how are you?"
-DEFAULT_LEAVE = "Nice knowing ya!"
+DEFAULT_GOODBYE = "Nice knowing ya!"
 
 
 @unique
@@ -25,16 +25,18 @@ class Welcome(BASE):
     __tablename__ = "welcome_pref"
     chat_id = Column(String(14), primary_key=True)
     should_welcome = Column(Boolean, default=True)
+    should_goodbye = Column(Boolean, default=True)
 
     custom_welcome = Column(UnicodeText, default=DEFAULT_WELCOME)
     welcome_type = Column(Integer, default=Types.TEXT.value)
 
-    custom_leave = Column(UnicodeText, default=DEFAULT_LEAVE)
+    custom_leave = Column(UnicodeText, default=DEFAULT_GOODBYE)
     leave_type = Column(Integer, default=Types.TEXT.value)
 
-    def __init__(self, chat_id, should_welcome=True):
+    def __init__(self, chat_id, should_welcome=True, should_goodbye=True):
         self.chat_id = chat_id
         self.should_welcome = should_welcome
+        self.should_goodbye = should_goodbye
 
     def __repr__(self):
         return "<Chat {} should Welcome new users: {}>".format(self.chat_id, self.should_welcome)
@@ -85,33 +87,35 @@ def get_welc_pref(chat_id):
         return True, DEFAULT_WELCOME, Types.TEXT
 
 
-def get_leave_pref(chat_id):
+def get_gdbye_pref(chat_id):
     welc = SESSION.query(Welcome).get(str(chat_id))
     SESSION.close()
     if welc:
-        return welc.should_welcome, welc.custom_leave, welc.leave_type
+        return welc.should_goodbye, welc.custom_leave, welc.leave_type
     else:
         # Welcome by default.
-        return True, DEFAULT_LEAVE, Types.TEXT
+        return True, DEFAULT_GOODBYE, Types.TEXT
 
 
-def get_preference(chat_id):
-    welc = SESSION.query(Welcome).get(str(chat_id))
-    SESSION.close()
-    if welc:
-        return welc.should_welcome, welc.custom_welcome, welc.custom_leave, welc.welcome_type, welc.leave_type
-    else:
-        # Welcome by default.
-        return True, DEFAULT_WELCOME, DEFAULT_LEAVE, Types.TEXT, Types.TEXT
-
-
-def set_preference(chat_id, should_welcome):
+def set_welc_preference(chat_id, should_welcome):
     with INSERTION_LOCK:
         curr = SESSION.query(Welcome).get(str(chat_id))
         if not curr:
-            curr = Welcome(str(chat_id), should_welcome)
+            curr = Welcome(str(chat_id), should_welcome=should_welcome)
         else:
             curr.should_welcome = should_welcome
+
+        SESSION.add(curr)
+        SESSION.commit()
+
+
+def set_gdbye_preference(chat_id, should_goodbye):
+    with INSERTION_LOCK:
+        curr = SESSION.query(Welcome).get(str(chat_id))
+        if not curr:
+            curr = Welcome(str(chat_id), should_goodbye=should_goodbye)
+        else:
+            curr.should_goodbye = should_goodbye
 
         SESSION.add(curr)
         SESSION.commit()
@@ -131,7 +135,7 @@ def set_custom_welcome(chat_id, custom_welcome, welcome_type, buttons=None):
             welcome_settings.welcome_type = welcome_type.value
 
         else:
-            welcome_settings.custom_welcome = DEFAULT_LEAVE
+            welcome_settings.custom_welcome = DEFAULT_GOODBYE
             welcome_settings.welcome_type = Types.TEXT.value
 
         SESSION.add(welcome_settings)
@@ -158,7 +162,7 @@ def get_custom_welcome(chat_id):
     return ret
 
 
-def set_custom_leave(chat_id, custom_leave, leave_type, buttons=None):
+def set_custom_gdbye(chat_id, custom_goodbye, goodbye_type, buttons=None):
     if buttons is None:
         buttons = []
 
@@ -167,12 +171,12 @@ def set_custom_leave(chat_id, custom_leave, leave_type, buttons=None):
         if not welcome_settings:
             welcome_settings = Welcome(str(chat_id), True)
 
-        if custom_leave:
-            welcome_settings.custom_leave = custom_leave
-            welcome_settings.leave_type = leave_type.value
+        if custom_goodbye:
+            welcome_settings.custom_leave = custom_goodbye
+            welcome_settings.leave_type = goodbye_type.value
 
         else:
-            welcome_settings.custom_leave = DEFAULT_LEAVE
+            welcome_settings.custom_leave = DEFAULT_GOODBYE
             welcome_settings.leave_type = Types.TEXT.value
 
         SESSION.add(welcome_settings)
@@ -189,9 +193,9 @@ def set_custom_leave(chat_id, custom_leave, leave_type, buttons=None):
         SESSION.commit()
 
 
-def get_custom_leave(chat_id):
+def get_custom_gdbye(chat_id):
     welcome_settings = SESSION.query(Welcome).get(str(chat_id))
-    ret = DEFAULT_LEAVE
+    ret = DEFAULT_GOODBYE
     if welcome_settings and welcome_settings.custom_leave:
         ret = welcome_settings.custom_leave
 
@@ -206,7 +210,7 @@ def get_welc_buttons(chat_id):
         SESSION.close()
 
 
-def get_leave_buttons(chat_id):
+def get_gdbye_buttons(chat_id):
     try:
         return SESSION.query(LeaveButtons).filter(LeaveButtons.chat_id == str(chat_id)).all()
     finally:

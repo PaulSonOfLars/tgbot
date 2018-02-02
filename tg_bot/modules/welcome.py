@@ -85,8 +85,8 @@ def new_member(bot, update):
 @run_async
 def left_member(bot, update):
     chat = update.effective_chat
-    should_welc, cust_leave, leave_type = sql.get_leave_pref(chat.id)
-    if should_welc:
+    should_goodbye, cust_goodbye, goodbye_type = sql.get_gdbye_pref(chat.id)
+    if should_goodbye:
         left_mem = update.effective_message.left_chat_member
         if left_mem:
             # Ignore bot being kicked
@@ -98,12 +98,12 @@ def left_member(bot, update):
                 update.effective_message.reply_text("RIP Master")
                 return
 
-            if leave_type != sql.Types.TEXT and leave_type != sql.Types.BUTTON_TEXT:
-                ENUM_FUNC_MAP[leave_type](chat.id, cust_leave)
+            if goodbye_type != sql.Types.TEXT and goodbye_type != sql.Types.BUTTON_TEXT:
+                ENUM_FUNC_MAP[goodbye_type](chat.id, cust_goodbye)
                 return
 
             first_name = left_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
-            if cust_leave:
+            if cust_goodbye:
                 if left_mem.last_name:
                     fullname = "{} {}".format(first_name, left_mem.last_name)
                 else:
@@ -115,31 +115,31 @@ def left_member(bot, update):
                 else:
                     username = mention
 
-                valid_format = escape_invalid_curly_brackets(cust_leave, VALID_WELCOME_FORMATTERS)
+                valid_format = escape_invalid_curly_brackets(cust_goodbye, VALID_WELCOME_FORMATTERS)
                 res = valid_format.format(first=escape_markdown(first_name),
                                           last=escape_markdown(left_mem.last_name or first_name),
                                           fullname=escape_markdown(fullname), username=username, mention=mention,
                                           count=count, chatname=escape_markdown(chat.title), id=left_mem.id)
             else:
-                res = sql.DEFAULT_LEAVE
+                res = sql.DEFAULT_GOODBYE
 
-            buttons = sql.get_leave_buttons(chat.id)
+            buttons = sql.get_gdbye_buttons(chat.id)
             keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
             keyboard = InlineKeyboardMarkup(keyb)
 
             try:
                 update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
             except IndexError:
-                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_LEAVE + "\nNote: the current leave "
+                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_GOODBYE + "\nNote: the current goodbye "
                                                                                         "message is invalid due to "
                                                                                         "markdown issues. "
                                                                                         " Please update."),
                                                     parse_mode=ParseMode.MARKDOWN)
             except KeyError:
-                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_LEAVE + "\nNote: the current leave "
-                                                                                        "message is invalid due to "
-                                                                                        "misplaced curly brackets. "
-                                                                                        " Please update."),
+                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_goodbye + "\nNote: the current leave "
+                                                                                          "message is invalid due to "
+                                                                                          "misplaced curly brackets. "
+                                                                                          " Please update."),
                                                     parse_mode=ParseMode.MARKDOWN)
 
 
@@ -149,22 +149,45 @@ def welcome(bot, update, args):
     chat = update.effective_chat
     # if no args, show current replies.
     if len(args) == 0:
-        pref, welcome_m, leave_m, welcome_type, leave_type = sql.get_preference(chat.id)
+        pref, welcome_m, welcome_type = sql.get_welc_pref(chat.id)
         update.effective_message.reply_text(
-            "This chat has it's welcome setting set to: {}.\n*The welcome message is:*".format(pref),
+            "This chat has it's welcome setting set to: `{}`.\n*The welcome message is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
         ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
-        bot.send_message(chat.id, "*The leave message is:*", parse_mode=ParseMode.MARKDOWN)
-        ENUM_FUNC_MAP[leave_type](chat.id, leave_m)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
-            sql.set_preference(str(chat.id), True)
+            sql.set_welc_preference(str(chat.id), True)
             update.effective_message.reply_text("I'll be polite!")
 
         elif args[0].lower() in ("off", "no"):
-            sql.set_preference(str(chat.id), False)
+            sql.set_welc_preference(str(chat.id), False)
             update.effective_message.reply_text("I'm sulking, not saying hello anymore.")
+
+        else:
+            # idek what you're writing, say yes or no
+            update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
+
+
+@run_async
+@user_admin
+def goodbye(bot, update, args):
+    chat = update.effective_chat
+
+    if len(args) == 0:
+        pref, goodbye_m, goodbye_type = sql.get_gdbye_pref(chat.id)
+        update.effective_message.reply_text(
+            "This chat has it's goodbye setting set to: `{}`.\n*The goodbye message is:*".format(pref),
+            parse_mode=ParseMode.MARKDOWN)
+        ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
+    elif len(args) >= 1:
+        if args[0].lower() in ("on", "yes"):
+            sql.set_gdbye_preference(str(chat.id), True)
+            update.effective_message.reply_text("I'll be sorry when people leave!")
+
+        elif args[0].lower() in ("off", "no"):
+            sql.set_gdbye_preference(str(chat.id), False)
+            update.effective_message.reply_text("They leave, they're dead to me.")
 
         else:
             # idek what you're writing, say yes or no
@@ -231,7 +254,7 @@ def reset_welcome(bot, update):
 
 @run_async
 @user_admin
-def set_leave(bot, update):
+def set_goodbye(bot, update):
     chat_id = update.effective_chat.id
     msg = update.effective_message
     raw_text = msg.text
@@ -275,19 +298,19 @@ def set_leave(bot, update):
         msg.reply_text("You didn't specify what to reply with!")
         return
 
-    sql.set_custom_leave(chat_id, content, data_type, buttons)
-    update.effective_message.reply_text("Successfully set custom leave message!")
+    sql.set_custom_gdbye(chat_id, content, data_type, buttons)
+    update.effective_message.reply_text("Successfully set custom goodbye message!")
 
 
 @run_async
 @user_admin
-def reset_leave(bot, update):
+def reset_goodbye(bot, update):
     chat_id = update.effective_chat.id
-    sql.set_custom_leave(chat_id, sql.DEFAULT_LEAVE, sql.Types.TEXT)
-    update.effective_message.reply_text("Successfully reset leave message to default!")
+    sql.set_custom_gdbye(chat_id, sql.DEFAULT_GOODBYE, sql.Types.TEXT)
+    update.effective_message.reply_text("Successfully reset goodbye message to default!")
 
 
-WELC_HELP_TXT = "Your group's welcome/leave messages can be personalised in multiple ways. If you want the messages " \
+WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in multiple ways. If you want the messages " \
                 "to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
                 " - `{{first}}`: this represents the user's *first* name\n" \
                 " - `{{last}}`: this represents the user's *last* name. Defaults to *first name* if user has no " \
@@ -335,30 +358,33 @@ def __migrate__(old_chat_id, new_chat_id):
 
 __help__ = """
 *Admin only:*
- - /welcome <on/off>: enable/disable welcome and goodbye messages. If used with no arg, shows current settings.
+ - /welcome <on/off>: enable/disable welcome messages. If used with no arg, shows current settings.
+ - /goodbye <on/off>: enable/disable goodbye messages. If used with no arg, shows current settings.
  - /setwelcome <sometext>: set a custom welcome message. If used replying to media, uses that media.
- - /setleave <sometext>: set a custom leaving message. If used replying to media, uses that media.
+ - /setgoodbye <sometext>: set a custom goodbye message. If used replying to media, uses that media.
  - /resetwelcome: reset to the default welcome message.
- - /resetleave: reset to the default leaving message.
- - /welcomehelp: view more formatting information for custom welcome messages.
+ - /resetgoodbye: reset to the default goodbye message.
+ - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
 """
 
-__name__ = "Welcomes"
+__name__ = "Welcomes/Goodbyes"
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)
-PREF_HANDLER = CommandHandler("welcome", welcome, pass_args=True, filters=Filters.group)
+WELC_PREF_HANDLER = CommandHandler("welcome", welcome, pass_args=True, filters=Filters.group)
+GOODBYE_PREF_HANDLER = CommandHandler("goodbye", goodbye, pass_args=True, filters=Filters.group)
 SET_WELCOME = CommandHandler("setwelcome", set_welcome, filters=Filters.group)
-SET_LEAVE = CommandHandler("setleave", set_leave, filters=Filters.group)
+SET_GOODBYE = CommandHandler("setgoodbye", set_goodbye, filters=Filters.group)
 RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
-RESET_LEAVE = CommandHandler("resetleave", reset_leave, filters=Filters.group)
+RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
 dispatcher.add_handler(NEW_MEM_HANDLER)
 dispatcher.add_handler(LEFT_MEM_HANDLER)
-dispatcher.add_handler(PREF_HANDLER)
+dispatcher.add_handler(WELC_PREF_HANDLER)
+dispatcher.add_handler(GOODBYE_PREF_HANDLER)
 dispatcher.add_handler(SET_WELCOME)
-dispatcher.add_handler(SET_LEAVE)
+dispatcher.add_handler(SET_GOODBYE)
 dispatcher.add_handler(RESET_WELCOME)
-dispatcher.add_handler(RESET_LEAVE)
+dispatcher.add_handler(RESET_GOODBYE)
 dispatcher.add_handler(WELCOME_HELP)
