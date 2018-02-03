@@ -14,6 +14,9 @@ def check_flood(bot, update):
     chat = update.effective_chat
     message = update.effective_message
 
+    if not user:  # ignore channels
+        return
+
     # ignore admins
     if is_user_admin(chat, user.id):
         sql.update_flood(chat.id, None)

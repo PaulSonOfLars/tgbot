@@ -24,6 +24,10 @@ def afk(bot, update):
 @run_async
 def no_longer_afk(bot, update):
     user = update.effective_user
+
+    if not user:  # ignore channels
+        return
+
     res = sql.rm_afk(user.id)
     if res:
         update.effective_message.reply_text("{} is no longer AFK!".format(update.effective_user.first_name))

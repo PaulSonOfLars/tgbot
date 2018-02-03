@@ -10,7 +10,7 @@ def extract_user(message: Message, args: List[str]):
     prev_message = message.reply_to_message
 
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION]).keys()
         ent = entities[0]
         user_id = ent.user.id
 

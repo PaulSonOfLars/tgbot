@@ -100,9 +100,12 @@ def bot_admin(func):
 def user_admin(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):
-        user_id = update.effective_user.id
-        if is_user_admin(update.effective_chat, user_id):
+        user = update.effective_user
+        if user and is_user_admin(update.effective_chat, user.id):
             func(bot, update, *args, **kwargs)
+
+        elif not user:
+            pass
 
         elif DEL_CMDS and " " not in update.effective_message.text:
             update.effective_message.delete()
@@ -116,9 +119,12 @@ def user_admin(func):
 def user_admin_no_reply(func):
     @wraps(func)
     def is_admin(bot, update, *args, **kwargs):
-        user_id = update.effective_user.id
-        if is_user_admin(update.effective_chat, user_id):
+        user = update.effective_user
+        if user and is_user_admin(update.effective_chat, user.id):
             func(bot, update, *args, **kwargs)
+
+        elif not user:
+            pass
 
         elif DEL_CMDS and " " not in update.effective_message.text:
             update.effective_message.delete()
@@ -129,8 +135,8 @@ def user_admin_no_reply(func):
 def user_not_admin(func):
     @wraps(func)
     def is_not_admin(bot, update, *args, **kwargs):
-        user_id = update.effective_user.id
-        if not is_user_admin(update.effective_chat, user_id):
+        user = update.effective_user
+        if user and not is_user_admin(update.effective_chat, user.id):
             func(bot, update, *args, **kwargs)
 
     return is_not_admin

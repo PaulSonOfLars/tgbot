@@ -355,7 +355,7 @@ dispatcher.add_handler(REST_MEDIA_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_OTHERS_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_PREVIEWS_HANDLER, REST_GROUP)
 
-dispatcher.add_handler(GIF_HANDLER, PERM_GROUP) # be at top, before doc handler
+dispatcher.add_handler(GIF_HANDLER, PERM_GROUP)  # be at top, before doc handler
 dispatcher.add_handler(STICKER_HANDLER, PERM_GROUP)
 dispatcher.add_handler(AUDIO_HANDLER, PERM_GROUP)
 dispatcher.add_handler(VOICE_HANDLER, PERM_GROUP)
