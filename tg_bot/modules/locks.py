@@ -3,7 +3,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.locks_sql as sql
-from tg_bot import dispatcher
+from tg_bot import dispatcher, SUDO_USERS
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
     bot_can_delete, is_bot_admin
 from tg_bot.modules.helper_funcs.cust_filters import CustomFilters
@@ -15,6 +15,21 @@ RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews', 'all']
 
 PERM_GROUP = 1
 REST_GROUP = 2
+
+
+# NOT ASYNC
+def restr_members(bot, chat_id, members, messages=False, media=False, other=False, previews=False):
+    for mem in members:
+        if mem.user in SUDO_USERS:
+            pass
+        try:
+            bot.restrict_chat_member(chat_id, mem.user,
+                                     can_send_messages=messages,
+                                     can_send_media_messages=media,
+                                     can_send_other_messages=other,
+                                     can_add_web_page_previews=previews)
+        except TelegramError:
+            pass
 
 
 # NOT ASYNC
@@ -48,6 +63,9 @@ def lock(bot, update, args):
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
+                if args[0] == "previews":
+                    members = users_sql.get_chat_members(str(chat.id))
+                    restr_members(bot, chat.id, members, messages=True, media=True, other=True)
 
                 message.reply_text("Locked {} for all non-admins!".format(args[0]))
 
@@ -237,7 +255,6 @@ def rest_previews(bot, update):
     if sql.is_restr_locked(chat.id, "previews") \
             and can_delete(chat, bot.id) \
             and not is_user_admin(chat, msg.from_user.id):
-        msg.delete()
         bot.restrict_chat_member(chat.id, msg.from_user.id,
                                  can_send_messages=True,
                                  can_send_media_messages=True,
@@ -336,8 +353,9 @@ dispatcher.add_handler(LOCKED_HANDLER)
 dispatcher.add_handler(REST_MSG_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_MEDIA_HANDLER, REST_GROUP)
 dispatcher.add_handler(REST_OTHERS_HANDLER, REST_GROUP)
-# dispatcher.add_handler(REST_PREVIEWS_HANDLER, REST_GROUP) # NOTE: disable, checking for URL's will trigger all urls,
+dispatcher.add_handler(REST_PREVIEWS_HANDLER, REST_GROUP)
 
+dispatcher.add_handler(GIF_HANDLER, PERM_GROUP) # be at top, before doc handler
 dispatcher.add_handler(STICKER_HANDLER, PERM_GROUP)
 dispatcher.add_handler(AUDIO_HANDLER, PERM_GROUP)
 dispatcher.add_handler(VOICE_HANDLER, PERM_GROUP)
@@ -345,6 +363,5 @@ dispatcher.add_handler(DOCUMENT_HANDLER, PERM_GROUP)
 dispatcher.add_handler(VIDEO_HANDLER, PERM_GROUP)
 dispatcher.add_handler(CONTACT_HANDLER, PERM_GROUP)
 dispatcher.add_handler(PHOTO_HANDLER, PERM_GROUP)
-dispatcher.add_handler(GIF_HANDLER, PERM_GROUP)
 dispatcher.add_handler(URL_HANDLER, PERM_GROUP)
 dispatcher.add_handler(BOT_HANDLER, PERM_GROUP)
