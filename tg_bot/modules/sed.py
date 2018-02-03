@@ -2,6 +2,7 @@ import re
 import sre_constants
 
 import telegram
+from telegram import Update, Bot
 from telegram.ext import RegexHandler, run_async
 
 from tg_bot import dispatcher
@@ -48,7 +49,7 @@ def separate_sed(sed_string):
 
 
 @run_async
-def sed(bot, update):
+def sed(bot: Bot, update: Update):
     sed_result = separate_sed(update.effective_message.text)
     if sed_result and update.effective_message.reply_to_message:
         if update.effective_message.reply_to_message.text:

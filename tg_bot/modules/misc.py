@@ -1,8 +1,10 @@
 import json
 import random
 from datetime import datetime
+from typing import Optional, List
 
 import requests
+from telegram import Message, Chat, Update, Bot
 from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown
@@ -122,13 +124,13 @@ GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
 
 
 @run_async
-def runs(bot, update):
+def runs(bot: Bot, update: Update):
     update.effective_message.reply_text(random.choice(RUN_STRINGS))
 
 
 @run_async
-def slap(bot, update, args):
-    msg = update.effective_message
+def slap(bot: Bot, update: Update, args: List[str]):
+    msg = update.effective_message  # type: Optional[Message]
 
     # reply to correct message
     reply_text = msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
@@ -165,7 +167,7 @@ def slap(bot, update, args):
 
 
 @run_async
-def get_bot_ip(bot, update):
+def get_bot_ip(bot: Bot, update: Update):
     """ Sends the bot's IP address, so as to be able to ssh in if necessary.
         OWNER ONLY.
     """
@@ -174,7 +176,7 @@ def get_bot_ip(bot, update):
 
 
 @run_async
-def get_id(bot, update, args):
+def get_id(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(update.effective_message, args)
     if user_id:
         if update.effective_message.reply_to_message and update.effective_message.reply_to_message.forward_from:
@@ -192,7 +194,7 @@ def get_id(bot, update, args):
             update.effective_message.reply_text("{}'s id is `{}`.".format(escape_markdown(user.first_name), user.id),
                                                 parse_mode=ParseMode.MARKDOWN)
     else:
-        chat = update.effective_chat
+        chat = update.effective_chat  # type: Optional[Chat]
         if chat.type == "private":
             update.effective_message.reply_text("Your id is `{}`.".format(chat.id),
                                                 parse_mode=ParseMode.MARKDOWN)
@@ -203,8 +205,8 @@ def get_id(bot, update, args):
 
 
 @run_async
-def info(bot, update, args):
-    msg = update.effective_message
+def info(bot: Bot, update: Update, args: List[str]):
+    msg = update.effective_message  # type: Optional[Message]
     user_id = extract_user(update.effective_message, args)
     if user_id:
         user = bot.get_chat(user_id)
@@ -245,7 +247,7 @@ def info(bot, update, args):
 
 
 @run_async
-def get_time(bot, update, args):
+def get_time(bot: Bot, update: Update, args: List[str]):
     location = " ".join(args)
     if location.lower() == bot.first_name.lower():
         update.effective_message.reply_text("Its always banhammer time for me!")
@@ -287,14 +289,14 @@ def get_time(bot, update, args):
 
 
 @run_async
-def echo(bot, update):
+def echo(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     update.effective_message.reply_text(args[1], quote=False)
     update.effective_message.delete()
 
 
 @run_async
-def markdown_help(bot, update):
+def markdown_help(bot: Bot, update: Update):
     update.effective_message.reply_text("""
 Markdown is a very powerful formatting tool supported by telegram. {} has some enhancements, to make sure that \
 saved messages are correctly parsed, and to allow you to create buttons.
@@ -317,7 +319,7 @@ Note: this message has had markdown disabled, to allow you to see what the chara
 
 
 @run_async
-def stats(bot, update):
+def stats(bot: Bot, update: Update):
     update.effective_message.reply_text("Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS]))
 
 

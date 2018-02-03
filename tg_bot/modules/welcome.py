@@ -1,3 +1,6 @@
+from typing import Optional, List
+
+from telegram import Message, Chat, Update, Bot
 from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import escape_markdown
@@ -23,8 +26,8 @@ ENUM_FUNC_MAP = {
 
 
 @run_async
-def new_member(bot, update):
-    chat = update.effective_chat
+def new_member(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
 
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     if should_welc:
@@ -83,8 +86,8 @@ def new_member(bot, update):
 
 
 @run_async
-def left_member(bot, update):
-    chat = update.effective_chat
+def left_member(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
     should_goodbye, cust_goodbye, goodbye_type = sql.get_gdbye_pref(chat.id)
     if should_goodbye:
         left_mem = update.effective_message.left_chat_member
@@ -131,12 +134,12 @@ def left_member(bot, update):
                 update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
             except IndexError:
                 update.effective_message.reply_text(markdown_parser(sql.DEFAULT_GOODBYE + "\nNote: the current goodbye "
-                                                                                        "message is invalid due to "
-                                                                                        "markdown issues. "
-                                                                                        " Please update."),
+                                                                                          "message is invalid due to "
+                                                                                          "markdown issues. "
+                                                                                          " Please update."),
                                                     parse_mode=ParseMode.MARKDOWN)
             except KeyError:
-                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_goodbye + "\nNote: the current leave "
+                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_GOODBYE + "\nNote: the current leave "
                                                                                           "message is invalid due to "
                                                                                           "misplaced curly brackets. "
                                                                                           " Please update."),
@@ -145,8 +148,8 @@ def left_member(bot, update):
 
 @run_async
 @user_admin
-def welcome(bot, update, args):
-    chat = update.effective_chat
+def welcome(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
     # if no args, show current replies.
     if len(args) == 0:
         pref, welcome_m, welcome_type = sql.get_welc_pref(chat.id)
@@ -171,8 +174,8 @@ def welcome(bot, update, args):
 
 @run_async
 @user_admin
-def goodbye(bot, update, args):
-    chat = update.effective_chat
+def goodbye(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
 
     if len(args) == 0:
         pref, goodbye_m, goodbye_type = sql.get_gdbye_pref(chat.id)
@@ -196,9 +199,9 @@ def goodbye(bot, update, args):
 
 @run_async
 @user_admin
-def set_welcome(bot, update):
+def set_welcome(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
-    msg = update.effective_message
+    msg = update.effective_message  # type: Optional[Message]
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
 
@@ -246,7 +249,7 @@ def set_welcome(bot, update):
 
 @run_async
 @user_admin
-def reset_welcome(bot, update):
+def reset_welcome(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     sql.set_custom_welcome(chat_id, sql.DEFAULT_WELCOME, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset welcome message to default!")
@@ -254,9 +257,9 @@ def reset_welcome(bot, update):
 
 @run_async
 @user_admin
-def set_goodbye(bot, update):
+def set_goodbye(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
-    msg = update.effective_message
+    msg = update.effective_message  # type: Optional[Message]
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
 
@@ -304,7 +307,7 @@ def set_goodbye(bot, update):
 
 @run_async
 @user_admin
-def reset_goodbye(bot, update):
+def reset_goodbye(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     sql.set_custom_gdbye(chat_id, sql.DEFAULT_GOODBYE, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset goodbye message to default!")
@@ -336,7 +339,7 @@ WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in mu
 
 @run_async
 @user_admin
-def welcome_help(bot, update):
+def welcome_help(bot: Bot, update: Update):
     update.effective_message.reply_text(WELC_HELP_TXT, parse_mode=ParseMode.MARKDOWN)
 
 

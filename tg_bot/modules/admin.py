@@ -1,3 +1,6 @@
+from typing import Optional, List
+
+from telegram import Message, Chat, Update, Bot
 from telegram import ParseMode
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
@@ -13,10 +16,10 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 @bot_admin
 @can_promote
 @user_admin
-def promote(bot, update, args):
+def promote(bot: Bot, update: Update, args: List[str]):
     chat_id = update.effective_chat.id
-    message = update.effective_message
-    chat = update.effective_chat
+    message = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  # type: Optional[Chat]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -52,9 +55,9 @@ def promote(bot, update, args):
 @bot_admin
 @can_promote
 @user_admin
-def demote(bot, update, args):
-    chat = update.effective_chat
-    message = update.effective_message
+def demote(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -96,7 +99,7 @@ def demote(bot, update, args):
 @bot_admin
 @can_pin
 @user_admin
-def pin(bot, update, args):
+def pin(bot: Bot, update: Update, args: List[str]):
     chat_id = update.effective_chat.id
     chat_type = update.effective_chat.type
     is_group = chat_type != "private" and chat_type != "channel"
@@ -121,7 +124,7 @@ def pin(bot, update, args):
 @bot_admin
 @can_pin
 @user_admin
-def unpin(bot, update):
+def unpin(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     bot.unpinChatMessage(chat_id)
 
@@ -129,8 +132,8 @@ def unpin(bot, update):
 @run_async
 @bot_admin
 @user_admin
-def invite(bot, update):
-    chat = update.effective_chat
+def invite(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
     if chat.username:
         update.effective_message.reply_text(chat.username)
     elif chat.type == chat.SUPERGROUP or chat.type == chat.CHANNEL:
@@ -145,7 +148,7 @@ def invite(bot, update):
 
 
 @run_async
-def adminlist(bot, update):
+def adminlist(bot: Bot, update: Update):
     administrators = update.effective_chat.get_administrators()
     text = "Admins in *{}*:".format(update.effective_chat.title or "this chat")
     for admin in administrators:

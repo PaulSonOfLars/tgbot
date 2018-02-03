@@ -1,3 +1,6 @@
+from typing import Optional
+
+from telegram import Message, Update, Bot, User
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, run_async, Filters
@@ -10,7 +13,7 @@ from tg_bot.modules.helper_funcs.string_handling import markdown_parser
 
 
 @run_async
-def get_rules(bot, update):
+def get_rules(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     send_rules(update, chat_id)
 
@@ -18,7 +21,7 @@ def get_rules(bot, update):
 # Do not async - not from a handler
 def send_rules(update, chat_id, from_pm=False):
     bot = dispatcher.bot
-    user = update.effective_user
+    user = update.effective_user  # type: Optional[User]
     try:
         chat = bot.get_chat(chat_id)
     except BadRequest as excp:
@@ -50,9 +53,9 @@ def send_rules(update, chat_id, from_pm=False):
 
 @run_async
 @user_admin
-def set_rules(bot, update):
+def set_rules(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
-    msg = update.effective_message
+    msg = update.effective_message  # type: Optional[Message]
     raw_text = msg.text
     args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
     if len(args) == 2:
@@ -66,7 +69,7 @@ def set_rules(bot, update):
 
 @run_async
 @user_admin
-def clear_rules(bot, update):
+def clear_rules(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     sql.set_rules(chat_id, "")
     update.effective_message.reply_text("Successfully cleared rules!")

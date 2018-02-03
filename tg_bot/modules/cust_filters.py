@@ -1,7 +1,9 @@
 import re
+from typing import Optional
 
 import telegram
-from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
+from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton, Message, Chat
+from telegram import Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, DispatcherHandlerStop, run_async, Filters
 from telegram.utils.helpers import escape_markdown
@@ -17,8 +19,8 @@ BASIC_FILTER_STRING = "*Filters in this chat:*\n"
 
 
 @run_async
-def list_handlers(bot, update):
-    chat = update.effective_chat
+def list_handlers(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
     all_handlers = sql.get_chat_filters(chat.id)
 
     if not all_handlers:
@@ -40,9 +42,9 @@ def list_handlers(bot, update):
 
 # NOT ASYNC BECAUSE DISPATCHER HANDLER RAISED
 @user_admin
-def filters(bot, update):
-    chat = update.effective_chat
-    msg = update.effective_message
+def filters(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    msg = update.effective_message  # type: Optional[Message]
     args = msg.text.split(None, 1)  # use python's maxsplit to separate Cmd, keyword, and reply_text
 
     if len(args) < 2:
@@ -110,8 +112,8 @@ def filters(bot, update):
 
 # NOT ASYNC BECAUSE DISPATCHER HANDLER RAISED
 @user_admin
-def stop_filter(bot, update):
-    chat = update.effective_chat
+def stop_filter(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
     args = update.effective_message.text.split(None, 1)
 
     if len(args) < 2:
@@ -133,9 +135,9 @@ def stop_filter(bot, update):
 
 
 @run_async
-def reply_filter(bot, update):
-    chat = update.effective_chat
-    message = update.effective_message
+def reply_filter(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
     chat_filters = sql.get_chat_filters(chat.id)
     to_match = extract_text(message)
     if not to_match:

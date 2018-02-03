@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from telegram import Message, MessageEntity
 from telegram.error import BadRequest
@@ -6,7 +6,7 @@ from telegram.error import BadRequest
 from tg_bot.modules.users import get_user_id
 
 
-def extract_user(message: Message, args: List[str]):
+def extract_user(message: Message, args: List[str]) -> Optional[int]:
     prev_message = message.reply_to_message
 
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
@@ -45,7 +45,7 @@ def extract_user(message: Message, args: List[str]):
     return user_id
 
 
-def extract_user_and_text(message: Message, args: List[str]):
+def extract_user_and_text(message: Message, args: List[str]) -> (Optional[int], Optional[str]):
     prev_message = message.reply_to_message
 
     text = ""
@@ -97,5 +97,5 @@ def extract_user_and_text(message: Message, args: List[str]):
     return user_id, text
 
 
-def extract_text(message):
+def extract_text(message) -> str:
     return message.text or message.caption or (message.sticker.emoji if message.sticker else None)

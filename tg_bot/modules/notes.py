@@ -1,7 +1,9 @@
 import re
 from io import BytesIO
+from typing import Optional, List
 
 from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Message, Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, RegexHandler, Filters
 from telegram.ext.dispatcher import run_async
@@ -19,7 +21,7 @@ FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
 def get(bot, update, notename, show_none=True):
     chat_id = update.effective_chat.id
     note = sql.get_note(chat_id, notename)
-    message = update.effective_message
+    message = update.effective_message  # type: Optional[Message]
 
     if note:
         # If not is replying to a message, reply to that message (unless its an error)
@@ -83,7 +85,7 @@ def get(bot, update, notename, show_none=True):
 
 
 @run_async
-def cmd_get(bot, update, args):
+def cmd_get(bot: Bot, update: Update, args: List[str]):
     if len(args) >= 1:
         notename = args[0]
         get(bot, update, notename, show_none=True)
@@ -92,7 +94,7 @@ def cmd_get(bot, update, args):
 
 
 @run_async
-def hash_get(bot, update):
+def hash_get(bot: Bot, update: Update):
     message = update.effective_message.text
     fst_word = message.split()[0]
     no_hash = fst_word[1:]
@@ -101,7 +103,7 @@ def hash_get(bot, update):
 
 @run_async
 @user_admin
-def save_replied(bot, update):
+def save_replied(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     text = update.effective_message.text
     args = text.split(None, 3)  # use python's maxsplit to separate Cmd, note_name, and data
@@ -124,9 +126,9 @@ def save_replied(bot, update):
 
 @run_async
 @user_admin
-def save(bot, update):
+def save(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
-    msg = update.effective_message
+    msg = update.effective_message  # type: Optional[Message]
     raw_text = msg.text
     args = raw_text.split(None, 2)  # use python's maxsplit to separate Cmd, note_name, and data
 
@@ -153,7 +155,7 @@ def save(bot, update):
 
 @run_async
 @user_admin
-def clear(bot, update, args):
+def clear(bot: Bot, update: Update, args: List[str]):
     chat_id = update.effective_chat.id
     if len(args) >= 1:
         notename = args[0]
@@ -165,7 +167,7 @@ def clear(bot, update, args):
 
 
 @run_async
-def list_notes(bot, update):
+def list_notes(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     note_list = sql.get_all_chat_notes(chat_id)
 

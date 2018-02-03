@@ -1,13 +1,15 @@
 import re
+from typing import Dict, List
 
 import emoji
+from telegram import MessageEntity
+from telegram.utils.helpers import escape_markdown
+
 # match * (bold) (don't escape if in url)
 # match _ (italics) (don't escape if in url)
 # match ` (code)
 # match []() (markdown link)
 # else, escape *, _, `, and [
-from telegram.utils.helpers import escape_markdown
-
 MATCH_MD = re.compile(r'\*(.*?)\*|'
                       r'_(.*?)_|'
                       r'`(.*?)`|'
@@ -17,7 +19,7 @@ MATCH_MD = re.compile(r'\*(.*?)\*|'
 BTN_URL_REGEX = re.compile(r"(?<!\\)(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)\))")
 
 
-def _selective_escape(to_parse):
+def _selective_escape(to_parse: str) -> str:
     """
     Escape all invalid markdown
 
@@ -33,7 +35,7 @@ def _selective_escape(to_parse):
     return to_parse
 
 
-def markdown_parser(txt, entities=None, offset=0):
+def markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: int=0) -> str:
     """
     Parse a string, escaping all invalid markdown entities.
 
@@ -92,7 +94,7 @@ def markdown_parser(txt, entities=None, offset=0):
     return res
 
 
-def button_markdown_parser(txt, entities=None, offset=0):
+def button_markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: int=0) -> (str, List):
     markdown_note = markdown_parser(txt, entities, offset)
     prev = 0
     note_data = ""
@@ -107,7 +109,7 @@ def button_markdown_parser(txt, entities=None, offset=0):
     return note_data, buttons
 
 
-def escape_invalid_curly_brackets(text, valids):
+def escape_invalid_curly_brackets(text: str, valids: List[str]) -> str:
     new_text = ""
     idx = 0
     while idx < len(text):
@@ -144,7 +146,7 @@ def escape_invalid_curly_brackets(text, valids):
     return new_text
 
 
-def split_quotes(text):
+def split_quotes(text: str) -> List:
     if text.startswith('\'') or text.startswith('"'):
         counter = 1  # ignore first char -> is some kind of quote
         while counter < len(text):
@@ -167,7 +169,7 @@ def split_quotes(text):
         return text.split(None, 1)
 
 
-def remove_escapes(text):
+def remove_escapes(text: str) -> str:
     counter = 0
     res = ""
     is_escaped = False

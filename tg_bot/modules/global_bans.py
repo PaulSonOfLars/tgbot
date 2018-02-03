@@ -1,5 +1,7 @@
 from io import BytesIO
+from typing import Optional, List
 
+from telegram import Message, Update, Bot, User
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import escape_markdown
@@ -16,8 +18,8 @@ GBAN_ENFORCE_GROUP = 6
 
 
 @run_async
-def gban(bot, update, args):
-    message = update.effective_message
+def gban(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
 
     user_id, reason = extract_user_and_text(message, args)
 
@@ -49,7 +51,7 @@ def gban(bot, update, args):
 
     message.reply_text("*Blows dust off of banhammer* 😉")
 
-    banner = update.effective_user
+    banner = update.effective_user  # type: Optional[User]
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
                  "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) "
                  "because:\n{}".format(escape_markdown(banner.first_name),
@@ -92,8 +94,8 @@ def gban(bot, update, args):
 
 
 @run_async
-def ungban(bot, update, args):
-    message = update.effective_message
+def ungban(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -105,7 +107,7 @@ def ungban(bot, update, args):
         message.reply_text("That's not a user!")
         return
 
-    banner = update.effective_user
+    banner = update.effective_user  # type: Optional[User]
 
     message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
 
@@ -158,7 +160,7 @@ def ungban(bot, update, args):
 
 
 @run_async
-def gbanlist(bot, update):
+def gbanlist(bot: Bot, update: Update):
     banned_users = sql.get_gban_list()
 
     if not banned_users:
@@ -186,7 +188,7 @@ def check_and_ban(update, user_id):
 @run_async
 @can_restrict
 @user_not_admin
-def enforce_gban(bot, update):
+def enforce_gban(bot: Bot, update: Update):
     if sql.does_chat_gban(update.effective_chat.id):
         user = update.effective_message.from_user
         check_and_ban(update, user.id)
@@ -199,7 +201,7 @@ def enforce_gban(bot, update):
 
 @run_async
 @user_admin
-def gbanstat(bot, update, args):
+def gbanstat(bot: Bot, update: Update, args: List[str]):
     if len(args) > 0:
         if args[0].lower() in ["on", "yes"]:
             sql.enable_gbans(update.effective_chat.id)

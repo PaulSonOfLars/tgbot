@@ -1,10 +1,22 @@
 from math import ceil
+from typing import List, Dict
 
 from telegram import MAX_MESSAGE_LENGTH, InlineKeyboardButton, Bot, ParseMode
 from telegram.error import TelegramError
 
 
-def split_message(msg):
+class EqInlineKeyboardButton(InlineKeyboardButton):
+    def __eq__(self, other):
+        return self.text == other.text
+
+    def __lt__(self, other):
+        return self.text < other.text
+
+    def __gt__(self, other):
+        return self.text > other.text
+
+
+def split_message(msg: str) -> List[str]:
     if len(msg) < MAX_MESSAGE_LENGTH:
         return [msg]
 
@@ -25,7 +37,7 @@ def split_message(msg):
         return result
 
 
-def paginate_modules(page_n, module_dict):
+def paginate_modules(page_n: int, module_dict: Dict) -> List:
     modules = sorted(
         [EqInlineKeyboardButton(x.__name__, callback_data="help_module({})".format(x.__name__.lower())) for x in
          module_dict.values()])
@@ -47,20 +59,9 @@ def paginate_modules(page_n, module_dict):
     return pairs
 
 
-def send_to_list(bot: Bot, send_to: list, message: str, markdown=False):
+def send_to_list(bot: Bot, send_to: list, message: str, markdown=False) -> None:
     for user_id in set(send_to):
         try:
             bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN if markdown else None)
         except TelegramError:
             pass  # ignore users who fail
-
-
-class EqInlineKeyboardButton(InlineKeyboardButton):
-    def __eq__(self, other):
-        return self.text == other.text
-
-    def __lt__(self, other):
-        return self.text < other.text
-
-    def __gt__(self, other):
-        return self.text > other.text

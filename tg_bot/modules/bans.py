@@ -1,3 +1,6 @@
+from typing import Optional, List
+
+from telegram import Message, Chat, Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
 
@@ -10,9 +13,9 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 @run_async
 @bot_admin
 @user_admin
-def ban(bot, update, args):
-    chat = update.effective_chat
-    message = update.effective_message
+def ban(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -48,9 +51,9 @@ def ban(bot, update, args):
 @bot_admin
 @can_restrict
 @user_admin
-def kick(bot, update, args):
-    chat = update.effective_chat
-    message = update.effective_message
+def kick(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -75,7 +78,7 @@ def kick(bot, update, args):
 @run_async
 @bot_admin
 @can_restrict
-def kickme(bot, update):
+def kickme(bot: Bot, update: Update):
     user_id = update.effective_message.from_user.id
     if is_user_admin(update.effective_chat, user_id):
         update.effective_message.reply_text("I wish I could... but you're an admin.")
@@ -91,9 +94,9 @@ def kickme(bot, update):
 @run_async
 @bot_admin
 @user_admin
-def unban(bot, update, args):
-    message = update.effective_message
-    chat = update.effective_chat
+def unban(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  # type: Optional[Chat]
 
     user_id = extract_user(message, args)
     if not user_id:

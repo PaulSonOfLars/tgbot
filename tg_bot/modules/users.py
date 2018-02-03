@@ -1,6 +1,7 @@
 from time import sleep
 
 from telegram import TelegramError
+from telegram import Update, Bot
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 
@@ -27,7 +28,7 @@ def get_user_id(username):
 
 
 @run_async
-def broadcast(bot, update):
+def broadcast(bot: Bot, update: Update):
     to_send = update.effective_message.text.split(None, 1)
     if len(to_send) >= 2:
         chats = sql.get_all_chats() or []
@@ -45,7 +46,7 @@ def broadcast(bot, update):
 
 
 @run_async
-def log_user(bot, update):
+def log_user(bot: Bot, update: Update):
     sql.update_user(update.effective_message.from_user.id,
                     update.effective_message.from_user.username,
                     update.effective_chat.id,

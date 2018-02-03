@@ -1,3 +1,6 @@
+from typing import Optional, List
+
+from telegram import Message, Update, Bot
 from telegram import ParseMode, MAX_MESSAGE_LENGTH
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
@@ -9,8 +12,8 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
 @run_async
-def about_me(bot, update, args):
-    message = update.effective_message
+def about_me(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
     user_id = extract_user(message, args)
 
     if user_id:
@@ -31,8 +34,8 @@ def about_me(bot, update, args):
 
 
 @run_async
-def set_about_me(bot, update):
-    message = update.effective_message
+def set_about_me(bot: Bot, update: Update):
+    message = update.effective_message  # type: Optional[Message]
     user_id = message.from_user.id
     text = message.text
     info = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
@@ -46,8 +49,8 @@ def set_about_me(bot, update):
 
 
 @run_async
-def about_bio(bot, update, args):
-    message = update.effective_message
+def about_bio(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
     if user_id:
@@ -68,8 +71,8 @@ def about_bio(bot, update, args):
 
 
 @run_async
-def set_about_bio(bot, update):
-    message = update.effective_message
+def set_about_bio(bot: Bot, update: Update):
+    message = update.effective_message  # type: Optional[Message]
     if message.reply_to_message:
         repl_message = message.reply_to_message
         user_id = repl_message.from_user.id

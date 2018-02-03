@@ -1,3 +1,6 @@
+from typing import Optional
+
+from telegram import Message, Chat, Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
@@ -8,10 +11,10 @@ from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
 
 @run_async
 @user_admin
-def purge(bot, update):
-    msg = update.effective_message
+def purge(bot: Bot, update: Update):
+    msg = update.effective_message  # type: Optional[Message]
     if msg.reply_to_message:
-        chat = update.effective_chat
+        chat = update.effective_chat  # type: Optional[Chat]
         if can_delete(chat, bot.id):
             message_id = msg.reply_to_message.message_id
             curr_message_id = msg.message_id
@@ -28,9 +31,9 @@ def purge(bot, update):
 
 @run_async
 @user_admin
-def del_message(bot, update):
+def del_message(bot: Bot, update: Update):
     if update.effective_message.reply_to_message:
-        chat = update.effective_chat
+        chat = update.effective_chat  # type: Optional[Chat]
         if can_delete(chat, bot.id):
             update.effective_message.reply_to_message.delete()
             update.effective_message.delete()

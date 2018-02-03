@@ -1,6 +1,8 @@
 import importlib
 import re
+from typing import Optional, List
 
+from telegram import Message, Chat, Update, Bot
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.error import Unauthorized, BadRequest, TimedOut, NetworkError, ChatMigrated, TelegramError
 from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryHandler
@@ -95,7 +97,7 @@ def send_help(chat_id, text, keyboard=None):
 
 
 @run_async
-def test(bot, update):
+def test(bot: Bot, update: Update):
     # pprint(eval(str(update)))
     # update.effective_message.reply_text("Hola tester! _I_ *have* `markdown`", parse_mode=ParseMode.MARKDOWN)
     update.effective_message.reply_text("This person edited a message")
@@ -103,7 +105,7 @@ def test(bot, update):
 
 
 @run_async
-def start(bot, update, args):
+def start(bot: Bot, update: Update, args: List[str]):
     if update.effective_chat.type == "private":
         if len(args) >= 1:
             if args[0].lower() == "help":
@@ -151,7 +153,7 @@ def error_callback(bot, update, error):
 
 
 @run_async
-def help_button(bot, update):
+def help_button(bot: Bot, update: Update):
     query = update.callback_query
     mod_match = re.match(r"help_module\((.+?)\)", query.data)
     prev_match = re.match(r"help_prev\((.+?)\)", query.data)
@@ -192,8 +194,8 @@ def help_button(bot, update):
 
 
 @run_async
-def get_help(bot, update):
-    chat = update.effective_chat
+def get_help(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
     args = update.effective_message.text.split(None, 1)
 
     # ONLY send help in PM
@@ -217,9 +219,9 @@ def get_help(bot, update):
 
 
 @run_async
-def donate(bot, update):
+def donate(bot: Bot, update: Update):
     user = update.effective_message.from_user
-    chat = update.effective_chat
+    chat = update.effective_chat  # type: Optional[Chat]
 
     if chat.type == "private":
         update.effective_message.reply_text(DONATE_STRING, parse_mode=ParseMode.MARKDOWN)
@@ -238,8 +240,8 @@ def donate(bot, update):
             update.effective_message.reply_text("Contact me in PM first to get donation information.")
 
 
-def migrate_chats(bot, update):
-    msg = update.effective_message
+def migrate_chats(bot: Bot, update: Update):
+    msg = update.effective_message  # type: Optional[Message]
     if msg.migrate_to_chat_id:
         old_chat = update.effective_chat.id
         new_chat = msg.migrate_to_chat_id

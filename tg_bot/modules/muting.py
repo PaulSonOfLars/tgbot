@@ -1,3 +1,6 @@
+from typing import Optional, List
+
+from telegram import Message, Chat, Update, Bot
 from telegram.ext import CommandHandler
 from telegram.ext.dispatcher import run_async
 
@@ -9,9 +12,9 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 @run_async
 @bot_admin
 @user_admin
-def mute(bot, update, args):
-    chat = update.effective_chat
-    message = update.effective_message
+def mute(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -44,9 +47,9 @@ def mute(bot, update, args):
 @run_async
 @bot_admin
 @user_admin
-def unmute(bot, update, args):
-    chat = update.effective_chat
-    message = update.effective_message
+def unmute(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
     if not user_id:

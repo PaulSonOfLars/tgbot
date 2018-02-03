@@ -1,7 +1,8 @@
 import json
 from io import BytesIO
+from typing import Optional
 
-from telegram import Bot
+from telegram import Message, Chat, Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, run_async
 
@@ -13,8 +14,8 @@ from tg_bot.modules.helper_funcs.chat_status import user_admin
 @run_async
 @user_admin
 def import_data(bot: Bot, update):
-    msg = update.effective_message
-    chat = update.effective_chat
+    msg = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  # type: Optional[Chat]
     # TODO: allow uploading doc with command, not just as reply
     # only work with a doc
     if msg.reply_to_message and msg.reply_to_message.document:
@@ -60,8 +61,8 @@ def import_data(bot: Bot, update):
 
 @run_async
 @user_admin
-def export_data(bot, update):
-    msg = update.effective_message
+def export_data(bot: Bot, update: Update):
+    msg = update.effective_message  # type: Optional[Message]
     msg.reply_text("")
 
 

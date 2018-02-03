@@ -1,7 +1,9 @@
 import re
+from typing import Optional, List
 
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+from telegram import Message, Chat, Update, Bot
 from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
 from telegram.utils.helpers import escape_markdown
 
@@ -44,7 +46,7 @@ def warn(user_id, chat, reason, bot, message):
 @run_async
 @user_admin_no_reply
 @bot_admin
-def button(bot, update):
+def button(bot: Bot, update: Update):
     query = update.callback_query
     match = re.match(r"rm_warn\((.+?)\)", query.data)
     if match:
@@ -58,9 +60,9 @@ def button(bot, update):
 @run_async
 @user_admin
 @bot_admin
-def warn_user(bot, update, args):
-    message = update.effective_message
-    chat = update.effective_chat
+def warn_user(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  # type: Optional[Chat]
 
     user_id, reason = extract_user_and_text(message, args)
 
@@ -73,9 +75,9 @@ def warn_user(bot, update, args):
 @run_async
 @user_admin
 @bot_admin
-def reset_warns(bot, update, args):
-    message = update.effective_message
-    chat = update.effective_chat
+def reset_warns(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  # type: Optional[Chat]
 
     user_id = extract_user(message, args)
     if user_id:
@@ -86,8 +88,8 @@ def reset_warns(bot, update, args):
 
 
 @run_async
-def warns(bot, update, args):
-    message = update.effective_message
+def warns(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message  # type: Optional[Message]
     user_id = extract_user(message, args) or update.effective_user.id
     warned_user = sql.get_warns(user_id, update.effective_chat.id)
     if warned_user and warned_user.num_warns != 0:
@@ -108,9 +110,9 @@ def warns(bot, update, args):
 
 # Dispatcher handler stop - do not async
 @user_admin
-def add_warn_filter(bot, update):
-    chat = update.effective_chat
-    msg = update.effective_message
+def add_warn_filter(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    msg = update.effective_message  # type: Optional[Message]
 
     args = msg.text.split(None, 1)  # use python's maxsplit to separate Cmd, keyword, and reply_text
 
@@ -139,8 +141,8 @@ def add_warn_filter(bot, update):
 
 
 @user_admin
-def remove_warn_filter(bot, update, args):
-    chat = update.effective_chat
+def remove_warn_filter(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
 
     if len(args) < 1:
         return
@@ -162,8 +164,8 @@ def remove_warn_filter(bot, update, args):
 
 
 @run_async
-def list_warn_filters(bot, update):
-    chat = update.effective_chat
+def list_warn_filters(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
     all_handlers = sql.get_chat_warn_filters(chat.id)
 
     if not all_handlers:
@@ -184,9 +186,9 @@ def list_warn_filters(bot, update):
 
 
 @run_async
-def reply_filter(bot, update):
+def reply_filter(bot: Bot, update: Update):
     chat_warn_filters = sql.get_chat_warn_filters(update.effective_chat.id)
-    message = update.effective_message
+    message = update.effective_message  # type: Optional[Message]
     to_match = extract_text(message)
     if not to_match:
         return
@@ -195,7 +197,7 @@ def reply_filter(bot, update):
         pattern = r"( |^|[^\w])" + re.escape(warn_filter.keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             user_id = update.effective_user.id
-            chat = update.effective_chat
+            chat = update.effective_chat  # type: Optional[Chat]
             warn(user_id, chat, warn_filter.reply, bot, message)
 
 
