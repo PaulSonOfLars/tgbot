@@ -15,7 +15,7 @@ FLOOD_GROUP = 3
 def check_flood(bot: Bot, update: Update):
     user = update.effective_user  # type: Optional[User]
     chat = update.effective_chat  # type: Optional[Chat]
-    message = update.effective_message  # type: Optional[Message]
+    msg = update.effective_message  # type: Optional[Message]
 
     if not user:  # ignore channels
         return
@@ -29,11 +29,12 @@ def check_flood(bot: Bot, update: Update):
     if should_ban:
         try:
             chat.kick_member(user.id)
-            message.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
-                               "disappointment. Get out.")
+            msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
+                           "disappointment. Get out.")
 
         except BadRequest:
-            message.reply_text("I can't kick people here, give me permissions first!")
+            msg.reply_text("I can't kick people here, give me permissions first! Until then, I'll disable antiflood.")
+            sql.set_flood(chat.id, 0)
 
 
 @run_async

@@ -17,6 +17,7 @@ from tg_bot.modules.sql import warns_sql as sql
 WARN_HANDLER_GROUP = 9
 CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
 
+
 # Not async
 def warn(user_id, chat, reason, bot, message):
     if is_user_admin(chat, user_id):

@@ -186,10 +186,9 @@ def check_and_ban(update, user_id):
 
 
 @run_async
-@can_restrict
 @user_not_admin
 def enforce_gban(bot: Bot, update: Update):
-    if sql.does_chat_gban(update.effective_chat.id):
+    if sql.does_chat_gban(update.effective_chat.id) and update.effective_chat.get_member(bot.id).can_restrict_members:
         user = update.effective_message.from_user
         check_and_ban(update, user.id)
 
