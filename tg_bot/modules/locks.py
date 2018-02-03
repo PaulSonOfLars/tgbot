@@ -264,8 +264,10 @@ def list_locks(bot, update):
                    "\n - video = {}" \
                    "\n - contact = {}" \
                    "\n - photo = {}" \
-                   "\n - gif = {}".format(locks.sticker, locks.audio, locks.voice, locks.document,
-                                          locks.video, locks.contact, locks.photo, locks.gif)
+                   "\n - gif = {}" \
+                   "\n - url = {}" \
+                   "\n - bots = {}".format(locks.sticker, locks.audio, locks.voice, locks.document,
+                                          locks.video, locks.contact, locks.photo, locks.gif, locks.url, locks.bots)
         if restr:
             res += "\n - messages = {}" \
                    "\n - media = {}" \
