@@ -12,6 +12,7 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 
 @run_async
 @bot_admin
+@can_restrict
 @user_admin
 def ban(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
@@ -93,6 +94,7 @@ def kickme(bot: Bot, update: Update):
 
 @run_async
 @bot_admin
+@can_restrict
 @user_admin
 def unban(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
