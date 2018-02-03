@@ -23,7 +23,7 @@ def purge(bot, update):
                         LOGGER.exception("Error while purging chat messages.")
             bot.send_message(chat.id, "Purge complete.")
     else:
-        msg.reply_to_message("Reply to a message to select where to start purging from.")
+        msg.reply_text("Reply to a message to select where to start purging from.")
 
 
 @run_async
