@@ -35,7 +35,7 @@ def del_message(bot, update):
             update.effective_message.reply_to_message.delete()
             update.effective_message.delete()
     else:
-        update.effective_message.reply_to_message("Whadya want to delete?")
+        update.effective_message.reply_text("Whadya want to delete?")
 
 
 __help__ = """
