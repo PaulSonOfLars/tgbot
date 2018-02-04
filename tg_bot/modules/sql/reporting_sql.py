@@ -42,7 +42,7 @@ def chat_should_report(chat_id: Union[str, int]) -> bool:
         chat_setting = SESSION.query(ReportingChatSettings).get(str(chat_id))
         if chat_setting:
             return chat_setting.should_report
-        return True
+        return False
     finally:
         SESSION.close()
 
