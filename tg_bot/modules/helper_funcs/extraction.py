@@ -51,7 +51,7 @@ def extract_user_and_text(message: Message, args: List[str]) -> (Optional[int], 
     text = ""
 
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION])
+        entities = message.parse_entities([MessageEntity.TEXT_MENTION]).keys()
         ent = entities[0]
         user_id = ent.user.id
         text = message.text[ent.offset + ent.length:]
