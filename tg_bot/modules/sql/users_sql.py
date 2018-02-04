@@ -156,8 +156,10 @@ def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:
         chat = SESSION.query(Chats).get(str(old_chat_id))
         if chat:
-            chat.chat_id = new_chat_id
+            chat.chat_id = str(new_chat_id)
             SESSION.add(chat)
+
+        SESSION.flush()
 
         chat_members = SESSION.query(ChatMembers).filter(ChatMembers.chat == str(old_chat_id)).all()
         for member in chat_members:
