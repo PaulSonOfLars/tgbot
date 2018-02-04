@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot, User
+from telegram import Message, Chat, Update, Bot, User, ParseMode
 from telegram.error import BadRequest, Unauthorized
 from telegram.ext import CommandHandler, RegexHandler, run_async
 
@@ -27,7 +27,8 @@ def report_setting(bot: Bot, update: Update, args: List[str]):
                 sql.set_user_setting(chat.id, False)
                 msg.reply_text("Turned off reporting! You wont get any reports.")
         else:
-            msg.reply_text("Your current report preference is: `{}`".format(sql.user_should_report(chat.id)))
+            msg.reply_text("Your current report preference is: `{}`".format(sql.user_should_report(chat.id)),
+                           parse_mode=ParseMode.MARKDOWN)
 
     else:
         if len(args) >= 1:
@@ -40,7 +41,8 @@ def report_setting(bot: Bot, update: Update, args: List[str]):
                 sql.set_chat_setting(chat.id, False)
                 msg.reply_text("Turned off reporting! No admins will be notified on /report or @admin.")
         else:
-            msg.reply_text("This chat's current setting is: `{}`".format(sql.chat_should_report(chat.id)))
+            msg.reply_text("This chat's current setting is: `{}`".format(sql.chat_should_report(chat.id)),
+                           parse_mode=ParseMode.MARKDOWN)
 
 
 @run_async
