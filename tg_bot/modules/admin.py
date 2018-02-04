@@ -161,6 +161,10 @@ def adminlist(bot: Bot, update: Update):
     update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
 
 
+def __chat_settings__(chat_id, user_id):
+    return "You are *admin*: `{}`".format(dispatcher.bot.get_chat_member(chat_id, user_id).status in ("administrator", "creator"))
+
+
 __help__ = """
  - /adminlist: list of admins in the chat
 

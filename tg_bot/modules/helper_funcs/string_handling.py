@@ -183,3 +183,13 @@ def remove_escapes(text: str) -> str:
             res += text[counter]
         counter += 1
     return res
+
+
+def escape_chars(text: str, to_escape: List[str]) -> str:
+    to_escape.append("\\")
+    new_text = ""
+    for x in text:
+        if x in to_escape:
+            new_text += "\\"
+        new_text += x
+    return new_text

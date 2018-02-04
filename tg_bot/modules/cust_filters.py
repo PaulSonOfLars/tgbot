@@ -196,6 +196,11 @@ def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
 
+def __chat_settings__(chat_id, user_id):
+    cust_filters = sql.get_chat_filters(chat_id)
+    return "There are `{}` custom filters here.".format(len(cust_filters))
+
+
 __help__ = """
  - /filters: list all active filters in this chat.
 

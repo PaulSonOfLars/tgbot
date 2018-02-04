@@ -83,6 +83,14 @@ def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
 
+def __chat_settings__(chat_id, user_id):
+    flood_settings = sql.get_flood(chat_id)
+    if not flood_settings or flood_settings.limit == 0:
+        return "*Not* currently enforcing flood control."
+    else:
+        return "Antiflood is set to `{}` messages.".format(flood_settings.limit)
+
+
 __help__ = """
  - /flood: Get the current flood control setting
 

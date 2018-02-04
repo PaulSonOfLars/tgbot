@@ -237,6 +237,10 @@ def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
 
+def __chat_settings__(chat_id, user_id):
+    return "This chat is enforcing *gbans*: `{}`.".format(sql.does_chat_gban(chat_id))
+
+
 __help__ = """
 *Admin only:*
  - /gbanstat <on/off/yes/no>: Will disable the effect of global bans on your group, or return your current settings.

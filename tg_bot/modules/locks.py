@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot
+from telegram import Message, Chat, Update, Bot, ParseMode
 from telegram import TelegramError, MessageEntity
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
@@ -265,42 +265,51 @@ def rest_previews(bot: Bot, update: Update):
                                  can_add_web_page_previews=False)
 
 
+def build_lock_message(chat_id):
+    locks = sql.get_locks(chat_id)
+    restr = sql.get_restr(chat_id)
+    if not (locks or restr):
+        res = "There are no current locks in this chat."
+    else:
+        res = "These are the locks in this chat:"
+        if locks:
+            res += "\n - sticker = `{}`" \
+                   "\n - audio = `{}`" \
+                   "\n - voice = `{}`" \
+                   "\n - document = `{}`" \
+                   "\n - video = `{}`" \
+                   "\n - contact = `{}`" \
+                   "\n - photo = `{}`" \
+                   "\n - gif = `{}`" \
+                   "\n - url = `{}`" \
+                   "\n - bots = `{}`".format(locks.sticker, locks.audio, locks.voice, locks.document,
+                                             locks.video, locks.contact, locks.photo, locks.gif, locks.url, locks.bots)
+        if restr:
+            res += "\n - messages = `{}`" \
+                   "\n - media = `{}`" \
+                   "\n - other = `{}`" \
+                   "\n - previews = `{}`" \
+                   "\n - all = `{}`".format(restr.messages, restr.media, restr.other, restr.preview,
+                                            all([restr.messages, restr.media, restr.other, restr.preview]))
+    return res
+
+
 @run_async
 @user_admin
 def list_locks(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
 
-    locks = sql.get_locks(chat.id)
-    restr = sql.get_restr(chat.id)
-    if not (locks or restr):
-        res = "There are no current locks in this chat."
-    else:
-        res = "This is the state of the current chat:\n"
-        if locks:
-            res += "\n - sticker = {}" \
-                   "\n - audio = {}" \
-                   "\n - voice = {}" \
-                   "\n - document = {}" \
-                   "\n - video = {}" \
-                   "\n - contact = {}" \
-                   "\n - photo = {}" \
-                   "\n - gif = {}" \
-                   "\n - url = {}" \
-                   "\n - bots = {}".format(locks.sticker, locks.audio, locks.voice, locks.document,
-                                           locks.video, locks.contact, locks.photo, locks.gif, locks.url, locks.bots)
-        if restr:
-            res += "\n - messages = {}" \
-                   "\n - media = {}" \
-                   "\n - other = {}" \
-                   "\n - previews = {}" \
-                   "\n - all = {}".format(restr.messages, restr.media, restr.other, restr.preview,
-                                          all([restr.messages, restr.media, restr.other, restr.preview]))
+    res = build_lock_message(chat.id)
 
-    update.effective_message.reply_text(res)
+    update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN)
 
 
 def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
+
+
+def __chat_settings__(chat_id, user_id):
+    return build_lock_message(chat_id)
 
 
 __help__ = """

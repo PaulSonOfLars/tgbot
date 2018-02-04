@@ -217,6 +217,11 @@ def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
 
+def __chat_settings__(chat_id, user_id):
+    notes = sql.get_all_chat_notes(chat_id)
+    return "There are `{}` notes in this chat.".format(len(notes))
+
+
 __help__ = """
  - /get  <notename>: get the note with this notename
  - #<notename>: same as /get

@@ -183,6 +183,7 @@ def goodbye(bot: Bot, update: Update, args: List[str]):
             "This chat has it's goodbye setting set to: `{}`.\n*The goodbye message is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
         ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
+
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
             sql.set_gdbye_preference(str(chat.id), True)
@@ -357,6 +358,13 @@ def welcome_help(bot: Bot, update: Update):
 
 def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
+
+
+def __chat_settings__(chat_id, user_id):
+    welcome_pref, welcome_m, welcome_type = sql.get_welc_pref(chat_id)
+    goodbye_pref, goodbye_m, goodbye_type = sql.get_gdbye_pref(chat_id)
+    return "This chat has it's welcome preference set to `{}`.\n" \
+           "It's goodbye preference is `{}`.".format(welcome_pref, goodbye_pref)
 
 
 __help__ = """
