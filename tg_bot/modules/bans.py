@@ -4,7 +4,7 @@ from telegram import Message, Chat, Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
 
-from tg_bot import dispatcher, BAN_STICKER
+from tg_bot import dispatcher, BAN_STICKER, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
     is_user_admin, is_user_in_chat
 from tg_bot.modules.helper_funcs.extraction import extract_user
@@ -40,12 +40,14 @@ def ban(bot: Bot, update: Update, args: List[str]):
         update.effective_message.reply_text("I'm not gonna BAN myself, are you crazy?")
         return
 
-    res = update.effective_chat.kick_member(user_id)
-    if res:
+    try:
+        update.effective_chat.kick_member(user_id)
         bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned!")
-    else:
+    except BadRequest as excp:
         message.reply_text("Well damn, I can't ban that user.")
+        LOGGER.warning(update)
+        LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id, excp.message)
 
 
 @run_async

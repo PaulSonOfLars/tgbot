@@ -8,7 +8,7 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
-from tg_bot.modules.helper_funcs.chat_status import can_restrict, user_not_admin, user_admin
+from tg_bot.modules.helper_funcs.chat_status import user_not_admin, user_admin
 from tg_bot.modules.helper_funcs.cust_filters import CustomFilters
 from tg_bot.modules.helper_funcs.extraction import extract_user, extract_user_and_text
 from tg_bot.modules.helper_funcs.misc import send_to_list
