@@ -126,7 +126,13 @@ def pin(bot: Bot, update: Update, args: List[str]):
 @user_admin
 def unpin(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
-    bot.unpinChatMessage(chat_id)
+    try:
+        bot.unpinChatMessage(chat_id)
+    except BadRequest as excp:
+        if excp.message == "Chat_not_modified":
+            pass
+        else:
+            raise
 
 
 @run_async
