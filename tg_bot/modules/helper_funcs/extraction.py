@@ -10,7 +10,7 @@ def extract_user(message: Message, args: List[str]) -> Optional[int]:
     prev_message = message.reply_to_message
 
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION]).keys()
+        entities = list(message.parse_entities([MessageEntity.TEXT_MENTION]))
         ent = entities[0]
         user_id = ent.user.id
 
@@ -51,7 +51,7 @@ def extract_user_and_text(message: Message, args: List[str]) -> (Optional[int], 
     text = ""
 
     if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
-        entities = message.parse_entities([MessageEntity.TEXT_MENTION]).keys()
+        entities = list(message.parse_entities([MessageEntity.TEXT_MENTION]))
         ent = entities[0]
         user_id = ent.user.id
         text = message.text[ent.offset + ent.length:]
