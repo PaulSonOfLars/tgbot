@@ -11,34 +11,40 @@ def can_delete(chat: Chat, bot_id: int) -> bool:
 
 
 def is_user_ban_protected(chat: Chat, user_id: int, member: ChatMember=None) -> bool:
+    if chat.type == 'private' \
+            or user_id in SUDO_USERS \
+            or user_id in WHITELIST_USERS \
+            or chat.all_members_are_administrators:
+        return True
+
     if not member:
         member = chat.get_member(user_id)
-    return chat.type == 'private' \
-           or member.status == 'administrator' \
-           or member.status == 'creator' \
-           or member.user.id in SUDO_USERS \
-           or member.user.id in WHITELIST_USERS
+    return member.status in ('administrator', 'creator')
 
 
 def is_user_admin(chat: Chat, user_id: int, member: ChatMember=None) -> bool:
+    if chat.type == 'private' \
+            or user_id in SUDO_USERS \
+            or chat.all_members_are_administrators:
+        return True
+
     if not member:
         member = chat.get_member(user_id)
-    return chat.type == 'private' \
-           or member.status == 'administrator' \
-           or member.status == 'creator' \
-           or member.user.id in SUDO_USERS
+    return member.status in ('administrator', 'creator')
 
 
 def is_bot_admin(chat: Chat, bot_id: int) -> bool:
+    if chat.type == 'private' \
+            or chat.all_members_are_administrators:
+        return True
+
     bot_member = chat.get_member(bot_id)
-    return chat.type == 'private' \
-           or bot_member.status == 'administrator' \
-           or bot_member.status == 'creator'
+    return bot_member.status in ('administrator', 'creator')
 
 
 def is_user_in_chat(chat: Chat, user_id: int) -> bool:
     member = chat.get_member(user_id)
-    return member.status != 'left' and member.status != 'kicked'
+    return member.status not in ('left', 'kicked')
 
 
 def bot_can_delete(func):
