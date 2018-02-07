@@ -62,7 +62,11 @@ def sed(bot: Bot, update: Update):
         repl, repl_with, flags = sed_result
 
         check = re.match(repl, to_fix)
-        if check and check.group(0) == to_fix:
+        if not repl:
+            update.effective_message.reply_to_message.reply_text("You're trying to replace... nothing with something?")
+            return
+
+        elif check and check.group(0) == to_fix:
             update.effective_message.reply_to_message.reply_text("Hey everyone, {} is trying to make "
                                                                  "me say stuff I don't wanna "
                                                                  "say!".format(update.effective_user.first_name))
