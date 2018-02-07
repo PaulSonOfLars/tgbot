@@ -183,25 +183,27 @@ def help_button(bot: Bot, update: Update):
             module = mod_match.group(1)
             text = "Here is the help for the *{}* module:\n".format(HELPABLE[module].__name__) \
                    + HELPABLE[module].__help__
-            query.message.edit_text(text=text,
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(
-                                        [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
+            query.message.reply_text(text=text,
+                                     parse_mode=ParseMode.MARKDOWN,
+                                     reply_markup=InlineKeyboardMarkup(
+                                         [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
-            query.message.edit_reply_markup(
-                reply_markup=InlineKeyboardMarkup(paginate_modules(curr_page - 1, HELPABLE, "help")))
+            query.message.reply_text(HELP_STRINGS,
+                                     reply_markup=InlineKeyboardMarkup(
+                                         paginate_modules(curr_page - 1, HELPABLE, "help")))
 
         elif next_match:
             next_page = int(next_match.group(1))
-            query.message.edit_reply_markup(
-                reply_markup=InlineKeyboardMarkup(paginate_modules(next_page + 1, HELPABLE, "help")))
+            query.message.reply_text(HELP_STRINGS,
+                                     reply_markup=InlineKeyboardMarkup(
+                                         paginate_modules(next_page + 1, HELPABLE, "help")))
 
         elif back_match:
-            query.message.edit_text(text=HELP_STRINGS,
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help")))
+            query.message.reply_text(text=HELP_STRINGS,
+                                     parse_mode=ParseMode.MARKDOWN,
+                                     reply_markup=InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help")))
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
@@ -279,34 +281,40 @@ def settings_button(bot: Bot, update: Update):
             text = "*{}* has the following settings for the *{}* module:\n\n".format(escape_markdown(chat.title),
                                                                                      CHAT_SETTINGS[module].__name__) + \
                    CHAT_SETTINGS[module].__chat_settings__(chat_id, user.id)
-            query.message.edit_text(text=text,
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(
-                                        [[InlineKeyboardButton(text="Back",
-                                                               callback_data="stngs_back({})".format(chat_id))]]))
+            query.message.reply_text(text=text,
+                                     parse_mode=ParseMode.MARKDOWN,
+                                     reply_markup=InlineKeyboardMarkup(
+                                         [[InlineKeyboardButton(text="Back",
+                                                                callback_data="stngs_back({})".format(chat_id))]]))
 
         elif prev_match:
             chat_id = prev_match.group(1)
             curr_page = int(prev_match.group(2))
-            query.message.edit_reply_markup(
-                reply_markup=InlineKeyboardMarkup(paginate_modules(curr_page - 1, CHAT_SETTINGS, "stngs",
-                                                                   chat=chat_id)))
+            chat = bot.get_chat(chat_id)
+            query.message.reply_text("Hi there! There are quite a few settings for {} - go ahead and pick what "
+                                     "you're interested in.".format(chat.title),
+                                     reply_markup=InlineKeyboardMarkup(
+                                         paginate_modules(curr_page - 1, CHAT_SETTINGS, "stngs",
+                                                          chat=chat_id)))
 
         elif next_match:
             chat_id = next_match.group(1)
             next_page = int(next_match.group(2))
-            query.message.edit_reply_markup(
-                reply_markup=InlineKeyboardMarkup(paginate_modules(next_page + 1, CHAT_SETTINGS, "stngs",
-                                                                   chat=chat_id)))
+            chat = bot.get_chat(chat_id)
+            query.message.reply_text("Hi there! There are quite a few settings for {} - go ahead and pick what "
+                                     "you're interested in.".format(chat.title),
+                                     reply_markup=InlineKeyboardMarkup(
+                                         paginate_modules(next_page + 1, CHAT_SETTINGS, "stngs",
+                                                          chat=chat_id)))
 
         elif back_match:
             chat_id = back_match.group(1)
             chat = bot.get_chat(chat_id)
-            query.message.edit_text(text="Hi there! There are quite a few settings for {} - go ahead and pick what "
-                                         "you're interested in.".format(chat.title),
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(paginate_modules(0, CHAT_SETTINGS, "stngs",
-                                                                                       chat=chat_id)))
+            query.message.reply_text(text="Hi there! There are quite a few settings for {} - go ahead and pick what "
+                                          "you're interested in.".format(chat.title),
+                                     parse_mode=ParseMode.MARKDOWN,
+                                     reply_markup=InlineKeyboardMarkup(paginate_modules(0, CHAT_SETTINGS, "stngs",
+                                                                                        chat=chat_id)))
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
