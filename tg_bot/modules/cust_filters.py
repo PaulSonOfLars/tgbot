@@ -68,6 +68,10 @@ def filters(bot: Bot, update: Update):
     if len(extracted) >= 2:
         offset = len(extracted[1]) - len(msg.text)  # set correct offset relative to command + notename
         content, buttons = button_markdown_parser(extracted[1], entities=msg.parse_entities(), offset=offset)
+        content = content.strip()
+        if not content:
+            msg.reply_text("There is no note message - You can't JUST have buttons, you need a message to go with it!")
+            return
 
     elif msg.reply_to_message and msg.reply_to_message.sticker:
         content = msg.reply_to_message.sticker.file_id
