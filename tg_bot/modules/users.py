@@ -2,6 +2,7 @@ from time import sleep
 
 from telegram import TelegramError
 from telegram import Update, Bot
+from telegram.error import BadRequest
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 
@@ -17,12 +18,28 @@ def get_user_id(username):
         return None
 
     if username.startswith('@'):
-        user = sql.get_userid_by_name(username[1:])
-    else:
-        user = sql.get_userid_by_name(username)
+        username = username[1:]
 
-    if user:
-        return user.user_id
+    users = sql.get_userid_by_name(username)
+
+    if not users:
+        return None
+
+    elif len(users) == 1:
+        return users[0].user_id
+
+    else:
+        for user_obj in users:
+            try:
+                userdat = dispatcher.bot.get_chat(user_obj.user_id)
+                if userdat.username == username:
+                    return userdat.id
+
+            except BadRequest as excp:
+                if excp.message == 'Chat not found':
+                    pass
+                else:
+                    LOGGER.exception("Error extracting user ID")
 
     return None
 
@@ -51,6 +68,7 @@ def log_user(bot: Bot, update: Update):
                     update.effective_message.from_user.username,
                     update.effective_chat.id,
                     update.effective_chat.title)
+
     if update.effective_message.forward_from:
         sql.update_user(update.effective_message.forward_from.id,
                         update.effective_message.forward_from.username)

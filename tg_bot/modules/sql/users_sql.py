@@ -105,7 +105,7 @@ def update_user(user_id, username, chat_id=None, chat_name=None):
 
 def get_userid_by_name(username):
     try:
-        return SESSION.query(Users).filter(func.lower(Users.username) == username.lower()).first()
+        return SESSION.query(Users).filter(func.lower(Users.username) == username.lower()).all()
     finally:
         SESSION.close()
 
