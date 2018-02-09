@@ -73,7 +73,7 @@ def demote(bot: Bot, update: Update, args: List[str]):
         return
 
     if user_id == bot.id:
-        update.effective_message.reply_text("I can't demote myself! Get an admin to do it for me.")
+        message.reply_text("I can't demote myself! Get an admin to do it for me.")
         return
 
     try:

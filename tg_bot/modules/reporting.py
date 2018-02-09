@@ -3,6 +3,7 @@ from typing import Optional, List
 from telegram import Message, Chat, Update, Bot, User, ParseMode
 from telegram.error import BadRequest, Unauthorized
 from telegram.ext import CommandHandler, RegexHandler, run_async
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_not_admin, user_admin
@@ -53,20 +54,39 @@ def report(bot: Bot, update: Update):
     user = update.effective_user  # type: Optional[User]
 
     if chat and message.reply_to_message and sql.chat_should_report(chat.id):
-        chat_name = chat.title or chat.username or chat.first
+        reported_user = message.reply_to_message.from_user  # type: Optional[User]
+        chat_name = chat.title or chat.first or chat.username
         admin_list = chat.get_administrators()
         for admin in admin_list:
             if admin.user.is_bot:  # can't message bots
                 continue
 
+            if chat.username and chat.type == Chat.SUPERGROUP:
+                msg = "*Reported user:* {} (`{}`)\n" \
+                      "*Reported by:* {} (`{}`)\n" \
+                      "*Group:* {}\n" \
+                      "*Link:* [click here](http://telegram.me/{}/{})".format(escape_markdown(reported_user.first_name),
+                                                                              reported_user.id,
+                                                                              escape_markdown(user.first_name),
+                                                                              user.id,
+                                                                              escape_markdown(chat.title),
+                                                                              chat.username, message.message_id)
+                should_forward = False
+
+            else:
+                msg = "{} (`{}`) is calling for admins in \"{}\"!".format(escape_markdown(user.first_name),
+                                                                          user.id, chat_name)
+                should_forward = True
+
             if sql.user_should_report(admin.user.id):
                 try:
-                    bot.send_message(admin.user.id,
-                                     "{} is calling for admins in {}!".format(user.first_name, chat_name))
-                    message.reply_to_message.forward(admin.user.id)
+                    bot.send_message(admin.user.id, msg, parse_mode=ParseMode.MARKDOWN)
 
-                    if len(message.text.split()) > 1:  # If user is giving a reason, send his message too
-                        message.forward(admin.user.id)
+                    if should_forward:
+                        message.reply_to_message.forward(admin.user.id)
+
+                        if len(message.text.split()) > 1:  # If user is giving a reason, send his message too
+                            message.forward(admin.user.id)
 
                 except Unauthorized:
                     pass
