@@ -5,7 +5,7 @@ import telegram
 from telegram import Update, Bot
 from telegram.ext import RegexHandler, run_async
 
-from tg_bot import dispatcher
+from tg_bot import dispatcher, LOGGER
 
 DELIMITERS = ("/", ":", "|", "_")
 
@@ -61,18 +61,20 @@ def sed(bot: Bot, update: Update):
 
         repl, repl_with, flags = sed_result
 
-        check = re.match(repl, to_fix)
-        if not repl:
-            update.effective_message.reply_to_message.reply_text("You're trying to replace... nothing with something?")
-            return
-
-        elif check and check.group(0) == to_fix:
-            update.effective_message.reply_to_message.reply_text("Hey everyone, {} is trying to make "
-                                                                 "me say stuff I don't wanna "
-                                                                 "say!".format(update.effective_user.first_name))
-            return
-
         try:
+            check = re.match(repl, to_fix)
+
+            if not repl:
+                update.effective_message.reply_to_message.reply_text("You're trying to replace... "
+                                                                     "nothing with something?")
+                return
+
+            elif check and check.group(0) == to_fix:
+                update.effective_message.reply_to_message.reply_text("Hey everyone, {} is trying to make "
+                                                                     "me say stuff I don't wanna "
+                                                                     "say!".format(update.effective_user.first_name))
+                return
+
             if 'i' in flags and 'g' in flags:
                 text = re.sub(repl, repl_with, to_fix, flags=re.I).strip()
             elif 'i' in flags:
@@ -82,6 +84,8 @@ def sed(bot: Bot, update: Update):
             else:
                 text = re.sub(repl, repl_with, to_fix, count=1).strip()
         except sre_constants.error:
+            LOGGER.warning(update.effective_message.text)
+            LOGGER.exception("SRE constant error")
             update.effective_message.reply_text("Do you even sed? Apparently not.")
             return
 
