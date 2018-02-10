@@ -7,12 +7,12 @@ from telegram.ext import CommandHandler, Filters, MessageHandler, run_async, Reg
 from tg_bot import dispatcher
 from tg_bot.modules.sql import afk_sql as sql
 from tg_bot.modules.users import get_user_id
-
+from tg_bot.modules.helper_funcs.restrict import restrict
 AFK_GROUP = 7
 AFK_REPLY_GROUP = 8
 
-
 @run_async
+@restrict
 def afk(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     if len(args) >= 2:
