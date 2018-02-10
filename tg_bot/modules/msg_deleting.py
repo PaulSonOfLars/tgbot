@@ -18,7 +18,7 @@ def purge(bot: Bot, update: Update):
         if can_delete(chat, bot.id):
             message_id = msg.reply_to_message.message_id
             curr_message_id = msg.message_id
-            for m_id in range(message_id, curr_message_id + 1):  # +1 to include curr message
+            for m_id in range(curr_message_id, message_id - 1, -1):  # Reverse iteration over message ids
                 try:
                     bot.deleteMessage(chat.id, m_id)
                 except BadRequest as err:
