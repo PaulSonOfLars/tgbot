@@ -13,6 +13,7 @@ from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_US
 from tg_bot.__main__ import STATS, USER_INFO
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.helper_funcs.extraction import extract_user
+from tg_bot.modules.helper_funcs.restrict import restrict
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -124,6 +125,7 @@ GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
 
 
 @run_async
+@restrict
 def runs(bot: Bot, update: Update):
     update.effective_message.reply_text(random.choice(RUN_STRINGS))
 
