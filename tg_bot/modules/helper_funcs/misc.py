@@ -71,3 +71,14 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False) -> None:
             bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN if markdown else None)
         except TelegramError:
             pass  # ignore users who fail
+
+
+def build_keyboard(buttons):
+    keyb = []
+    for btn in buttons:
+        if btn.same_line and keyb:
+            keyb[-1].append(InlineKeyboardButton(btn.name, url=btn.url))
+        else:
+            keyb.append([InlineKeyboardButton(btn.name, url=btn.url)])
+
+    return keyb

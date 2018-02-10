@@ -1,13 +1,14 @@
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot
-from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import ParseMode, InlineKeyboardMarkup
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID
 from tg_bot.modules.helper_funcs.chat_status import user_admin
+from tg_bot.modules.helper_funcs.misc import build_keyboard
 from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser, markdown_parser, \
     escape_invalid_curly_brackets
 
@@ -67,6 +68,7 @@ def new_member(bot: Bot, update: Update):
                     return
                 # else, move on
                 first_name = new_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
+
                 if cust_welcome:
                     if new_mem.last_name:
                         fullname = "{} {}".format(first_name, new_mem.last_name)
@@ -85,7 +87,7 @@ def new_member(bot: Bot, update: Update):
                                               fullname=escape_markdown(fullname), username=username, mention=mention,
                                               count=count, chatname=escape_markdown(chat.title), id=new_mem.id)
                     buttons = sql.get_welc_buttons(chat.id)
-                    keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+                    keyb = build_keyboard(buttons)
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=first_name)
                     keyb = []
@@ -135,7 +137,7 @@ def left_member(bot: Bot, update: Update):
                                           fullname=escape_markdown(fullname), username=username, mention=mention,
                                           count=count, chatname=escape_markdown(chat.title), id=left_mem.id)
                 buttons = sql.get_gdbye_buttons(chat.id)
-                keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+                keyb = build_keyboard(buttons)
 
             else:
                 res = sql.DEFAULT_GOODBYE
@@ -159,7 +161,7 @@ def welcome(bot: Bot, update: Update, args: List[str]):
 
         if welcome_type == sql.Types.BUTTON_TEXT:
             buttons = sql.get_welc_buttons(chat.id)
-            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+            keyb = build_keyboard(buttons)
             keyboard = InlineKeyboardMarkup(keyb)
 
             send(update, welcome_m, keyboard, sql.DEFAULT_WELCOME)
@@ -194,7 +196,8 @@ def goodbye(bot: Bot, update: Update, args: List[str]):
 
         if goodbye_type == sql.Types.BUTTON_TEXT:
             buttons = sql.get_gdbye_buttons(chat.id)
-            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+            keyb = build_keyboard(buttons)
+
             keyboard = InlineKeyboardMarkup(keyb)
 
             send(update, goodbye_m, keyboard, sql.DEFAULT_GOODBYE)

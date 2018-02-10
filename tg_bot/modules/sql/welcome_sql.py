@@ -48,29 +48,33 @@ class WelcomeButtons(BASE):
     chat_id = Column(String(14), primary_key=True)
     name = Column(UnicodeText, nullable=False)
     url = Column(UnicodeText, nullable=False)
+    same_line = Column(Boolean, default=False)
 
-    def __init__(self, chat_id, name, url):
+    def __init__(self, chat_id, name, url, same_line=False):
         self.chat_id = str(chat_id)
         self.name = name
         self.url = url
+        self.same_line = same_line
 
 
-class LeaveButtons(BASE):
+class GoodbyeButtons(BASE):
     __tablename__ = "leave_urls"
     id = Column(Integer, primary_key=True, autoincrement=True)
     chat_id = Column(String(14), primary_key=True)
     name = Column(UnicodeText, nullable=False)
     url = Column(UnicodeText, nullable=False)
+    same_line = Column(Boolean, default=False)
 
-    def __init__(self, chat_id, name, url):
+    def __init__(self, chat_id, name, url, same_line=False):
         self.chat_id = str(chat_id)
         self.name = name
         self.url = url
+        self.same_line = same_line
 
 
 Welcome.__table__.create(checkfirst=True)
 WelcomeButtons.__table__.create(checkfirst=True)
-LeaveButtons.__table__.create(checkfirst=True)
+GoodbyeButtons.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
 WELC_BTN_LOCK = threading.RLock()
@@ -145,8 +149,8 @@ def set_custom_welcome(chat_id, custom_welcome, welcome_type, buttons=None):
             for btn in prev_buttons:
                 SESSION.delete(btn)
 
-            for b_name, url in buttons:
-                button = WelcomeButtons(chat_id, b_name, url)
+            for b_name, url, same_line in buttons:
+                button = WelcomeButtons(chat_id, b_name, url, same_line)
                 SESSION.add(button)
 
         SESSION.commit()
@@ -182,12 +186,12 @@ def set_custom_gdbye(chat_id, custom_goodbye, goodbye_type, buttons=None):
         SESSION.add(welcome_settings)
 
         with LEAVE_BTN_LOCK:
-            prev_buttons = SESSION.query(LeaveButtons).filter(LeaveButtons.chat_id == str(chat_id)).all()
+            prev_buttons = SESSION.query(GoodbyeButtons).filter(GoodbyeButtons.chat_id == str(chat_id)).all()
             for btn in prev_buttons:
                 SESSION.delete(btn)
 
-            for b_name, url in buttons:
-                button = LeaveButtons(chat_id, b_name, url)
+            for b_name, url, same_line in buttons:
+                button = GoodbyeButtons(chat_id, b_name, url, same_line)
                 SESSION.add(button)
 
         SESSION.commit()
@@ -212,7 +216,7 @@ def get_welc_buttons(chat_id):
 
 def get_gdbye_buttons(chat_id):
     try:
-        return SESSION.query(LeaveButtons).filter(LeaveButtons.chat_id == str(chat_id)).all()
+        return SESSION.query(GoodbyeButtons).filter(GoodbyeButtons.chat_id == str(chat_id)).all()
     finally:
         SESSION.close()
 
@@ -229,7 +233,7 @@ def migrate_chat(old_chat_id, new_chat_id):
                 btn.chat_id = str(new_chat_id)
 
         with LEAVE_BTN_LOCK:
-            chat_buttons = SESSION.query(LeaveButtons).filter(LeaveButtons.chat_id == str(old_chat_id)).all()
+            chat_buttons = SESSION.query(GoodbyeButtons).filter(GoodbyeButtons.chat_id == str(old_chat_id)).all()
             for btn in chat_buttons:
                 btn.chat_id = str(new_chat_id)
 

@@ -32,12 +32,14 @@ class Buttons(BASE):
     note_name = Column(UnicodeText, primary_key=True)
     name = Column(UnicodeText, nullable=False)
     url = Column(UnicodeText, nullable=False)
+    same_line = Column(Boolean, default=False)
 
-    def __init__(self, chat_id, note_name, name, url):
+    def __init__(self, chat_id, note_name, name, url, same_line=False):
         self.chat_id = str(chat_id)
         self.note_name = note_name
         self.name = name
         self.url = url
+        self.same_line = same_line
 
 
 Notes.__table__.create(checkfirst=True)
@@ -65,8 +67,8 @@ def add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=None):
         SESSION.add(note)
         SESSION.commit()
 
-    for b_name, url in buttons:
-        add_note_button_to_db(chat_id, note_name, b_name, url)
+    for b_name, url, same_line in buttons:
+        add_note_button_to_db(chat_id, note_name, b_name, url, same_line)
 
 
 def get_note(chat_id, note_name):
@@ -100,9 +102,9 @@ def get_all_chat_notes(chat_id):
         SESSION.close()
 
 
-def add_note_button_to_db(chat_id, note_name, b_name, url):
+def add_note_button_to_db(chat_id, note_name, b_name, url, same_line):
     with BUTTONS_INSERTION_LOCK:
-        button = Buttons(chat_id, note_name, b_name, url)
+        button = Buttons(chat_id, note_name, b_name, url, same_line)
         SESSION.add(button)
         SESSION.commit()
 

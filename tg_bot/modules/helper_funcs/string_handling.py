@@ -16,7 +16,7 @@ MATCH_MD = re.compile(r'\*(.*?)\*|'
                       r'(?<!\\)(\[.*?\])(\(.*?\))|'
                       r'(?P<esc>[*_`\[])')
 
-BTN_URL_REGEX = re.compile(r"(?<!\\)(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)\))")
+BTN_URL_REGEX = re.compile(r"(?<!\\)(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)(:same)?\))")
 
 
 def _selective_escape(to_parse: str) -> str:
@@ -100,7 +100,8 @@ def button_markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, of
     note_data = ""
     buttons = []
     for match in BTN_URL_REGEX.finditer(markdown_note):
-        buttons.append((match.group(2), match.group(3)))
+        # create a thruple with button label, url, and newline status
+        buttons.append((match.group(2), match.group(3), bool(match.group(4))))
         note_data += markdown_note[prev:match.start(1)]
         prev = match.end(1)
     else:

@@ -51,12 +51,14 @@ class Buttons(BASE):
     keyword = Column(UnicodeText, primary_key=True)
     name = Column(UnicodeText, nullable=False)
     url = Column(UnicodeText, nullable=False)
+    same_line = Column(Boolean, default=False)
 
-    def __init__(self, chat_id, keyword, name, url):
+    def __init__(self, chat_id, keyword, name, url, same_line=False):
         self.chat_id = str(chat_id)
         self.keyword = keyword
         self.name = name
         self.url = url
+        self.same_line = same_line
 
 
 CustomFilters.__table__.create(checkfirst=True)
@@ -94,8 +96,8 @@ def add_filter(chat_id, keyword, reply, is_sticker=False, is_document=False, is_
         SESSION.add(filt)
         SESSION.commit()
 
-    for b_name, url in buttons:
-        add_note_button_to_db(chat_id, keyword, b_name, url)
+    for b_name, url, same_line in buttons:
+        add_note_button_to_db(chat_id, keyword, b_name, url, same_line)
 
 
 def remove_filter(chat_id, keyword):
@@ -117,9 +119,9 @@ def get_chat_filters(chat_id):
         SESSION.close()
 
 
-def add_note_button_to_db(chat_id, keyword, b_name, url):
+def add_note_button_to_db(chat_id, keyword, b_name, url, same_line):
     with BUTTON_LOCK:
-        button = Buttons(chat_id, keyword, b_name, url)
+        button = Buttons(chat_id, keyword, b_name, url, same_line)
         SESSION.add(button)
         SESSION.commit()
 

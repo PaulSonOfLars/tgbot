@@ -2,7 +2,7 @@ import re
 from io import BytesIO
 from typing import Optional, List
 
-from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardMarkup
 from telegram import Message, Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, RegexHandler, Filters
@@ -12,6 +12,7 @@ from telegram.utils.helpers import escape_markdown
 import tg_bot.modules.sql.notes_sql as sql
 from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
+from tg_bot.modules.helper_funcs.misc import build_keyboard
 from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser
 
 FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
@@ -57,7 +58,7 @@ def get(bot, update, notename, show_none=True):
             keyb = []
             if note.has_buttons:
                 buttons = sql.get_buttons(chat_id, notename)
-                keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+                keyb = build_keyboard(buttons)
 
             keyboard = InlineKeyboardMarkup(keyb)
             try:
