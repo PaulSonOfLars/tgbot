@@ -49,10 +49,13 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
     def disable(bot, update, args):
         chat_id = update.effective_chat.id
         if len(args) >= 1:
-            disable = args[0]
-            if disable in set(DISABLE_CMDS + DISABLE_OTHER):
-                sql.disable_command(chat_id, disable)
-                update.effective_message.reply_text("Disabled the use of `{}`".format(disable),
+            disable_cmd = args[0]
+            if disable_cmd .startswith("/"):
+                disable_cmd = disable_cmd[1:]
+
+            if disable_cmd in set(DISABLE_CMDS + DISABLE_OTHER):
+                sql.disable_command(chat_id, disable_cmd)
+                update.effective_message.reply_text("Disabled the use of `{}`".format(disable_cmd),
                                                     parse_mode=ParseMode.MARKDOWN)
             else:
                 update.effective_message.reply_text("That command can't be disabled")
@@ -66,12 +69,12 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
     def enable(bot, update, args):
         chat_id = update.effective_chat.id
         if len(args) >= 1:
-            enable = args[0]
-            if enable.startswith("/"):
-                enable = enable[1:]
+            enable_cmd = args[0]
+            if enable_cmd.startswith("/"):
+                enable_cmd = enable_cmd[1:]
 
-            if sql.enable_command(chat_id, enable):
-                update.effective_message.reply_text("Enabled the use of `{}`".format(enable),
+            if sql.enable_command(chat_id, enable_cmd):
+                update.effective_message.reply_text("Enabled the use of `{}`".format(enable_cmd),
                                                     parse_mode=ParseMode.MARKDOWN)
             else:
                 update.effective_message.reply_text("Is that even disabled?")
