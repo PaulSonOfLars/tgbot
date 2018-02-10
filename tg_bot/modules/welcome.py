@@ -25,6 +25,24 @@ ENUM_FUNC_MAP = {
 }
 
 
+# do not async
+def send(update, message, keyboard, backup_message):
+    try:
+        update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+    except IndexError:
+        update.effective_message.reply_text(markdown_parser(backup_message +
+                                                            "\nNote: the current message was "
+                                                            "invalid due to markdown issues. Could be "
+                                                            "due to the user's name."),
+                                            parse_mode=ParseMode.MARKDOWN)
+    except KeyError:
+        update.effective_message.reply_text(markdown_parser(backup_message +
+                                                            "\nNote: the current message is "
+                                                            "invalid due to an issue with some misplaced "
+                                                            "curly brackets. Please update"),
+                                            parse_mode=ParseMode.MARKDOWN)
+
+
 @run_async
 def new_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
@@ -37,12 +55,17 @@ def new_member(bot: Bot, update: Update):
             if new_mem.id == OWNER_ID:
                 update.effective_message.reply_text("Master is in the houseeee, let's get this party started!")
                 continue
+
             # Don't welcome yourself
-            elif not new_mem.id == bot.id:
+            elif new_mem.id == bot.id:
+                continue
+
+            else:
+                # If welcome message is media, send with appropriate function
                 if welc_type != sql.Types.TEXT and welc_type != sql.Types.BUTTON_TEXT:
                     ENUM_FUNC_MAP[welc_type](chat.id, cust_welcome)
                     return
-
+                # else, move on
                 first_name = new_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
                 if cust_welcome:
                     if new_mem.last_name:
@@ -61,28 +84,15 @@ def new_member(bot: Bot, update: Update):
                                               last=escape_markdown(new_mem.last_name or first_name),
                                               fullname=escape_markdown(fullname), username=username, mention=mention,
                                               count=count, chatname=escape_markdown(chat.title), id=new_mem.id)
+                    buttons = sql.get_welc_buttons(chat.id)
+                    keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
                 else:
                     res = sql.DEFAULT_WELCOME.format(first=first_name)
+                    keyb = []
 
-                buttons = sql.get_welc_buttons(chat.id)
-                keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
                 keyboard = InlineKeyboardMarkup(keyb)
 
-                try:
-                    update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
-                except IndexError:
-
-                    update.effective_message.reply_text(markdown_parser(sql.DEFAULT_WELCOME.format(first=first_name) +
-                                                                        "\nNote: the current welcome message was "
-                                                                        "invalid due to markdown issues. Could be "
-                                                                        "due to the user's name."),
-                                                        parse_mode=ParseMode.MARKDOWN)
-                except KeyError:
-                    update.effective_message.reply_text(markdown_parser(sql.DEFAULT_WELCOME.format(first=first_name) +
-                                                                        "\nNote: the current welcome message is "
-                                                                        "invalid due to an issue with some misplaced "
-                                                                        "curly brackets. Please update"),
-                                                        parse_mode=ParseMode.MARKDOWN)
+                send(update, res, keyboard, sql.DEFAULT_WELCOME.format(first=first_name))
 
 
 @run_async
@@ -101,6 +111,7 @@ def left_member(bot: Bot, update: Update):
                 update.effective_message.reply_text("RIP Master")
                 return
 
+            # if media goodbye, use appropriate function for it
             if goodbye_type != sql.Types.TEXT and goodbye_type != sql.Types.BUTTON_TEXT:
                 ENUM_FUNC_MAP[goodbye_type](chat.id, cust_goodbye)
                 return
@@ -123,27 +134,16 @@ def left_member(bot: Bot, update: Update):
                                           last=escape_markdown(left_mem.last_name or first_name),
                                           fullname=escape_markdown(fullname), username=username, mention=mention,
                                           count=count, chatname=escape_markdown(chat.title), id=left_mem.id)
+                buttons = sql.get_gdbye_buttons(chat.id)
+                keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+
             else:
                 res = sql.DEFAULT_GOODBYE
+                keyb = []
 
-            buttons = sql.get_gdbye_buttons(chat.id)
-            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
             keyboard = InlineKeyboardMarkup(keyb)
 
-            try:
-                update.effective_message.reply_text(res, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
-            except IndexError:
-                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_GOODBYE + "\nNote: the current goodbye "
-                                                                                          "message is invalid due to "
-                                                                                          "markdown issues. "
-                                                                                          " Please update."),
-                                                    parse_mode=ParseMode.MARKDOWN)
-            except KeyError:
-                update.effective_message.reply_text(markdown_parser(sql.DEFAULT_GOODBYE + "\nNote: the current leave "
-                                                                                          "message is invalid due to "
-                                                                                          "misplaced curly brackets. "
-                                                                                          " Please update."),
-                                                    parse_mode=ParseMode.MARKDOWN)
+            send(update, res, keyboard, sql.DEFAULT_GOODBYE)
 
 
 @run_async
@@ -156,7 +156,16 @@ def welcome(bot: Bot, update: Update, args: List[str]):
         update.effective_message.reply_text(
             "This chat has it's welcome setting set to: `{}`.\n*The welcome message is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
-        ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
+
+        if welcome_type == sql.Types.BUTTON_TEXT:
+            buttons = sql.get_welc_buttons(chat.id)
+            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+            keyboard = InlineKeyboardMarkup(keyb)
+
+            send(update, welcome_m, keyboard, sql.DEFAULT_WELCOME)
+
+        else:
+            ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
@@ -182,7 +191,16 @@ def goodbye(bot: Bot, update: Update, args: List[str]):
         update.effective_message.reply_text(
             "This chat has it's goodbye setting set to: `{}`.\n*The goodbye message is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
-        ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
+
+        if goodbye_type == sql.Types.BUTTON_TEXT:
+            buttons = sql.get_gdbye_buttons(chat.id)
+            keyb = [[InlineKeyboardButton(btn.name, url=btn.url)] for btn in buttons]
+            keyboard = InlineKeyboardMarkup(keyb)
+
+            send(update, goodbye_m, keyboard, sql.DEFAULT_GOODBYE)
+
+        else:
+            ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
