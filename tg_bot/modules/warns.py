@@ -27,11 +27,16 @@ def warn(user_id, chat, reason, bot, message):
         return
 
     user_warned = sql.warn_user(user_id, chat.id, reason)
-    if user_warned.num_warns >= 3:
-        res = chat.kick_member(user_id)
+    limit, soft_warn = sql.get_warn_setting(chat.id)
+    if user_warned.num_warns >= limit:
+        if soft_warn:  # kick
+            res = chat.unban_member(user_id)
+        else:  # ban
+            res = chat.kick_member(user_id)
+
         if res:
             bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-            message.reply_text("3 warnings, this user has been banned!")
+            message.reply_text("{} warnings, this user has been banned!".format(limit))
             sql.reset_warns(user_id, chat.id)
         else:
             message.reply_text("An error occurred, I couldn't ban this person!")
@@ -40,10 +45,11 @@ def warn(user_id, chat, reason, bot, message):
             [[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user_id))]])
         if reason:
             message.reply_text(
-                "{}/3 warnings... watch out! Latest one was because:\n{}".format(user_warned.num_warns, reason),
+                "{}/{} warnings... watch out! Latest one was because:\n{}".format(user_warned.num_warns, limit, reason),
                 reply_markup=keyboard)
         else:
-            message.reply_text("{}/3 warnings... watch out!".format(user_warned.num_warns), reply_markup=keyboard)
+            message.reply_text("{}/{} warnings... watch out!".format(user_warned.num_warns, limit),
+                               reply_markup=keyboard)
 
 
 @run_async
@@ -93,11 +99,15 @@ def reset_warns(bot: Bot, update: Update, args: List[str]):
 @run_async
 def warns(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  # type: Optional[Chat]
     user_id = extract_user(message, args) or update.effective_user.id
-    warned_user = sql.get_warns(user_id, update.effective_chat.id)
+    warned_user = sql.get_warns(user_id, chat.id)
+
     if warned_user and warned_user.num_warns != 0:
+        limit, soft_warn = sql.get_warn_setting(chat.id)
+
         if warned_user.reasons:
-            text = "This user has {} warnings, for the following reasons:".format(warned_user.num_warns)
+            text = "This user has {}/{} warnings, for the following reasons:".format(warned_user.num_warns, limit)
             for reason in warned_user.reasons:
                 text += "\n - {}".format(reason)
 
@@ -106,7 +116,7 @@ def warns(bot: Bot, update: Update, args: List[str]):
                 update.effective_message.reply_text(msg)
         else:
             update.effective_message.reply_text(
-                "User has {} warnings, but no reasons for any of them.".format(warned_user.num_warns))
+                "User has {}/{} warnings, but no reasons for any of them.".format(warned_user.num_warns, limit))
     else:
         update.effective_message.reply_text("This user hasn't got any warnings!")
 
@@ -204,6 +214,54 @@ def reply_filter(bot: Bot, update: Update):
             warn(user_id, chat, warn_filter.reply, bot, message)
 
 
+@run_async
+@user_admin
+def set_warn_limit(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
+    msg = update.effective_message  # type: Optional[Message]
+
+    if args:
+        if args[0].isdigit():
+            if int(args[0]) < 3:
+                msg.reply_text("The minimum warn limit is 3!")
+            else:
+                sql.set_warn_limit(chat.id, int(args[0]))
+                msg.reply_text("Updated the warn limit to {}".format(args[0]))
+        else:
+            msg.reply_text("Give me a number as an arg!")
+    else:
+        limit, soft_warn = sql.get_warn_setting(chat.id)
+
+        msg.reply_text("The current warn limit is {}".format(limit))
+
+
+@run_async
+@user_admin
+def set_warn_strength(bot: Bot, update: Update, args: List[str]):
+    chat = update.effective_chat  # type: Optional[Chat]
+    msg = update.effective_message  # type: Optional[Message]
+
+    if args:
+        if args[0].lower() in ("on", "yes"):
+            sql.set_warn_strength(chat.id, False)
+            msg.reply_text("Too many warns will now result in a ban!")
+
+        elif args[0].lower() in ("off", "no"):
+            sql.set_warn_strength(chat.id, True)
+            msg.reply_text("Too many warns will now result in a kick! Users will be able to join again after.")
+
+        else:
+            msg.reply_text("I only understand on/yes/no/off!")
+    else:
+        limit, soft_warn = sql.get_warn_setting(chat.id)
+        if soft_warn:
+            msg.reply_text("Warns are currently set to *kick* users when they exceed the limits.",
+                           parse_mode=ParseMode.MARKDOWN)
+        else:
+            msg.reply_text("Warns are currently set to *ban* users when they exceed the limits.",
+                           parse_mode=ParseMode.MARKDOWN)
+
+
 def __stats__():
     return "{} overall warns, across {} chats.\n" \
            "{} warn filters, across {} chats.".format(sql.num_warns(), sql.num_warn_chats(),
@@ -222,7 +280,9 @@ def __migrate__(old_chat_id, new_chat_id):
 
 def __chat_settings__(chat_id, user_id):
     warn_filters = sql.get_chat_warn_filters(chat_id)
-    return "This chat has `{}` warn filters".format(len(warn_filters))
+    limit, soft_warn = sql.get_warn_setting(chat_id)
+    return "This chat has `{}` warn filters. It takes `{}` warns " \
+           "before the user gets *{}*.".format(len(warn_filters), limit, "kicked" if soft_warn else "banned")
 
 
 __help__ = """
@@ -235,6 +295,8 @@ __help__ = """
  - /addwarn <keyword> <reply message>: set a warning filter on a certain keyword. If you want your keyword to \
 be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is an angry user`. 
  - /nowarn <keyword>: stop a warning filter
+ - /warnlimit <num>: set the warning limit
+ - /strongwarn <on/yes/off/no>: If set to on, exceeding the warn limit will result in a ban. Else, will just kick.
 """
 
 __name__ = "Warnings"
@@ -248,6 +310,9 @@ ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
 RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True)
 LIST_WARN_HANDLER = DisableAbleCommandHandler("warnlist", list_warn_filters)
 WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
+WARN_LIMIT_HANDLER = CommandHandler("warnlimit", set_warn_limit, pass_args=True)
+WARN_STRENGTH_HANDLER = CommandHandler("strongwarn", set_warn_strength, pass_args=True)
+
 
 dispatcher.add_handler(WARN_HANDLER)
 dispatcher.add_handler(CALLBACK_QUERY_HANDLER)
@@ -256,4 +321,6 @@ dispatcher.add_handler(MYWARNS_HANDLER)
 dispatcher.add_handler(ADD_WARN_HANDLER)
 dispatcher.add_handler(RM_WARN_HANDLER)
 dispatcher.add_handler(LIST_WARN_HANDLER)
+dispatcher.add_handler(WARN_LIMIT_HANDLER)
+dispatcher.add_handler(WARN_STRENGTH_HANDLER)
 dispatcher.add_handler(WARN_FILTER_HANDLER, WARN_HANDLER_GROUP)
