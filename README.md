@@ -11,6 +11,9 @@ Marie and I are also moderating a [support group](https://t.me/MarieSupport), wh
 bot, discover/request new features, report bugs, and stay in the loop whenever a new update is available. Of course
 I'll also help when a database schema changes, and some table column needs to be modified/added.
 
+Join the [news channel](https://t.me/MarieNews) if you just want to stay in the loop about new features or
+announcements.
+
 ## Starting the bot.
 
 Once you've setup your database and your configuration (see below) is complete, simply run:
@@ -53,23 +56,35 @@ class Development(Config):
 
 If you can't have a config.py file (EG on heroku), it is also possible to use environment variables.
 The following env variables are supported:
- - `TOKEN`: Your bot token, as a string.
  - `ENV`: Setting this to ANYTHING will enable env variables
- - `WEBHOOKS`: Setting this to ANYTHING will enable webhooks when in env mode
+
+ - `TOKEN`: Your bot token, as a string.
  - `OWNER_ID`: An integer of consisting of your owner ID
- - `MESSAGE_DUMP`: optional: a chat where your replied saved messages are stored, to stop people deleting their old 
- messages
  - `OWNER_USERNAME`: Your username
- - `SUDO_USERS`: a space separated list of user_ids which should be considered sudo users
- - `URL`: the URL your webhook should connect to (only needed for webhook mode)
- - `DATABASE_URL`: your database URL
- - `DONATION_LINK`: optional: link where you would like to receive donations.
- - `LOAD`: space separated list of modules you would like to load
- - `NO_LOAD`: space separated list of modules you would like NOT to load
- - `DEL_CMDS`: delete commands from users which don't have rights to use that command
- - `STRICT_GBAN`: enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.
+
+ - `DATABASE_URL`: Your database URL
+ - `MESSAGE_DUMP`: optional: a chat where your replied saved messages are stored, to stop people deleting their old 
+ - `LOAD`: Space separated list of modules you would like to load
+ - `NO_LOAD`: Space separated list of modules you would like NOT to load
+ - `WEBHOOK`: Setting this to ANYTHING will enable webhooks when in env mode
+ messages
+ - `URL`: The URL your webhook should connect to (only needed for webhook mode)
+
+ - `SUDO_USERS`: A space separated list of user_ids which should be considered sudo users
+ - `SUPPORT_USERS`: A space separated list of user_ids which should be considered support users (can gban/ungban,
+ nothing else)
+ - `WHITELIST_USERS`: A space separated list of user_ids which should be considered whitelisted - they can't be banned.
+ - `DONATION_LINK`: Optional: link where you would like to receive donations.
+ - `CERT_PATH`: Path to your webhook certificate
+ - `PORT`: Port to use for your webhooks
+ - `DEL_CMDS`: Whether to delete commands from users which don't have rights to use that command
+ - `STRICT_GBAN`: Enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.
  - `WORKERS`: Number of threads to use. 8 is the recommended (and default) amount, but your experience may vary.
- Note that going crazy with more threads wont necessarily speed up your bot, given the large amount of sql data accesses.
+ __Note__ that going crazy with more threads wont necessarily speed up your bot, given the large amount of sql data 
+ accesses, and the way python asynchronous calls work.
+ - `BAN_STICKER`: Which sticker to use when banning people.
+ - `ALLOW_EXCL`: Whether to allow using exclamation marks ! for commands as well as /.
+
 ### Python dependencies
 
 Install the necessary python dependencies by moving to the project directory and running:
