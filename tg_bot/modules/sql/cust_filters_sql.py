@@ -104,6 +104,11 @@ def remove_filter(chat_id, keyword):
     with CUST_FILT_LOCK:
         filt = SESSION.query(CustomFilters).get((str(chat_id), keyword))
         if filt:
+            with BUTTON_LOCK:
+                prev_buttons = SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id),
+                                                             Buttons.keyword == keyword).all()
+                for btn in prev_buttons:
+                    SESSION.delete(btn)
             SESSION.delete(filt)
             SESSION.commit()
             return True
