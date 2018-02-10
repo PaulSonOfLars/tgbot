@@ -9,7 +9,8 @@ from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, BAN_STICKER
 from tg_bot.modules.disable import DisableAbleCommandHandler
-from tg_bot.modules.helper_funcs.chat_status import is_user_admin, bot_admin, user_admin_no_reply, user_admin
+from tg_bot.modules.helper_funcs.chat_status import is_user_admin, bot_admin, user_admin_no_reply, user_admin, \
+    can_restrict
 from tg_bot.modules.helper_funcs.extraction import extract_text, extract_user_and_text, extract_user
 from tg_bot.modules.helper_funcs.misc import split_message
 from tg_bot.modules.helper_funcs.string_handling import split_quotes
@@ -61,7 +62,7 @@ def button(bot: Bot, update: Update):
 
 @run_async
 @user_admin
-@bot_admin
+@can_restrict
 def warn_user(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
