@@ -204,6 +204,12 @@ def reply_filter(bot: Bot, update: Update):
             warn(user_id, chat, warn_filter.reply, bot, message)
 
 
+def __stats__():
+    return "{} overall warns, across {} chats.\n" \
+           "{} warn filters, across {} chats.".format(sql.num_warns(), sql.num_warn_chats(),
+                                                      sql.num_warn_filters(), sql.num_warn_filter_chats())
+
+
 def __import_data__(chat_id, data):
     for user_id, count in data.get('warns', {}).items():
         for x in range(int(count)):

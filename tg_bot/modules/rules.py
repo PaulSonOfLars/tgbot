@@ -75,6 +75,10 @@ def clear_rules(bot: Bot, update: Update):
     update.effective_message.reply_text("Successfully cleared rules!")
 
 
+def __stats__():
+    return "{} chats have rules set.".format(sql.num_chats())
+
+
 def __import_data__(chat_id, data):
     # set chat rules
     rules = data.get('info', {}).get('rules', "")

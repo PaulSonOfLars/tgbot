@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Integer, Column, String, UnicodeText
+from sqlalchemy import Integer, Column, String, UnicodeText, func, distinct
 from sqlalchemy.dialects import postgresql
 
 from tg_bot.modules.sql import SESSION, BASE
@@ -126,6 +126,34 @@ def remove_warn_filter(chat_id, keyword):
 def get_chat_warn_filters(chat_id):
     try:
         return SESSION.query(WarnFilters).filter(WarnFilters.chat_id == str(chat_id)).all()
+    finally:
+        SESSION.close()
+
+
+def num_warns():
+    try:
+        return SESSION.query(func.sum(Warns.num_warns)).scalar()
+    finally:
+        SESSION.close()
+
+
+def num_warn_chats():
+    try:
+        return SESSION.query(func.count(distinct(Warns.chat_id))).scalar()
+    finally:
+        SESSION.close()
+
+
+def num_warn_filters():
+    try:
+        return SESSION.query(WarnFilters).count()
+    finally:
+        SESSION.close()
+
+
+def num_warn_filter_chats():
+    try:
+        return SESSION.query(func.count(distinct(WarnFilters.chat_id))).scalar()
     finally:
         SESSION.close()
 

@@ -118,6 +118,10 @@ def does_chat_gban(chat_id):
         SESSION.close()
 
 
+def num_gbanned_users():
+    return len(GBANNED_LIST)
+
+
 def __load_gbanned_userid_list():
     global GBANNED_LIST
     try:

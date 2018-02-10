@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, String, UnicodeText
+from sqlalchemy import Column, String, UnicodeText, func, distinct
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -41,6 +41,13 @@ def get_rules(chat_id):
 
     SESSION.close()
     return ret
+
+
+def num_chats():
+    try:
+        return SESSION.query(func.count(distinct(Rules.chat_id))).scalar()
+    finally:
+        SESSION.close()
 
 
 def migrate_chat(old_chat_id, new_chat_id):

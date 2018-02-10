@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, String, UnicodeText
+from sqlalchemy import Column, String, UnicodeText, func, distinct
 from tg_bot.modules.sql import SESSION, BASE
 
 
@@ -58,6 +58,20 @@ def is_command_disabled(chat_id, cmd):
 def get_all_disabled(chat_id):
     try:
         return SESSION.query(Disable).filter(Disable.chat_id == str(chat_id)).all()
+    finally:
+        SESSION.close()
+
+
+def num_chats():
+    try:
+        return SESSION.query(func.count(distinct(Disable.chat_id))).scalar()
+    finally:
+        SESSION.close()
+
+
+def num_disabled():
+    try:
+        return SESSION.query(Disable).count()
     finally:
         SESSION.close()
 

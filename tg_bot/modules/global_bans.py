@@ -219,6 +219,10 @@ def gbanstat(bot: Bot, update: Update, args: List[str]):
                                             "spammers.".format(sql.does_chat_gban(update.effective_chat.id)))
 
 
+def __stats__():
+    return "{} gbanned users.".format(sql.num_gbanned_users())
+
+
 def __user_info__(user_id):
     is_gbanned = sql.is_user_gbanned(user_id)
 

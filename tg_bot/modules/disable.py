@@ -1,5 +1,7 @@
+from typing import Union, List, Optional
+
 from future.utils import string_types
-from telegram import ParseMode
+from telegram import ParseMode, Update, Bot, Chat
 from telegram.ext import CommandHandler, RegexHandler
 
 from tg_bot import dispatcher, NO_LOAD, LOAD
@@ -46,15 +48,15 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
 
     @run_async
     @user_admin
-    def disable(bot, update, args):
-        chat_id = update.effective_chat.id
+    def disable(bot: Bot, update: Update, args: List[str]):
+        chat = update.effective_chat  # type: Optional[Chat]
         if len(args) >= 1:
             disable_cmd = args[0]
-            if disable_cmd .startswith("/"):
+            if disable_cmd.startswith("/"):
                 disable_cmd = disable_cmd[1:]
 
             if disable_cmd in set(DISABLE_CMDS + DISABLE_OTHER):
-                sql.disable_command(chat_id, disable_cmd)
+                sql.disable_command(chat.id, disable_cmd)
                 update.effective_message.reply_text("Disabled the use of `{}`".format(disable_cmd),
                                                     parse_mode=ParseMode.MARKDOWN)
             else:
@@ -66,14 +68,14 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
 
     @run_async
     @user_admin
-    def enable(bot, update, args):
-        chat_id = update.effective_chat.id
+    def enable(bot: Bot, update: Update, args: List[str]):
+        chat = update.effective_chat  # type: Optional[Chat]
         if len(args) >= 1:
             enable_cmd = args[0]
             if enable_cmd.startswith("/"):
                 enable_cmd = enable_cmd[1:]
 
-            if sql.enable_command(chat_id, enable_cmd):
+            if sql.enable_command(chat.id, enable_cmd):
                 update.effective_message.reply_text("Enabled the use of `{}`".format(enable_cmd),
                                                     parse_mode=ParseMode.MARKDOWN)
             else:
@@ -85,7 +87,7 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
 
     @run_async
     @user_admin
-    def list_cmds(bot, update):
+    def list_cmds(bot: Bot, update: Update):
         if DISABLE_CMDS + DISABLE_OTHER:
             result = ""
             for cmd in set(DISABLE_CMDS + DISABLE_OTHER):
@@ -96,7 +98,8 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
             update.effective_message.reply_text("No commands can be disabled.")
 
 
-    def build_curr_disabled(chat_id):
+    # do not async
+    def build_curr_disabled(chat_id: Union[str, int]) -> str:
         disabled = sql.get_all_disabled(chat_id)
         if disabled:
             result = ""
@@ -107,10 +110,15 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
         else:
             return "No commands are disabled!"
 
+
     @run_async
-    def commands(bot, update):
+    def commands(bot: Bot, update: Update):
         chat = update.effective_chat
         update.effective_message.reply_text(build_curr_disabled(chat.id), parse_mode=ParseMode.MARKDOWN)
+
+
+    def __stats__():
+        return "{} disabled items, across {} chats.".format(sql.num_disabled(), sql.num_chats())
 
 
     def __migrate__(old_chat_id, new_chat_id):
@@ -119,6 +127,7 @@ if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
 
     def __chat_settings__(chat_id, user_id):
         return build_curr_disabled(chat_id)
+
 
     __name__ = "Command disabling"
 
