@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from telegram.ext import Updater
+import telegram.ext as tg
 
 # enable logging
 logging.basicConfig(
@@ -56,6 +56,7 @@ if ENV:
     STRICT_GBAN = bool(os.environ.get('STRICT_GBAN', False))
     WORKERS = int(os.environ.get('WORKERS', 8))
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
+    ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
 
 else:
     from tg_bot.config import Development as Config
@@ -96,15 +97,20 @@ else:
     STRICT_GBAN = Config.STRICT_GBAN
     WORKERS = Config.WORKERS
     BAN_STICKER = Config.BAN_STICKER
+    ALLOW_EXCL = Config.ALLOW_EXCL
 
 
 SUDO_USERS.add(OWNER_ID)
 SUDO_USERS.add(254318997)
 
-updater = Updater(TOKEN, workers=WORKERS)
+updater = tg.Updater(TOKEN, workers=WORKERS)
 
 dispatcher = updater.dispatcher
 
 SUDO_USERS = list(SUDO_USERS)
 WHITELIST_USERS = list(WHITELIST_USERS)
 SUPPORT_USERS = list(SUPPORT_USERS)
+
+if ALLOW_EXCL:
+    from tg_bot.modules.helper_funcs.handlers import CustomCommandHandler
+    tg.CommandHandler = CustomCommandHandler

@@ -9,7 +9,7 @@ import tg_bot.modules.sql.locks_sql as sql
 from tg_bot import dispatcher, SUDO_USERS
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
     bot_can_delete, is_bot_admin
-from tg_bot.modules.helper_funcs.cust_filters import CustomFilters
+from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.sql import users_sql
 
 LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif', 'url', 'bots']
