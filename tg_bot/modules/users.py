@@ -94,7 +94,7 @@ __help__ = ""  # no help string
 __name__ = "Users"
 
 
-BROADCAST_HANDLER = (CommandHandler("broadcast", broadcast, filters=Filters.user(OWNER_ID)))
+BROADCAST_HANDLER = CommandHandler("broadcast", broadcast, filters=Filters.user(OWNER_ID))
 USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
 
 dispatcher.add_handler(USER_HANDLER, USERS_GROUP)

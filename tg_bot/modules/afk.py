@@ -5,6 +5,7 @@ from telegram import MessageEntity
 from telegram.ext import CommandHandler, Filters, MessageHandler, run_async, RegexHandler
 
 from tg_bot import dispatcher
+from tg_bot.modules.disable import DisableAbleCommandHandler, DisableAbleRegexHandler
 from tg_bot.modules.sql import afk_sql as sql
 from tg_bot.modules.users import get_user_id
 
@@ -80,8 +81,8 @@ When marked as AFK, any mentions will be replied to with a message to say you're
 
 __name__ = "AFK"
 
-AFK_HANDLER = CommandHandler("afk", afk)
-AFK_REGEX_HANDLER = RegexHandler("(?i)brb", afk)
+AFK_HANDLER = DisableAbleCommandHandler("afk", afk)
+AFK_REGEX_HANDLER = DisableAbleRegexHandler("(?i)brb", afk, friendly="afk")
 NO_AFK_HANDLER = MessageHandler(Filters.all, no_longer_afk)
 AFK_REPLY_HANDLER = MessageHandler(Filters.entity(MessageEntity.MENTION) | Filters.entity(MessageEntity.TEXT_MENTION),
                                    reply_afk)

@@ -7,6 +7,7 @@ from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.locks_sql as sql
 from tg_bot import dispatcher, SUDO_USERS
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
     bot_can_delete, is_bot_admin
 from tg_bot.modules.helper_funcs.filters import CustomFilters
@@ -335,7 +336,7 @@ MEDIA = Filters.audio | Filters.document | Filters.video | Filters.voice | Filte
 MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | MEDIA | OTHER
 PREVIEWS = Filters.entity("url")
 
-LOCKTYPES_HANDLER = CommandHandler("locktypes", locktypes)
+LOCKTYPES_HANDLER = DisableAbleCommandHandler("locktypes", locktypes)
 LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=~Filters.private)
 UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True, filters=~Filters.private)
 LOCKED_HANDLER = CommandHandler("locks", list_locks, filters=~Filters.private)

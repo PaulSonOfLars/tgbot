@@ -6,6 +6,7 @@ from telegram import Update, Bot
 from telegram.ext import RegexHandler, run_async
 
 from tg_bot import dispatcher, LOGGER
+from tg_bot.modules.disable import DisableAbleRegexHandler
 
 DELIMITERS = ("/", ":", "|", "_")
 
@@ -107,6 +108,6 @@ larger than {}
 __name__ = "Sed/Regex"
 
 
-SED_HANDLER = RegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed)
+SED_HANDLER = DisableAbleRegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed, friendly="sed")
 
 dispatcher.add_handler(SED_HANDLER)

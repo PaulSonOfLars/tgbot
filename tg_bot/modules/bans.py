@@ -5,6 +5,7 @@ from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
 
 from tg_bot import dispatcher, BAN_STICKER, LOGGER
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
     is_user_admin, is_user_in_chat
 from tg_bot.modules.helper_funcs.extraction import extract_user
@@ -136,7 +137,7 @@ __name__ = "Bans"
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=~Filters.private)
 KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=~Filters.private)
 UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=~Filters.private)
-KICKME_HANDLER = CommandHandler("kickme", kickme, filters=~Filters.private)
+KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=~Filters.private)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(KICK_HANDLER)

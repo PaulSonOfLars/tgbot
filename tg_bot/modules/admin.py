@@ -8,6 +8,7 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, can_promote, user_admin, can_pin
 from tg_bot.modules.helper_funcs.extraction import extract_user
 
@@ -193,7 +194,7 @@ INVITE_HANDLER = CommandHandler("invitelink", invite)
 PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True)
 DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True)
 
-ADMINLIST_HANDLER = CommandHandler("adminlist", adminlist, filters=Filters.group)
+ADMINLIST_HANDLER = DisableAbleCommandHandler("adminlist", adminlist, filters=Filters.group)
 
 dispatcher.add_handler(PIN_HANDLER)
 dispatcher.add_handler(UNPIN_HANDLER)

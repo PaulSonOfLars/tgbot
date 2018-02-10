@@ -111,6 +111,11 @@ SUDO_USERS = list(SUDO_USERS)
 WHITELIST_USERS = list(WHITELIST_USERS)
 SUPPORT_USERS = list(SUPPORT_USERS)
 
+# Load at end to ensure all prev variables have been set
+from tg_bot.modules.helper_funcs.handlers import CustomCommandHandler, CustomRegexHandler
+
+# make sure the regex handler can take extra kwargs
+tg.RegexHandler = CustomRegexHandler
+
 if ALLOW_EXCL:
-    from tg_bot.modules.helper_funcs.handlers import CustomCommandHandler
     tg.CommandHandler = CustomCommandHandler

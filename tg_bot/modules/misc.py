@@ -11,6 +11,7 @@ from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS, BAN_STICKER
 from tg_bot.__main__ import STATS, USER_INFO
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.helper_funcs.extraction import extract_user
 
@@ -346,13 +347,13 @@ __help__ = """
 
 __name__ = "Misc"
 
-ID_HANDLER = CommandHandler("id", get_id, pass_args=True)
+ID_HANDLER = DisableAbleCommandHandler("id", get_id, pass_args=True)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 
 TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
-RUNS_HANDLER = CommandHandler("runs", runs)
-SLAP_HANDLER = CommandHandler("slap", slap, pass_args=True)
+RUNS_HANDLER = DisableAbleCommandHandler("runs", runs)
+SLAP_HANDLER = DisableAbleCommandHandler("slap", slap, pass_args=True)
 INFO_HANDLER = CommandHandler("info", info, pass_args=True)
 
 ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))

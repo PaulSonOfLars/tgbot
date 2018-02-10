@@ -8,6 +8,7 @@ from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, Messa
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, BAN_STICKER
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import is_user_admin, bot_admin, user_admin_no_reply, user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text, extract_user_and_text, extract_user
 from tg_bot.modules.helper_funcs.misc import split_message
@@ -235,10 +236,10 @@ __name__ = "Warnings"
 WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True)
 RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns, pass_args=True)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
-MYWARNS_HANDLER = CommandHandler("warns", warns, pass_args=True)
+MYWARNS_HANDLER = DisableAbleCommandHandler("warns", warns, pass_args=True)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
 RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True)
-LIST_WARN_HANDLER = CommandHandler("warnlist", list_warn_filters)
+LIST_WARN_HANDLER = DisableAbleCommandHandler("warnlist", list_warn_filters)
 WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
 
 dispatcher.add_handler(WARN_HANDLER)
