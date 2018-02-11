@@ -78,10 +78,13 @@ def warn_user(user_id, chat_id, reason=None):
         if reason:
             warned_user.reasons = warned_user.reasons + [reason]  # TODO:: double check this wizardry
 
+        reasons = warned_user.reasons
+        num = warned_user.num_warns
+
         SESSION.add(warned_user)
         SESSION.commit()
 
-        return warned_user
+        return num, reasons
 
 
 def remove_warn(user_id, chat_id):
@@ -116,7 +119,12 @@ def reset_warns(user_id, chat_id):
 
 def get_warns(user_id, chat_id):
     try:
-        return SESSION.query(Warns).get((user_id, str(chat_id)))
+        user = SESSION.query(Warns).get((user_id, str(chat_id)))
+        if not user:
+            return None
+        reasons = user.reasons
+        num = user.num_warns
+        return num, reasons
     finally:
         SESSION.close()
 
@@ -200,6 +208,13 @@ def num_warn_chats():
 def num_warn_filters():
     try:
         return SESSION.query(WarnFilters).count()
+    finally:
+        SESSION.close()
+
+
+def num_warn_chat_filters(chat_id):
+    try:
+        return SESSION.query(WarnFilters.chat_id).filter(WarnFilters.chat_id == str(chat_id)).count()
     finally:
         SESSION.close()
 

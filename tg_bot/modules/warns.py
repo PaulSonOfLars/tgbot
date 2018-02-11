@@ -26,9 +26,9 @@ def warn(user_id, chat, reason, bot, message):
         message.reply_text("Damn admins, can't even be warned!")
         return
 
-    user_warned = sql.warn_user(user_id, chat.id, reason)
     limit, soft_warn = sql.get_warn_setting(chat.id)
-    if user_warned.num_warns >= limit:
+    num_warns, reasons = sql.warn_user(user_id, chat.id, reason)
+    if num_warns >= limit:
         if soft_warn:  # kick
             res = chat.unban_member(user_id)
         else:  # ban
@@ -45,10 +45,10 @@ def warn(user_id, chat, reason, bot, message):
             [[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user_id))]])
         if reason:
             message.reply_text(
-                "{}/{} warnings... watch out! Latest one was because:\n{}".format(user_warned.num_warns, limit, reason),
+                "{}/{} warnings... watch out! Latest one was because:\n{}".format(num_warns, limit, reason),
                 reply_markup=keyboard)
         else:
-            message.reply_text("{}/{} warnings... watch out!".format(user_warned.num_warns, limit),
+            message.reply_text("{}/{} warnings... watch out!".format(num_warns, limit),
                                reply_markup=keyboard)
 
 
@@ -101,14 +101,15 @@ def warns(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     user_id = extract_user(message, args) or update.effective_user.id
-    warned_user = sql.get_warns(user_id, chat.id)
+    result = sql.get_warns(user_id, chat.id)
 
-    if warned_user and warned_user.num_warns != 0:
+    if result and result[0] != 0:
+        num_warns, reasons = result
         limit, soft_warn = sql.get_warn_setting(chat.id)
 
-        if warned_user.reasons:
-            text = "This user has {}/{} warnings, for the following reasons:".format(warned_user.num_warns, limit)
-            for reason in warned_user.reasons:
+        if reasons:
+            text = "This user has {}/{} warnings, for the following reasons:".format(num_warns, limit)
+            for reason in reasons:
                 text += "\n - {}".format(reason)
 
             msgs = split_message(text)
@@ -116,7 +117,7 @@ def warns(bot: Bot, update: Update, args: List[str]):
                 update.effective_message.reply_text(msg)
         else:
             update.effective_message.reply_text(
-                "User has {}/{} warnings, but no reasons for any of them.".format(warned_user.num_warns, limit))
+                "User has {}/{} warnings, but no reasons for any of them.".format(num_warns, limit))
     else:
         update.effective_message.reply_text("This user hasn't got any warnings!")
 
@@ -279,10 +280,10 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 def __chat_settings__(chat_id, user_id):
-    warn_filters = sql.get_chat_warn_filters(chat_id)
+    num_warn_filters = sql.num_warn_chat_filters(chat_id)
     limit, soft_warn = sql.get_warn_setting(chat_id)
     return "This chat has `{}` warn filters. It takes `{}` warns " \
-           "before the user gets *{}*.".format(len(warn_filters), limit, "kicked" if soft_warn else "banned")
+           "before the user gets *{}*.".format(num_warn_filters, limit, "kicked" if soft_warn else "banned")
 
 
 __help__ = """
