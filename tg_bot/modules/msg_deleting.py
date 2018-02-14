@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot
 from telegram.error import BadRequest
@@ -11,24 +11,29 @@ from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
 
 @run_async
 @user_admin
-def purge(bot: Bot, update: Update):
+def purge(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     if msg.reply_to_message:
         chat = update.effective_chat  # type: Optional[Chat]
         if can_delete(chat, bot.id):
             message_id = msg.reply_to_message.message_id
-            curr_message_id = msg.message_id
-            for m_id in range(curr_message_id, message_id - 1, -1):  # Reverse iteration over message ids
+            if args and args[0].isdigit():
+                delete_to = message_id + int(args[0])
+            else:
+                delete_to = msg.message_id - 1
+            for m_id in range(delete_to, message_id - 1, -1):  # Reverse iteration over message ids
                 try:
                     bot.deleteMessage(chat.id, m_id)
                 except BadRequest as err:
                     if err.message == "Message can't be deleted":
-                        bot.send_message(chat.id, "Cannot delete messages. The messages may be too old, I might not "
-                                                  "have delete rights, or this might not be a supergroup.")
+                        bot.send_message(chat.id, "Cannot delete all messages. The messages may be too old, I might "
+                                                  "not have delete rights, or this might not be a supergroup.")
                         break
 
                     elif err.message != "Message to delete not found":
                         LOGGER.exception("Error while purging chat messages.")
+
+            msg.delete()
             bot.send_message(chat.id, "Purge complete.")
     else:
         msg.reply_text("Reply to a message to select where to start purging from.")
@@ -49,14 +54,15 @@ def del_message(bot: Bot, update: Update):
 __help__ = """
 *Admin only:*
  - /del: deletes the message you replied to
- - /purge: deletes all messages between this and the replied to message
+ - /purge: deletes all messages between this and the replied to message.
+ - /purge <integer X>: deletes the replied message, and X messages following it.
 """
 
 __name__ = "Purges"
 
 
 DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.group)
-PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.group)
+PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.group, pass_args=True)
 
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(PURGE_HANDLER)
