@@ -76,7 +76,10 @@ def warn_user(bot: Bot, update: Update, args: List[str]):
     user_id, reason = extract_user_and_text(message, args)
 
     if user_id:
-        warn(user_id, chat, reason, bot, message)
+        if message.reply_to_message.from_user.id == user_id:
+            warn(user_id, chat, reason, bot, message.reply_to_message)
+        else:
+            warn(user_id, chat, reason, bot, message)
     else:
         message.reply_text("No user was designated!")
 
