@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, func, distinct
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -50,3 +50,20 @@ def stop_chat_logging(chat_id):
             SESSION.delete(res)
             SESSION.commit()
             return log_channel
+
+
+def migrate_chat(old_chat_id, new_chat_id):
+    with LOGS_INSERTION_LOCK:
+        chat = SESSION.query(GroupLogs).get(str(old_chat_id))
+        if chat:
+            chat.chat_id = str(new_chat_id)
+            SESSION.add(chat)
+
+        SESSION.commit()
+
+
+def num_logchannels():
+    try:
+        return SESSION.query(func.count(distinct(GroupLogs.chat_id))).scalar()
+    finally:
+        SESSION.close()

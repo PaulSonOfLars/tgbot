@@ -1,19 +1,21 @@
 from functools import wraps
 from typing import Optional
 
-from telegram import Bot, Update, ParseMode, Message, User, Chat
-from telegram.error import BadRequest
-from telegram.ext import CommandHandler, Filters, run_async
-from telegram.utils.helpers import escape_markdown
-
-from tg_bot import dispatcher, LOGGER
-from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.misc import is_module_loaded
-from tg_bot.modules.sql import log_channel_sql as sql
 
 FILENAME = __name__.rsplit(".", 1)[-1]
 
 if is_module_loaded(FILENAME):
+    from telegram import Bot, Update, ParseMode, Message, Chat
+    from telegram.error import BadRequest
+    from telegram.ext import CommandHandler, run_async
+    from telegram.utils.helpers import escape_markdown
+
+    from tg_bot import dispatcher, LOGGER
+    from tg_bot.modules.helper_funcs.chat_status import user_admin
+    from tg_bot.modules.sql import log_channel_sql as sql
+
+
     def loggable(func):
         @wraps(func)
         def log_action(bot: Bot, update: Update, *args, **kwargs):
@@ -97,9 +99,36 @@ if is_module_loaded(FILENAME):
             message.reply_text("No log channel has been set yet!")
 
 
-    # TODO: help
-    # TODO: settings
-    # TODO: migrations
+    def __stats__():
+        return "{} log channels set.".format(sql.num_logchannels())
+
+
+    def __migrate__(old_chat_id, new_chat_id):
+        sql.migrate_chat(old_chat_id, new_chat_id)
+
+
+    def __chat_settings__(chat_id, user_id):
+        log_channel = sql.get_chat_log_group(chat_id)
+        if log_channel:
+            log_channel_info = dispatcher.bot.get_chat(log_channel)
+            return "This group has all it's logs sent to: {} (`{}`)".format(escape_markdown(log_channel_info.title),
+                                                                            log_channel)
+        return "No log channel is set for this group!"
+
+
+    __help__ = """
+*Admin only:*
+- /logchannel: get log channel info
+- /setlog: set the log channel.
+- /unsetlog: unset the log channel.
+
+Setting the log channel is done by:
+- adding the bot to the desired channel (as an admin!)
+- sending /setlog in the channel
+- forwarding the /setlog to the group
+"""
+
+    __name__ = "Log Channels"
 
     LOG_HANDLER = CommandHandler("logchannel", logging)
     SET_LOG_HANDLER = CommandHandler("setlog", setlog)
