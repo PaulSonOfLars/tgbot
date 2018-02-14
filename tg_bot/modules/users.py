@@ -1,6 +1,7 @@
 from time import sleep
+from typing import Optional
 
-from telegram import TelegramError
+from telegram import TelegramError, Chat, Message
 from telegram import Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import MessageHandler, Filters, CommandHandler
@@ -64,14 +65,23 @@ def broadcast(bot: Bot, update: Update):
 
 @run_async
 def log_user(bot: Bot, update: Update):
-    sql.update_user(update.effective_message.from_user.id,
-                    update.effective_message.from_user.username,
-                    update.effective_chat.id,
-                    update.effective_chat.title)
+    chat = update.effective_chat  # type: Optional[Chat]
+    msg = update.effective_message  # type: Optional[Message]
 
-    if update.effective_message.forward_from:
-        sql.update_user(update.effective_message.forward_from.id,
-                        update.effective_message.forward_from.username)
+    sql.update_user(msg.from_user.id,
+                    msg.from_user.username,
+                    chat.id,
+                    chat.title)
+
+    if msg.reply_to_message:
+        sql.update_user(msg.reply_to_message.from_user.id,
+                        msg.reply_to_message.from_user.username,
+                        chat.id,
+                        chat.title)
+
+    if msg.forward_from:
+        sql.update_user(msg.forward_from.id,
+                        msg.forward_from.username)
 
 
 def __user_info__(user_id):
