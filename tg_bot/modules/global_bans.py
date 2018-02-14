@@ -1,16 +1,16 @@
 from io import BytesIO
 from typing import Optional, List
 
-from telegram import Message, Update, Bot, User
+from telegram import Message, Update, Bot, User, Chat
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
-from tg_bot.modules.helper_funcs.chat_status import user_not_admin, user_admin
-from tg_bot.modules.helper_funcs.filters import CustomFilters
+from tg_bot.modules.helper_funcs.chat_status import user_admin, can_restrict, is_user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_user, extract_user_and_text
+from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.helper_funcs.misc import send_to_list
 from tg_bot.modules.sql.users_sql import get_all_chats
 
@@ -186,16 +186,25 @@ def check_and_ban(update, user_id):
 
 
 @run_async
-@user_not_admin
+@can_restrict
 def enforce_gban(bot: Bot, update: Update):
-    if sql.does_chat_gban(update.effective_chat.id) and update.effective_chat.get_member(bot.id).can_restrict_members:
-        user = update.effective_message.from_user
-        check_and_ban(update, user.id)
+    if sql.does_chat_gban(update.effective_chat.id):
+        user = update.effective_user  # type: Optional[User]
+        chat = update.effective_chat  # type: Optional[Chat]
+        msg = update.effective_message  # type: Optional[Message]
 
-        if update.effective_message.new_chat_members:
+        if user and not is_user_admin(chat, user.id):
+            check_and_ban(update, user.id)
+
+        if msg.new_chat_members:
             new_members = update.effective_message.new_chat_members
             for mem in new_members:
                 check_and_ban(update, mem.id)
+
+        if msg.reply_to_message:
+            user = msg.reply_to_message.from_user  # type: Optional[User]
+            if user and not is_user_admin(chat, user.id):
+                check_and_ban(update, user.id)
 
 
 @run_async
