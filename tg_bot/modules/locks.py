@@ -337,9 +337,9 @@ MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | M
 PREVIEWS = Filters.entity("url")
 
 LOCKTYPES_HANDLER = DisableAbleCommandHandler("locktypes", locktypes)
-LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=~Filters.private)
-UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True, filters=~Filters.private)
-LOCKED_HANDLER = CommandHandler("locks", list_locks, filters=~Filters.private)
+LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=Filters.group)
+UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True, filters=Filters.group)
+LOCKED_HANDLER = CommandHandler("locks", list_locks, filters=Filters.group)
 
 REST_MSG_HANDLER = MessageHandler(MESSAGES, rest_msg)
 REST_MEDIA_HANDLER = MessageHandler(MEDIA, rest_media)

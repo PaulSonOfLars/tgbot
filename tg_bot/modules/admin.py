@@ -186,13 +186,13 @@ __help__ = """
 __name__ = "Admin"
 
 
-PIN_HANDLER = CommandHandler("pin", pin, pass_args=True)
-UNPIN_HANDLER = CommandHandler("unpin", unpin)
+PIN_HANDLER = CommandHandler("pin", pin, pass_args=True, filters=Filters.group)
+UNPIN_HANDLER = CommandHandler("unpin", unpin, filters=Filters.group)
 
-INVITE_HANDLER = CommandHandler("invitelink", invite)
+INVITE_HANDLER = CommandHandler("invitelink", invite, filters=Filters.group)
 
-PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True)
-DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True)
+PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True, filters=Filters.group)
+DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True, filters=Filters.group)
 
 ADMINLIST_HANDLER = DisableAbleCommandHandler("adminlist", adminlist, filters=Filters.group)
 

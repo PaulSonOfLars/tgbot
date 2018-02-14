@@ -2,7 +2,7 @@ from typing import Optional
 
 from telegram import Message, Chat, Update, Bot
 from telegram.error import BadRequest
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher, LOGGER
@@ -55,8 +55,8 @@ __help__ = """
 __name__ = "Purges"
 
 
-DELETE_HANDLER = CommandHandler("del", del_message)
-PURGE_HANDLER = CommandHandler("purge", purge)
+DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.group)
+PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.group)
 
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(PURGE_HANDLER)

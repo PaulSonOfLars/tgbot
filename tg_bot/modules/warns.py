@@ -303,16 +303,17 @@ be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is
 __name__ = "Warnings"
 
 
-WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True)
-RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns, pass_args=True)
+WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True, filters=Filters.group)
+RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns, pass_args=True, filters=Filters.group)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
-MYWARNS_HANDLER = DisableAbleCommandHandler("warns", warns, pass_args=True)
-ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter)
-RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True)
-LIST_WARN_HANDLER = DisableAbleCommandHandler("warnlist", list_warn_filters)
-WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo, reply_filter)
-WARN_LIMIT_HANDLER = CommandHandler("warnlimit", set_warn_limit, pass_args=True)
-WARN_STRENGTH_HANDLER = CommandHandler("strongwarn", set_warn_strength, pass_args=True)
+MYWARNS_HANDLER = DisableAbleCommandHandler("warns", warns, pass_args=True, filters=Filters.group)
+ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter, filters=Filters.group)
+RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True, filters=Filters.group)
+LIST_WARN_HANDLER = DisableAbleCommandHandler("warnlist", list_warn_filters, filters=Filters.group)
+WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo | Filters.group,
+                                     reply_filter)
+WARN_LIMIT_HANDLER = CommandHandler("warnlimit", set_warn_limit, pass_args=True, filters=Filters.group)
+WARN_STRENGTH_HANDLER = CommandHandler("strongwarn", set_warn_strength, pass_args=True, filters=Filters.group)
 
 
 dispatcher.add_handler(WARN_HANDLER)

@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 
 from tg_bot import dispatcher
@@ -87,8 +87,8 @@ __help__ = """
 __name__ = "Muting"
 
 
-MUTE_HANDLER = CommandHandler("mute", mute, pass_args=True)
-UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True)
+MUTE_HANDLER = CommandHandler("mute", mute, pass_args=True, filters=Filters.group)
+UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True, filters=Filters.group)
 
 dispatcher.add_handler(MUTE_HANDLER)
 dispatcher.add_handler(UNMUTE_HANDLER)

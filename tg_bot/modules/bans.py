@@ -134,10 +134,10 @@ __help__ = """
 __name__ = "Bans"
 
 
-BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=~Filters.private)
-KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=~Filters.private)
-UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=~Filters.private)
-KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=~Filters.private)
+BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
+KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.group)
+UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=Filters.group)
+KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=Filters.group)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(KICK_HANDLER)
