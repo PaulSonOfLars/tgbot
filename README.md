@@ -162,8 +162,8 @@ You can then add commands using the usual
 
 Assigning the `__help__` variable to a string describing this modules' available
 commands will allow the bot to load it and add the documentation for
-your module to the `/help` command. Setting the `__name__` variable will also allow you to use a nicer, user friendly 
-name for a module.
+your module to the `/help` command. Setting the `__mod_name__` variable will also allow you to use a nicer, user
+friendly name for a module.
 
 The `__migrate__()` function is used for migrating chats - when a chat is upgraded to a supergroup, the ID changes, so 
 it is necessary to migrate it in the db.

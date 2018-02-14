@@ -105,7 +105,7 @@ or nothing. Delimiters include '/', '\_', '|' and ':'. Text grouping is supporte
 larger than {}
 """.format(telegram.MAX_MESSAGE_LENGTH)
 
-__name__ = "Sed/Regex"
+__mod_name__ = "Sed/Regex"
 
 
 SED_HANDLER = DisableAbleRegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed, friendly="sed")

@@ -303,7 +303,7 @@ be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is
  - /strongwarn <on/yes/off/no>: If set to on, exceeding the warn limit will result in a ban. Else, will just kick.
 """
 
-__name__ = "Warnings"
+__mod_name__ = "Warnings"
 
 
 WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True, filters=Filters.group)

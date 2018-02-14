@@ -68,13 +68,16 @@ USER_SETTINGS = {}
 
 for module_name in ALL_MODULES:
     imported_module = importlib.import_module("tg_bot.modules." + module_name)
-    if not imported_module.__name__.lower() in IMPORTED:
-        IMPORTED[imported_module.__name__.lower()] = imported_module
+    if not hasattr(imported_module, "__mod_name__"):
+        imported_module.__mod_name__ = imported_module.__name__
+
+    if not imported_module.__mod_name__.lower() in IMPORTED:
+        IMPORTED[imported_module.__mod_name__.lower()] = imported_module
     else:
         raise Exception("Can't have two modules with the same name! Please change one")
 
     if hasattr(imported_module, "__help__") and imported_module.__help__:
-        HELPABLE[imported_module.__name__.lower()] = imported_module
+        HELPABLE[imported_module.__mod_name__.lower()] = imported_module
 
     # Chats to migrate on chat_migrated events
     if hasattr(imported_module, "__migrate__"):
@@ -93,10 +96,10 @@ for module_name in ALL_MODULES:
         DATA_EXPORT.append(imported_module)
 
     if hasattr(imported_module, "__chat_settings__"):
-        CHAT_SETTINGS[imported_module.__name__.lower()] = imported_module
+        CHAT_SETTINGS[imported_module.__mod_name__.lower()] = imported_module
 
     if hasattr(imported_module, "__user_settings__"):
-        USER_SETTINGS[imported_module.__name__.lower()] = imported_module
+        USER_SETTINGS[imported_module.__mod_name__.lower()] = imported_module
 
 
 # do not async
@@ -184,7 +187,7 @@ def help_button(bot: Bot, update: Update):
     try:
         if mod_match:
             module = mod_match.group(1)
-            text = "Here is the help for the *{}* module:\n".format(HELPABLE[module].__name__) \
+            text = "Here is the help for the *{}* module:\n".format(HELPABLE[module].__mod_name__) \
                    + HELPABLE[module].__help__
             query.message.reply_text(text=text,
                                      parse_mode=ParseMode.MARKDOWN,
@@ -234,7 +237,7 @@ def get_help(bot: Bot, update: Update):
 
     elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
         module = args[1].lower()
-        text = "Here is the available help for the *{}* module:\n".format(HELPABLE[module].__name__) \
+        text = "Here is the available help for the *{}* module:\n".format(HELPABLE[module].__mod_name__) \
                + HELPABLE[module].__help__
         send_help(chat.id, text, InlineKeyboardMarkup([[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
 
@@ -246,7 +249,7 @@ def send_settings(chat_id, user_id, user=False):
     if user:
         if USER_SETTINGS:
             settings = "\n\n".join(
-                "*{}*:\n{}".format(mod.__name__, mod.__user_settings__(user_id)) for mod in USER_SETTINGS.values())
+                "*{}*:\n{}".format(mod.__mod_name__, mod.__user_settings__(user_id)) for mod in USER_SETTINGS.values())
             dispatcher.bot.send_message(user_id, "These are your current settings:" + "\n\n" + settings,
                                         parse_mode=ParseMode.MARKDOWN)
 
@@ -282,7 +285,7 @@ def settings_button(bot: Bot, update: Update):
             module = mod_match.group(2)
             chat = bot.get_chat(chat_id)
             text = "*{}* has the following settings for the *{}* module:\n\n".format(escape_markdown(chat.title),
-                                                                                     CHAT_SETTINGS[module].__name__) + \
+                                                                                     CHAT_SETTINGS[module].__mod_name__) + \
                    CHAT_SETTINGS[module].__chat_settings__(chat_id, user.id)
             query.message.reply_text(text=text,
                                      parse_mode=ParseMode.MARKDOWN,

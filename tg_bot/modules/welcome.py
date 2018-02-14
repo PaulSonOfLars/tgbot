@@ -399,7 +399,7 @@ __help__ = """
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
 """
 
-__name__ = "Welcomes/Goodbyes"
+__mod_name__ = "Welcomes/Goodbyes"
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)

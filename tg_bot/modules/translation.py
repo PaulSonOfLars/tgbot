@@ -51,7 +51,7 @@ __help__ = """
  - /t: while replying to a message, will reply with a grammar corrected version
 """
 
-__name__ = "Translator"
+__mod_name__ = "Translator"
 
 
 TRANSLATE_HANDLER = CommandHandler('t', translate)

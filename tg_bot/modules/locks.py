@@ -328,7 +328,7 @@ stickers, etc.
 Locking bots will stop non-admins from adding bots to the chat.
 """
 
-__name__ = "Locks"
+__mod_name__ = "Locks"
 
 GIF = Filters.document & CustomFilters.mime_type("video/mp4")
 OTHER = Filters.game | Filters.sticker | GIF

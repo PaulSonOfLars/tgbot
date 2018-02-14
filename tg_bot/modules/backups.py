@@ -66,7 +66,7 @@ def export_data(bot: Bot, update: Update):
     msg.reply_text("")
 
 
-__name__ = "Backups"
+__mod_name__ = "Backups"
 
 __help__ = """
 *Admin only:*

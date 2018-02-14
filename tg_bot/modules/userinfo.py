@@ -115,7 +115,7 @@ __help__ = """
  - /me: will get your or another user's info
 """
 
-__name__ = "Bios and Abouts"
+__mod_name__ = "Bios and Abouts"
 
 SET_BIO_HANDLER = DisableAbleCommandHandler("setbio", set_about_bio)
 GET_BIO_HANDLER = DisableAbleCommandHandler("bio", about_bio, pass_args=True)

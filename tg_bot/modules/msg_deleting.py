@@ -58,7 +58,7 @@ __help__ = """
  - /purge <integer X>: deletes the replied message, and X messages following it.
 """
 
-__name__ = "Purges"
+__mod_name__ = "Purges"
 
 
 DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.group)

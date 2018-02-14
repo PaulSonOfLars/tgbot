@@ -345,7 +345,7 @@ __help__ = """
  - /info: get information about a user.
 """
 
-__name__ = "Misc"
+__mod_name__ = "Misc"
 
 ID_HANDLER = DisableAbleCommandHandler("id", get_id, pass_args=True)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
