@@ -4,12 +4,13 @@ from future.utils import string_types
 from telegram import ParseMode, Update, Bot, Chat
 from telegram.ext import CommandHandler, RegexHandler, Filters
 
-from tg_bot import dispatcher, NO_LOAD, LOAD
+from tg_bot import dispatcher
+from tg_bot.modules.helper_funcs.misc import is_module_loaded
 
 FILENAME = __name__.rsplit(".", 1)[-1]
 
 # If module is due to be loaded, then setup all the magical handlers
-if (not LOAD or FILENAME in LOAD) and FILENAME not in NO_LOAD:
+if is_module_loaded(FILENAME):
     from tg_bot.modules.helper_funcs.chat_status import user_admin
     from telegram.ext.dispatcher import run_async
 

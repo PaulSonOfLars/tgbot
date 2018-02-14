@@ -4,6 +4,8 @@ from typing import List, Dict
 from telegram import MAX_MESSAGE_LENGTH, InlineKeyboardButton, Bot, ParseMode
 from telegram.error import TelegramError
 
+from tg_bot import LOAD, NO_LOAD
+
 
 class EqInlineKeyboardButton(InlineKeyboardButton):
     def __eq__(self, other):
@@ -82,3 +84,7 @@ def build_keyboard(buttons):
             keyb.append([InlineKeyboardButton(btn.name, url=btn.url)])
 
     return keyb
+
+
+def is_module_loaded(name):
+    return (not LOAD or name in LOAD) and name not in NO_LOAD
