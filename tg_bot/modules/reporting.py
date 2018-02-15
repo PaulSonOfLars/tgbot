@@ -7,6 +7,7 @@ from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_not_admin, user_admin
+from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import reporting_sql as sql
 
 REPORT_GROUP = 5
@@ -48,6 +49,7 @@ def report_setting(bot: Bot, update: Update, args: List[str]):
 
 @run_async
 @user_not_admin
+@loggable
 def report(bot: Bot, update: Update):
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
@@ -57,26 +59,27 @@ def report(bot: Bot, update: Update):
         reported_user = message.reply_to_message.from_user  # type: Optional[User]
         chat_name = chat.title or chat.first or chat.username
         admin_list = chat.get_administrators()
+
+        if chat.username and chat.type == Chat.SUPERGROUP:
+            msg = "*Reported user:* {} (`{}`)\n" \
+                  "*Reported by:* {} (`{}`)\n" \
+                  "*Group:* {}\n" \
+                  "*Link:* [click here](http://telegram.me/{}/{})".format(escape_markdown(reported_user.first_name),
+                                                                          reported_user.id,
+                                                                          escape_markdown(user.first_name),
+                                                                          user.id,
+                                                                          escape_markdown(chat.title),
+                                                                          chat.username, message.message_id)
+            should_forward = False
+
+        else:
+            msg = "[{}](tg://user?id={}) is calling for admins in \"{}\"!".format(escape_markdown(user.first_name),
+                                                                                  user.id, escape_markdown(chat_name))
+            should_forward = True
+
         for admin in admin_list:
             if admin.user.is_bot:  # can't message bots
                 continue
-
-            if chat.username and chat.type == Chat.SUPERGROUP:
-                msg = "*Reported user:* {} (`{}`)\n" \
-                      "*Reported by:* {} (`{}`)\n" \
-                      "*Group:* {}\n" \
-                      "*Link:* [click here](http://telegram.me/{}/{})".format(escape_markdown(reported_user.first_name),
-                                                                              reported_user.id,
-                                                                              escape_markdown(user.first_name),
-                                                                              user.id,
-                                                                              escape_markdown(chat.title),
-                                                                              chat.username, message.message_id)
-                should_forward = False
-
-            else:
-                msg = "{} (`{}`) is calling for admins in \"{}\"!".format(escape_markdown(user.first_name),
-                                                                          user.id, chat_name)
-                should_forward = True
 
             if sql.user_should_report(admin.user.id):
                 try:
@@ -92,6 +95,9 @@ def report(bot: Bot, update: Update):
                     pass
                 except BadRequest as excp:  # TODO: cleanup exceptions
                     LOGGER.exception("Exception while reporting user")
+        return msg
+
+    return ""
 
 
 def __migrate__(old_chat_id, new_chat_id):
