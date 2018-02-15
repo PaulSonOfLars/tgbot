@@ -12,8 +12,9 @@ from telegram.utils.helpers import escape_markdown
 import tg_bot.modules.sql.notes_sql as sql
 from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
+from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.misc import build_keyboard
-from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser
+from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser, markdown_parser
 
 FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
 
@@ -116,13 +117,28 @@ def save_replied(bot: Bot, update: Update):
         update.effective_message.reply_text("You need to give me a notename to save this message!")
         return
 
-    msg = update.effective_message.reply_to_message
+    msg = update.effective_message.reply_to_message  # type: Optional[Message]
+
+    if msg.from_user.is_bot:
+        text = extract_text(msg)
+        if text:
+            sql.add_note_to_db(chat_id, notename, markdown_parser(text), is_reply=False)
+            update.effective_message.reply_text("Seems like you're trying to save a message from a bot. Unfortunately, "
+                                                "bots can't forward bot messages, so I can't save the exact message. "
+                                                "\nI'll save all the text I can, but if you want more, you'll have to "
+                                                "forward the message yourself, and then save it.")
+        else:
+            update.effective_message.reply_text("Bots are kinda handicapped by telegram, making it hard for bots to "
+                                                "interract with other bots, so I can't save this message "
+                                                "like I usually would - do you mind forwarding it and "
+                                                "then saving that new message? Thanks!")
+        return
 
     if MESSAGE_DUMP:
         msg = bot.forward_message(chat_id=MESSAGE_DUMP, from_chat_id=chat_id, message_id=msg.message_id)
 
     sql.add_note_to_db(chat_id, notename, msg.message_id, is_reply=True)
-    update.effective_message.reply_text("Yas! Added replied message " + notename)
+    update.effective_message.reply_text("Yas! Added replied message {}".format(notename))
 
 
 @run_async
