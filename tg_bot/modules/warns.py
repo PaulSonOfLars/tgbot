@@ -40,7 +40,7 @@ def warn(user, chat, reason, bot, message) -> str:
             message.reply_text("{} warnings, this user has been banned!".format(limit))
             sql.reset_warns(user.id, chat.id)
             return "{}:" \
-                   "\n#WARN" \
+                   "\n#WARN_BAN" \
                    "\n*User:* [{}](tg://user?id={})" \
                    "\n*Reason:* {}".format(escape_markdown(chat.title),
                                            escape_markdown(user.first_name),
@@ -58,9 +58,12 @@ def warn(user, chat, reason, bot, message) -> str:
             reply += " Latest one was because:\n{}".format(reason)
 
         message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
-        return "[{}](tg://user?id={}) was *warned* in {}".format(escape_markdown(user.first_name),
-                                                                 user.id,
-                                                                 escape_markdown(chat.title))
+        return "{}:" \
+               "\n#WARN" \
+               "\n*User:* [{}](tg://user?id={})" \
+               "\n*Reason:* {}".format(escape_markdown(chat.title),
+                                       escape_markdown(user.first_name),
+                                       user.id, reason)
     return ""
 
 
