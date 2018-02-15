@@ -22,10 +22,10 @@ CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
 
 
 # Not async
-def warn(user, chat, reason, bot, message):
+def warn(user, chat, reason, bot, message) -> str:
     if is_user_admin(chat, user.id):
         message.reply_text("Damn admins, can't even be warned!")
-        return
+        return ""
 
     limit, soft_warn = sql.get_warn_setting(chat.id)
     num_warns, reasons = sql.warn_user(user.id, chat.id, reason)
@@ -66,7 +66,7 @@ def warn(user, chat, reason, bot, message):
 @user_admin_no_reply
 @bot_admin
 @loggable
-def button(bot: Bot, update: Update):
+def button(bot: Bot, update: Update) -> str:
     query = update.callback_query  # type: Optional[CallbackQuery]
     user = update.effective_user  # type: Optional[User]
     match = re.match(r"rm_warn\((.+?)\)", query.data)
@@ -91,7 +91,7 @@ def button(bot: Bot, update: Update):
 @user_admin
 @can_restrict
 @loggable
-def warn_user(bot: Bot, update: Update, args: List[str]):
+def warn_user(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
 
@@ -111,7 +111,7 @@ def warn_user(bot: Bot, update: Update, args: List[str]):
 @user_admin
 @bot_admin
 @loggable
-def reset_warns(bot: Bot, update: Update, args: List[str]):
+def reset_warns(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
 
@@ -236,7 +236,7 @@ def list_warn_filters(bot: Bot, update: Update):
 
 @run_async
 @loggable
-def reply_filter(bot: Bot, update: Update):
+def reply_filter(bot: Bot, update: Update) -> str:
     chat_warn_filters = sql.get_chat_warn_filters(update.effective_chat.id)
     message = update.effective_message  # type: Optional[Message]
     to_match = extract_text(message)
@@ -255,7 +255,7 @@ def reply_filter(bot: Bot, update: Update):
 @run_async
 @user_admin
 @loggable
-def set_warn_limit(bot: Bot, update: Update, args: List[str]):
+def set_warn_limit(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]

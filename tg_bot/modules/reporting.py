@@ -50,7 +50,7 @@ def report_setting(bot: Bot, update: Update, args: List[str]):
 @run_async
 @user_not_admin
 @loggable
-def report(bot: Bot, update: Update):
+def report(bot: Bot, update: Update) -> str:
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]

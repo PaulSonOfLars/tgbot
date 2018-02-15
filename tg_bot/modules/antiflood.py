@@ -15,18 +15,18 @@ FLOOD_GROUP = 3
 
 @run_async
 @loggable
-def check_flood(bot: Bot, update: Update):
+def check_flood(bot: Bot, update: Update) -> str:
     user = update.effective_user  # type: Optional[User]
     chat = update.effective_chat  # type: Optional[Chat]
     msg = update.effective_message  # type: Optional[Message]
 
     if not user:  # ignore channels
-        return
+        return ""
 
     # ignore admins
     if is_user_admin(chat, user.id):
         sql.update_flood(chat.id, None)
-        return
+        return ""
 
     should_ban = sql.update_flood(chat.id, user.id)
     if should_ban:
@@ -49,7 +49,7 @@ def check_flood(bot: Bot, update: Update):
 @user_admin
 @can_restrict
 @loggable
-def set_flood(bot: Bot, update: Update, args: List[str]):
+def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]

@@ -19,7 +19,7 @@ from tg_bot.modules.log_channel import loggable
 @can_promote
 @user_admin
 @loggable
-def promote(bot: Bot, update: Update, args: List[str]):
+def promote(bot: Bot, update: Update, args: List[str]) -> str:
     chat_id = update.effective_chat.id
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
@@ -65,7 +65,7 @@ def promote(bot: Bot, update: Update, args: List[str]):
 @can_promote
 @user_admin
 @loggable
-def demote(bot: Bot, update: Update, args: List[str]):
+def demote(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
 
@@ -121,7 +121,7 @@ def demote(bot: Bot, update: Update, args: List[str]):
 @can_pin
 @user_admin
 @loggable
-def pin(bot: Bot, update: Update, args: List[str]):
+def pin(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat
     chat_type = update.effective_chat.type
     is_group = chat_type != "private" and chat_type != "channel"
@@ -153,7 +153,7 @@ def pin(bot: Bot, update: Update, args: List[str]):
 @can_pin
 @user_admin
 @loggable
-def unpin(bot: Bot, update: Update):
+def unpin(bot: Bot, update: Update) -> str:
     chat = update.effective_chat
     try:
         bot.unpinChatMessage(chat.id)
