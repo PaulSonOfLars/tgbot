@@ -1,6 +1,6 @@
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot
+from telegram import Message, Chat, Update, Bot, User
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
@@ -17,6 +17,7 @@ from tg_bot.modules.log_channel import loggable
 @loggable
 def mute(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
@@ -37,12 +38,13 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
         elif member.can_send_messages is None or member.can_send_messages:
             bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
             message.reply_text("Muted!")
-            return "[{}](tg://user?id={}) was *muted* in {} by [{}](tg://user?id={})".format(
-                escape_markdown(member.user.first_name),
-                member.user.id,
-                escape_markdown(chat.title),
-                escape_markdown(update.effective_user.first_name),
-                update.effective_user.id)
+            return "{}:" \
+                   "\n#MUTE" \
+                   "\n*Admin:* [{}](tg://user?id={})" \
+                   "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                            escape_markdown(user.first_name),
+                                                            user.id, escape_markdown(member.user.first_name),
+                                                            member.user.id)
 
         else:
             message.reply_text("This user is already muted!")
@@ -58,6 +60,7 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
 @loggable
 def unmute(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
@@ -73,17 +76,18 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
             message.reply_text("This user already has the right to speak.")
         else:
             bot.restrict_chat_member(chat.id, int(user_id),
-                                               can_send_messages=True,
-                                               can_send_media_messages=True,
-                                               can_send_other_messages=True,
-                                               can_add_web_page_previews=True)
+                                     can_send_messages=True,
+                                     can_send_media_messages=True,
+                                     can_send_other_messages=True,
+                                     can_add_web_page_previews=True)
             message.reply_text("Unmuted!")
-            return "[{}](tg://user?id={}) was *unmuted* in {} by [{}](tg://user?id={})".format(
-                escape_markdown(member.user.first_name),
-                member.user.id,
-                escape_markdown(chat.title),
-                escape_markdown(update.effective_user.first_name),
-                update.effective_user.id)
+            return "{}:" \
+                   "\n#UNMUTE" \
+                   "\n*Admin:* [{}](tg://user?id={})" \
+                   "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                            escape_markdown(user.first_name),
+                                                            user.id, escape_markdown(member.user.first_name),
+                                                            member.user.id)
     else:
         message.reply_text("This user isn't even in the chat, unmuting them won't make them talk more than they "
                            "already do!")
@@ -98,7 +102,6 @@ __help__ = """
 """
 
 __mod_name__ = "Muting"
-
 
 MUTE_HANDLER = CommandHandler("mute", mute, pass_args=True, filters=Filters.group)
 UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True, filters=Filters.group)

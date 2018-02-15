@@ -39,8 +39,12 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
 
             msg.delete()
             bot.send_message(chat.id, "Purge complete.")
-            return "[{}](tg://user?id={}) purged {} messages in {}.".format(escape_markdown(user.first_name), user.id,
-                                                                            delete_to - message_id, chat.title)
+            return "{}:" \
+                   "\n#PURGE" \
+                   "\n*Admin:* [{}](tg://user?id={})" \
+                   "\nPurged `{}` messages.".format(escape_markdown(chat.title),
+                                                    escape_markdown(user.first_name),
+                                                    user.id, delete_to - message_id)
 
     else:
         msg.reply_text("Reply to a message to select where to start purging from.")
@@ -58,8 +62,12 @@ def del_message(bot: Bot, update: Update) -> str:
         if can_delete(chat, bot.id):
             update.effective_message.reply_to_message.delete()
             update.effective_message.delete()
-            return "[{}](tg://user?id={}) deleted a message in {}.".format(escape_markdown(user.first_name), user.id,
-                                                                           chat.title)
+            return "{}:" \
+                   "\n#DEL" \
+                   "\n*Admin:* [{}](tg://user?id={})" \
+                   "\nMessage deleted.".format(escape_markdown(chat.title),
+                                               escape_markdown(user.first_name),
+                                               user.id)
     else:
         update.effective_message.reply_text("Whadya want to delete?")
 

@@ -39,10 +39,12 @@ def warn(user, chat, reason, bot, message) -> str:
             bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
             message.reply_text("{} warnings, this user has been banned!".format(limit))
             sql.reset_warns(user.id, chat.id)
-            return '[{}](tg://user?id={}) was *banned* in {} due to too many warnings'.format(
-                escape_markdown(user.first_name),
-                user.id,
-                escape_markdown(chat.title))
+            return "{}:" \
+                   "\n#WARN" \
+                   "\n*User:* [{}](tg://user?id={})" \
+                   "\n*Reason:* {}".format(escape_markdown(chat.title),
+                                           escape_markdown(user.first_name),
+                                           user.id, reason)
         else:
             message.reply_text("An error occurred, I couldn't ban this person!")
 
@@ -79,11 +81,13 @@ def button(bot: Bot, update: Update) -> str:
                 "Warn removed by [{}](tg://user?id={}).".format(escape_markdown(user.first_name), user.id),
                 parse_mode=ParseMode.MARKDOWN)
             user_member = chat.get_member(user_id)
-            return "[{}](tg://user?id={}) had their warn in {} removed by [{}](tg://user?id={}).".format(
-                escape_markdown(user_member.user.first_name),
-                user_member.user.id,
-                update.effective_chat.title,
-                escape_markdown(user.first_name), user.id)
+            return "{}:" \
+                   "\n#UNWARN" \
+                   "\n*Admin:* [{}](tg://user?id={})" \
+                   "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                            escape_markdown(user.first_name),
+                                                            user.id, escape_markdown(user_member.user.first_name),
+                                                            user_member.user.id)
     return ""
 
 
@@ -114,18 +118,20 @@ def warn_user(bot: Bot, update: Update, args: List[str]) -> str:
 def reset_warns(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
 
     user_id = extract_user(message, args)
     if user_id:
         sql.reset_warns(user_id, chat.id)
         message.reply_text("Warnings have been reset!")
         warned = chat.get_member(user_id).user
-        return "[{}](tg://user?id={}) reset all warnings for [{}](tg://user?id={}) in {}".format(
-            escape_markdown(update.effective_user.first_name),
-            update.effective_user.id,
-            escape_markdown(warned.first_name),
-            warned.id,
-            escape_markdown(chat.title))
+        return "{}:" \
+               "\n#RESETWARNS" \
+               "\n*Admin:* [{}](tg://user?id={})" \
+               "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                        escape_markdown(user.first_name),
+                                                        user.id, escape_markdown(warned.first_name),
+                                                        warned.id)
     else:
         message.reply_text("No user has been designated!")
     return ""
@@ -246,7 +252,7 @@ def reply_filter(bot: Bot, update: Update) -> str:
     for warn_filter in chat_warn_filters:
         pattern = r"( |^|[^\w])" + re.escape(warn_filter.keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
-            user = update.effective_user
+            user = update.effective_user  # type: Optional[User]
             chat = update.effective_chat  # type: Optional[Chat]
             return warn(user, chat, warn_filter.reply, bot, message)
     return ""
@@ -267,10 +273,12 @@ def set_warn_limit(bot: Bot, update: Update, args: List[str]) -> str:
             else:
                 sql.set_warn_limit(chat.id, int(args[0]))
                 msg.reply_text("Updated the warn limit to {}".format(args[0]))
-                return "[{}](tg://user?id={}) set the warn limit in {} to `{}`".format(escape_markdown(user.first_name),
-                                                                                       user.id,
-                                                                                       escape_markdown(chat.title),
-                                                                                       args[0])
+                return "{}:" \
+                       "\n#SET_WARN_LIMIT" \
+                       "\n*Admin:* [{}](tg://user?id={})" \
+                       "\nSet the warn limit to `{}`".format(escape_markdown(chat.title),
+                                                             escape_markdown(user.first_name),
+                                                             user.id, args[0])
         else:
             msg.reply_text("Give me a number as an arg!")
     else:

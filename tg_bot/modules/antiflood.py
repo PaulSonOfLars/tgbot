@@ -34,15 +34,21 @@ def check_flood(bot: Bot, update: Update) -> str:
             chat.kick_member(user.id)
             msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
                            "disappointment. Get out.")
-            return "[{}](tg://user?id={}) was *banned* in {} due to *flood*.".format(
-                escape_markdown(user.first_name),
-                user.id,
-                escape_markdown(chat.title))
+
+            return "{}:" \
+                   "\n#BANNED" \
+                   "\n*User:* [{}](tg://user?id={})" \
+                   "\nFlooded the group.".format(escape_markdown(chat.title),
+                                                 escape_markdown(user.first_name),
+                                                 user.id)
 
         except BadRequest:
             msg.reply_text("I can't kick people here, give me permissions first! Until then, I'll disable antiflood.")
             sql.set_flood(chat.id, 0)
-            return "Antiflood disabled in {} as I don't have *kick* permissions.".format(escape_markdown(chat.title))
+            return "{}:" \
+                   "\n#INFO" \
+                   "\nDon't have kick permissions, so automatically disabled antiflood.".format(
+                escape_markdown(chat.title))
 
     return ""
 
@@ -67,10 +73,12 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
             if amount <= 0:
                 sql.set_flood(chat.id, 0)
                 message.reply_text("Antiflood has been disabled.")
-                return "[{}](tg://user?id={}) disabled antiflood in {}.".format(
-                    escape_markdown(user.first_name),
-                    user.id,
-                    escape_markdown(chat.title))
+                return "{}:" \
+                       "\n#SETFLOOD" \
+                       "\n*Admin:* [{}](tg://user?id={})" \
+                       "\nDisabled antiflood.".format(escape_markdown(chat.title),
+                                                      escape_markdown(user.first_name),
+                                                      user.id)
 
             elif amount < 3:
                 message.reply_text("Antiflood has to be either 0 (disabled), or a number bigger than 3!")
@@ -79,11 +87,12 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
             else:
                 sql.set_flood(chat.id, amount)
                 message.reply_text("Antiflood has been updated and set to {}".format(amount))
-                return "[{}](tg://user?id={}) set antiflood in {} tp `{}`.".format(
-                    escape_markdown(user.first_name),
-                    user.id,
-                    escape_markdown(chat.title),
-                    amount)
+                return "{}:" \
+                       "\n#SETFLOOD" \
+                       "\n*Admin:* [{}](tg://user?id={})" \
+                       "\nSet antiflood to `{}`.".format(escape_markdown(chat.title),
+                                                         escape_markdown(user.first_name),
+                                                         user.id, amount)
 
         else:
             message.reply_text("Unrecognised argument - please use a number, 'off', or 'no'.")

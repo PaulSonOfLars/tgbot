@@ -52,12 +52,14 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
                           can_promote_members=bot_member.can_promote_members)
 
     message.reply_text("Successfully promoted!")
-    return "[{}](tg://user?id={}) was *promoted* in {} by [{}](tg://user?id={})".format(
-        escape_markdown(user_member.user.first_name),
-        user_member.user.id,
-        escape_markdown(chat.title),
-        escape_markdown(update.effective_user.first_name),
-        update.effective_user.id)
+    return "{}:" \
+           "\n#PROMOTED" \
+           "\n*Admin:* [{}](tg://user?id={})" \
+           "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                    escape_markdown(update.effective_user.first_name),
+                                                    update.effective_user.id,
+                                                    escape_markdown(user_member.user.first_name),
+                                                    user_member.user.id)
 
 
 @run_async
@@ -98,22 +100,18 @@ def demote(bot: Bot, update: Update, args: List[str]) -> str:
                               can_pin_messages=False,
                               can_promote_members=False)
         message.reply_text("Successfully demoted!")
-        return "[{}](tg://user?id={}) was *demoted* in {} by [{}](tg://user?id={})".format(
-            escape_markdown(user_member.user.first_name),
-            user_member.user.id,
-            escape_markdown(chat.title),
-            escape_markdown(update.effective_user.first_name),
-            update.effective_user.id)
+        return "{}:" \
+               "\n#DEMOTED" \
+               "\n*Admin:* [{}](tg://user?id={})" \
+               "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                        escape_markdown(update.effective_user.first_name),
+                                                        update.effective_user.id,
+                                                        escape_markdown(user_member.user.first_name),
+                                                        user_member.user.id)
 
     except BadRequest:
         message.reply_text("Could not demote. I might not be admin, or the admin status was appointed by another "
                            "user, so I can't act upon them!")
-        return "An *error* occurred while demoting [{}](tg://user?id={}) in {} by [{}](tg://user?id={})".format(
-            escape_markdown(user_member.user.first_name),
-            user_member.user.id,
-            escape_markdown(chat.title),
-            escape_markdown(update.effective_user.first_name),
-            update.effective_user.id)
 
 
 @run_async
@@ -140,10 +138,11 @@ def pin(bot: Bot, update: Update, args: List[str]) -> str:
                 pass
             else:
                 raise
-        return "[{}](tg://user?id={}) *pinned* a message in {}".format(
-            escape_markdown(update.effective_user.first_name),
-            update.effective_user.id,
-            escape_markdown(chat.title))
+        return "{}:" \
+               "\n#PINNED" \
+               "\n*Admin:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                         escape_markdown(update.effective_user.first_name),
+                                                         update.effective_user.id)
 
     return ""
 
@@ -162,10 +161,12 @@ def unpin(bot: Bot, update: Update) -> str:
             pass
         else:
             raise
-    return "[{}](tg://user?id={}) *unpinned* a message in {}".format(
-        escape_markdown(update.effective_user.first_name),
-        update.effective_user.id,
-        escape_markdown(chat.title))
+
+    return "{}:" \
+           "\n#UNPINNED" \
+           "\n*Admin:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
+                                                     escape_markdown(update.effective_user.first_name),
+                                                     update.effective_user.id)
 
 
 @run_async

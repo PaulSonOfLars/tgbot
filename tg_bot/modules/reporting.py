@@ -61,14 +61,14 @@ def report(bot: Bot, update: Update) -> str:
         admin_list = chat.get_administrators()
 
         if chat.username and chat.type == Chat.SUPERGROUP:
-            msg = "*Reported user:* {} (`{}`)\n" \
+            msg = "*Group:* {}\n" \
+                  "*Reported user:* {} (`{}`)\n" \
                   "*Reported by:* {} (`{}`)\n" \
-                  "*Group:* {}\n" \
-                  "*Link:* [click here](http://telegram.me/{}/{})".format(escape_markdown(reported_user.first_name),
+                  "*Link:* [click here](http://telegram.me/{}/{})".format(escape_markdown(chat.title),
+                                                                          escape_markdown(reported_user.first_name),
                                                                           reported_user.id,
                                                                           escape_markdown(user.first_name),
                                                                           user.id,
-                                                                          escape_markdown(chat.title),
                                                                           chat.username, message.message_id)
             should_forward = False
 
