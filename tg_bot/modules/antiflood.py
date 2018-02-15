@@ -44,6 +44,8 @@ def check_flood(bot: Bot, update: Update) -> str:
             sql.set_flood(chat.id, 0)
             return "Antiflood disabled in {} as I don't have *kick* permissions.".format(escape_markdown(chat.title))
 
+    return ""
+
 
 @run_async
 @user_admin
