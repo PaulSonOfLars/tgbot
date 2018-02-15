@@ -51,7 +51,7 @@ def bot_can_delete(func):
     @wraps(func)
     def delete_rights(bot: Bot, update: Update, *args, **kwargs):
         if update.effective_chat.get_member(bot.id).can_delete_messages:
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I can't delete messages here! "
                                                 "Make sure I'm admin and can delete other user's messages.")
@@ -63,7 +63,7 @@ def can_pin(func):
     @wraps(func)
     def pin_rights(bot: Bot, update: Update, *args, **kwargs):
         if update.effective_chat.get_member(bot.id).can_pin_messages:
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I can't pin messages here! "
                                                 "Make sure I'm admin and can pin messages.")
@@ -75,7 +75,7 @@ def can_promote(func):
     @wraps(func)
     def promote_rights(bot: Bot, update: Update, *args, **kwargs):
         if update.effective_chat.get_member(bot.id).can_promote_members:
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I can't promote/demote people here! "
                                                 "Make sure I'm admin and can appoint new admins.")
@@ -87,7 +87,7 @@ def can_restrict(func):
     @wraps(func)
     def promote_rights(bot: Bot, update: Update, *args, **kwargs):
         if update.effective_chat.get_member(bot.id).can_restrict_members:
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I can't restrict people here! "
                                                 "Make sure I'm admin and can appoint new admins.")
@@ -99,7 +99,7 @@ def bot_admin(func):
     @wraps(func)
     def is_admin(bot: Bot, update: Update, *args, **kwargs):
         if is_bot_admin(update.effective_chat, bot.id):
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I'm not admin!")
 
@@ -111,7 +111,7 @@ def user_admin(func):
     def is_admin(bot: Bot, update: Update, *args, **kwargs):
         user = update.effective_user  # type: Optional[User]
         if user and is_user_admin(update.effective_chat, user.id):
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
 
         elif not user:
             pass
@@ -130,7 +130,7 @@ def user_admin_no_reply(func):
     def is_admin(bot: Bot, update: Update, *args, **kwargs):
         user = update.effective_user  # type: Optional[User]
         if user and is_user_admin(update.effective_chat, user.id):
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
 
         elif not user:
             pass
@@ -146,6 +146,6 @@ def user_not_admin(func):
     def is_not_admin(bot: Bot, update: Update, *args, **kwargs):
         user = update.effective_user  # type: Optional[User]
         if user and not is_user_admin(update.effective_chat, user.id):
-            func(bot, update, *args, **kwargs)
+            return func(bot, update, *args, **kwargs)
 
     return is_not_admin
