@@ -1,19 +1,23 @@
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot
+from telegram import Message, Chat, Update, Bot, User
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
+from tg_bot.modules.log_channel import loggable
 
 
 @run_async
 @user_admin
+@loggable
 def purge(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     if msg.reply_to_message:
+        user = update.effective_user  # type: Optional[User]
         chat = update.effective_chat  # type: Optional[Chat]
         if can_delete(chat, bot.id):
             message_id = msg.reply_to_message.message_id
@@ -35,20 +39,31 @@ def purge(bot: Bot, update: Update, args: List[str]):
 
             msg.delete()
             bot.send_message(chat.id, "Purge complete.")
+            return "[{}](tg://user?id={}) purged {} messages in {}.".format(escape_markdown(user.first_name), user.id,
+                                                                            delete_to - message_id, chat.title)
+
     else:
         msg.reply_text("Reply to a message to select where to start purging from.")
+
+    return ""
 
 
 @run_async
 @user_admin
+@loggable
 def del_message(bot: Bot, update: Update):
     if update.effective_message.reply_to_message:
+        user = update.effective_user  # type: Optional[User]
         chat = update.effective_chat  # type: Optional[Chat]
         if can_delete(chat, bot.id):
             update.effective_message.reply_to_message.delete()
             update.effective_message.delete()
+            return "[{}](tg://user?id={}) deleted a message in {}.".format(escape_markdown(user.first_name), user.id,
+                                                                           chat.title)
     else:
         update.effective_message.reply_text("Whadya want to delete?")
+
+    return ""
 
 
 __help__ = """
@@ -59,7 +74,6 @@ __help__ = """
 """
 
 __mod_name__ = "Purges"
-
 
 DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.group)
 PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.group, pass_args=True)
