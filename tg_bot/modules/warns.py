@@ -2,7 +2,7 @@ import re
 from typing import Optional, List
 
 import telegram
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, User, CallbackQuery
 from telegram import Message, Chat, Update, Bot
 from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
 from telegram.utils.helpers import escape_markdown
@@ -14,6 +14,7 @@ from tg_bot.modules.helper_funcs.chat_status import is_user_admin, bot_admin, us
 from tg_bot.modules.helper_funcs.extraction import extract_text, extract_user_and_text, extract_user
 from tg_bot.modules.helper_funcs.misc import split_message
 from tg_bot.modules.helper_funcs.string_handling import split_quotes
+from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import warns_sql as sql
 
 WARN_HANDLER_GROUP = 9
@@ -21,54 +22,75 @@ CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
 
 
 # Not async
-def warn(user_id, chat, reason, bot, message):
-    if is_user_admin(chat, user_id):
+def warn(user, chat, reason, bot, message):
+    if is_user_admin(chat, user.id):
         message.reply_text("Damn admins, can't even be warned!")
         return
 
     limit, soft_warn = sql.get_warn_setting(chat.id)
-    num_warns, reasons = sql.warn_user(user_id, chat.id, reason)
+    num_warns, reasons = sql.warn_user(user.id, chat.id, reason)
     if num_warns >= limit:
         if soft_warn:  # kick
-            res = chat.unban_member(user_id)
+            res = chat.unban_member(user.id)
         else:  # ban
-            res = chat.kick_member(user_id)
+            res = chat.kick_member(user.id)
 
         if res:
             bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
             message.reply_text("{} warnings, this user has been banned!".format(limit))
-            sql.reset_warns(user_id, chat.id)
+            sql.reset_warns(user.id, chat.id)
+            return '[{}](tg://user?id={}) was *banned* in {} due to too many warnings'.format(
+                escape_markdown(user.first_name),
+                user.id,
+                escape_markdown(chat.title))
         else:
             message.reply_text("An error occurred, I couldn't ban this person!")
+
     else:
         keyboard = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user_id))]])
+            [[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user.id))]])
+
+        reply = "[{}](tg://user?id={}) has {}/{} warnings... watch out!".format(escape_markdown(user.first_name),
+                                                                                user.id, num_warns, limit)
         if reason:
-            message.reply_text(
-                "{}/{} warnings... watch out! Latest one was because:\n{}".format(num_warns, limit, reason),
-                reply_markup=keyboard)
-        else:
-            message.reply_text("{}/{} warnings... watch out!".format(num_warns, limit),
-                               reply_markup=keyboard)
+            reply += " Latest one was because:\n{}".format(reason)
+
+        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+        return "[{}](tg://user?id={}) was *warned* in {}".format(escape_markdown(user.first_name),
+                                                                 user.id,
+                                                                 escape_markdown(chat.title))
+    return ""
 
 
 @run_async
 @user_admin_no_reply
 @bot_admin
+@loggable
 def button(bot: Bot, update: Update):
-    query = update.callback_query
+    query = update.callback_query  # type: Optional[CallbackQuery]
+    user = update.effective_user  # type: Optional[User]
     match = re.match(r"rm_warn\((.+?)\)", query.data)
     if match:
         user_id = match.group(1)
-        chat_id = update.effective_chat.id
-        res = sql.remove_warn(user_id, chat_id)
+        chat = update.effective_chat  # type: Optional[Chat]
+        res = sql.remove_warn(user_id, chat.id)
         if res:
-            update.effective_message.edit_text("Warn removed.")
+            update.effective_message.edit_text(
+                "Warn removed by [{}](tg://user?id={}).".format(escape_markdown(user.first_name), user.id),
+                parse_mode=ParseMode.MARKDOWN)
+            user_member = chat.get_member(user_id)
+            return "[{}](tg://user?id={}) had their warn in {} removed by [{}](tg://user?id={}).".format(
+                escape_markdown(user_member.user.first_name),
+                user_member.user.id,
+                update.effective_chat.title,
+                escape_markdown(user.first_name), user.id)
+    return ""
 
 
 @run_async
 @user_admin
 @can_restrict
+@loggable
 def warn_user(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
@@ -77,16 +99,18 @@ def warn_user(bot: Bot, update: Update, args: List[str]):
 
     if user_id:
         if message.reply_to_message and message.reply_to_message.from_user.id == user_id:
-            warn(user_id, chat, reason, bot, message.reply_to_message)
+            return warn(message.reply_to_message.from_user, chat, reason, bot, message.reply_to_message)
         else:
-            warn(user_id, chat, reason, bot, message)
+            return warn(chat.get_member(user_id).user, chat, reason, bot, message)
     else:
         message.reply_text("No user was designated!")
+    return ""
 
 
 @run_async
 @user_admin
 @bot_admin
+@loggable
 def reset_warns(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
@@ -95,8 +119,16 @@ def reset_warns(bot: Bot, update: Update, args: List[str]):
     if user_id:
         sql.reset_warns(user_id, chat.id)
         message.reply_text("Warnings have been reset!")
+        warned = chat.get_member(user_id).user
+        return "[{}](tg://user?id={}) reset all warnings for [{}](tg://user?id={}) in {}".format(
+            escape_markdown(update.effective_user.first_name),
+            update.effective_user.id,
+            escape_markdown(warned.first_name),
+            warned.id,
+            escape_markdown(chat.title))
     else:
         message.reply_text("No user has been designated!")
+    return ""
 
 
 @run_async
@@ -203,25 +235,29 @@ def list_warn_filters(bot: Bot, update: Update):
 
 
 @run_async
+@loggable
 def reply_filter(bot: Bot, update: Update):
     chat_warn_filters = sql.get_chat_warn_filters(update.effective_chat.id)
     message = update.effective_message  # type: Optional[Message]
     to_match = extract_text(message)
     if not to_match:
-        return
+        return ""
 
     for warn_filter in chat_warn_filters:
         pattern = r"( |^|[^\w])" + re.escape(warn_filter.keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
-            user_id = update.effective_user.id
+            user = update.effective_user
             chat = update.effective_chat  # type: Optional[Chat]
-            warn(user_id, chat, warn_filter.reply, bot, message)
+            return warn(user, chat, warn_filter.reply, bot, message)
+    return ""
 
 
 @run_async
 @user_admin
+@loggable
 def set_warn_limit(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
 
     if args:
@@ -231,29 +267,41 @@ def set_warn_limit(bot: Bot, update: Update, args: List[str]):
             else:
                 sql.set_warn_limit(chat.id, int(args[0]))
                 msg.reply_text("Updated the warn limit to {}".format(args[0]))
+                return "[{}](tg://user?id={}) set the warn limit in {} to `{}`".format(escape_markdown(user.first_name),
+                                                                                       user.id,
+                                                                                       escape_markdown(chat.title),
+                                                                                       args[0])
         else:
             msg.reply_text("Give me a number as an arg!")
     else:
         limit, soft_warn = sql.get_warn_setting(chat.id)
 
         msg.reply_text("The current warn limit is {}".format(limit))
+    return ""
 
 
 @run_async
 @user_admin
 def set_warn_strength(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
 
     if args:
         if args[0].lower() in ("on", "yes"):
             sql.set_warn_strength(chat.id, False)
             msg.reply_text("Too many warns will now result in a ban!")
-
+            return "[{}](tg://user?id={}) as enabled strong warns in {}. Users will be banned.".format(
+                escape_markdown(user.first_name),
+                user.id,
+                escape_markdown(chat.title))
         elif args[0].lower() in ("off", "no"):
             sql.set_warn_strength(chat.id, True)
             msg.reply_text("Too many warns will now result in a kick! Users will be able to join again after.")
-
+            return "[{}](tg://user?id={}) as disabled strong warns in {}. Users will only be kicked.".format(
+                escape_markdown(user.first_name),
+                user.id,
+                escape_markdown(chat.title))
         else:
             msg.reply_text("I only understand on/yes/no/off!")
     else:
@@ -264,6 +312,7 @@ def set_warn_strength(bot: Bot, update: Update, args: List[str]):
         else:
             msg.reply_text("Warns are currently set to *ban* users when they exceed the limits.",
                            parse_mode=ParseMode.MARKDOWN)
+    return ""
 
 
 def __stats__():
@@ -305,7 +354,6 @@ be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is
 
 __mod_name__ = "Warnings"
 
-
 WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True, filters=Filters.group)
 RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns, pass_args=True, filters=Filters.group)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
@@ -317,7 +365,6 @@ WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.st
                                      reply_filter)
 WARN_LIMIT_HANDLER = CommandHandler("warnlimit", set_warn_limit, pass_args=True, filters=Filters.group)
 WARN_STRENGTH_HANDLER = CommandHandler("strongwarn", set_warn_strength, pass_args=True, filters=Filters.group)
-
 
 dispatcher.add_handler(WARN_HANDLER)
 dispatcher.add_handler(CALLBACK_QUERY_HANDLER)
