@@ -35,6 +35,17 @@ def _selective_escape(to_parse: str) -> str:
     return to_parse
 
 
+# This is a fun one.
+def _calc_emoji_offset(to_calc) -> int:
+    # Get all emoji in text.
+    emoticons = emoji.get_emoji_regexp().finditer(to_calc)
+    # Check the utf16 length of the emoji to determine the offset it caused.
+    # Normal, 1 character emoji don't affect; hence sub 1.
+    # special, eg with two emoji characters (eg face, and skin col) will have length 2, so by subbing one we
+    # know we'll get one extra offset,
+    return sum(len(e.group(0).encode('utf-16-le'))//2 - 1 for e in emoticons)
+
+
 def markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: int=0) -> str:
     """
     Parse a string, escaping all invalid markdown entities.
@@ -65,8 +76,7 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: i
         # we only care about url and code
         if ent.type == "url" or ent.type == "code":
             # count emoji to switch counter
-            emoticons = emoji.get_emoji_regexp().finditer(txt[prev:start])
-            count += sum(1 for _ in emoticons)
+            count += _calc_emoji_offset(txt[prev:start])
             start -= count
             end -= count
 
