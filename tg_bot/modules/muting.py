@@ -3,15 +3,18 @@ from typing import Optional, List
 from telegram import Message, Chat, Update, Bot
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_user
+from tg_bot.modules.log_channel import loggable
 
 
 @run_async
 @bot_admin
 @user_admin
+@loggable
 def mute(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
@@ -19,11 +22,11 @@ def mute(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(message, args)
     if not user_id:
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
-        return
+        return ""
 
     if user_id == bot.id:
         message.reply_text("I'm not muting myself!")
-        return
+        return ""
 
     member = chat.get_member(int(user_id))
 
@@ -32,21 +35,27 @@ def mute(bot: Bot, update: Update, args: List[str]):
             message.reply_text("Afraid I can't stop an admin from talking!")
 
         elif member.can_send_messages is None or member.can_send_messages:
-            success = bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
-            if success:
-                message.reply_text("Muted!")
-            else:
-                message.reply_text("Did not go as expected - couldn't mute this user!")
+            bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+            message.reply_text("Muted!")
+            return "[{}](tg://user?id={}) was *muted* in {} by [{}](tg://user?id={})".format(
+                escape_markdown(member.user.first_name),
+                member.user.id,
+                escape_markdown(chat.title),
+                escape_markdown(update.effective_user.first_name),
+                update.effective_user.id)
 
         else:
             message.reply_text("This user is already muted!")
     else:
         message.reply_text("This user isn't in the chat!")
 
+    return ""
+
 
 @run_async
 @bot_admin
 @user_admin
+@loggable
 def unmute(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
@@ -54,7 +63,7 @@ def unmute(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(message, args)
     if not user_id:
         message.reply_text("You'll need to either give me a username to unmute, or reply to someone to be unmuted.")
-        return
+        return ""
 
     member = chat.get_member(int(user_id))
 
@@ -63,19 +72,23 @@ def unmute(bot: Bot, update: Update, args: List[str]):
                 and member.can_send_other_messages and member.can_add_web_page_previews:
             message.reply_text("This user already has the right to speak.")
         else:
-            success = bot.restrict_chat_member(chat.id, int(user_id),
+            bot.restrict_chat_member(chat.id, int(user_id),
                                                can_send_messages=True,
                                                can_send_media_messages=True,
                                                can_send_other_messages=True,
                                                can_add_web_page_previews=True)
-            if success:
-                message.reply_text("Unmuted!")
-
-            else:
-                message.reply_text("Uh... I couldn't unmute this one")
+            message.reply_text("Unmuted!")
+            return "[{}](tg://user?id={}) was *unmuted* in {} by [{}](tg://user?id={})".format(
+                escape_markdown(member.user.first_name),
+                member.user.id,
+                escape_markdown(chat.title),
+                escape_markdown(update.effective_user.first_name),
+                update.effective_user.id)
     else:
         message.reply_text("This user isn't even in the chat, unmuting them won't make them talk more than they "
                            "already do!")
+
+    return ""
 
 
 __help__ = """
