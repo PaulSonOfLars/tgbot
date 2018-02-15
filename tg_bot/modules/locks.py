@@ -1,9 +1,10 @@
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot, ParseMode
+from telegram import Message, Chat, Update, Bot, ParseMode, User
 from telegram import TelegramError, MessageEntity
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
+from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.locks_sql as sql
 from tg_bot import dispatcher, SUDO_USERS
@@ -11,6 +12,7 @@ from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
     bot_can_delete, is_bot_admin
 from tg_bot.modules.helper_funcs.filters import CustomFilters
+from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import users_sql
 
 LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif', 'url', 'bots']
@@ -56,14 +58,18 @@ def locktypes(bot: Bot, update: Update):
 
 @user_admin
 @bot_can_delete
+@loggable
 def lock(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
     if can_delete(chat, bot.id):
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=True)
                 message.reply_text("Locked {} messages for all non-admins!".format(args[0]))
+                return "[{}](tg://user?id={}) locked {} in {}".format(escape_markdown(user.first_name), user.id,
+                                                                      args[0], chat.title)
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
@@ -72,6 +78,8 @@ def lock(bot: Bot, update: Update, args: List[str]):
                     restr_members(bot, chat.id, members, messages=True, media=True, other=True)
 
                 message.reply_text("Locked {} for all non-admins!".format(args[0]))
+                return "[{}](tg://user?id={}) locked {} in {}".format(escape_markdown(user.first_name), user.id,
+                                                                      args[0], chat.title)
 
             else:
                 message.reply_text("What are you trying to lock...? Try /locktypes for the list of lockables")
@@ -79,17 +87,23 @@ def lock(bot: Bot, update: Update, args: List[str]):
     else:
         message.reply_text("I'm not an administrator, or haven't got delete rights.")
 
+    return ""
+
 
 @run_async
 @user_admin
+@loggable
 def unlock(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
     if is_user_admin(chat, message.from_user.id):
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=False)
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
+                return "[{}](tg://user?id={}) unlocked {} in {}".format(escape_markdown(user.first_name), user.id,
+                                                                        args[0], chat.title)
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=False)
@@ -111,12 +125,15 @@ def unlock(bot: Bot, update: Update, args: List[str]):
                     unrestr_members(bot, chat.id, members, True, True, True, True)
 
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
-
+                return "[{}](tg://user?id={}) unlocked {} in {}".format(escape_markdown(user.first_name), user.id,
+                                                                        args[0], chat.title)
             else:
                 message.reply_text("What are you trying to unlock...? Try /locktypes for the list of lockables")
 
         else:
             bot.sendMessage(chat.id, "What are you trying to unlock...?")
+
+    return ""
 
 
 @run_async
