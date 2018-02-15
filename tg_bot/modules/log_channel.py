@@ -25,6 +25,8 @@ if is_module_loaded(FILENAME):
                 log_chat = sql.get_chat_log_group(update.effective_chat.id)
                 if log_chat:
                     send_log(bot, log_chat, result)
+            elif result == "":
+                pass
             else:
                 LOGGER.warning("%s was set as loggable, but had no return statement.", func)
 
@@ -55,7 +57,8 @@ if is_module_loaded(FILENAME):
             log_channel_info = bot.get_chat(log_channel)
             message.reply_text(
                 "This group has all it's logs sent to: {} (`{}`)".format(escape_markdown(log_channel_info.title),
-                                                                         log_channel))
+                                                                         log_channel),
+                parse_mode=ParseMode.MARKDOWN)
 
         else:
             message.reply_text("No log channel has been set for this group!")
