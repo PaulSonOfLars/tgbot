@@ -2,6 +2,7 @@ from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode, InlineKeyboardMarkup
+from telegram.error import BadRequest
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import escape_markdown
 
@@ -43,6 +44,20 @@ def send(update, message, keyboard, backup_message):
                                                             "invalid due to an issue with some misplaced "
                                                             "curly brackets. Please update"),
                                             parse_mode=ParseMode.MARKDOWN)
+    except BadRequest as excp:
+        if excp.message == "Button_url_invalid":
+            update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                "\nNote: the current message has an invalid url in "
+                                                                "one of its buttons. Please update."),
+                                                parse_mode=ParseMode.MARKDOWN)
+        elif excp.message == "Unsupported url protocol":
+            update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                "\nNote: the current message has buttons which use "
+                                                                "url protocols that are unsupported by telegram. "
+                                                                "Please update."),
+                                                parse_mode=ParseMode.MARKDOWN)
+        else:
+            raise
 
 
 @run_async
