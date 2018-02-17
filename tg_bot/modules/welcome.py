@@ -7,7 +7,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
-from tg_bot import dispatcher, OWNER_ID
+from tg_bot import dispatcher, OWNER_ID, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.misc import build_keyboard
 from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser, markdown_parser, \
@@ -56,8 +56,20 @@ def send(update, message, keyboard, backup_message):
                                                                 "url protocols that are unsupported by telegram. "
                                                                 "Please update."),
                                                 parse_mode=ParseMode.MARKDOWN)
+        elif excp.message == "Wrong url host":
+            update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                "\nNote: the current message has some bad urls. "
+                                                                "Please update."),
+                                                parse_mode=ParseMode.MARKDOWN)
+            LOGGER.warning(message)
+            LOGGER.warning(keyboard)
+            LOGGER.exception("Could not parse! got invalid url host errors")
         else:
-            raise
+            update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                "\nNote: An error occured when sending the custom "
+                                                                "message. Please update."),
+                                                parse_mode=ParseMode.MARKDOWN)
+            LOGGER.exception()
 
 
 @run_async
