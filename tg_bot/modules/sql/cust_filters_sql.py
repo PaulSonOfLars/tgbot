@@ -109,9 +109,11 @@ def remove_filter(chat_id, keyword):
                                                              Buttons.keyword == keyword).all()
                 for btn in prev_buttons:
                     SESSION.delete(btn)
+
             SESSION.delete(filt)
             SESSION.commit()
             return True
+
         SESSION.close()
         return False
 
@@ -133,7 +135,8 @@ def add_note_button_to_db(chat_id, keyword, b_name, url, same_line):
 
 def get_buttons(chat_id, keyword):
     try:
-        return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.keyword == keyword).all()
+        return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.keyword == keyword).order_by(
+            Buttons.id).all()
     finally:
         SESSION.close()
 

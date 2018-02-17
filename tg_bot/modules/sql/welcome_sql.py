@@ -209,14 +209,16 @@ def get_custom_gdbye(chat_id):
 
 def get_welc_buttons(chat_id):
     try:
-        return SESSION.query(WelcomeButtons).filter(WelcomeButtons.chat_id == str(chat_id)).all()
+        return SESSION.query(WelcomeButtons).filter(WelcomeButtons.chat_id == str(chat_id)).order_by(
+            WelcomeButtons.id).all()
     finally:
         SESSION.close()
 
 
 def get_gdbye_buttons(chat_id):
     try:
-        return SESSION.query(GoodbyeButtons).filter(GoodbyeButtons.chat_id == str(chat_id)).all()
+        return SESSION.query(GoodbyeButtons).filter(GoodbyeButtons.chat_id == str(chat_id)).order_by(
+            GoodbyeButtons.id).all()
     finally:
         SESSION.close()
 

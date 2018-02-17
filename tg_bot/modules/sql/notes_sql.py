@@ -87,9 +87,11 @@ def rm_note(chat_id, note_name):
                                                         Buttons.note_name == note_name).all()
                 for btn in buttons:
                     SESSION.delete(btn)
+
             SESSION.delete(note)
             SESSION.commit()
             return True
+
         else:
             SESSION.close()
             return False
@@ -111,7 +113,8 @@ def add_note_button_to_db(chat_id, note_name, b_name, url, same_line):
 
 def get_buttons(chat_id, note_name):
     try:
-        return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.note_name == note_name).all()
+        return SESSION.query(Buttons).filter(Buttons.chat_id == str(chat_id), Buttons.note_name == note_name).order_by(
+            Buttons.id).all()
     finally:
         SESSION.close()
 
