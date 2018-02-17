@@ -62,7 +62,7 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: i
         entities = {}
 
     # regex to find []() links -> hyperlinks/buttons
-    pattern = re.compile(r'(?<!\\)\[.*?\]\((.*?)\)')
+    pattern = re.compile(r'(?<!\\)\[.+?\]\((.*?)\)')
     prev = 0
     count = 0
     res = ""
