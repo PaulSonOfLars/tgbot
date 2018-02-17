@@ -78,9 +78,10 @@ def num_disabled():
 
 def migrate_chat(old_chat_id, new_chat_id):
     with DISABLE_INSERTION_LOCK:
-        chat = SESSION.query(Disable).get(str(old_chat_id))
-        if chat:
-            chat.chat_id = str(new_chat_id)
-            SESSION.add(chat)
+        chats = SESSION.query(Disable).filter(Disable.chat_id == str(old_chat_id)).all()
+        if chats:
+            for chat in chats:
+                chat.chat_id = str(new_chat_id)
+                SESSION.add(chat)
 
         SESSION.commit()
