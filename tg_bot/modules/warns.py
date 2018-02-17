@@ -40,7 +40,7 @@ def warn(user, chat, reason, bot, message) -> str:
             message.reply_text("{} warnings, this user has been banned!".format(limit))
             sql.reset_warns(user.id, chat.id)
             return "{}:" \
-                   "\n#WARN_BAN" \
+                   "\n#WARN\_BAN" \
                    "\n*User:* [{}](tg://user?id={})" \
                    "\n*Reason:* {}".format(escape_markdown(chat.title),
                                            escape_markdown(user.first_name),
@@ -277,7 +277,7 @@ def set_warn_limit(bot: Bot, update: Update, args: List[str]) -> str:
                 sql.set_warn_limit(chat.id, int(args[0]))
                 msg.reply_text("Updated the warn limit to {}".format(args[0]))
                 return "{}:" \
-                       "\n#SET_WARN_LIMIT" \
+                       "\n#SET_WARN\_LIMIT" \
                        "\n*Admin:* [{}](tg://user?id={})" \
                        "\nSet the warn limit to `{}`".format(escape_markdown(chat.title),
                                                              escape_markdown(user.first_name),

@@ -287,7 +287,7 @@ def set_welcome(bot: Bot, update: Update) -> str:
     update.effective_message.reply_text("Successfully set custom welcome message!")
 
     return "{}:" \
-           "\n#SET_WELCOME" \
+           "\n#SET\_WELCOME" \
            "\n*Admin:* [{}](tg://user?id={})" \
            "\nSet the welcome message.".format(escape_markdown(chat.title),
                                                escape_markdown(user.first_name),
@@ -303,7 +303,7 @@ def reset_welcome(bot: Bot, update: Update) -> str:
     sql.set_custom_welcome(chat.id, sql.DEFAULT_WELCOME, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset welcome message to default!")
     return "{}:" \
-           "\n#RESET_WELCOME" \
+           "\n#RESET\_WELCOME" \
            "\n*Admin:* [{}](tg://user?id={})" \
            "\nReset the welcome message to default.".format(escape_markdown(chat.title),
                                                             escape_markdown(user.first_name),
@@ -361,7 +361,7 @@ def set_goodbye(bot: Bot, update: Update) -> str:
     sql.set_custom_gdbye(chat.id, content, data_type, buttons)
     update.effective_message.reply_text("Successfully set custom goodbye message!")
     return "{}:" \
-           "\n#SET_GOODBYE" \
+           "\n#SET\_GOODBYE" \
            "\n*Admin:* [{}](tg://user?id={})" \
            "\nSet the goodbye message.".format(escape_markdown(chat.title),
                                                escape_markdown(user.first_name),
@@ -377,7 +377,7 @@ def reset_goodbye(bot: Bot, update: Update) -> str:
     sql.set_custom_gdbye(chat.id, sql.DEFAULT_GOODBYE, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset goodbye message to default!")
     return "{}:" \
-           "\n#RESET_GOODBYE" \
+           "\n#RESET\_GOODBYE" \
            "\n*Admin:* [{}](tg://user?id={})" \
            "\nReset the goodbye message.".format(escape_markdown(chat.title),
                                                  escape_markdown(user.first_name),
