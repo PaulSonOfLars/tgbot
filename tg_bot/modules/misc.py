@@ -28,7 +28,13 @@ RUN_STRINGS = (
     "You're gonna regret that...",
     "You could also try /kickme, I hear that's fun.",
     "Go bother someone else, no-one here cares.",
-    "I hear @MSFJarvis wants to hear more about you.",
+    "You can run, but you can't hide.",
+    "Is that all you've got?",
+    "I'm behind you...",
+    "You've got company!",
+    "We can do this the easy way, or the hard way.",
+    "You just don't get it, do you?",
+    "Yeah, you better run!",
     "Please, remind me how much I care?",
     "I'd run faster if I were you.",
     "That's definitely the droid we're looking for.",
@@ -105,19 +111,22 @@ ITEMS = (
     "beehive",
     "piece of rotten meat",
     "bear",
+    "ton of bricks",
 )
 
 THROW = (
     "throws",
     "flings",
-    "chucks"
+    "chucks",
+    "hurls",
 )
 
 HIT = (
     "hits",
     "whacks",
     "slaps",
-    "smacks"
+    "smacks",
+    "bashes",
 )
 
 GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
