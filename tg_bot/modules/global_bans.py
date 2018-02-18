@@ -107,6 +107,10 @@ def ungban(bot: Bot, update: Update, args: List[str]):
         message.reply_text("That's not a user!")
         return
 
+    if not sql.is_user_gbanned(user_id):
+        message.reply_text("This user is not gbanned!")
+        return
+
     banner = update.effective_user  # type: Optional[User]
 
     message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
