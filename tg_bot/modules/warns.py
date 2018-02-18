@@ -22,10 +22,15 @@ CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
 
 
 # Not async
-def warn(user, chat, reason, bot, message) -> str:
+def warn(user: User, chat: Chat, reason: str, message: Message, warner: User=None) -> str:
     if is_user_admin(chat, user.id):
         message.reply_text("Damn admins, can't even be warned!")
         return ""
+
+    if warner:
+        warner_tag = "[{}](tg://user?id={})".format(escape_markdown(warner.first_name), warner.id)
+    else:
+        warner_tag = "Automated warn filter."
 
     limit, soft_warn = sql.get_warn_setting(chat.id)
     num_warns, reasons = sql.warn_user(user.id, chat.id, reason)
@@ -36,15 +41,18 @@ def warn(user, chat, reason, bot, message) -> str:
             res = chat.kick_member(user.id)
 
         if res:
-            bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+            message.bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
             message.reply_text("{} warnings, this user has been banned!".format(limit))
             sql.reset_warns(user.id, chat.id)
+
             return "{}:" \
                    "\n#WARN\_BAN" \
+                   "\n*Admin:* {}" \
                    "\n*User:* [{}](tg://user?id={})" \
                    "\n*Reason:* {}".format(escape_markdown(chat.title),
+                                           warner_tag,
                                            escape_markdown(user.first_name),
-                                           user.id, reason)
+                                           user.id, escape_markdown(reason))
         else:
             message.reply_text("An error occurred, I couldn't ban this person!")
 
@@ -55,15 +63,18 @@ def warn(user, chat, reason, bot, message) -> str:
         reply = "[{}](tg://user?id={}) has {}/{} warnings... watch out!".format(escape_markdown(user.first_name),
                                                                                 user.id, num_warns, limit)
         if reason:
-            reply += " Latest one was because:\n{}".format(reason)
+            reply += "\nReason for last warn:\n{}".format(escape_markdown(reason))
 
         message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+
         return "{}:" \
                "\n#WARN" \
+               "\n*Admin:* {}" \
                "\n*User:* [{}](tg://user?id={})" \
                "\n*Reason:* {}".format(escape_markdown(chat.title),
+                                       warner_tag,
                                        escape_markdown(user.first_name),
-                                       user.id, reason)
+                                       user.id, escape_markdown(reason))
     return ""
 
 
@@ -101,14 +112,15 @@ def button(bot: Bot, update: Update) -> str:
 def warn_user(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
+    warner = update.effective_user  # type: Optional[User]
 
     user_id, reason = extract_user_and_text(message, args)
 
     if user_id:
         if message.reply_to_message and message.reply_to_message.from_user.id == user_id:
-            return warn(message.reply_to_message.from_user, chat, reason, bot, message.reply_to_message)
+            return warn(message.reply_to_message.from_user, chat, reason, message.reply_to_message, warner)
         else:
-            return warn(chat.get_member(user_id).user, chat, reason, bot, message)
+            return warn(chat.get_member(user_id).user, chat, reason, message, warner)
     else:
         message.reply_text("No user was designated!")
     return ""
@@ -257,7 +269,7 @@ def reply_filter(bot: Bot, update: Update) -> str:
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             user = update.effective_user  # type: Optional[User]
             chat = update.effective_chat  # type: Optional[Chat]
-            return warn(user, chat, warn_filter.reply, bot, message)
+            return warn(user, chat, warn_filter.reply, message)
     return ""
 
 
