@@ -123,8 +123,6 @@ def ungban(bot: Bot, update: Update, args: List[str]):
                      user_chat.id),
                  markdown=True)
 
-    sql.ungban_user(user_id)
-
     chats = get_all_chats()
     for chat in chats:
         chat_id = chat.chat_id
@@ -151,12 +149,16 @@ def ungban(bot: Bot, update: Update, args: List[str]):
                 pass
             elif excp.message == "Not in the chat":
                 pass
+            elif excp.message == "Channel_private":
+                pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
                 bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
                 return
         except TelegramError:
             pass
+
+    sql.ungban_user(user_id)
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
 
