@@ -1,3 +1,4 @@
+import html
 import re
 from typing import Optional, List
 
@@ -49,7 +50,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                    "\n#WARN_BAN" \
                    "\n<b>Admin:</b> {}" \
                    "\n<b>User:</b> {}" \
-                   "\n<b>Reason:</b> {}".format(chat.title,
+                   "\n<b>Reason:</b> {}".format(html.escape(chat.title),
                                                 warner_tag,
                                                 mention_html(user.id, user.first_name),
                                                 user.id, reason)
@@ -71,7 +72,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                "\n#WARN" \
                "\n<b>Admin:</b> {}" \
                "\n<b>User:</b> {}" \
-               "\n<b>Reason:</b> {}".format(chat.title,
+               "\n<b>Reason:</b> {}".format(html.escape(chat.title),
                                             warner_tag,
                                             mention_html(user.id, user.first_name), reason)
     return ""
@@ -97,7 +98,7 @@ def button(bot: Bot, update: Update) -> str:
             return "<b>{}:</b>" \
                    "\n#UNWARN" \
                    "\n<b>Admin:</b> {}" \
-                   "\n<b>User:</b> {}".format(chat.title,
+                   "\n<b>User:</b> {}".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
                                               mention_html(user_member.user.id, user_member.user.first_name))
     return ""
@@ -141,7 +142,7 @@ def reset_warns(bot: Bot, update: Update, args: List[str]) -> str:
         return "<b>{}:</b>" \
                "\n#RESETWARNS" \
                "\n<b>Admin:</b> {}" \
-               "\n<b>User:</b> {}".format(chat.title,
+               "\n<b>User:</b> {}".format(html.escape(chat.title),
                                           mention_html(user.id, user.first_name),
                                           mention_html(warned.id, warned.first_name))
     else:
@@ -288,7 +289,7 @@ def set_warn_limit(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#SET_WARN_LIMIT" \
                        "\n<b>Admin:</b> {}" \
-                       "\nSet the warn limit to <code>{}</code>".format(chat.title,
+                       "\nSet the warn limit to <code>{}</code>".format(html.escape(chat.title),
                                                                         mention_html(user.id, user.first_name), args[0])
         else:
             msg.reply_text("Give me a number as an arg!")
@@ -312,7 +313,7 @@ def set_warn_strength(bot: Bot, update: Update, args: List[str]):
             msg.reply_text("Too many warns will now result in a ban!")
             return "<b>{}:</b>\n" \
                    "<b>Admin:</b> {}\n" \
-                   "Has enabled strong warns. Users will be banned.".format(chat.title,
+                   "Has enabled strong warns. Users will be banned.".format(html.escape(chat.title),
                                                                             mention_html(user.id, user.first_name))
 
         elif args[0].lower() in ("off", "no"):
@@ -320,7 +321,7 @@ def set_warn_strength(bot: Bot, update: Update, args: List[str]):
             msg.reply_text("Too many warns will now result in a kick! Users will be able to join again after.")
             return "<b>{}:</b>\n" \
                    "<b>Admin:</b> {}\n" \
-                   "Has disabled strong warns. Users will only be kicked.".format(chat.title,
+                   "Has disabled strong warns. Users will only be kicked.".format(html.escape(chat.title),
                                                                                   mention_html(user.id,
                                                                                                user.first_name))
 

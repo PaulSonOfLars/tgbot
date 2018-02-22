@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, ParseMode, User
@@ -72,7 +73,8 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#LOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nLocked <code>{}</code>.".format(chat.title, mention_html(user.id, user.first_name), args[0])
+                       "\nLocked <code>{}</code>.".format(html.escape(chat.title),
+                                                          mention_html(user.id, user.first_name), args[0])
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
@@ -84,7 +86,7 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#LOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nLocked <code>{}</code>.".format(chat.title,
+                       "\nLocked <code>{}</code>.".format(html.escape(chat.title),
                                                           mention_html(user.id, user.first_name), args[0])
 
             else:
@@ -111,7 +113,7 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#UNLOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nUnlocked <code>{}</code>.".format(chat.title,
+                       "\nUnlocked <code>{}</code>.".format(html.escape(chat.title),
                                                             mention_html(user.id, user.first_name), args[0])
 
             elif args[0] in RESTRICTION_TYPES:
@@ -137,7 +139,7 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#UNLOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nUnlocked <code>{}</code>.".format(chat.title,
+                       "\nUnlocked <code>{}</code>.".format(html.escape(chat.title),
                                                             mention_html(user.id, user.first_name), args[0])
             else:
                 message.reply_text("What are you trying to unlock...? Try /locktypes for the list of lockables")

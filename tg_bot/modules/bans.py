@@ -52,7 +52,7 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
         return "<b>{}:</b>" \
                "\n#BANNED" \
                "\n<b>Admin:</b> {}" \
-               "\n<b>User:</b> {}".format(chat.title, mention_html(user.id, user.first_name),
+               "\n<b>User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
                                           mention_html(member.user.id, member.user.first_name))
     except BadRequest as excp:
         message.reply_text("Well damn, I can't ban that user.")
@@ -100,7 +100,7 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
         return "<b>{}:</b>" \
                "\n#KICKED" \
                "\n<b>Admin:</b> {}" \
-               "\n<b>User:</b> {}".format(chat.title,
+               "\n<b>User:</b> {}".format(html.escape(chat.title),
                                           mention_html(user.id, user.first_name),
                                           mention_html(member.user.id, member.user.first_name))
     else:
@@ -162,7 +162,7 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
     return "<b>{}:</b>" \
            "\n#UNBANNED" \
            "\n<b>Admin:</b> {}" \
-           "\n<b>User:</b> {}".format(chat.title,
+           "\n<b>User:</b> {}".format(html.escape(chat.title),
                                       mention_html(user.id, user.first_name),
                                       mention_html(member.user.id, member.user.first_name))
 

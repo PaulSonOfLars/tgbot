@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
@@ -41,7 +42,7 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
             return "<b>{}:</b>" \
                    "\n#MUTE" \
                    "\n<b>Admin:</b> {}" \
-                   "\n<b>User:</b> {}".format(chat.title,
+                   "\n<b>User:</b> {}".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
                                               mention_html(member.user.id, member.user.first_name))
 
@@ -83,7 +84,7 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
             return "<b>{}:</b>" \
                    "\n#UNMUTE" \
                    "\n<b>Admin:</b> {}" \
-                   "\n<b>User:</b> {}".format(chat.title,
+                   "\n<b>User:</b> {}".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
                                               mention_html(member.user.id, member.user.first_name))
     else:

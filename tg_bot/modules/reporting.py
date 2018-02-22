@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User, ParseMode
@@ -64,7 +65,7 @@ def report(bot: Bot, update: Update) -> str:
             msg = "<b>{}:</b>\n" \
                   "<b>Reported user:</b> {} (<code>{}</code>)\n" \
                   "<b>Reported by:</b> {} (<code>{}</code>)\n" \
-                  "<b>Link:</b> [click here](http://telegram.me/{}/{})".format(chat.title,
+                  "<b>Link:</b> [click here](http://telegram.me/{}/{})".format(html.escape(chat.title),
                                                                                mention_html(reported_user.id,
                                                                                             reported_user.first_name),
                                                                                reported_user.id,

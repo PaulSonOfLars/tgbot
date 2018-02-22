@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
@@ -301,7 +302,7 @@ def set_welcome(bot: Bot, update: Update) -> str:
     return "<b>{}:</b>" \
            "\n#SET_WELCOME" \
            "\n<b>Admin:</b> {}" \
-           "\nSet the welcome message.".format(chat.title,
+           "\nSet the welcome message.".format(html.escape(chat.title),
                                                mention_html(user.id, user.first_name))
 
 
@@ -316,7 +317,7 @@ def reset_welcome(bot: Bot, update: Update) -> str:
     return "<b>{}:</b>" \
            "\n#RESET_WELCOME" \
            "\n<b>Admin:</b> {}" \
-           "\nReset the welcome message to default.".format(chat.title,
+           "\nReset the welcome message to default.".format(html.escape(chat.title),
                                                             mention_html(user.id, user.first_name))
 
 
@@ -373,7 +374,7 @@ def set_goodbye(bot: Bot, update: Update) -> str:
     return "<b>{}:</b>" \
            "\n#SET_GOODBYE" \
            "\n<b>Admin:</b> {}" \
-           "\nSet the goodbye message.".format(chat.title,
+           "\nSet the goodbye message.".format(html.escape(chat.title),
                                                mention_html(user.id, user.first_name))
 
 
@@ -388,7 +389,7 @@ def reset_goodbye(bot: Bot, update: Update) -> str:
     return "<b>{}:</b>" \
            "\n#RESET_GOODBYE" \
            "\n<b>Admin:</b> {}" \
-           "\nReset the goodbye message.".format(chat.title,
+           "\nReset the goodbye message.".format(html.escape(chat.title),
                                                  mention_html(user.id, user.first_name))
 
 

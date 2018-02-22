@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
@@ -42,7 +43,7 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
             return "<b>{}:</b>" \
                    "\n#PURGE" \
                    "\n<b>Admin:</b> {}" \
-                   "\nPurged <code>{}</code> messages.".format(chat.title,
+                   "\nPurged <code>{}</code> messages.".format(html.escape(chat.title),
                                                                mention_html(user.id, user.first_name),
                                                                delete_to - message_id)
 
@@ -65,7 +66,7 @@ def del_message(bot: Bot, update: Update) -> str:
             return "<b>{}:</b>" \
                    "\n#DEL" \
                    "\n<b>Admin:</b> {}" \
-                   "\nMessage deleted.".format(chat.title,
+                   "\nMessage deleted.".format(html.escape(chat.title),
                                                mention_html(user.id, user.first_name))
     else:
         update.effective_message.reply_text("Whadya want to delete?")

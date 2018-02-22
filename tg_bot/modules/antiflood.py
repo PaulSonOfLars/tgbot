@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
@@ -38,7 +39,7 @@ def check_flood(bot: Bot, update: Update) -> str:
             return "<b>{}:</b>" \
                    "\n#BANNED" \
                    "\n<b>User:</b> {}" \
-                   "\nFlooded the group.".format(chat.title,
+                   "\nFlooded the group.".format(html.escape(chat.title),
                                                  mention_html(user.id, user.first_name))
 
         except BadRequest:
@@ -74,7 +75,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
                        "\n<b>Admin:</b> {}" \
-                       "\nDisabled antiflood.".format(chat.title, mention_html(user.id, user.first_name))
+                       "\nDisabled antiflood.".format(html.escape(chat.title), mention_html(user.id, user.first_name))
 
             elif amount < 3:
                 message.reply_text("Antiflood has to be either 0 (disabled), or a number bigger than 3!")
@@ -86,7 +87,8 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
                        "\n<b>Admin:</b> {}" \
-                       "\nSet antiflood to <code>{}</code>.".format(chat.title, mention_html(user.id, user.first_name), amount)
+                       "\nSet antiflood to <code>{}</code>.".format(html.escape(chat.title),
+                                                                    mention_html(user.id, user.first_name), amount)
 
         else:
             message.reply_text("Unrecognised argument - please use a number, 'off', or 'no'.")

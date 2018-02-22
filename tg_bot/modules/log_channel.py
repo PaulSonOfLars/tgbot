@@ -47,7 +47,7 @@ if is_module_loaded(FILENAME):
                 LOGGER.warning(result)
                 LOGGER.exception("Could not parse")
 
-                bot.send_message(log_chat_id, result + "\n\nMarkdown disabled due to error.")
+                bot.send_message(log_chat_id, result + "\n\nFormatting has been disabled due to an unexpected error.")
 
 
     @run_async
