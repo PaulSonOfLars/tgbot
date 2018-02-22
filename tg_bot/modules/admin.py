@@ -1,11 +1,11 @@
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot
+from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import escape_markdown, mention_html
 
 from tg_bot import dispatcher
 from tg_bot.modules.disable import DisableAbleCommandHandler
@@ -23,6 +23,7 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
     chat_id = update.effective_chat.id
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -52,14 +53,12 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
                           can_promote_members=bot_member.can_promote_members)
 
     message.reply_text("Successfully promoted!")
-    return "{}:" \
+    return "<b>{}:</b>" \
            "\n#PROMOTED" \
-           "\n*Admin:* [{}](tg://user?id={})" \
-           "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                    escape_markdown(update.effective_user.first_name),
-                                                    update.effective_user.id,
-                                                    escape_markdown(user_member.user.first_name),
-                                                    user_member.user.id)
+           "\n<b>Admin:</b> {}" \
+           "\n<b>User:</b> {}".format(chat.title,
+                                      mention_html(user.id, user.first_name),
+                                      mention_html(user_member.user.id, user_member.user.first_name))
 
 
 @run_async
@@ -70,6 +69,7 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
 def demote(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
+    user = update.effective_user  # type: Optional[User]
 
     user_id = extract_user(message, args)
     if not user_id:
@@ -100,14 +100,12 @@ def demote(bot: Bot, update: Update, args: List[str]) -> str:
                               can_pin_messages=False,
                               can_promote_members=False)
         message.reply_text("Successfully demoted!")
-        return "{}:" \
+        return "<b>{}:</b>" \
                "\n#DEMOTED" \
-               "\n*Admin:* [{}](tg://user?id={})" \
-               "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                        escape_markdown(update.effective_user.first_name),
-                                                        update.effective_user.id,
-                                                        escape_markdown(user_member.user.first_name),
-                                                        user_member.user.id)
+               "\n<b>Admin:</b> {}" \
+               "\n<b>User:</b> {}".format(chat.title,
+                                          mention_html(user.id, user.first_name),
+                                          mention_html(user_member.user.id, user_member.user.first_name))
 
     except BadRequest:
         message.reply_text("Could not demote. I might not be admin, or the admin status was appointed by another "
@@ -120,9 +118,10 @@ def demote(bot: Bot, update: Update, args: List[str]) -> str:
 @user_admin
 @loggable
 def pin(bot: Bot, update: Update, args: List[str]) -> str:
-    chat = update.effective_chat
-    chat_type = update.effective_chat.type
-    is_group = chat_type != "private" and chat_type != "channel"
+    user = update.effective_user  # type: Optional[User]
+    chat = update.effective_chat  # type: Optional[Chat]
+
+    is_group = chat.type != "private" and chat.type != "channel"
 
     prev_message = update.effective_message.reply_to_message
 
@@ -138,11 +137,9 @@ def pin(bot: Bot, update: Update, args: List[str]) -> str:
                 pass
             else:
                 raise
-        return "{}:" \
+        return "<b>{}:</b>" \
                "\n#PINNED" \
-               "\n*Admin:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                         escape_markdown(update.effective_user.first_name),
-                                                         update.effective_user.id)
+               "\n<b>Admin:</b> {}".format(chat.title, mention_html(user.id, user.first_name))
 
     return ""
 
@@ -154,6 +151,8 @@ def pin(bot: Bot, update: Update, args: List[str]) -> str:
 @loggable
 def unpin(bot: Bot, update: Update) -> str:
     chat = update.effective_chat
+    user = update.effective_user  # type: Optional[User]
+
     try:
         bot.unpinChatMessage(chat.id)
     except BadRequest as excp:
@@ -162,11 +161,10 @@ def unpin(bot: Bot, update: Update) -> str:
         else:
             raise
 
-    return "{}:" \
+    return "<b>{}:</b>" \
            "\n#UNPINNED" \
-           "\n*Admin:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                     escape_markdown(update.effective_user.first_name),
-                                                     update.effective_user.id)
+           "\n<b>Admin:</b> {}".format(chat.title,
+                                       mention_html(user.id, user.first_name))
 
 
 @run_async

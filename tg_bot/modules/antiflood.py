@@ -3,7 +3,7 @@ from typing import Optional, List
 from telegram import Message, Chat, Update, Bot, User
 from telegram.error import BadRequest
 from telegram.ext import Filters, MessageHandler, CommandHandler, run_async
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs.chat_status import is_user_admin, user_admin, can_restrict
@@ -35,20 +35,18 @@ def check_flood(bot: Bot, update: Update) -> str:
             msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
                            "disappointment. Get out.")
 
-            return "{}:" \
+            return "<b>{}:</b>" \
                    "\n#BANNED" \
-                   "\n*User:* [{}](tg://user?id={})" \
-                   "\nFlooded the group.".format(escape_markdown(chat.title),
-                                                 escape_markdown(user.first_name),
-                                                 user.id)
+                   "\n<b>User:</b> {}" \
+                   "\nFlooded the group.".format(chat.title,
+                                                 mention_html(user.id, user.first_name))
 
         except BadRequest:
             msg.reply_text("I can't kick people here, give me permissions first! Until then, I'll disable antiflood.")
             sql.set_flood(chat.id, 0)
-            return "{}:" \
+            return "<b>{}:</b>" \
                    "\n#INFO" \
-                   "\nDon't have kick permissions, so automatically disabled antiflood.".format(
-                escape_markdown(chat.title))
+                   "\nDon't have kick permissions, so automatically disabled antiflood.".format(chat.title)
 
     return ""
 
@@ -73,12 +71,10 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
             if amount <= 0:
                 sql.set_flood(chat.id, 0)
                 message.reply_text("Antiflood has been disabled.")
-                return "{}:" \
+                return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
-                       "\n*Admin:* [{}](tg://user?id={})" \
-                       "\nDisabled antiflood.".format(escape_markdown(chat.title),
-                                                      escape_markdown(user.first_name),
-                                                      user.id)
+                       "\n<b>Admin:</b> {}" \
+                       "\nDisabled antiflood.".format(chat.title, mention_html(user.id, user.first_name))
 
             elif amount < 3:
                 message.reply_text("Antiflood has to be either 0 (disabled), or a number bigger than 3!")
@@ -87,12 +83,10 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
             else:
                 sql.set_flood(chat.id, amount)
                 message.reply_text("Antiflood has been updated and set to {}".format(amount))
-                return "{}:" \
+                return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
-                       "\n*Admin:* [{}](tg://user?id={})" \
-                       "\nSet antiflood to `{}`.".format(escape_markdown(chat.title),
-                                                         escape_markdown(user.first_name),
-                                                         user.id, amount)
+                       "\n<b>Admin:</b> {}" \
+                       "\nSet antiflood to <code>{}</code>.".format(chat.title, mention_html(user.id, user.first_name), amount)
 
         else:
             message.reply_text("Unrecognised argument - please use a number, 'off', or 'no'.")

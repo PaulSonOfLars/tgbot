@@ -3,7 +3,7 @@ from typing import Optional, List
 from telegram import Message, Chat, Update, Bot, User
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_admin
@@ -38,13 +38,12 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
         elif member.can_send_messages is None or member.can_send_messages:
             bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
             message.reply_text("Muted!")
-            return "{}:" \
+            return "<b>{}:</b>" \
                    "\n#MUTE" \
-                   "\n*Admin:* [{}](tg://user?id={})" \
-                   "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                            escape_markdown(user.first_name),
-                                                            user.id, escape_markdown(member.user.first_name),
-                                                            member.user.id)
+                   "\n<b>Admin:</b> {}" \
+                   "\n<b>User:</b> {}".format(chat.title,
+                                              mention_html(user.id, user.first_name),
+                                              mention_html(member.user.id, member.user.first_name))
 
         else:
             message.reply_text("This user is already muted!")
@@ -81,13 +80,12 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
                                      can_send_other_messages=True,
                                      can_add_web_page_previews=True)
             message.reply_text("Unmuted!")
-            return "{}:" \
+            return "<b>{}:</b>" \
                    "\n#UNMUTE" \
-                   "\n*Admin:* [{}](tg://user?id={})" \
-                   "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                            escape_markdown(user.first_name),
-                                                            user.id, escape_markdown(member.user.first_name),
-                                                            member.user.id)
+                   "\n<b>Admin:</b> {}" \
+                   "\n<b>User:</b> {}".format(chat.title,
+                                              mention_html(user.id, user.first_name),
+                                              mention_html(member.user.id, member.user.first_name))
     else:
         message.reply_text("This user isn't even in the chat, unmuting them won't make them talk more than they "
                            "already do!")

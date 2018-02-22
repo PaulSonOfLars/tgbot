@@ -1,9 +1,9 @@
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot
+from telegram import Message, Chat, Update, Bot, User
 from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 from tg_bot import dispatcher, BAN_STICKER, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
@@ -20,6 +20,7 @@ from tg_bot.modules.log_channel import loggable
 @loggable
 def ban(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
@@ -48,14 +49,11 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
         update.effective_chat.kick_member(user_id)
         bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned!")
-        return "{}:" \
+        return "<b>{}:</b>" \
                "\n#BANNED" \
-               "\n*Admin:* [{}](tg://user?id={})" \
-               "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                        escape_markdown(update.effective_user.first_name),
-                                                        update.effective_user.id,
-                                                        escape_markdown(member.user.first_name),
-                                                        member.user.id)
+               "\n<b>Admin:</b> {}" \
+               "\n<b>User:</b> {}".format(chat.title, mention_html(user.id, user.first_name),
+                                          mention_html(member.user.id, member.user.first_name))
     except BadRequest as excp:
         message.reply_text("Well damn, I can't ban that user.")
         LOGGER.warning(update)
@@ -71,6 +69,7 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
 @loggable
 def kick(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
@@ -98,14 +97,12 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
     if res:
         bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Kicked!")
-        return "{}:" \
+        return "<b>{}:</b>" \
                "\n#KICKED" \
-               "\n*Admin:* [{}](tg://user?id={})" \
-               "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                        escape_markdown(update.effective_user.first_name),
-                                                        update.effective_user.id,
-                                                        escape_markdown(member.user.first_name),
-                                                        member.user.id)
+               "\n<b>Admin:</b> {}" \
+               "\n<b>User:</b> {}".format(chat.title,
+                                          mention_html(user.id, user.first_name),
+                                          mention_html(member.user.id, member.user.first_name))
     else:
         message.reply_text("Well damn, I can't kick that user.")
 
@@ -135,6 +132,7 @@ def kickme(bot: Bot, update: Update):
 @loggable
 def unban(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
+    user = update.effective_user  # type: Optional[User]
     chat = update.effective_chat  # type: Optional[Chat]
 
     user_id = extract_user(message, args)
@@ -161,14 +159,12 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
     update.effective_chat.unban_member(user_id)
     message.reply_text("Yep, this user can join!")
 
-    return "{}:" \
+    return "<b>{}:</b>" \
            "\n#UNBANNED" \
-           "\n*Admin:* [{}](tg://user?id={})" \
-           "\n*User:* [{}](tg://user?id={})".format(escape_markdown(chat.title),
-                                                    escape_markdown(update.effective_user.first_name),
-                                                    update.effective_user.id,
-                                                    escape_markdown(member.user.first_name),
-                                                    member.user.id)
+           "\n<b>Admin:</b> {}" \
+           "\n<b>User:</b> {}".format(chat.title,
+                                      mention_html(user.id, user.first_name),
+                                      mention_html(member.user.id, member.user.first_name))
 
 
 __help__ = """
@@ -181,7 +177,6 @@ __help__ = """
 """
 
 __mod_name__ = "Bans"
-
 
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
 KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.group)

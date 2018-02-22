@@ -4,7 +4,7 @@ from telegram import Message, Chat, Update, Bot, User
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
@@ -39,12 +39,12 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
 
             msg.delete()
             bot.send_message(chat.id, "Purge complete.")
-            return "{}:" \
+            return "<b>{}:</b>" \
                    "\n#PURGE" \
-                   "\n*Admin:* [{}](tg://user?id={})" \
-                   "\nPurged `{}` messages.".format(escape_markdown(chat.title),
-                                                    escape_markdown(user.first_name),
-                                                    user.id, delete_to - message_id)
+                   "\n<b>Admin:</b> {}" \
+                   "\nPurged <code>{}</code> messages.".format(chat.title,
+                                                               mention_html(user.id, user.first_name),
+                                                               delete_to - message_id)
 
     else:
         msg.reply_text("Reply to a message to select where to start purging from.")
@@ -62,12 +62,11 @@ def del_message(bot: Bot, update: Update) -> str:
         if can_delete(chat, bot.id):
             update.effective_message.reply_to_message.delete()
             update.effective_message.delete()
-            return "{}:" \
+            return "<b>{}:</b>" \
                    "\n#DEL" \
-                   "\n*Admin:* [{}](tg://user?id={})" \
-                   "\nMessage deleted.".format(escape_markdown(chat.title),
-                                               escape_markdown(user.first_name),
-                                               user.id)
+                   "\n<b>Admin:</b> {}" \
+                   "\nMessage deleted.".format(chat.title,
+                                               mention_html(user.id, user.first_name))
     else:
         update.effective_message.reply_text("Whadya want to delete?")
 

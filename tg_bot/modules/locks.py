@@ -4,7 +4,7 @@ from telegram import Message, Chat, Update, Bot, ParseMode, User
 from telegram import TelegramError, MessageEntity
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 import tg_bot.modules.sql.locks_sql as sql
 from tg_bot import dispatcher, SUDO_USERS
@@ -69,12 +69,10 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
                 sql.update_lock(chat.id, args[0], locked=True)
                 message.reply_text("Locked {} messages for all non-admins!".format(args[0]))
 
-                return "{}:" \
+                return "<b>{}:</b>" \
                        "\n#LOCK" \
-                       "\n*Admin:* [{}](tg://user?id={})" \
-                       "\nLocked `{}`.".format(escape_markdown(chat.title),
-                                               escape_markdown(user.first_name),
-                                               user.id, args[0])
+                       "\n<b>Admin:</b> {}" \
+                       "\nLocked <code>{}</code>.".format(chat.title, mention_html(user.id, user.first_name), args[0])
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=True)
@@ -83,12 +81,11 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
                     restr_members(bot, chat.id, members, messages=True, media=True, other=True)
 
                 message.reply_text("Locked {} for all non-admins!".format(args[0]))
-                return "{}:" \
+                return "<b>{}:</b>" \
                        "\n#LOCK" \
-                       "\n*Admin:* [{}](tg://user?id={})" \
-                       "\nLocked `{}`.".format(escape_markdown(chat.title),
-                                               escape_markdown(user.first_name),
-                                               user.id, args[0])
+                       "\n<b>Admin:</b> {}" \
+                       "\nLocked <code>{}</code>.".format(chat.title,
+                                                          mention_html(user.id, user.first_name), args[0])
 
             else:
                 message.reply_text("What are you trying to lock...? Try /locktypes for the list of lockables")
@@ -111,12 +108,11 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=False)
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
-                return "{}:" \
+                return "<b>{}:</b>" \
                        "\n#UNLOCK" \
-                       "\n*Admin:* [{}](tg://user?id={})" \
-                       "\nUnlocked `{}`.".format(escape_markdown(chat.title),
-                                                 escape_markdown(user.first_name),
-                                                 user.id, args[0])
+                       "\n<b>Admin:</b> {}" \
+                       "\nUnlocked <code>{}</code>.".format(chat.title,
+                                                            mention_html(user.id, user.first_name), args[0])
 
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=False)
@@ -138,12 +134,11 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
                     unrestr_members(bot, chat.id, members, True, True, True, True)
 
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
-                return "{}:" \
+                return "<b>{}:</b>" \
                        "\n#UNLOCK" \
-                       "\n*Admin:* [{}](tg://user?id={})" \
-                       "\nUnlocked `{}`.".format(escape_markdown(chat.title),
-                                                 escape_markdown(user.first_name),
-                                                 user.id, args[0])
+                       "\n<b>Admin:</b> {}" \
+                       "\nUnlocked <code>{}</code>.".format(chat.title,
+                                                            mention_html(user.id, user.first_name), args[0])
             else:
                 message.reply_text("What are you trying to unlock...? Try /locktypes for the list of lockables")
 

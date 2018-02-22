@@ -4,7 +4,7 @@ from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode, InlineKeyboardMarkup
 from telegram.error import BadRequest
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID, LOGGER
@@ -103,7 +103,7 @@ def new_member(bot: Bot, update: Update):
                     else:
                         fullname = first_name
                     count = chat.get_members_count()
-                    mention = "[{}](tg://user?id={})".format(first_name, new_mem.id)
+                    mention = mention_markdown(new_mem.id, first_name)
                     if new_mem.username:
                         username = "@" + escape_markdown(new_mem.username)
                     else:
@@ -153,7 +153,7 @@ def left_member(bot: Bot, update: Update):
                 else:
                     fullname = first_name
                 count = chat.get_members_count()
-                mention = "[{}](tg://user?id={})".format(first_name, left_mem.id)
+                mention = mention_markdown(left_mem.id, first_name)
                 if left_mem.username:
                     username = "@" + escape_markdown(left_mem.username)
                 else:
@@ -298,12 +298,11 @@ def set_welcome(bot: Bot, update: Update) -> str:
     sql.set_custom_welcome(chat.id, content, data_type, buttons)
     update.effective_message.reply_text("Successfully set custom welcome message!")
 
-    return "{}:" \
-           "\n#SET\_WELCOME" \
-           "\n*Admin:* [{}](tg://user?id={})" \
-           "\nSet the welcome message.".format(escape_markdown(chat.title),
-                                               escape_markdown(user.first_name),
-                                               user.id)
+    return "<b>{}:</b>" \
+           "\n#SET_WELCOME" \
+           "\n<b>Admin:</b> {}" \
+           "\nSet the welcome message.".format(chat.title,
+                                               mention_html(user.id, user.first_name))
 
 
 @run_async
@@ -314,12 +313,11 @@ def reset_welcome(bot: Bot, update: Update) -> str:
     user = update.effective_user  # type: Optional[User]
     sql.set_custom_welcome(chat.id, sql.DEFAULT_WELCOME, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset welcome message to default!")
-    return "{}:" \
-           "\n#RESET\_WELCOME" \
-           "\n*Admin:* [{}](tg://user?id={})" \
-           "\nReset the welcome message to default.".format(escape_markdown(chat.title),
-                                                            escape_markdown(user.first_name),
-                                                            user.id)
+    return "<b>{}:</b>" \
+           "\n#RESET_WELCOME" \
+           "\n<b>Admin:</b> {}" \
+           "\nReset the welcome message to default.".format(chat.title,
+                                                            mention_html(user.id, user.first_name))
 
 
 @run_async
@@ -372,12 +370,11 @@ def set_goodbye(bot: Bot, update: Update) -> str:
 
     sql.set_custom_gdbye(chat.id, content, data_type, buttons)
     update.effective_message.reply_text("Successfully set custom goodbye message!")
-    return "{}:" \
-           "\n#SET\_GOODBYE" \
-           "\n*Admin:* [{}](tg://user?id={})" \
-           "\nSet the goodbye message.".format(escape_markdown(chat.title),
-                                               escape_markdown(user.first_name),
-                                               user.id)
+    return "<b>{}:</b>" \
+           "\n#SET_GOODBYE" \
+           "\n<b>Admin:</b> {}" \
+           "\nSet the goodbye message.".format(chat.title,
+                                               mention_html(user.id, user.first_name))
 
 
 @run_async
@@ -388,12 +385,11 @@ def reset_goodbye(bot: Bot, update: Update) -> str:
     user = update.effective_user  # type: Optional[User]
     sql.set_custom_gdbye(chat.id, sql.DEFAULT_GOODBYE, sql.Types.TEXT)
     update.effective_message.reply_text("Successfully reset goodbye message to default!")
-    return "{}:" \
-           "\n#RESET\_GOODBYE" \
-           "\n*Admin:* [{}](tg://user?id={})" \
-           "\nReset the goodbye message.".format(escape_markdown(chat.title),
-                                                 escape_markdown(user.first_name),
-                                                 user.id)
+    return "<b>{}:</b>" \
+           "\n#RESET_GOODBYE" \
+           "\n<b>Admin:</b> {}" \
+           "\nReset the goodbye message.".format(chat.title,
+                                                 mention_html(user.id, user.first_name))
 
 
 WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in multiple ways. If you want the messages" \

@@ -37,7 +37,7 @@ if is_module_loaded(FILENAME):
 
     def send_log(bot: Bot, log_chat_id: str, orig_chat_id: str, result: str):
         try:
-            bot.send_message(log_chat_id, result, parse_mode=ParseMode.MARKDOWN)
+            bot.send_message(log_chat_id, result, parse_mode=ParseMode.HTML)
         except BadRequest as excp:
             if excp.message == "Chat not found":
                 bot.send_message(orig_chat_id, "This log channel has been deleted - unsetting.")

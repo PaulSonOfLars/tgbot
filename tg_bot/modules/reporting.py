@@ -3,7 +3,7 @@ from typing import Optional, List
 from telegram import Message, Chat, Update, Bot, User, ParseMode
 from telegram.error import BadRequest, Unauthorized
 from telegram.ext import CommandHandler, RegexHandler, run_async, Filters
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_not_admin, user_admin
@@ -61,20 +61,20 @@ def report(bot: Bot, update: Update) -> str:
         admin_list = chat.get_administrators()
 
         if chat.username and chat.type == Chat.SUPERGROUP:
-            msg = "*Group:* {}\n" \
-                  "*Reported user:* {} (`{}`)\n" \
-                  "*Reported by:* {} (`{}`)\n" \
-                  "*Link:* [click here](http://telegram.me/{}/{})".format(escape_markdown(chat.title),
-                                                                          escape_markdown(reported_user.first_name),
-                                                                          reported_user.id,
-                                                                          escape_markdown(user.first_name),
-                                                                          user.id,
-                                                                          chat.username, message.message_id)
+            msg = "<b>{}:</b>\n" \
+                  "<b>Reported user:</b> {} (<code>{}</code>)\n" \
+                  "<b>Reported by:</b> {} (<code>{}</code>)\n" \
+                  "<b>Link:</b> [click here](http://telegram.me/{}/{})".format(chat.title,
+                                                                               mention_html(reported_user.id,
+                                                                                            reported_user.first_name),
+                                                                               reported_user.id,
+                                                                               mention_html(user.id, user.first_name),
+                                                                               user.id,
+                                                                               chat.username, message.message_id)
             should_forward = False
 
         else:
-            msg = "[{}](tg://user?id={}) is calling for admins in \"{}\"!".format(escape_markdown(user.first_name),
-                                                                                  user.id, escape_markdown(chat_name))
+            msg = "{} is calling for admins in \"{}\"!".format(mention_html(user.idm, user.first_name), chat_name)
             should_forward = True
 
         for admin in admin_list:
@@ -83,7 +83,7 @@ def report(bot: Bot, update: Update) -> str:
 
             if sql.user_should_report(admin.user.id):
                 try:
-                    bot.send_message(admin.user.id, msg, parse_mode=ParseMode.MARKDOWN)
+                    bot.send_message(admin.user.id, msg, parse_mode=ParseMode.HTML)
 
                     if should_forward:
                         message.reply_to_message.forward(admin.user.id)
