@@ -20,11 +20,11 @@ if is_module_loaded(FILENAME):
         @wraps(func)
         def log_action(bot: Bot, update: Update, *args, **kwargs):
             result = func(bot, update, *args, **kwargs)
-
+            chat = update.effective_chat  # type: Optional[Chat]
             if result:
-                log_chat = sql.get_chat_log_group(update.effective_chat.id)
+                log_chat = sql.get_chat_log_group(chat.id)
                 if log_chat:
-                    send_log(bot, log_chat, result)
+                    send_log(bot, log_chat, chat.id, result)
             elif result == "":
                 pass
             else:
@@ -35,15 +35,19 @@ if is_module_loaded(FILENAME):
         return log_action
 
 
-    def send_log(bot: Bot, log_chat: str, result: str):
+    def send_log(bot: Bot, log_chat_id: str, orig_chat_id: str, result: str):
         try:
-            bot.send_message(log_chat, result, parse_mode=ParseMode.MARKDOWN)
+            bot.send_message(log_chat_id, result, parse_mode=ParseMode.MARKDOWN)
         except BadRequest as excp:
-            LOGGER.warning(excp.message)
-            LOGGER.warning(result)
-            LOGGER.exception("Could not parse")
+            if excp.message == "Chat not found":
+                bot.send_message(orig_chat_id, "This log channel has been deleted - unsetting.")
+                sql.stop_chat_logging(orig_chat_id)
+            else:
+                LOGGER.warning(excp.message)
+                LOGGER.warning(result)
+                LOGGER.exception("Could not parse")
 
-            bot.send_message(log_chat, result + "\n\nMarkdown disabled due to error.")
+                bot.send_message(log_chat_id, result + "\n\nMarkdown disabled due to error.")
 
 
     @run_async
