@@ -185,10 +185,11 @@ def gbanlist(bot: Bot, update: Update):
                                                 caption="Here is the list of currently gbanned users.")
 
 
-def check_and_ban(update, user_id):
+def check_and_ban(update, user_id, should_message=True):
     if sql.is_user_gbanned(user_id):
         update.effective_chat.kick_member(user_id)
-        update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
+        if should_message:
+            update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
 
 
 @run_async
@@ -210,7 +211,7 @@ def enforce_gban(bot: Bot, update: Update):
         if msg.reply_to_message:
             user = msg.reply_to_message.from_user  # type: Optional[User]
             if user and not is_user_admin(chat, user.id):
-                check_and_ban(update, user.id)
+                check_and_ban(update, user.id, should_message=False)
 
 
 @run_async
