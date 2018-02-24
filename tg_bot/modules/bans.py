@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
