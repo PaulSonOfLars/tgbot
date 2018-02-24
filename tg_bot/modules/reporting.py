@@ -75,7 +75,7 @@ def report(bot: Bot, update: Update) -> str:
             should_forward = False
 
         else:
-            msg = "{} is calling for admins in \"{}\"!".format(mention_html(user.idm, user.first_name), chat_name)
+            msg = "{} is calling for admins in \"{}\"!".format(mention_html(user.id, user.first_name), chat_name)
             should_forward = True
 
         for admin in admin_list:
