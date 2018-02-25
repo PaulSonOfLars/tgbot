@@ -5,6 +5,7 @@ from typing import Optional, List
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, User, CallbackQuery
 from telegram import Message, Chat, Update, Bot
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
 from telegram.utils.helpers import mention_html, mention_markdown, escape_markdown
 
@@ -36,26 +37,25 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
     limit, soft_warn = sql.get_warn_setting(chat.id)
     num_warns, reasons = sql.warn_user(user.id, chat.id, reason)
     if num_warns >= limit:
+        sql.reset_warns(user.id, chat.id)
         if soft_warn:  # kick
-            res = chat.unban_member(user.id)
+            chat.unban_member(user.id)
+            reply = "{} warnings, this user has been kicked!".format(limit)
+
         else:  # ban
-            res = chat.kick_member(user.id)
+            chat.kick_member(user.id)
+            reply = "{} warnings, this user has been banned!".format(limit)
 
-        if res:
-            message.bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-            message.reply_text("{} warnings, this user has been banned!".format(limit))
-            sql.reset_warns(user.id, chat.id)
-
-            return "<b>{}:</b>" \
-                   "\n#WARN_BAN" \
-                   "\n<b>Admin:</b> {}" \
-                   "\n<b>User:</b> {}" \
-                   "\n<b>Reason:</b> {}".format(html.escape(chat.title),
-                                                warner_tag,
-                                                mention_html(user.id, user.first_name),
-                                                user.id, reason)
-        else:
-            message.reply_text("An error occurred, I couldn't ban this person!")
+        message.bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+        keyboard = []
+        reason = "<b>{}:</b>" \
+                 "\n#WARN_BAN" \
+                 "\n<b>Admin:</b> {}" \
+                 "\n<b>User:</b> {}" \
+                 "\n<b>Reason:</b> {}".format(html.escape(chat.title),
+                                              warner_tag,
+                                              mention_html(user.id, user.first_name),
+                                              user.id, reason)
 
     else:
         keyboard = InlineKeyboardMarkup(
@@ -66,16 +66,23 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
         if reason:
             reply += "\nReason for last warn:\n{}".format(escape_markdown(reason))
 
-        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+        reason = "<b>{}:</b>" \
+                 "\n#WARN" \
+                 "\n<b>Admin:</b> {}" \
+                 "\n<b>User:</b> {}" \
+                 "\n<b>Reason:</b> {}".format(html.escape(chat.title),
+                                              warner_tag,
+                                              mention_html(user.id, user.first_name), reason)
 
-        return "<b>{}:</b>" \
-               "\n#WARN" \
-               "\n<b>Admin:</b> {}" \
-               "\n<b>User:</b> {}" \
-               "\n<b>Reason:</b> {}".format(html.escape(chat.title),
-                                            warner_tag,
-                                            mention_html(user.id, user.first_name), reason)
-    return ""
+    try:
+        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+    except BadRequest as excp:
+        if excp.message == "Reply message not found":
+            # Do not reply
+            message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN, quote=False)
+        else:
+            raise
+    return reason
 
 
 @run_async
@@ -382,7 +389,7 @@ RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns, pass_args=True, fi
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
 MYWARNS_HANDLER = DisableAbleCommandHandler("warns", warns, pass_args=True, filters=Filters.group)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter, filters=Filters.group)
-RM_WARN_HANDLER = CommandHandler("nowarn", remove_warn_filter, pass_args=True, filters=Filters.group)
+RM_WARN_HANDLER = CommandHandler(["nowarn", "stopwarn"], remove_warn_filter, pass_args=True, filters=Filters.group)
 LIST_WARN_HANDLER = DisableAbleCommandHandler("warnlist", list_warn_filters, filters=Filters.group)
 WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo | Filters.group,
                                      reply_filter)
