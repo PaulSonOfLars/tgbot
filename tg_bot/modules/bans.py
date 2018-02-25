@@ -10,7 +10,7 @@ from tg_bot import dispatcher, BAN_STICKER, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
     is_user_admin, is_user_in_chat
-from tg_bot.modules.helper_funcs.extraction import extract_user
+from tg_bot.modules.helper_funcs.extraction import extract_user_and_text
 from tg_bot.modules.log_channel import loggable
 
 
@@ -24,7 +24,8 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
 
-    user_id = extract_user(message, args)
+    user_id, reason = extract_user_and_text(message, args)
+
     if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
         return ""
@@ -50,15 +51,20 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
         update.effective_chat.kick_member(user_id)
         bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned!")
-        return "<b>{}:</b>" \
-               "\n#BANNED" \
-               "\n<b>Admin:</b> {}" \
-               "\n<b>User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
-                                          mention_html(member.user.id, member.user.first_name))
+        log = "<b>{}:</b>" \
+              "\n#BANNED" \
+              "\n<b>Admin:</b> {}" \
+              "\n<b>User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
+                                         mention_html(member.user.id, member.user.first_name))
+        if reason:
+            log += "\n<b>Reason:</b> {}".format(reason)
+
+        return log
+
     except BadRequest as excp:
-        message.reply_text("Well damn, I can't ban that user.")
         LOGGER.warning(update)
         LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id, excp.message)
+        message.reply_text("Well damn, I can't ban that user.")
 
     return ""
 
@@ -73,7 +79,8 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
 
-    user_id = extract_user(message, args)
+    user_id, reason = extract_user_and_text(message, args)
+
     if not user_id:
         return ""
 
@@ -98,12 +105,17 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
     if res:
         bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Kicked!")
-        return "<b>{}:</b>" \
-               "\n#KICKED" \
-               "\n<b>Admin:</b> {}" \
-               "\n<b>User:</b> {}".format(html.escape(chat.title),
-                                          mention_html(user.id, user.first_name),
-                                          mention_html(member.user.id, member.user.first_name))
+        log = "<b>{}:</b>" \
+              "\n#KICKED" \
+              "\n<b>Admin:</b> {}" \
+              "\n<b>User:</b> {}".format(html.escape(chat.title),
+                                         mention_html(user.id, user.first_name),
+                                         mention_html(member.user.id, member.user.first_name))
+        if reason:
+            log += "\n<b>Reason:</b> {}".format(reason)
+
+        return log
+
     else:
         message.reply_text("Well damn, I can't kick that user.")
 
@@ -136,7 +148,8 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
     user = update.effective_user  # type: Optional[User]
     chat = update.effective_chat  # type: Optional[Chat]
 
-    user_id = extract_user(message, args)
+    user_id, reason = extract_user_and_text(message, args)
+
     if not user_id:
         return ""
 
@@ -160,12 +173,16 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
     update.effective_chat.unban_member(user_id)
     message.reply_text("Yep, this user can join!")
 
-    return "<b>{}:</b>" \
-           "\n#UNBANNED" \
-           "\n<b>Admin:</b> {}" \
-           "\n<b>User:</b> {}".format(html.escape(chat.title),
-                                      mention_html(user.id, user.first_name),
-                                      mention_html(member.user.id, member.user.first_name))
+    log = "<b>{}:</b>" \
+          "\n#UNBANNED" \
+          "\n<b>Admin:</b> {}" \
+          "\n<b>User:</b> {}".format(html.escape(chat.title),
+                                     mention_html(user.id, user.first_name),
+                                     mention_html(member.user.id, member.user.first_name))
+    if reason:
+        log += "\n<b>Reason:</b> {}".format(reason)
+
+    return log
 
 
 __help__ = """
