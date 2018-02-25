@@ -43,10 +43,10 @@ def _calc_emoji_offset(to_calc) -> int:
     # Normal, 1 character emoji don't affect; hence sub 1.
     # special, eg with two emoji characters (eg face, and skin col) will have length 2, so by subbing one we
     # know we'll get one extra offset,
-    return sum(len(e.group(0).encode('utf-16-le'))//2 - 1 for e in emoticons)
+    return sum(len(e.group(0).encode('utf-16-le')) // 2 - 1 for e in emoticons)
 
 
-def markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: int=0) -> str:
+def markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset: int = 0) -> str:
     """
     Parse a string, escaping all invalid markdown entities.
 
@@ -108,7 +108,7 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: i
     return res
 
 
-def button_markdown_parser(txt: str, entities: Dict[MessageEntity, str]=None, offset: int=0) -> (str, List):
+def button_markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset: int = 0) -> (str, List):
     markdown_note = markdown_parser(txt, entities, offset)
     prev = 0
     note_data = ""
