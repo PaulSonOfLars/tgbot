@@ -81,6 +81,8 @@ def gban(bot: Bot, update: Update, args: List[str]):
                 pass
             elif excp.message == "User_not_participant":
                 pass
+            elif excp.message == "Peer_id_invalid":  # Suspect this happens when a group is suspended by telegram.
+                pass
             else:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
                 send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
