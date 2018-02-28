@@ -193,7 +193,7 @@ def get_warn_setting(chat_id):
 
 def num_warns():
     try:
-        return SESSION.query(func.sum(Warns.num_warns)).scalar()
+        return SESSION.query(func.sum(Warns.num_warns)).scalar() or 0
     finally:
         SESSION.close()
 
