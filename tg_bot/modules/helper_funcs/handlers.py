@@ -9,7 +9,7 @@ class CustomCommandHandler(tg.CommandHandler):
             message = update.message or update.edited_message
 
             if message.text and len(message.text) > 1:
-                fst_word = message.text_markdown.split(None, 1)[0]
+                fst_word = message.text_html.split(None, 1)[0]
                 if len(fst_word) > 1 and any(fst_word.startswith(start) for start in ('/', '!')):
                     command = fst_word[1:].split('@')
                     command.append(message.bot.username)  # in case the command was sent without a username
