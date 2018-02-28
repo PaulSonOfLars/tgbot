@@ -62,20 +62,24 @@ def report(bot: Bot, update: Update) -> str:
         admin_list = chat.get_administrators()
 
         if chat.username and chat.type == Chat.SUPERGROUP:
-            msg = "<b>{}:</b>\n" \
-                  "<b>Reported user:</b> {} (<code>{}</code>)\n" \
-                  "<b>Reported by:</b> {} (<code>{}</code>)\n" \
-                  "<b>Link:</b> [click here](http://telegram.me/{}/{})".format(html.escape(chat.title),
-                                                                               mention_html(reported_user.id,
-                                                                                            reported_user.first_name),
-                                                                               reported_user.id,
-                                                                               mention_html(user.id, user.first_name),
-                                                                               user.id,
-                                                                               chat.username, message.message_id)
+            msg = "<b>{}:</b>" \
+                  "\n<b>Reported user:</b> {} (<code>{}</code>)" \
+                  "\n<b>Reported by:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
+                                                                      mention_html(
+                                                                          reported_user.id,
+                                                                          reported_user.first_name),
+                                                                      reported_user.id,
+                                                                      mention_html(user.id,
+                                                                                   user.first_name),
+                                                                      user.id)
+            link = "\n<b>Link:</b> " \
+                   "<a href=\"http://telegram.me/{}/{}\">click here</a>".format(chat.username, message.message_id)
+
             should_forward = False
 
         else:
             msg = "{} is calling for admins in \"{}\"!".format(mention_html(user.id, user.first_name), chat_name)
+            link = ""
             should_forward = True
 
         for admin in admin_list:
@@ -84,7 +88,7 @@ def report(bot: Bot, update: Update) -> str:
 
             if sql.user_should_report(admin.user.id):
                 try:
-                    bot.send_message(admin.user.id, msg, parse_mode=ParseMode.HTML)
+                    bot.send_message(admin.user.id, msg + link, parse_mode=ParseMode.HTML)
 
                     if should_forward:
                         message.reply_to_message.forward(admin.user.id)

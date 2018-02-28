@@ -21,7 +21,12 @@ if is_module_loaded(FILENAME):
         def log_action(bot: Bot, update: Update, *args, **kwargs):
             result = func(bot, update, *args, **kwargs)
             chat = update.effective_chat  # type: Optional[Chat]
+            message = update.effective_message  # type: Optional[Message]
             if result:
+                if chat.type == chat.SUPERGROUP and chat.username:
+                    result += "\n<b>Link:</b> " \
+                              "<a href=\"http://telegram.me/{}/{}\">click here</a>".format(chat.username,
+                                                                                           message.message_id)
                 log_chat = sql.get_chat_log_group(chat.id)
                 if log_chat:
                     send_log(bot, log_chat, chat.id, result)
