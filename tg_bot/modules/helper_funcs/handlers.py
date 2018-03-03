@@ -22,12 +22,7 @@ class CustomCommandHandler(tg.CommandHandler):
 
                     return res and (command[0].lower() in self.command
                                     and command[1].lower() == message.bot.username.lower())
-                else:
-                    return False
-            else:
-                return False
 
-        else:
             return False
 
 

@@ -26,19 +26,19 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
                 delete_to = message_id + int(args[0])
             else:
                 delete_to = msg.message_id - 1
-            for m_id in range(delete_to, message_id - 1, -1):  # Reverse iteration over message ids
-                try:
+            try:
+                for m_id in range(delete_to, message_id - 1, -1):  # Reverse iteration over message ids
                     bot.deleteMessage(chat.id, m_id)
-                except BadRequest as err:
-                    if err.message == "Message can't be deleted":
-                        bot.send_message(chat.id, "Cannot delete all messages. The messages may be too old, I might "
-                                                  "not have delete rights, or this might not be a supergroup.")
-                        break
+                msg.delete()
 
-                    elif err.message != "Message to delete not found":
-                        LOGGER.exception("Error while purging chat messages.")
+            except BadRequest as err:
+                if err.message == "Message can't be deleted":
+                    bot.send_message(chat.id, "Cannot delete all messages. The messages may be too old, I might "
+                                              "not have delete rights, or this might not be a supergroup.")
 
-            msg.delete()
+                elif err.message != "Message to delete not found":
+                    LOGGER.exception("Error while purging chat messages.")
+
             bot.send_message(chat.id, "Purge complete.")
             return "<b>{}:</b>" \
                    "\n#PURGE" \

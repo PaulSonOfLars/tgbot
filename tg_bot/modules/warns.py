@@ -14,6 +14,7 @@ from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import is_user_admin, bot_admin, user_admin_no_reply, user_admin, \
     can_restrict
 from tg_bot.modules.helper_funcs.extraction import extract_text, extract_user_and_text, extract_user
+from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.helper_funcs.misc import split_message
 from tg_bot.modules.helper_funcs.string_handling import split_quotes
 from tg_bot.modules.log_channel import loggable
@@ -391,8 +392,7 @@ MYWARNS_HANDLER = DisableAbleCommandHandler("warns", warns, pass_args=True, filt
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter, filters=Filters.group)
 RM_WARN_HANDLER = CommandHandler(["nowarn", "stopwarn"], remove_warn_filter, pass_args=True, filters=Filters.group)
 LIST_WARN_HANDLER = DisableAbleCommandHandler("warnlist", list_warn_filters, filters=Filters.group)
-WARN_FILTER_HANDLER = MessageHandler(Filters.text | Filters.command | Filters.sticker | Filters.photo | Filters.group,
-                                     reply_filter)
+WARN_FILTER_HANDLER = MessageHandler(CustomFilters.has_text & Filters.group, reply_filter)
 WARN_LIMIT_HANDLER = CommandHandler("warnlimit", set_warn_limit, pass_args=True, filters=Filters.group)
 WARN_STRENGTH_HANDLER = CommandHandler("strongwarn", set_warn_strength, pass_args=True, filters=Filters.group)
 

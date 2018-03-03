@@ -47,24 +47,30 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
         update.effective_message.reply_text("I'm not gonna BAN myself, are you crazy?")
         return ""
 
+    log = "<b>{}:</b>" \
+          "\n#BANNED" \
+          "\n<b>Admin:</b> {}" \
+          "\n<b>User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
+                                     mention_html(member.user.id, member.user.first_name))
+    if reason:
+        log += "\n<b>Reason:</b> {}".format(reason)
+
     try:
         update.effective_chat.kick_member(user_id)
         bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned!")
-        log = "<b>{}:</b>" \
-              "\n#BANNED" \
-              "\n<b>Admin:</b> {}" \
-              "\n<b>User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
-                                         mention_html(member.user.id, member.user.first_name))
-        if reason:
-            log += "\n<b>Reason:</b> {}".format(reason)
-
         return log
 
     except BadRequest as excp:
-        LOGGER.warning(update)
-        LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id, excp.message)
-        message.reply_text("Well damn, I can't ban that user.")
+        if excp.message == "Reply message not found":
+            # Do not reply
+            message.reply_text('Banned!', quote=False)
+            return log
+        else:
+            LOGGER.warning(update)
+            LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id,
+                             excp.message)
+            message.reply_text("Well damn, I can't ban that user.")
 
     return ""
 
