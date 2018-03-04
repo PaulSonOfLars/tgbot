@@ -298,6 +298,8 @@ __help__ = """
  - /removerss <link>: removes the RSS link from the subscriptions.
  - /rss <link>: shows the link's data and the last entry, for testing purposes.
  - /listrss: shows the list of links you currently subscribed to in that particular chat.
+
+NOTE: On groups, only admins can add/remove RSS links to the group's subscription
 """
 
 __mod_name__ = "RSS Feed"
