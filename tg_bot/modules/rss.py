@@ -77,20 +77,17 @@ def list_urls(bot, update):
     # this loops gets every link from the DB based on the filter above and appends it to the list
     links_list = [row.feed_link for row in user_data]
 
-    # make an empty string for later usage
-    final_content = ""
-
     # this neatly arranges the links from links_list to be properly sent by the bot
-    final_content += "\n\n".join(links_list)
+    final_content = "\n\n".join(links_list)
 
     # check if the length of the message is too long to be posted in 1 chat bubble
     if len(final_content) == 0:
         bot.send_message(chat_id=tg_chat_id, text="This chat is not subscribed to any links")
     elif len(final_content) <= constants.MAX_MESSAGE_LENGTH:
-        bot.send_message(chat_id=tg_chat_id, text="This chat is subscribed to the following links:"
-                                                  + "\n" + final_content)
+        bot.send_message(chat_id=tg_chat_id, text="This chat is subscribed to the following links\n" + final_content)
     else:
-        bot.send_message(chat_id=tg_chat_id, text="<b>Warning: </b>" + "The message is too long to be sent")
+        bot.send_message(chat_id=tg_chat_id, parse_mode=ParseMode.HTML,
+                         text="<b>Warning: </b>" + "The message is too long to be sent")
 
 
 @user_admin
@@ -297,9 +294,9 @@ __help__ = """
  - /addrss <link>: add an RSS link to the subscriptions.
  - /removerss <link>: removes the RSS link from the subscriptions.
  - /rss <link>: shows the link's data and the last entry, for testing purposes.
- - /listrss: shows the list of links you currently subscribed to in that particular chat.
+ - /listrss: shows the list of rss feeds that the chat is currently subscribed to.
 
-NOTE: On groups, only admins can add/remove RSS links to the group's subscription
+NOTE: In groups, only admins can add/remove RSS links to the group's subscription
 """
 
 __mod_name__ = "RSS Feed"
