@@ -71,14 +71,8 @@ def list_urls(bot, update):
     # gather telegram chat ID (might be the same as user ID if message is sent to the bot via PM)
     tg_chat_id = str(update.effective_chat.id)
 
-    # gather telegram user ID
-    tg_user_id = update.effective_user.id
-
     # gather link data from DB based on who sent the message and from where
-    user_data = sql.get_urls(tg_user_id, tg_chat_id)
-
-    # make an empty list for later usage
-    links_list = []
+    user_data = sql.get_urls(tg_chat_id)
 
     # this loops gets every link from the DB based on the filter above and appends it to the list
     links_list = [row.feed_link for row in user_data]
@@ -106,9 +100,6 @@ def add_url(bot, update, args):
         # gather telegram chat data
         chat = update.effective_chat
 
-        # gather telegram user ID
-        tg_user_id = update.effective_user.id
-
         # gather telegram chat ID (might be the same as user ID if message is sent to the bot via PM)
         tg_chat_id = str(update.effective_chat.id)
 
@@ -128,7 +119,7 @@ def add_url(bot, update, args):
             tg_old_entry_link = link_processed.entries[0].link
 
             # gather the row which contains exactly that telegram user ID, group ID and link for later comparison
-            row = sql.check_url_availability(tg_user_id, tg_feed_link, tg_chat_id)
+            row = sql.check_url_availability(tg_chat_id, tg_feed_link)
 
             # check if there's an entry already added to DB by the same user in the same group with the same link
             if row:
@@ -138,24 +129,19 @@ def add_url(bot, update, args):
                 # there is no link added, so we'll add it now
 
                 # prepare the action for the DB push
-                sql.add_url(tg_user_id, tg_chat_id, tg_feed_link, tg_old_entry_link)
+                sql.add_url(tg_chat_id, tg_feed_link, tg_old_entry_link)
 
                 update.effective_message.reply_text("Added URL to subscription")
     else:
         # there's nothing written or it's too less text to be an actual link
         update.effective_message.reply_text("URL missing")
 
+
 @user_admin
 def remove_url(bot, update, args):
     # check if there is anything written as argument (will give out of range if there's no argument)
     if len(args) >= 1:
         # there is an actual link written
-
-        # gather telegram chat data
-        chat = update.effective_chat
-
-        # gather telegram user ID
-        tg_user_id = update.effective_user.id
 
         # gather telegram chat ID (might be the same as user ID if message is sent to the bot via PM)
         tg_chat_id = str(update.effective_chat.id)
@@ -174,13 +160,13 @@ def remove_url(bot, update, args):
             # the RSS Feed link is valid
 
             # gather all duplicates (if possible) for the same TG User ID, TG Chat ID and link
-            user_data = sql.check_url_availability(tg_user_id, tg_chat_id, tg_feed_link)
+            user_data = sql.check_url_availability(tg_chat_id, tg_feed_link)
 
             # check if it finds the link in the database
             if user_data:
                 # there is an link in the DB
 
-                sql.remove_url(tg_user_id, tg_chat_id, tg_feed_link)
+                sql.remove_url(tg_chat_id, tg_feed_link)
 
                 update.effective_message.reply_text("Removed URL from subscription")
             else:
