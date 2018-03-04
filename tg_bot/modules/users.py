@@ -89,14 +89,14 @@ def log_user(bot: Bot, update: Update):
 
 @run_async
 def chats(bot: Bot, update: Update):
-    chats = sql.get_all_chats() or []
+    all_chats = sql.get_all_chats() or []
     chatfile = 'List of chats.\n'
-    for chat in chats:
-        chatfile += "{} - {}\n".format(chat.chat_name, chat.chat_id)
+    for chat in all_chats:
+        chatfile += "{} - ({})\n".format(chat.chat_name, chat.chat_id)
 
     with BytesIO(str.encode(chatfile)) as output:
         output.name = "chatlist.txt"
-	update.effective_message.reply_document(document=output, filename="chatlist.txt",
+        update.effective_message.reply_document(document=output, filename="chatlist.txt",
                                                 caption="Here is the list of chats in my database.")
 
 
@@ -119,10 +119,9 @@ __help__ = ""  # no help string
 
 __mod_name__ = "Users"
 
-
 BROADCAST_HANDLER = CommandHandler("broadcast", broadcast, filters=Filters.user(OWNER_ID))
 USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
-CHATLIST_HANDLER = CommandHandler("chats", chats, filters=CustomFilters.sudo_filter)
+CHATLIST_HANDLER = CommandHandler("chatlist", chats, filters=CustomFilters.sudo_filter)
 
 dispatcher.add_handler(USER_HANDLER, USERS_GROUP)
 dispatcher.add_handler(BROADCAST_HANDLER)
