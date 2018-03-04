@@ -1,3 +1,4 @@
+import html
 import json
 import random
 from datetime import datetime
@@ -7,7 +8,7 @@ import requests
 from telegram import Message, Chat, Update, Bot, MessageEntity
 from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import escape_markdown, mention_html
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS, BAN_STICKER
 from tg_bot.__main__ import STATS, USER_INFO
@@ -227,22 +228,24 @@ def info(bot: Bot, update: Update, args: List[str]):
 
     elif not msg.reply_to_message and (not args or (
             len(args) >= 1 and not args[0].startswith("@") and not args[0].isdigit() and not msg.parse_entities(
-            [MessageEntity.TEXT_MENTION]))):
+        [MessageEntity.TEXT_MENTION]))):
         msg.reply_text("I can't extract a user from this.")
         return
 
     else:
         return
 
-    text = "*User info*:" \
-           "\nID: `{}`" \
-           "\nFirst Name: {}".format(user.id, escape_markdown(user.first_name))
+    text = "<b>User info</b>:" \
+           "\nID: <code>{}</code>" \
+           "\nFirst Name: {}".format(user.id, html.escape(user.first_name))
 
     if user.last_name:
-        text += "\nLast Name: {}".format(escape_markdown(user.last_name))
+        text += "\nLast Name: {}".format(html.escape(user.last_name))
 
     if user.username:
-        text += "\nUsername: @{}".format(escape_markdown(user.username))
+        text += "\nUsername: @{}".format(html.escape(user.username))
+
+    text += "\nPermanent user link: {}".format(mention_html(user.id, "link"))
 
     if user.id == OWNER_ID:
         text += "\n\nThis person is my owner - I would never do anything against them!"
@@ -264,7 +267,7 @@ def info(bot: Bot, update: Update, args: List[str]):
         if mod_info:
             text += "\n\n" + mod_info
 
-    update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+    update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
 @run_async

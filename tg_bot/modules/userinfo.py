@@ -1,3 +1,4 @@
+import html
 from typing import Optional, List
 
 from telegram import Message, Update, Bot
@@ -95,14 +96,14 @@ def set_about_bio(bot: Bot, update: Update):
 
 
 def __user_info__(user_id):
-    bio = escape_markdown(sql.get_user_bio(user_id) or "")
-    me = escape_markdown(sql.get_user_me_info(user_id) or "")
+    bio = html.escape(sql.get_user_bio(user_id) or "")
+    me = html.escape(sql.get_user_me_info(user_id) or "")
     if bio and me:
-        return "*About user:*\n{me}\n*What others say:*\n{bio}".format(me=me, bio=bio)
+        return "<b>About user:</b>\n{me}\n<b>What others say:</b>\n{bio}".format(me=me, bio=bio)
     elif bio:
-        return "*What others say:*\n{bio}\n".format(me=me, bio=bio)
+        return "<b>What others say:</b>\n{bio}\n".format(me=me, bio=bio)
     elif me:
-        return "*About user:*\n{me}""".format(me=me, bio=bio)
+        return "<b>About user:</b>\n{me}""".format(me=me, bio=bio)
     else:
         return ""
 

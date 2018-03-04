@@ -1,5 +1,4 @@
 from io import BytesIO
-
 from time import sleep
 from typing import Optional
 
@@ -104,7 +103,7 @@ def __user_info__(user_id):
     if user_id == dispatcher.bot.id:
         return """I've seen them in... Wow. Are they stalking me? They're in all the same places I am... oh. It's me."""
     num_chats = sql.get_user_num_chats(user_id)
-    return """I've seen them in {} chats in total.""".format(num_chats)
+    return """I've seen them in <code>{}</code> chats in total.""".format(num_chats)
 
 
 def __stats__():
