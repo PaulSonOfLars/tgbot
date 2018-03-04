@@ -43,7 +43,7 @@ def add_blacklist(bot: Bot, update: Update):
     words = msg.text.split(None, 1)
     if len(words) > 1:
         text = words[1]
-        to_blacklist = text.split("\n")
+        to_blacklist = list(set(trigger.strip() for trigger in text.split("\n") if trigger.strip()))
         for trigger in to_blacklist:
             sql.add_to_blacklist(chat.id, trigger.lower())
 
@@ -126,7 +126,8 @@ def __chat_settings__(chat_id, user_id):
 
 
 def __stats__():
-    return "{} blacklist triggers, across {} chats.".format(sql.num_blacklist_filters(), sql.num_blacklist_filter_chats())
+    return "{} blacklist triggers, across {} chats.".format(sql.num_blacklist_filters(),
+                                                            sql.num_blacklist_filter_chats())
 
 
 __mod_name__ = "Word Blacklists"
