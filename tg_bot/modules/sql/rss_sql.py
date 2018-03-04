@@ -30,13 +30,11 @@ RSS.__table__.create(checkfirst=True)
 INSERTION_LOCK = threading.RLock()
 
 
-def check_url_availability(tg_user_id, tg_feed_link, tg_chat_id):
+def check_url_availability(tg_user_id, tg_chat_id, tg_feed_link):
     try:
-        row = SESSION.query(RSS).filter(RSS.user_id == tg_user_id,
-                                    RSS.feed_link == tg_feed_link,
-                                    RSS.chat_id == tg_chat_id).all()
-
-        return row
+        return SESSION.query(RSS).filter(RSS.user_id == tg_user_id,
+                                         RSS.feed_link == tg_feed_link,
+                                         RSS.chat_id == tg_chat_id).all()
     finally:
         SESSION.close()
 
@@ -49,7 +47,7 @@ def add_url(tg_user_id, tg_chat_id, tg_feed_link, tg_old_entry_link):
         SESSION.commit()
 
 
-def remove_url(tg_user_id, tg_feed_link, tg_chat_id):
+def remove_url(tg_user_id, tg_chat_id, tg_feed_link):
     with INSERTION_LOCK:
         # this loops to delete any possible duplicates for the same TG User ID, TG Chat ID and link
         for row in check_url_availability(tg_user_id, tg_feed_link, tg_chat_id):
@@ -61,32 +59,25 @@ def remove_url(tg_user_id, tg_feed_link, tg_chat_id):
 
 def get_urls(tg_user_id, tg_chat_id):
     try:
-        row = SESSION.query(RSS).filter(RSS.user_id == tg_user_id,
+        return SESSION.query(RSS).filter(RSS.user_id == tg_user_id,
                                     RSS.chat_id == tg_chat_id).all()
-
-        return row
     finally:
         SESSION.close()
 
 
 def get_all():
     try:
-        data = SESSION.query(RSS).all()
-
-        return data
+        return SESSION.query(RSS).all()
     finally:
         SESSION.close()
 
 
 def update_url(row_id, new_entry_links):
     with INSERTION_LOCK:
-        row = SESSION.query(RSS).filter(RSS.id == row_id)
-        print(row)
+        row = SESSION.query(RSS).get(row_id)
 
         # set the new old_entry_link with the latest update from the RSS Feed
         row.old_entry_link = new_entry_links[0]
 
         # commit the changes to the DB
         SESSION.commit()
-
-
