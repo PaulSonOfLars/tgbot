@@ -57,7 +57,7 @@ def show_url(bot, update, args):
                         "\n\nentry link: {}".format(html.escape(feed_title),
                                                     html.escape(feed_description),
                                                     html.escape(feed_link),
-                                                    entry_title,
+                                                    html.escape(entry_title),
                                                     html.escape(entry_description),
                                                     html.escape(entry_link))
 
@@ -81,8 +81,7 @@ def list_urls(bot, update):
     links_list = []
 
     # this loops gets every link from the DB based on the filter above and appends it to the list
-    for row in user_data:
-        links_list.append(row.feed_link)
+    links_list = [row.feed_link for row in user_data]
 
     # make an empty string for later usage
     final_content = ""
@@ -97,7 +96,7 @@ def list_urls(bot, update):
         bot.send_message(chat_id=tg_chat_id, text="This chat is subscribed to the following links:"
                                                   + "\n" + final_content)
     else:
-        bot.send_message(chat_id=tg_chat_id, text="*Warning: *" + "The message is too long to be sent")
+        bot.send_message(chat_id=tg_chat_id, text="<b>Warning: </b>" + "The message is too long to be sent")
 
 
 @user_admin
@@ -164,33 +163,28 @@ def remove_url(bot, update, args):
         # gather the feed link from the command sent by the user
         tg_feed_link = args[0]
 
-        # check if the user who issued the command is the chat's admin or owner (to prevent spam)
-        if chat.get_member(tg_user_id).status == 'administrator' or chat.get_member(
-                tg_user_id).status == 'owner' or tg_user_id in SUDO_USERS:
-            # pass the link to be processed by feedparser
-            link_processed = parse(tg_feed_link)
+        # pass the link to be processed by feedparser
+        link_processed = parse(tg_feed_link)
 
-            # check if link is a valid RSS Feed link
-            if link_processed.bozo == 1:
-                # it's not a valid RSS Feed link
-                update.effective_message.reply_text("This link is not an RSS Feed link")
-            else:
-                # the RSS Feed link is valid
-
-                # gather all duplicates (if possible) for the same TG User ID, TG Chat ID and link
-                user_data = sql.check_url_availability(tg_user_id, tg_feed_link, tg_chat_id)
-
-                # check if it finds the link in the database
-                if user_data:
-                    # there is an link in the DB
-
-                    sql.remove_url(tg_user_id, tg_feed_link, tg_chat_id)
-
-                    update.effective_message.reply_text("Removed URL from subscription")
-                else:
-                    update.effective_message.reply_text("You haven't subscribed to this URL yet")
+        # check if link is a valid RSS Feed link
+        if link_processed.bozo == 1:
+            # it's not a valid RSS Feed link
+            update.effective_message.reply_text("This link is not an RSS Feed link")
         else:
-            update.effective_message.reply_text("You must be an admin to issue this command")
+            # the RSS Feed link is valid
+
+            # gather all duplicates (if possible) for the same TG User ID, TG Chat ID and link
+            user_data = sql.check_url_availability(tg_user_id, tg_chat_id, tg_feed_link)
+
+            # check if it finds the link in the database
+            if user_data:
+                # there is an link in the DB
+
+                sql.remove_url(tg_user_id, tg_chat_id, tg_feed_link)
+
+                update.effective_message.reply_text("Removed URL from subscription")
+            else:
+                update.effective_message.reply_text("You haven't subscribed to this URL yet")
     else:
         # there's nothing written or it's too less text to be an actual link
         update.effective_message.reply_text("URL missing")
@@ -262,7 +256,7 @@ def rss_update(bot, job):
                 if len(final_message) <= constants.MAX_MESSAGE_LENGTH:
                     bot.send_message(chat_id=tg_chat_id, text=final_message, parse_mode=ParseMode.HTML)
                 else:
-                    bot.send_message(chat_id=tg_chat_id, text="*Warning: *" + "The message is too long to be sent",
+                    bot.send_message(chat_id=tg_chat_id, text="<b>Warning: </b>" + "The message is too long to be sent",
                                      parse_mode=ParseMode.HTML)
 
             bot.send_message(chat_id=tg_chat_id, parse_mode=ParseMode.HTML,
