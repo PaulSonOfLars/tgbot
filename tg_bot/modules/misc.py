@@ -75,7 +75,6 @@ SLAP_TEMPLATES = (
     "{user1} {throws} a {item} at {user2}.",
     "{user1} grabs a {item} and {throws} it at {user2}'s face.",
     "{user1} launches a {item} in {user2}'s general direction.",
-    "{user1} sits on {user2}'s face while slamming a {item} into their crotch.",
     "{user1} starts slapping {user2} silly with a {item}.",
     "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
     "{user1} grabs up a {item} and {hits} {user2} with it.",
