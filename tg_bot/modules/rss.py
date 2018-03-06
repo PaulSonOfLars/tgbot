@@ -228,7 +228,7 @@ def rss_update(bot, job):
                 if len(final_message) <= constants.MAX_MESSAGE_LENGTH:
                     bot.send_message(chat_id=tg_chat_id, text=final_message, parse_mode=ParseMode.HTML)
                 else:
-                    bot.send_message(chat_id=tg_chat_id, text="<b>Warning: </b>" + "The message is too long to be sent",
+                    bot.send_message(chat_id=tg_chat_id, text="<b>Warning:</b> The message is too long to be sent",
                                      parse_mode=ParseMode.HTML)
         else:
             for link, title in zip(reversed(new_entry_links[-5:]), reversed(new_entry_titles[-5:])):
@@ -239,7 +239,7 @@ def rss_update(bot, job):
                 if len(final_message) <= constants.MAX_MESSAGE_LENGTH:
                     bot.send_message(chat_id=tg_chat_id, text=final_message, parse_mode=ParseMode.HTML)
                 else:
-                    bot.send_message(chat_id=tg_chat_id, text="<b>Warning: </b>" + "The message is too long to be sent",
+                    bot.send_message(chat_id=tg_chat_id, text="<b>Warning:</b> The message is too long to be sent",
                                      parse_mode=ParseMode.HTML)
 
             bot.send_message(chat_id=tg_chat_id, parse_mode=ParseMode.HTML,
