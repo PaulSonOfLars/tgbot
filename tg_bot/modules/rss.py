@@ -44,7 +44,7 @@ def show_url(bot, update, args):
         else:
             entry_description = "Unknown"
 
-        if 'link' in link_processed.entries[0].link:
+        if 'link' in link_processed.entries[0]:
             entry_link = link_processed.entries[0].link
         else:
             entry_link = "Unknown"
@@ -87,7 +87,7 @@ def list_urls(bot, update):
         bot.send_message(chat_id=tg_chat_id, text="This chat is subscribed to the following links\n" + final_content)
     else:
         bot.send_message(chat_id=tg_chat_id, parse_mode=ParseMode.HTML,
-                         text="<b>Warning: </b>" + "The message is too long to be sent")
+                         text="<b>Warning:</b> The message is too long to be sent")
 
 
 @user_admin
