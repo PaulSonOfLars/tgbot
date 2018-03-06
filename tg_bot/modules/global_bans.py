@@ -85,6 +85,8 @@ def gban(bot: Bot, update: Update, args: List[str]):
                 pass
             elif excp.message == "Group chat was deactivated":
                 pass
+            elif excp.message == "Need to be inviter of a user to kick it from a basic group":
+                pass
             else:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
                 send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
