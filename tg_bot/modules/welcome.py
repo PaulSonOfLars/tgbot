@@ -407,12 +407,13 @@ WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in mu
                 " - `{{count}}`: this represents the user's *member number*.\n" \
                 " - `{{chatname}}`: this represents the *current chat name*.\n" \
                 "\nEach variable MUST be surrounded by `{{}}` to be replaced.\n" \
-                "Welcome messages also support markdown, so you can make any elements bold/italic/code/links." \
-                "Buttons are also supported, so you can make your welcomes look damn good with some sexy intro " \
+                "Welcome messages also support markdown, so you can make any elements bold/italic/code/links. " \
+                "Buttons are also supported, so you can make your welcomes look awesome with some nice intro " \
                 "buttons.\n" \
                 "To create a button linking to your rules, use this: `[Rules](buttonurl://t.me/{}?start=group_id)`. " \
                 "Simply replace `group_id` with your group's id, which can be obtained via /id, and you're good to " \
-                "go.\n" \
+                "go. Note that group ids are usually preceded by a `-` sign; this is required, so please don't " \
+                "remove it.\n" \
                 "If you're feeling fun, you can even set images/gifs/videos/voice messages as the welcome message by " \
                 "replying to the desired media, and calling /setwelcome.".format(dispatcher.bot.username)
 
@@ -447,6 +448,8 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
+{}
+
 *Admin only:*
  - /welcome <on/off>: enable/disable welcome messages. If used with no arg, shows current settings.
  - /goodbye <on/off>: enable/disable goodbye messages. If used with no arg, shows current settings.
@@ -454,8 +457,9 @@ __help__ = """
  - /setgoodbye <sometext>: set a custom goodbye message. If used replying to media, uses that media.
  - /resetwelcome: reset to the default welcome message.
  - /resetgoodbye: reset to the default goodbye message.
+
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
-"""
+""".format(WELC_HELP_TXT)
 
 __mod_name__ = "Welcomes/Goodbyes"
 
