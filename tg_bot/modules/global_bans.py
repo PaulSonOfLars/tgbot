@@ -1,10 +1,11 @@
+import html
 from io import BytesIO
 from typing import Optional, List
 
 from telegram import Message, Update, Bot, User, Chat
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
@@ -53,12 +54,10 @@ def gban(bot: Bot, update: Update, args: List[str]):
 
     banner = update.effective_user  # type: Optional[User]
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
-                 "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) "
-                 "because:\n{}".format(escape_markdown(banner.first_name),
-                                       banner.id,
-                                       escape_markdown(user_chat.first_name),
-                                       user_chat.id, reason or "No reason given"),
-                 markdown=True)
+                 "{} is gbanning user {} "
+                 "because:\n{}".format(mention_html(banner.id, banner.first_name),
+                                       mention_html(user_chat.id, user_chat.first_name), reason or "No reason given"),
+                 html=True)
 
     sql.gban_user(user_id, user_chat.username or user_chat.first_name, reason)
 
@@ -122,12 +121,9 @@ def ungban(bot: Bot, update: Update, args: List[str]):
     message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
-                 "[{}](tg://user?id={}) has ungbanned user [{}](tg://user?id={})".format(
-                     escape_markdown(banner.first_name),
-                     banner.id,
-                     escape_markdown(user_chat.first_name),
-                     user_chat.id),
-                 markdown=True)
+                 "{} has ungbanned user {}".format(mention_html(banner.id, banner.first_name),
+                                                   mention_html(user_chat.id, user_chat.first_name)),
+                 html=True)
 
     chats = get_all_chats()
     for chat in chats:
@@ -253,7 +249,7 @@ def __user_info__(user_id):
         text = text.format("Yes")
         user = sql.get_gbanned_user(user_id)
         if user.reason:
-            text += "\nReason: {}".format(escape_markdown(user.reason))
+            text += "\nReason: {}".format(html.escape(user.reason))
     else:
         text = text.format("No")
     return text
