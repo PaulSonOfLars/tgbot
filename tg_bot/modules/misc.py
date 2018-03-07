@@ -346,7 +346,7 @@ Keep in mind that your message <b>MUST</b> contain some text other than just a b
     update.effective_message.reply_text("Try forwarding the following message to me, and you'll see!")
     update.effective_message.reply_text("/save test This is a markdown test. _italics_, *bold*, `code`, "
                                         "[URL](example.com) [button](buttonurl:github.com) "
-                                        "[button2](buttonurl://google.com:same)]")
+                                        "[button2](buttonurl://google.com:same)")
 
 
 @run_async
