@@ -1,20 +1,17 @@
 import html
 import re
 
+from feedparser import parse
 from telegram import ParseMode, constants
 from telegram.ext import CommandHandler
 
-from tg_bot import dispatcher, SUDO_USERS, updater
+from tg_bot import dispatcher, updater
+from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.sql import rss_sql as sql
-from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin
-
-from feedparser import parse
 
 
 def show_url(bot, update, args):
     tg_chat_id = str(update.effective_chat.id)
-
-    global feed_message, entry_message
 
     if len(args) >= 1:
         tg_feed_link = args[0]
@@ -43,7 +40,7 @@ def show_url(bot, update, args):
                                 "\n\n<b>Entry Link:</b> \n{}".format(html.escape(entry_title),
                                                                      entry_description,
                                                                      html.escape(entry_link))
-                final_message = str.join('', (feed_message, entry_message))
+                final_message = feed_message + entry_message
 
                 bot.send_message(chat_id=tg_chat_id, text=final_message, parse_mode=ParseMode.HTML)
             else:
@@ -86,10 +83,11 @@ def add_url(bot, update, args):
         link_processed = parse(tg_feed_link)
 
         # check if link is a valid RSS Feed link
-        if link_processed.bozo == 1:
-            update.effective_message.reply_text("This link is not an RSS Feed link")
-        else:
-            tg_old_entry_link = link_processed.entries[0].link
+        if link_processed.bozo == 0:
+            if len(link_processed.entries[0] >= 1):
+                tg_old_entry_link = link_processed.entries[0].link
+            else:
+                tg_old_entry_link = ""
 
             # gather the row which contains exactly that telegram group ID and link for later comparison
             row = sql.check_url_availability(tg_chat_id, tg_feed_link)
@@ -101,6 +99,8 @@ def add_url(bot, update, args):
                 sql.add_url(tg_chat_id, tg_feed_link, tg_old_entry_link)
 
                 update.effective_message.reply_text("Added URL to subscription")
+        else:
+            update.effective_message.reply_text("This link is not an RSS Feed link")
     else:
         update.effective_message.reply_text("URL missing")
 
@@ -114,9 +114,7 @@ def remove_url(bot, update, args):
 
         link_processed = parse(tg_feed_link)
 
-        if link_processed.bozo == 1:
-            update.effective_message.reply_text("This link is not an RSS Feed link")
-        else:
+        if link_processed.bozo == 0:
             user_data = sql.check_url_availability(tg_chat_id, tg_feed_link)
 
             if user_data:
@@ -125,6 +123,8 @@ def remove_url(bot, update, args):
                 update.effective_message.reply_text("Removed URL from subscription")
             else:
                 update.effective_message.reply_text("You haven't subscribed to this URL yet")
+        else:
+            update.effective_message.reply_text("This link is not an RSS Feed link")
     else:
         update.effective_message.reply_text("URL missing")
 
@@ -182,7 +182,7 @@ def rss_update(bot, job):
 
             bot.send_message(chat_id=tg_chat_id, parse_mode=ParseMode.HTML,
                              text="<b>Warning: </b>{} occurrences have been left out to prevent spam"
-                             .format(str(len(new_entry_links) - 5)))
+                             .format(len(new_entry_links) - 5))
 
 
 def rss_set(bot, job):
