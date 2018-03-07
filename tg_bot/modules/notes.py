@@ -10,7 +10,7 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
-from tg_bot import dispatcher, MESSAGE_DUMP, OWNER_USERNAME, LOGGER
+from tg_bot import dispatcher, MESSAGE_DUMP, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.misc import build_keyboard
@@ -77,8 +77,8 @@ def get(bot, update, notename, show_none=True):
                                        "the meantime, I'll remove it from your notes list.")
                     sql.rm_note(chat_id, notename)
                 else:
-                    message.reply_text("This note is not formatted correctly. Could not send. Contact @{} if you "
-                                       "can't figure out why!".format(OWNER_USERNAME))
+                    message.reply_text("This note could not be sent, as it is incorrectly formatted. Ask in "
+                                       "@MarieSupport if you can't figure out why!")
                     LOGGER.exception("Could not parse message #%s in chat %s", notename, str(chat_id))
                     LOGGER.warning("Message was: %s", str(note.value))
         return
