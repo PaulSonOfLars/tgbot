@@ -76,7 +76,7 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False, html=Fal
             if markdown:
                 bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN)
             elif html:
-                bot.send_message(user_id, parse_mode=ParseMode.HTML)
+                bot.send_message(user_id, message, parse_mode=ParseMode.HTML)
             else:
                 bot.send_message(user_id, message)
         except TelegramError:
