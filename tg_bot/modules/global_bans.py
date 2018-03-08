@@ -50,6 +50,20 @@ def gban(bot: Bot, update: Update, args: List[str]):
         message.reply_text("That's not a user!")
         return
 
+    if sql.is_user_gbanned(user_id):
+        if not reason:
+            message.reply_text("This user is already gbanned; I'd change the reason, but you haven't given me one...")
+            return
+
+        success = sql.update_gban_reason(user_id, user_chat.username or user_chat.first_name, reason)
+        if success:
+            message.reply_text("This user is already gbanned; I've gone and updated the gban reason though!")
+        else:
+            message.reply_text("Do you mind trying again? I thought this person was gbanned, but then they weren't? "
+                               "Am very confused")
+
+        return
+
     message.reply_text("*Blows dust off of banhammer* 😉")
 
     banner = update.effective_user  # type: Optional[User]

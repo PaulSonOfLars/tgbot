@@ -60,6 +60,19 @@ def gban_user(user_id, name, reason=None):
         __load_gbanned_userid_list()
 
 
+def update_gban_reason(user_id, name, reason=None):
+    with GBANNED_USERS_LOCK:
+        user = SESSION.query(GloballyBannedUsers).get(user_id)
+        if not user:
+            return False
+        user.name = name
+        user.reason = reason
+
+        SESSION.merge(user)
+        SESSION.commit()
+        return True
+
+
 def ungban_user(user_id):
     with GBANNED_USERS_LOCK:
         user = SESSION.query(GloballyBannedUsers).get(user_id)
