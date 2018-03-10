@@ -64,7 +64,6 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset:
     # regex to find []() links -> hyperlinks/buttons
     pattern = re.compile(r'(?<!\\)\[.+?\]\((.*?)\)')
     prev = 0
-    count = 0
     res = ""
     # Loop over all message entities, and:
     # reinsert code
@@ -76,7 +75,7 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset:
         # we only care about code, url, text links
         if ent.type in ("code", "url", "text_link"):
             # count emoji to switch counter
-            count += _calc_emoji_offset(txt[prev:start])
+            count = _calc_emoji_offset(txt[:start])
             start -= count
             end -= count
 
@@ -86,6 +85,7 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset:
                     continue
                 # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
                 else:
+                    # TODO: investigate possible offset bug when lots of emoji are present
                     res += _selective_escape(txt[prev:start] or "") + escape_markdown(ent_text)
 
             # code handling
