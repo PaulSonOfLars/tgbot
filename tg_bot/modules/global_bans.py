@@ -100,6 +100,8 @@ def gban(bot: Bot, update: Update, args: List[str]):
                 pass
             elif excp.message == "Need to be inviter of a user to kick it from a basic group":
                 pass
+            elif excp.message == "Chat_admin_required":
+                pass
             else:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
                 send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
@@ -166,6 +168,8 @@ def ungban(bot: Bot, update: Update, args: List[str]):
             elif excp.message == "Not in the chat":
                 pass
             elif excp.message == "Channel_private":
+                pass
+            elif excp.message == "Chat_admin_required":
                 pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
