@@ -314,8 +314,13 @@ def get_time(bot: Bot, update: Update, args: List[str]):
 @run_async
 def echo(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
-    update.effective_message.reply_text(args[1], quote=False)
-    update.effective_message.delete()
+    message = update.effective_message
+    if message.reply_to_message:
+        message.reply_to_message.reply_text(args[1])
+        message.delete()
+    else:
+        message.reply_text(args[1], quote=False)
+        message.delete()
 
 
 MARKDOWN_HELP = """
