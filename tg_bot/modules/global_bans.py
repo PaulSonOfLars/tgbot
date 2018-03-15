@@ -102,6 +102,8 @@ def gban(bot: Bot, update: Update, args: List[str]):
                 pass
             elif excp.message == "Chat_admin_required":
                 pass
+            elif excp.message == "Only the creator of a basic group can kick group administrators":
+                pass
             else:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
                 send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
