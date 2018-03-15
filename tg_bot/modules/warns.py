@@ -55,8 +55,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                  "\n<b>User:</b> {}" \
                  "\n<b>Reason:</b> {}".format(html.escape(chat.title),
                                               warner_tag,
-                                              mention_html(user.id, user.first_name),
-                                              user.id, reason)
+                                              mention_html(user.id, user.first_name), reason)
 
     else:
         keyboard = InlineKeyboardMarkup(
