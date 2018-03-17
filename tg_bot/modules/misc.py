@@ -315,12 +315,11 @@ def get_time(bot: Bot, update: Update, args: List[str]):
 def echo(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
+    message.delete()
     if message.reply_to_message:
         message.reply_to_message.reply_text(args[1])
-        message.delete()
     else:
         message.reply_text(args[1], quote=False)
-        message.delete()
 
 
 MARKDOWN_HELP = """
