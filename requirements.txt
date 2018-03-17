@@ -3,4 +3,4 @@ emoji
 requests
 sqlalchemy
 python-telegram-bot>=8.0.0
-psycopg2
+psycopg2-binary
