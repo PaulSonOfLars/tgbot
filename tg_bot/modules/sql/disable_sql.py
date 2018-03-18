@@ -56,6 +56,14 @@ def is_command_disabled(chat_id, cmd):
         SESSION.close()
 
 
+def are_commands_disabled(chat_id, cmds):
+    try:
+        return bool(SESSION.query(Disable).filter(Disable.chat_id == str(chat_id),
+                                                  Disable.command.in_(v for v in cmds)).first())
+    finally:
+        SESSION.close()
+
+
 def get_all_disabled(chat_id):
     try:
         return SESSION.query(Disable).filter(Disable.chat_id == str(chat_id)).all()
