@@ -247,8 +247,8 @@ __help__ = """
 
 *Admin only:*
  - /save <notename> <notedata>: saves notedata as a note with name notename
-A button can be added to a botton by using standard markdown link syntax - the link should just be prepended with a \
-`buttonurl:` section, as such: `[somelink](buttonurl:example.com)`
+A button can be added to a note by using standard markdown link syntax - the link should just be prepended with a \
+`buttonurl:` section, as such: `[somelink](buttonurl:example.com)`. Check /markdownhelp for more info.
  - /save <notename>: save the replied message as a note with name notename
  - /clear <notename>: clear note with this name
 """
