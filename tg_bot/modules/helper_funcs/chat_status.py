@@ -33,12 +33,13 @@ def is_user_admin(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
     return member.status in ('administrator', 'creator')
 
 
-def is_bot_admin(chat: Chat, bot_id: int) -> bool:
+def is_bot_admin(chat: Chat, bot_id: int, bot_member: ChatMember = None) -> bool:
     if chat.type == 'private' \
             or chat.all_members_are_administrators:
         return True
 
-    bot_member = chat.get_member(bot_id)
+    if not bot_member:
+        bot_member = chat.get_member(bot_id)
     return bot_member.status in ('administrator', 'creator')
 
 
