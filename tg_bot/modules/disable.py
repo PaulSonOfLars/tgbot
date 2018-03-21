@@ -31,10 +31,9 @@ if is_module_loaded(FILENAME):
         def check_update(self, update):
             chat = update.effective_chat
             if super().check_update(update):
-                first_word = update.effective_message.text_html.split(None, 1)[0]
-                if len(first_word) > 1 and first_word.startswith('/'):
-                    command = first_word[1:].split('@')[0]
-                    return not sql.is_command_disabled(chat.id, command)
+                # Should be safe since check_update passed.
+                command = update.effective_message.text_html.split(None, 1)[0][1:].split('@')[0]
+                return not sql.is_command_disabled(chat.id, command)
 
             return False
 
