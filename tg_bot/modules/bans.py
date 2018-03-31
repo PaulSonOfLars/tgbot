@@ -14,7 +14,7 @@ from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_us
 from tg_bot.modules.helper_funcs.extraction import extract_user_and_text
 from tg_bot.modules.helper_funcs.string_handling import extract_time
 from tg_bot.modules.log_channel import loggable
-
+from tg_bot.modules.helper_funcs.filters import CustomFilters
 
 @run_async
 @bot_admin
@@ -216,7 +216,6 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
 
     return ""
 
-
 @run_async
 @bot_admin
 @can_restrict
@@ -296,6 +295,66 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
     return log
 
 
+@run_async
+@bot_admin
+def rban(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message
+
+    if args:
+        user_id, chat_id = extract_user_and_text(message, args)
+
+        if not user_id:
+            message.reply_text("You don't seem to be referring to a user.")
+            return ""
+        elif not chat_id:
+            message.reply_text("You don't seem to be referring to a chat.")
+            return ""
+
+        try:
+            chat = bot.get_chat(chat_id)
+        except BadRequest as excp:
+            if excp.message == "Chat not found":
+                message.reply_text("Chat not found! Make sure you entered a valid chat ID")
+                return ""
+            else:
+                raise
+
+    else:
+        message.reply_text("You don't seem to be referring to a chat/user.")
+        return ""
+
+    try:
+        member = chat.get_member(user_id)
+    except BadRequest as excp:
+        if excp.message == "User not found":
+            message.reply_text("I can't seem to find this user")
+            return ""
+        else:
+            raise
+
+    if is_user_ban_protected(chat, user_id, member):
+        message.reply_text("I really wish I could ban admins...")
+        return ""
+
+    if user_id == bot.id:
+        message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        return ""
+
+    try:
+        chat.kick_member(user_id)
+        message.reply_text("Banned!")
+    except BadRequest as excp:
+        if excp.message == "Reply message not found":
+            # Do not reply
+            message.reply_text('Banned!', quote=False)
+            return log
+        else:
+            LOGGER.warning(update)
+            LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id,
+                             excp.message)
+            message.reply_text("Well damn, I can't ban that user.")
+
+
 __help__ = """
  - /kickme: kicks the user who issued the command.
  - /banme: bans the user who issued the command.
@@ -314,6 +373,7 @@ TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, 
 KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.group)
 UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=Filters.group)
 KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=Filters.group)
+RBAN_HANDLER = CommandHandler("rban", rban, pass_args=True, filters=CustomFilters.sudo_filter)
 BANME_HANDLER = DisableAbleCommandHandler("banme", banme, filters=Filters.group)
 
 dispatcher.add_handler(BAN_HANDLER)
@@ -321,4 +381,5 @@ dispatcher.add_handler(TEMPBAN_HANDLER)
 dispatcher.add_handler(KICK_HANDLER)
 dispatcher.add_handler(UNBAN_HANDLER)
 dispatcher.add_handler(KICKME_HANDLER)
+dispatcher.add_handler(RBAN_HANDLER)
 dispatcher.add_handler(BANME_HANDLER)
