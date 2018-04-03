@@ -119,7 +119,7 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
             elif args[0] in RESTRICTION_TYPES:
                 sql.update_restriction(chat.id, args[0], locked=False)
                 members = users_sql.get_chat_members(chat.id)
-
+                """
                 if args[0] == "messages":
                     unrestr_members(bot, chat.id, members, media=False, other=False, previews=False)
 
@@ -134,8 +134,9 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
 
                 elif args[0] == "all":
                     unrestr_members(bot, chat.id, members, True, True, True, True)
-
+                """
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
+                message.reply_text("NOTE: due to a recent abuse of locking, {} will now only be deleting messages, and not restricting users via the tg api. This shouldn't affect all you users though, so dont worry! Just means that any restricted users should be manually unrestricted from the chat admin pannel.".format(bot.first_name))
                 return "<b>{}:</b>" \
                        "\n#UNLOCK" \
                        "\n<b>Admin:</b> {}" \
@@ -243,11 +244,11 @@ def rest_msg(bot: Bot, update: Update):
             and can_delete(chat, bot.id) \
             and not is_user_admin(chat, msg.from_user.id):
         msg.delete()
-        bot.restrict_chat_member(chat.id, msg.from_user.id,
-                                 can_send_messages=False,
-                                 can_send_media_messages=False,
-                                 can_send_other_messages=False,
-                                 can_add_web_page_previews=False)
+        #bot.restrict_chat_member(chat.id, msg.from_user.id,
+        #                         can_send_messages=False,
+        #                         can_send_media_messages=False,
+        #                         can_send_other_messages=False,
+        #                         can_add_web_page_previews=False)
 
 
 @run_async
@@ -259,11 +260,11 @@ def rest_media(bot: Bot, update: Update):
             and can_delete(chat, bot.id) \
             and not is_user_admin(chat, msg.from_user.id):
         msg.delete()
-        bot.restrict_chat_member(chat.id, msg.from_user.id,
-                                 can_send_messages=True,
-                                 can_send_media_messages=False,
-                                 can_send_other_messages=False,
-                                 can_add_web_page_previews=False)
+        #bot.restrict_chat_member(chat.id, msg.from_user.id,
+        #                         can_send_messages=True,
+        #                         can_send_media_messages=False,
+        #                         can_send_other_messages=False,
+        #                         can_add_web_page_previews=False)
 
 
 @run_async
@@ -275,11 +276,11 @@ def rest_other(bot: Bot, update: Update):
             and can_delete(chat, bot.id) \
             and not is_user_admin(chat, msg.from_user.id):
         msg.delete()
-        bot.restrict_chat_member(chat.id, msg.from_user.id,
-                                 can_send_messages=True,
-                                 can_send_media_messages=True,
-                                 can_send_other_messages=False,
-                                 can_add_web_page_previews=False)
+        #bot.restrict_chat_member(chat.id, msg.from_user.id,
+        #                         can_send_messages=True,
+        #                         can_send_media_messages=True,
+        #                         can_send_other_messages=False,
+        #                         can_add_web_page_previews=False)
 
 
 @run_async
@@ -290,11 +291,12 @@ def rest_previews(bot: Bot, update: Update):
     if sql.is_restr_locked(chat.id, "previews") \
             and can_delete(chat, bot.id) \
             and not is_user_admin(chat, msg.from_user.id):
-        bot.restrict_chat_member(chat.id, msg.from_user.id,
-                                 can_send_messages=True,
-                                 can_send_media_messages=True,
-                                 can_send_other_messages=True,
-                                 can_add_web_page_previews=False)
+        pass
+        #bot.restrict_chat_member(chat.id, msg.from_user.id,
+        #                         can_send_messages=True,
+        #                         can_send_media_messages=True,
+        #                         can_send_other_messages=True,
+        #                         can_add_web_page_previews=False)
 
 
 def build_lock_message(chat_id):
