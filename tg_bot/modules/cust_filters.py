@@ -112,7 +112,7 @@ def filters(bot: Bot, update: Update):
     sql.add_filter(chat.id, keyword, content, is_sticker, is_document, is_image, is_audio, is_voice, is_video,
                    buttons)
 
-    msg.reply_text("Handler {} added!".format(keyword))
+    msg.reply_text("Handler '{}' added!".format(keyword))
     raise DispatcherHandlerStop
 
 

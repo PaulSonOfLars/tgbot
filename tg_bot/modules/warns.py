@@ -7,7 +7,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, User
 from telegram import Message, Chat, Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, run_async, DispatcherHandlerStop, MessageHandler, Filters, CallbackQueryHandler
-from telegram.utils.helpers import mention_html, mention_markdown, escape_markdown
+from telegram.utils.helpers import mention_html
 
 from tg_bot import dispatcher, BAN_STICKER
 from tg_bot.modules.disable import DisableAbleCommandHandler
@@ -21,7 +21,7 @@ from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import warns_sql as sql
 
 WARN_HANDLER_GROUP = 9
-CURRENT_WARNING_FILTER_STRING = "*Current warning filters in this chat:*\n"
+CURRENT_WARNING_FILTER_STRING = "<b>Current warning filters in this chat:</b>\n"
 
 
 # Not async
@@ -41,48 +41,51 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
         sql.reset_warns(user.id, chat.id)
         if soft_warn:  # kick
             chat.unban_member(user.id)
-            reply = "{} warnings, this user has been kicked!".format(limit)
+            reply = "{} warnings, {} has been kicked!".format(limit, mention_html(user.id, user.first_name))
 
         else:  # ban
             chat.kick_member(user.id)
-            reply = "{} warnings, this user has been banned!".format(limit)
+            reply = "{} warnings, {} has been banned!".format(limit, mention_html(user.id, user.first_name))
+
+        for warn_reason in reasons:
+            reply += "\n - {}".format(html.escape(warn_reason))
 
         message.bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         keyboard = []
-        reason = "<b>{}:</b>" \
-                 "\n#WARN_BAN" \
-                 "\n<b>Admin:</b> {}" \
-                 "\n<b>User:</b> {}" \
-                 "\n<b>Reason:</b> {}".format(html.escape(chat.title),
-                                              warner_tag,
-                                              mention_html(user.id, user.first_name), reason)
+        log_reason = "<b>{}:</b>" \
+                     "\n#WARN_BAN" \
+                     "\n<b>Admin:</b> {}" \
+                     "\n<b>User:</b> {}" \
+                     "\n<b>Reason:</b> {}".format(html.escape(chat.title),
+                                                  warner_tag,
+                                                  mention_html(user.id, user.first_name), reason)
 
     else:
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user.id))]])
 
-        reply = "{} has {}/{} warnings... watch out!".format(mention_markdown(user.id, user.first_name), num_warns,
+        reply = "{} has {}/{} warnings... watch out!".format(mention_html(user.id, user.first_name), num_warns,
                                                              limit)
         if reason:
-            reply += "\nReason for last warn:\n{}".format(escape_markdown(reason))
+            reply += "\nReason for last warn:\n{}".format(html.escape(reason))
 
-        reason = "<b>{}:</b>" \
-                 "\n#WARN" \
-                 "\n<b>Admin:</b> {}" \
-                 "\n<b>User:</b> {}" \
-                 "\n<b>Reason:</b> {}".format(html.escape(chat.title),
-                                              warner_tag,
-                                              mention_html(user.id, user.first_name), reason)
+        log_reason = "<b>{}:</b>" \
+                     "\n#WARN" \
+                     "\n<b>Admin:</b> {}" \
+                     "\n<b>User:</b> {}" \
+                     "\n<b>Reason:</b> {}".format(html.escape(chat.title),
+                                                  warner_tag,
+                                                  mention_html(user.id, user.first_name), reason)
 
     try:
-        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
-            message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN, quote=False)
+            message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML, quote=False)
         else:
             raise
-    return reason
+    return log_reason
 
 
 @run_async
@@ -264,15 +267,15 @@ def list_warn_filters(bot: Bot, update: Update):
 
     filter_list = CURRENT_WARNING_FILTER_STRING
     for handler in all_handlers:
-        entry = " - {}\n".format(escape_markdown(handler.keyword))
+        entry = " - {}\n".format(html.escape(handler.keyword))
         if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
-            update.effective_message.reply_text(filter_list, parse_mode=ParseMode.MARKDOWN)
+            update.effective_message.reply_text(filter_list, parse_mode=ParseMode.HTML)
             filter_list = entry
         else:
             filter_list += entry
 
     if not filter_list == CURRENT_WARNING_FILTER_STRING:
-        update.effective_message.reply_text(filter_list, parse_mode=ParseMode.MARKDOWN)
+        update.effective_message.reply_text(filter_list, parse_mode=ParseMode.HTML)
 
 
 @run_async
