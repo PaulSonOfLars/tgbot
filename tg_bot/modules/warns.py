@@ -99,8 +99,8 @@ def button(bot: Bot, update: Update) -> str:
         res = sql.remove_warn(user_id, chat.id)
         if res:
             update.effective_message.edit_text(
-                "Warn removed by {}.".format(mention_markdown(user.id, user.first_name)),
-                parse_mode=ParseMode.MARKDOWN)
+                "Warn removed by {}.".format(mention_html(user.id, user.first_name)),
+                parse_mode=ParseMode.HTML)
             user_member = chat.get_member(user_id)
             return "<b>{}:</b>" \
                    "\n#UNWARN" \
@@ -108,6 +108,11 @@ def button(bot: Bot, update: Update) -> str:
                    "\n<b>User:</b> {}".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
                                               mention_html(user_member.user.id, user_member.user.first_name))
+        else:
+            update.effective_message.edit_text(
+                "User has already has no warns.".format(mention_html(user.id, user.first_name)),
+                parse_mode=ParseMode.HTML)
+
     return ""
 
 
@@ -142,6 +147,7 @@ def reset_warns(bot: Bot, update: Update, args: List[str]) -> str:
     user = update.effective_user  # type: Optional[User]
 
     user_id = extract_user(message, args)
+
     if user_id:
         sql.reset_warns(user_id, chat.id)
         message.reply_text("Warnings have been reset!")
@@ -394,7 +400,7 @@ be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is
 __mod_name__ = "Warnings"
 
 WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True, filters=Filters.group)
-RESET_WARN_HANDLER = CommandHandler("resetwarn", reset_warns, pass_args=True, filters=Filters.group)
+RESET_WARN_HANDLER = CommandHandler(["resetwarn", "resetwarns"], reset_warns, pass_args=True, filters=Filters.group)
 CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
 MYWARNS_HANDLER = DisableAbleCommandHandler("warns", warns, pass_args=True, filters=Filters.group)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter, filters=Filters.group)

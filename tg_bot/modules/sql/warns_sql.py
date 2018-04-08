@@ -89,20 +89,18 @@ def warn_user(user_id, chat_id, reason=None):
 
 def remove_warn(user_id, chat_id):
     with WARN_INSERTION_LOCK:
+        removed = False
         warned_user = SESSION.query(Warns).get((user_id, str(chat_id)))
-        if not warned_user:
-            SESSION.close()
-            return None
 
-        if warned_user.num_warns >= 0:
+        if warned_user and warned_user.num_warns > 0:
             warned_user.num_warns -= 1
 
             SESSION.add(warned_user)
             SESSION.commit()
-
-            return warned_user
+            removed = True
 
         SESSION.close()
+        return removed
 
 
 def reset_warns(user_id, chat_id):
