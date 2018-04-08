@@ -16,7 +16,7 @@ from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import users_sql
 
-LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif', 'url', 'bots']
+LOCK_TYPES = ['sticker', 'audio', 'voice', 'document', 'video', 'contact', 'photo', 'gif', 'url', 'bots', 'forward', 'game']
 
 RESTRICTION_TYPES = ['messages', 'media', 'other', 'previews', 'all']
 
@@ -225,6 +225,22 @@ def del_url(bot: Bot, update: Update):
 
 @run_async
 @user_not_admin
+def del_fwd(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    if sql.is_locked(chat.id, "forward") and can_delete(chat, bot.id):
+        update.effective_message.delete()
+
+
+@run_async
+@user_not_admin
+def del_game(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    if sql.is_locked(chat.id, "game") and can_delete(chat, bot.id):
+        update.effective_message.delete()
+
+
+@run_async
+@user_not_admin
 def remove_bot(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     if sql.is_locked(chat.id, "bots") and is_bot_admin(chat, bot.id):
@@ -316,8 +332,11 @@ def build_lock_message(chat_id):
                    "\n - photo = `{}`" \
                    "\n - gif = `{}`" \
                    "\n - url = `{}`" \
-                   "\n - bots = `{}`".format(locks.sticker, locks.audio, locks.voice, locks.document,
-                                             locks.video, locks.contact, locks.photo, locks.gif, locks.url, locks.bots)
+                   "\n - bots = `{}`" \
+                   "\n - forward = `{}`" \
+                   "\n - game = `{}`".format(locks.sticker, locks.audio, locks.voice, locks.document,
+                                             locks.video, locks.contact, locks.photo, locks.gif, locks.url, locks.bots,
+                                             locks.forward, locks.game)
         if restr:
             res += "\n - messages = `{}`" \
                    "\n - media = `{}`" \
