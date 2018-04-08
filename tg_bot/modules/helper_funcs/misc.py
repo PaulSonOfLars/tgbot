@@ -94,5 +94,16 @@ def build_keyboard(buttons):
     return keyb
 
 
+def revert_buttons(buttons):
+    res = ""
+    for btn in buttons:
+        if btn.same_line:
+            res += "\n[{}](buttonurl://{}:same)".format(btn.name, btn.url)
+        else:
+            res += "\n[{}](buttonurl://{})".format(btn.name, btn.url)
+
+    return res
+
+
 def is_module_loaded(name):
     return (not LOAD or name in LOAD) and name not in NO_LOAD

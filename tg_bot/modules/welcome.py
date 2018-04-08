@@ -10,7 +10,7 @@ from telegram.utils.helpers import mention_markdown, mention_html, escape_markdo
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
-from tg_bot.modules.helper_funcs.misc import build_keyboard
+from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
 from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser, markdown_parser, \
     escape_invalid_curly_brackets
 from tg_bot.modules.log_channel import loggable
@@ -199,7 +199,8 @@ def welcome(bot: Bot, update: Update, args: List[str]):
     if len(args) == 0:
         pref, welcome_m, welcome_type = sql.get_welc_pref(chat.id)
         update.effective_message.reply_text(
-            "This chat has it's welcome setting set to: `{}`.\n*The welcome message is:*".format(pref),
+            "This chat has it's welcome setting set to: `{}`.\n*The welcome message "
+            "(not filling the {{}}) is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
 
         if welcome_type == sql.Types.BUTTON_TEXT:
@@ -210,7 +211,7 @@ def welcome(bot: Bot, update: Update, args: List[str]):
             send(update, welcome_m, keyboard, sql.DEFAULT_WELCOME)
 
         else:
-            ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
+            ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m, parse_mode=ParseMode.MARKDOWN)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
@@ -231,22 +232,32 @@ def welcome(bot: Bot, update: Update, args: List[str]):
 def goodbye(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
 
-    if len(args) == 0:
+    if len(args) == 0 or args[0] == "noformat":
+        noformat = args and args[0] == "noformat"
         pref, goodbye_m, goodbye_type = sql.get_gdbye_pref(chat.id)
         update.effective_message.reply_text(
-            "This chat has it's goodbye setting set to: `{}`.\n*The goodbye message is:*".format(pref),
+            "This chat has it's goodbye setting set to: `{}`.\n*The goodbye  message "
+            "(not filling the {{}}) is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
 
         if goodbye_type == sql.Types.BUTTON_TEXT:
             buttons = sql.get_gdbye_buttons(chat.id)
-            keyb = build_keyboard(buttons)
+            if noformat:
+                goodbye_m += revert_buttons(buttons)
+                update.effective_message.reply_text(goodbye_m)
 
-            keyboard = InlineKeyboardMarkup(keyb)
+            else:
+                keyb = build_keyboard(buttons)
+                keyboard = InlineKeyboardMarkup(keyb)
 
-            send(update, goodbye_m, keyboard, sql.DEFAULT_GOODBYE)
+                send(update, goodbye_m, keyboard, sql.DEFAULT_GOODBYE)
 
         else:
-            ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
+            if noformat:
+                ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
+
+            else:
+                ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m, parse_mode=ParseMode.MARKDOWN)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
@@ -502,8 +513,10 @@ __help__ = """
 {}
 
 *Admin only:*
- - /welcome <on/off>: enable/disable welcome messages. If used with no arg, shows current settings.
- - /goodbye <on/off>: enable/disable goodbye messages. If used with no arg, shows current settings.
+ - /welcome <on/off>: enable/disable welcome messages.
+ - /welcome: shows current welcome settings.
+ - /welcome noformat: shows current welcome settings, without the formatting - useful to recycle your welcome messages!
+ - /goodbye -> same usage and args as /welcome.
  - /setwelcome <sometext>: set a custom welcome message. If used replying to media, uses that media.
  - /setgoodbye <sometext>: set a custom goodbye message. If used replying to media, uses that media.
  - /resetwelcome: reset to the default welcome message.
