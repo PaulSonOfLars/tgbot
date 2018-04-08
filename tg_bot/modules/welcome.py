@@ -32,45 +32,47 @@ ENUM_FUNC_MAP = {
 # do not async
 def send(update, message, keyboard, backup_message):
     try:
-        update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+        msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except IndexError:
-        update.effective_message.reply_text(markdown_parser(backup_message +
-                                                            "\nNote: the current message was "
-                                                            "invalid due to markdown issues. Could be "
-                                                            "due to the user's name."),
-                                            parse_mode=ParseMode.MARKDOWN)
+        msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                  "\nNote: the current message was "
+                                                                  "invalid due to markdown issues. Could be "
+                                                                  "due to the user's name."),
+                                                  parse_mode=ParseMode.MARKDOWN)
     except KeyError:
-        update.effective_message.reply_text(markdown_parser(backup_message +
-                                                            "\nNote: the current message is "
-                                                            "invalid due to an issue with some misplaced "
-                                                            "curly brackets. Please update"),
-                                            parse_mode=ParseMode.MARKDOWN)
+        msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                  "\nNote: the current message is "
+                                                                  "invalid due to an issue with some misplaced "
+                                                                  "curly brackets. Please update"),
+                                                  parse_mode=ParseMode.MARKDOWN)
     except BadRequest as excp:
         if excp.message == "Button_url_invalid":
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: the current message has an invalid url in "
-                                                                "one of its buttons. Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: the current message has an invalid url "
+                                                                      "in one of its buttons. Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
         elif excp.message == "Unsupported url protocol":
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: the current message has buttons which use "
-                                                                "url protocols that are unsupported by telegram. "
-                                                                "Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: the current message has buttons which "
+                                                                      "use url protocols that are unsupported by "
+                                                                      "telegram. Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
         elif excp.message == "Wrong url host":
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: the current message has some bad urls. "
-                                                                "Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: the current message has some bad urls. "
+                                                                      "Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
             LOGGER.warning(message)
             LOGGER.warning(keyboard)
             LOGGER.exception("Could not parse! got invalid url host errors")
         else:
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: An error occured when sending the custom "
-                                                                "message. Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: An error occured when sending the "
+                                                                      "custom message. Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
             LOGGER.exception()
+
+    return msg
 
 
 @run_async
@@ -79,6 +81,7 @@ def new_member(bot: Bot, update: Update):
 
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     if should_welc:
+        sent = None
         new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
             # Give the owner a special welcome
@@ -123,7 +126,18 @@ def new_member(bot: Bot, update: Update):
 
                 keyboard = InlineKeyboardMarkup(keyb)
 
-                send(update, res, keyboard, sql.DEFAULT_WELCOME.format(first=first_name))
+                sent = send(update, res, keyboard,
+                            sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
+
+        prev_welc = sql.get_clean_pref(chat.id)
+        if prev_welc:
+            try:
+                bot.delete_message(chat.id, prev_welc)
+            except BadRequest as excp:
+                pass
+
+            if sent:
+                sql.set_clean_welcome(chat.id, sent.message_id)
 
 
 @run_async
@@ -393,6 +407,43 @@ def reset_goodbye(bot: Bot, update: Update) -> str:
                                                  mention_html(user.id, user.first_name))
 
 
+@run_async
+@user_admin
+@loggable
+def clean_welcome(bot: Bot, update: Update, args: List[str]) -> str:
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+
+    if not args:
+        clean_pref = sql.get_clean_pref(chat.id)
+        if clean_pref:
+            update.effective_message.reply_text("I should be deleting welcome messages up to two days old.")
+        else:
+            update.effective_message.reply_text("I'm currently not deleting old welcome messages!")
+        return ""
+
+    if args[0].lower() in ("on", "yes"):
+        sql.set_clean_welcome(str(chat.id), True)
+        update.effective_message.reply_text("I'll try to delete old welcome messages!")
+        return "<b>{}:</b>" \
+               "\n#CLEAN_WELCOME" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas toggled clean welcomes to <code>ON</code>.".format(html.escape(chat.title),
+                                                                         mention_html(user.id, user.first_name))
+    elif args[0].lower() in ("off", "no"):
+        sql.set_clean_welcome(str(chat.id), False)
+        update.effective_message.reply_text("I won't delete old welcome messages.")
+        return "<b>{}:</b>" \
+               "\n#CLEAN_WELCOME" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas toggled clean welcomes to <code>OFF</code>.".format(html.escape(chat.title),
+                                                                          mention_html(user.id, user.first_name))
+    else:
+        # idek what you're writing, say yes or no
+        update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
+        return ""
+
+
 WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in multiple ways. If you want the messages" \
                 " to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
                 " - `{{first}}`: this represents the user's *first* name\n" \
@@ -457,6 +508,7 @@ __help__ = """
  - /setgoodbye <sometext>: set a custom goodbye message. If used replying to media, uses that media.
  - /resetwelcome: reset to the default welcome message.
  - /resetgoodbye: reset to the default goodbye message.
+ - /cleanwelcome <on/off>: On new member, try to delete the previous welcome message to avoid spamming the chat.
 
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
 """.format(WELC_HELP_TXT)
@@ -471,6 +523,7 @@ SET_WELCOME = CommandHandler("setwelcome", set_welcome, filters=Filters.group)
 SET_GOODBYE = CommandHandler("setgoodbye", set_goodbye, filters=Filters.group)
 RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
 RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.group)
+CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
 dispatcher.add_handler(NEW_MEM_HANDLER)
@@ -481,4 +534,5 @@ dispatcher.add_handler(SET_WELCOME)
 dispatcher.add_handler(SET_GOODBYE)
 dispatcher.add_handler(RESET_WELCOME)
 dispatcher.add_handler(RESET_GOODBYE)
+dispatcher.add_handler(CLEAN_WELCOME)
 dispatcher.add_handler(WELCOME_HELP)
