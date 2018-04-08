@@ -78,7 +78,8 @@ def report(bot: Bot, update: Update) -> str:
             should_forward = False
 
         else:
-            msg = "{} is calling for admins in \"{}\"!".format(mention_html(user.id, user.first_name), chat_name)
+            msg = "{} is calling for admins in \"{}\"!".format(mention_html(user.id, user.first_name),
+                                                               html.escape(chat_name))
             link = ""
             should_forward = True
 
@@ -123,7 +124,7 @@ __mod_name__ = "Reporting"
 
 __help__ = """
  - /report <reason>: reply to a message to report it to admins.
- - @admins: reply to a message to report it to admins.
+ - @admin: reply to a message to report it to admins.
 NOTE: neither of these will get triggered if used by admins
 
 *Admin only:*
@@ -134,7 +135,7 @@ NOTE: neither of these will get triggered if used by admins
 
 REPORT_HANDLER = CommandHandler("report", report, filters=Filters.group)
 SETTING_HANDLER = CommandHandler("reports", report_setting, pass_args=True)
-ADMIN_REPORT_HANDLER = RegexHandler("(?i)@admin", report)
+ADMIN_REPORT_HANDLER = RegexHandler("(?i)@admin(s)?", report)
 
 dispatcher.add_handler(REPORT_HANDLER, REPORT_GROUP)
 dispatcher.add_handler(ADMIN_REPORT_HANDLER, REPORT_GROUP)
