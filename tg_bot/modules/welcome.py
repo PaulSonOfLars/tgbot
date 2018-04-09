@@ -196,7 +196,8 @@ def left_member(bot: Bot, update: Update):
 def welcome(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
     # if no args, show current replies.
-    if len(args) == 0:
+    if len(args) == 0 or args[0] == "noformat":
+        noformat = args and args[0] == "noformat"
         pref, welcome_m, welcome_type = sql.get_welc_pref(chat.id)
         update.effective_message.reply_text(
             "This chat has it's welcome setting set to: `{}`.\n*The welcome message "
@@ -205,13 +206,22 @@ def welcome(bot: Bot, update: Update, args: List[str]):
 
         if welcome_type == sql.Types.BUTTON_TEXT:
             buttons = sql.get_welc_buttons(chat.id)
-            keyb = build_keyboard(buttons)
-            keyboard = InlineKeyboardMarkup(keyb)
+            if noformat:
+                welcome_m += revert_buttons(buttons)
+                update.effective_message.reply_text(welcome_m)
 
-            send(update, welcome_m, keyboard, sql.DEFAULT_WELCOME)
+            else:
+                keyb = build_keyboard(buttons)
+                keyboard = InlineKeyboardMarkup(keyb)
+
+                send(update, welcome_m, keyboard, sql.DEFAULT_WELCOME)
 
         else:
-            ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m, parse_mode=ParseMode.MARKDOWN)
+            if noformat:
+                ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
+
+            else:
+                ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m, parse_mode=ParseMode.MARKDOWN)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
