@@ -51,7 +51,7 @@ def is_user_in_chat(chat: Chat, user_id: int) -> bool:
 def bot_can_delete(func):
     @wraps(func)
     def delete_rights(bot: Bot, update: Update, *args, **kwargs):
-        if update.effective_chat.get_member(bot.id).can_delete_messages:
+        if can_delete(update.effective_chat, bot.id):
             return func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I can't delete messages here! "
