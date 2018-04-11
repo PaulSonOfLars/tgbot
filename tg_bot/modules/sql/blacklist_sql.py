@@ -27,6 +27,8 @@ BlackListFilters.__table__.create(checkfirst=True)
 
 BLACKLIST_FILTER_INSERTION_LOCK = threading.RLock()
 
+CHAT_BLACKLISTS = {}
+
 
 def add_to_blacklist(chat_id, trigger):
     with BLACKLIST_FILTER_INSERTION_LOCK:
@@ -34,24 +36,26 @@ def add_to_blacklist(chat_id, trigger):
 
         SESSION.merge(blacklist_filt)  # merge to avoid duplicate key issues
         SESSION.commit()
+        CHAT_BLACKLISTS[str(chat_id)] = CHAT_BLACKLISTS.get(str(chat_id), []).append(trigger)
 
 
 def rm_from_blacklist(chat_id, trigger):
     with BLACKLIST_FILTER_INSERTION_LOCK:
         blacklist_filt = SESSION.query(BlackListFilters).get((str(chat_id), trigger))
         if blacklist_filt:
+            if trigger in CHAT_BLACKLISTS.get(str(chat_id), []):  # sanity check
+                CHAT_BLACKLISTS.get(str(chat_id), []).remove(trigger)
+
             SESSION.delete(blacklist_filt)
             SESSION.commit()
             return True
+
         SESSION.close()
         return False
 
 
 def get_chat_blacklist(chat_id):
-    try:
-        return SESSION.query(BlackListFilters).filter(BlackListFilters.chat_id == str(chat_id)).all()
-    finally:
-        SESSION.close()
+    return CHAT_BLACKLISTS.get(str(chat_id), [])
 
 
 def num_blacklist_filters():
@@ -75,9 +79,29 @@ def num_blacklist_filter_chats():
         SESSION.close()
 
 
+def __load_chat_blacklists():
+    global CHAT_BLACKLISTS
+    try:
+        chats = SESSION.query(BlackListFilters.chat_id).distinct().all()
+        for (chat_id,) in chats:  # remove tuple by ( ,)
+            CHAT_BLACKLISTS[chat_id] = []
+
+        all_filters = SESSION.query(BlackListFilters).all()
+        for x in all_filters:
+            CHAT_BLACKLISTS[x.chat_id] += [x.trigger]
+
+        CHAT_BLACKLISTS = {x: set(y) for x, y in CHAT_BLACKLISTS.items()}
+
+    finally:
+        SESSION.close()
+
+
 def migrate_chat(old_chat_id, new_chat_id):
     with BLACKLIST_FILTER_INSERTION_LOCK:
         chat_filters = SESSION.query(BlackListFilters).filter(BlackListFilters.chat_id == str(old_chat_id)).all()
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
         SESSION.commit()
+
+
+__load_chat_blacklists()

@@ -24,8 +24,8 @@ def blacklist(bot: Bot, update: Update):
     all_blacklisted = sql.get_chat_blacklist(chat.id)
 
     filter_list = BASE_BLACKLIST_STRING
-    for handler in all_blacklisted:
-        filter_list += " - <code>{}</code>\n".format(html.escape(handler.trigger))
+    for trigger in all_blacklisted:
+        filter_list += " - <code>{}</code>\n".format(html.escape(trigger))
 
     split_text = split_message(filter_list)
     for text in split_text:
@@ -105,13 +105,13 @@ def unblacklist(bot: Bot, update: Update):
 def del_blacklist(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
-    chat_filters = sql.get_chat_blacklist(chat.id)
     to_match = extract_text(message)
     if not to_match:
         return
 
-    for filt in chat_filters:
-        pattern = r"( |^|[^\w])" + re.escape(filt.trigger) + r"( |$|[^\w])"
+    chat_filters = sql.get_chat_blacklist(chat.id)
+    for trigger in chat_filters:
+        pattern = r"( |^|[^\w])" + re.escape(trigger) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             message.delete()
 
