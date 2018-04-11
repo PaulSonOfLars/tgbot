@@ -44,8 +44,8 @@ def reply_afk(bot: Bot, update: Update):
         entities = message.parse_entities([MessageEntity.TEXT_MENTION])
         for ent in entities:
             user_id = ent.user.id
-            user = sql.check_afk_status(user_id)
-            if user and user.is_afk:
+            if sql.is_afk(user_id):
+                user = sql.check_afk_status(user_id)
                 if not user.reason:
                     res = "{} is AFK!".format(ent.user.first_name)
                 else:
@@ -59,8 +59,8 @@ def reply_afk(bot: Bot, update: Update):
             if not user_id:
                 # Should never happen, since for a user to become AFK they must have spoken. Maybe changed username?
                 return
-            user = sql.check_afk_status(user_id)
-            if user and user.is_afk:
+            if sql.is_afk(user_id):
+                user = sql.check_afk_status(user_id)
                 chat = bot.get_chat(user_id)
                 if not user.reason:
                     res = "{} is AFK!".format(chat.first_name)
