@@ -241,14 +241,14 @@ def remove_warn_filter(bot: Bot, update: Update):
 
     to_remove = extracted[0]
 
-    chat_filters = sql.get_chat_warn_filters(chat.id)
+    chat_filters = sql.get_chat_warn_triggers(chat.id)
 
     if not chat_filters:
         msg.reply_text("No warning filters are active here!")
         return
 
     for filt in chat_filters:
-        if filt.chat_id == str(chat.id) and filt.keyword == to_remove:
+        if filt == to_remove:
             sql.remove_warn_filter(chat.id, to_remove)
             msg.reply_text("Yep, I'll stop warning people for that.")
             raise DispatcherHandlerStop
@@ -259,15 +259,15 @@ def remove_warn_filter(bot: Bot, update: Update):
 @run_async
 def list_warn_filters(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
-    all_handlers = sql.get_chat_warn_filters(chat.id)
+    all_handlers = sql.get_chat_warn_triggers(chat.id)
 
     if not all_handlers:
         update.effective_message.reply_text("No warning filters are active here!")
         return
 
     filter_list = CURRENT_WARNING_FILTER_STRING
-    for handler in all_handlers:
-        entry = " - {}\n".format(html.escape(handler.keyword))
+    for keyword in all_handlers:
+        entry = " - {}\n".format(html.escape(keyword))
         if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
             update.effective_message.reply_text(filter_list, parse_mode=ParseMode.HTML)
             filter_list = entry
@@ -281,17 +281,19 @@ def list_warn_filters(bot: Bot, update: Update):
 @run_async
 @loggable
 def reply_filter(bot: Bot, update: Update) -> str:
-    chat_warn_filters = sql.get_chat_warn_filters(update.effective_chat.id)
+    chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
+
+    chat_warn_filters = sql.get_chat_warn_triggers(chat.id)
     to_match = extract_text(message)
     if not to_match:
         return ""
 
-    for warn_filter in chat_warn_filters:
-        pattern = r"( |^|[^\w])" + re.escape(warn_filter.keyword) + r"( |$|[^\w])"
+    for keyword in chat_warn_filters:
+        pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             user = update.effective_user  # type: Optional[User]
-            chat = update.effective_chat  # type: Optional[Chat]
+            warn_filter = sql.get_warn_filter(chat.id, keyword)
             return warn(user, chat, warn_filter.reply, message)
     return ""
 
@@ -408,7 +410,7 @@ CALLBACK_QUERY_HANDLER = CallbackQueryHandler(button, pattern=r"rm_warn")
 MYWARNS_HANDLER = DisableAbleCommandHandler("warns", warns, pass_args=True, filters=Filters.group)
 ADD_WARN_HANDLER = CommandHandler("addwarn", add_warn_filter, filters=Filters.group)
 RM_WARN_HANDLER = CommandHandler(["nowarn", "stopwarn"], remove_warn_filter, filters=Filters.group)
-LIST_WARN_HANDLER = DisableAbleCommandHandler("warnlist", list_warn_filters, filters=Filters.group)
+LIST_WARN_HANDLER = DisableAbleCommandHandler(["warnlist", "warnfilters"], list_warn_filters, filters=Filters.group)
 WARN_FILTER_HANDLER = MessageHandler(CustomFilters.has_text & Filters.group, reply_filter)
 WARN_LIMIT_HANDLER = CommandHandler("warnlimit", set_warn_limit, pass_args=True, filters=Filters.group)
 WARN_STRENGTH_HANDLER = CommandHandler("strongwarn", set_warn_strength, pass_args=True, filters=Filters.group)

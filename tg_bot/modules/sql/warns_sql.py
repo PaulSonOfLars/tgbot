@@ -67,6 +67,8 @@ WARN_INSERTION_LOCK = threading.RLock()
 WARN_FILTER_INSERTION_LOCK = threading.RLock()
 WARN_SETTINGS_LOCK = threading.RLock()
 
+WARN_FILTERS = {}
+
 
 def warn_user(user_id, chat_id, reason=None):
     with WARN_INSERTION_LOCK:
@@ -131,6 +133,10 @@ def add_warn_filter(chat_id, keyword, reply):
     with WARN_FILTER_INSERTION_LOCK:
         warn_filt = WarnFilters(str(chat_id), keyword, reply)
 
+        if keyword not in WARN_FILTERS.get(str(chat_id), []):
+            WARN_FILTERS[str(chat_id)] = sorted(WARN_FILTERS.get(str(chat_id), []) + [keyword],
+                                                key=lambda x: (-len(x), x))
+
         SESSION.merge(warn_filt)  # merge to avoid duplicate key issues
         SESSION.commit()
 
@@ -139,6 +145,9 @@ def remove_warn_filter(chat_id, keyword):
     with WARN_FILTER_INSERTION_LOCK:
         warn_filt = SESSION.query(WarnFilters).get((str(chat_id), keyword))
         if warn_filt:
+            if keyword in WARN_FILTERS.get(str(chat_id), []):  # sanity check
+                WARN_FILTERS.get(str(chat_id), []).remove(keyword)
+
             SESSION.delete(warn_filt)
             SESSION.commit()
             return True
@@ -146,9 +155,20 @@ def remove_warn_filter(chat_id, keyword):
         return False
 
 
+def get_chat_warn_triggers(chat_id):
+    return WARN_FILTERS.get(str(chat_id), set())
+
+
 def get_chat_warn_filters(chat_id):
     try:
         return SESSION.query(WarnFilters).filter(WarnFilters.chat_id == str(chat_id)).all()
+    finally:
+        SESSION.close()
+
+
+def get_warn_filter(chat_id, keyword):
+    try:
+        return SESSION.query(WarnFilters).get((str(chat_id), keyword))
     finally:
         SESSION.close()
 
@@ -224,6 +244,23 @@ def num_warn_filter_chats():
         SESSION.close()
 
 
+def __load_chat_warn_filters():
+    global WARN_FILTERS
+    try:
+        chats = SESSION.query(WarnFilters.chat_id).distinct().all()
+        for (chat_id,) in chats:  # remove tuple by ( ,)
+            WARN_FILTERS[chat_id] = []
+
+        all_filters = SESSION.query(WarnFilters).all()
+        for x in all_filters:
+            WARN_FILTERS[x.chat_id] += [x.keyword]
+
+        WARN_FILTERS = {x: sorted(set(y), key=lambda i: (-len(i), i)) for x, y in WARN_FILTERS.items()}
+
+    finally:
+        SESSION.close()
+
+
 def migrate_chat(old_chat_id, new_chat_id):
     with WARN_INSERTION_LOCK:
         chat_notes = SESSION.query(Warns).filter(Warns.chat_id == str(old_chat_id)).all()
@@ -236,9 +273,14 @@ def migrate_chat(old_chat_id, new_chat_id):
         for filt in chat_filters:
             filt.chat_id = str(new_chat_id)
         SESSION.commit()
+        WARN_FILTERS[str(new_chat_id)] = WARN_FILTERS[str(old_chat_id)]
+        del WARN_FILTERS[str(old_chat_id)]
 
     with WARN_SETTINGS_LOCK:
         chat_settings = SESSION.query(WarnSettings).filter(WarnSettings.chat_id == str(old_chat_id)).all()
         for setting in chat_settings:
             setting.chat_id = str(new_chat_id)
         SESSION.commit()
+
+
+__load_chat_warn_filters()
