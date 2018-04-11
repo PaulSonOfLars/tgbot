@@ -23,15 +23,15 @@ BASIC_FILTER_STRING = "*Filters in this chat:*\n"
 @run_async
 def list_handlers(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
-    all_handlers = sql.get_chat_filters(chat.id)
+    all_handlers = sql.get_chat_triggers(chat.id)
 
     if not all_handlers:
         update.effective_message.reply_text("No filters are active here!")
         return
 
     filter_list = BASIC_FILTER_STRING
-    for handler in all_handlers:
-        entry = " - {}\n".format(escape_markdown(handler.keyword))
+    for keyword in all_handlers:
+        entry = " - {}\n".format(escape_markdown(keyword))
         if len(entry) + len(filter_list) > telegram.MAX_MESSAGE_LENGTH:
             update.effective_message.reply_text(filter_list, parse_mode=telegram.ParseMode.MARKDOWN)
             filter_list = entry
@@ -125,14 +125,14 @@ def stop_filter(bot: Bot, update: Update):
     if len(args) < 2:
         return
 
-    chat_filters = sql.get_chat_filters(chat.id)
+    chat_filters = sql.get_chat_triggers(chat.id)
 
     if not chat_filters:
         update.effective_message.reply_text("No filters are active here!")
         return
 
-    for filt in chat_filters:
-        if filt.chat_id == str(chat.id) and filt.keyword == args[1]:
+    for keyword in chat_filters:
+        if keyword == args[1]:
             sql.remove_filter(chat.id, args[1])
             update.effective_message.reply_text("Yep, I'll stop replying to that.")
             raise DispatcherHandlerStop
@@ -144,14 +144,15 @@ def stop_filter(bot: Bot, update: Update):
 def reply_filter(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
-    chat_filters = sql.get_chat_filters(chat.id)
+    chat_filters = sql.get_chat_triggers(chat.id)
     to_match = extract_text(message)
     if not to_match:
         return
 
-    for filt in chat_filters:
-        pattern = r"( |^|[^\w])" + re.escape(filt.keyword) + r"( |$|[^\w])"
+    for keyword in chat_filters:
+        pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
+            filt = sql.get_filter(chat.id, keyword)
             if filt.is_sticker:
                 message.reply_sticker(filt.reply)
             elif filt.is_document:
@@ -203,7 +204,7 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 def __chat_settings__(chat_id, user_id):
-    cust_filters = sql.get_chat_filters(chat_id)
+    cust_filters = sql.get_chat_triggers(chat_id)
     return "There are `{}` custom filters here.".format(len(cust_filters))
 
 
