@@ -3,12 +3,13 @@ from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, ParseMode, User, MessageEntity
 from telegram import TelegramError
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import mention_html
 
 import tg_bot.modules.sql.locks_sql as sql
-from tg_bot import dispatcher, SUDO_USERS
+from tg_bot import dispatcher, SUDO_USERS, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
     bot_can_delete, is_bot_admin
@@ -198,7 +199,13 @@ def del_lockables(bot: Bot, update: Update):
                         chat.kick_member(new_mem.id)
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
-                message.delete()
+                try:
+                    message.delete()
+                except BadRequest as excp:
+                    if excp.message == "Message to delete not found":
+                        pass
+                    else:
+                        LOGGER.exception("ERROR in lockables")
 
             break
 
@@ -210,7 +217,13 @@ def rest_handler(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     for restriction, filter in RESTRICTION_TYPES.items():
         if filter(msg) and sql.is_restr_locked(chat.id, restriction) and can_delete(chat, bot.id):
-            msg.delete()
+            try:
+                msg.delete()
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("ERROR in restrictions")
             break
 
 
