@@ -179,14 +179,13 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
 
 
 @run_async
-@bot_can_delete
 @user_not_admin
 def del_lockables(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
 
     for lockable, filter in LOCK_TYPES.items():
-        if filter(message) and sql.is_locked(chat.id, lockable):
+        if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
                 for new_mem in new_members:
@@ -205,13 +204,12 @@ def del_lockables(bot: Bot, update: Update):
 
 
 @run_async
-@bot_can_delete
 @user_not_admin
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     for restriction, filter in RESTRICTION_TYPES.items():
-        if filter(msg) and sql.is_restr_locked(chat.id, restriction):
+        if filter(msg) and sql.is_restr_locked(chat.id, restriction) and can_delete(chat, bot.id):
             msg.delete()
             break
 
@@ -293,5 +291,5 @@ dispatcher.add_handler(UNLOCK_HANDLER)
 dispatcher.add_handler(LOCKTYPES_HANDLER)
 dispatcher.add_handler(LOCKED_HANDLER)
 
-dispatcher.add_handler(MessageHandler(Filters.all, del_lockables), PERM_GROUP)
-dispatcher.add_handler(MessageHandler(Filters.all, rest_handler), REST_GROUP)
+dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, del_lockables), PERM_GROUP)
+dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, rest_handler), REST_GROUP)
