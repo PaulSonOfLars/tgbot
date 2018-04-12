@@ -36,15 +36,15 @@ def add_to_blacklist(chat_id, trigger):
 
         SESSION.merge(blacklist_filt)  # merge to avoid duplicate key issues
         SESSION.commit()
-        CHAT_BLACKLISTS[str(chat_id)] = CHAT_BLACKLISTS.get(str(chat_id), []).append(trigger)
+        CHAT_BLACKLISTS.get(str(chat_id), set()).add(trigger)
 
 
 def rm_from_blacklist(chat_id, trigger):
     with BLACKLIST_FILTER_INSERTION_LOCK:
         blacklist_filt = SESSION.query(BlackListFilters).get((str(chat_id), trigger))
         if blacklist_filt:
-            if trigger in CHAT_BLACKLISTS.get(str(chat_id), []):  # sanity check
-                CHAT_BLACKLISTS.get(str(chat_id), []).remove(trigger)
+            if trigger in CHAT_BLACKLISTS.get(str(chat_id), set()):  # sanity check
+                CHAT_BLACKLISTS.get(str(chat_id), set()).remove(trigger)
 
             SESSION.delete(blacklist_filt)
             SESSION.commit()
@@ -55,7 +55,7 @@ def rm_from_blacklist(chat_id, trigger):
 
 
 def get_chat_blacklist(chat_id):
-    return CHAT_BLACKLISTS.get(str(chat_id), [])
+    return CHAT_BLACKLISTS.get(str(chat_id), set())
 
 
 def num_blacklist_filters():
