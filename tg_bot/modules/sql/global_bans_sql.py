@@ -128,7 +128,7 @@ def disable_gbans(chat_id):
 
 
 def does_chat_gban(chat_id):
-    return chat_id not in GBANSTAT_LIST
+    return str(chat_id) not in GBANSTAT_LIST
 
 
 def num_gbanned_users():
