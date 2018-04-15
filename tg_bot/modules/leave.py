@@ -5,23 +5,23 @@ from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 from typing import List
 from tg_bot.modules.helper_funcs.filters import CustomFilters
+from tg_bot.modules.sql.users_sql import rm_chat
 
 import telegram
 from tg_bot import dispatcher
 
 @run_async
 def leave(bot: Bot, update: Update, args: List[str]):
-    try:
+    if args:
         chat_id = str(args[0])
         del args[0]
-    except TypeError as excp:
-        update.effective_message.reply_text("Please give me a valid chat_id!")
-    
-    try:
-        bot.leaveChat(int(chat_id))
-        update.effective_message.reply_text("Left the group successfully!")
-    except telegram.TelegramError:
-        update.effective_message.reply_text("Attempt failed.")
+        try:
+            bot.leave_chat(int(chat_id))
+            update.effective_message.reply_text("Left the group successfully!")
+        except telegram.TelegramError:
+            update.effective_message.reply_text("Attempt failed.")
+    else:
+        update.effective_message.reply_text("Give me a valid chat id") 
 
 __help__ = "Leaves a chat. Uses only one paramater: chat_id"
 
