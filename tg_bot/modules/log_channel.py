@@ -7,7 +7,7 @@ FILENAME = __name__.rsplit(".", 1)[-1]
 
 if is_module_loaded(FILENAME):
     from telegram import Bot, Update, ParseMode, Message, Chat
-    from telegram.error import BadRequest
+    from telegram.error import BadRequest, Unauthorized
     from telegram.ext import CommandHandler, run_async
     from telegram.utils.helpers import escape_markdown
 
@@ -83,10 +83,24 @@ if is_module_loaded(FILENAME):
 
         elif message.forward_from_chat:
             sql.set_chat_log_channel(chat.id, message.forward_from_chat.id)
-            bot.send_message(message.forward_from_chat.id,
-                             "This channel has been set as the log channel for {}.".format(
-                                 chat.title or chat.first_name))
-            message.delete()
+            try:
+                message.delete()
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("Error deleting message in log channel. Should work anyway though.")
+
+            try:
+                bot.send_message(message.forward_from_chat.id,
+                                 "This channel has been set as the log channel for {}.".format(
+                                     chat.title or chat.first_name))
+            except Unauthorized as excp:
+                if excp.message == "Forbidden: bot is not a member of the channel chat":
+                    bot.send_message(chat.id, "Successfully set log channel!")
+                else:
+                    LOGGER.exception("ERROR in setting the log channel.")
+
             bot.send_message(chat.id, "Successfully set log channel!")
 
         else:

@@ -3,10 +3,11 @@ import re
 from typing import Optional
 
 from telegram import Message, Chat, Update, Bot, ParseMode
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, Filters, run_async
 
 import tg_bot.modules.sql.blacklist_sql as sql
-from tg_bot import dispatcher
+from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin, user_not_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.misc import split_message
@@ -113,7 +114,14 @@ def del_blacklist(bot: Bot, update: Update):
     for trigger in chat_filters:
         pattern = r"( |^|[^\w])" + re.escape(trigger) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
-            message.delete()
+            try:
+                message.delete()
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("Error while deleting blacklist message.")
+            break
 
 
 def __migrate__(old_chat_id, new_chat_id):
