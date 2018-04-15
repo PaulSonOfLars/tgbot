@@ -68,21 +68,21 @@ def unblacklist(bot: Bot, update: Update):
     words = msg.text.split(None, 1)
     if len(words) > 1:
         text = words[1]
-        to_blacklist = text.split("\n")
+        to_unblacklist = list(set(trigger.strip() for trigger in text.split("\n") if trigger.strip()))
         successful = 0
-        for trigger in to_blacklist:
+        for trigger in to_unblacklist:
             success = sql.rm_from_blacklist(chat.id, trigger.lower())
             if success:
                 successful += 1
 
-        if len(to_blacklist) == 1:
+        if len(to_unblacklist) == 1:
             if successful:
-                msg.reply_text("Removed <code>{}</code> from the blacklist!".format(html.escape(to_blacklist[0])),
+                msg.reply_text("Removed <code>{}</code> from the blacklist!".format(html.escape(to_unblacklist[0])),
                                parse_mode=ParseMode.HTML)
             else:
                 msg.reply_text("This isn't a blacklisted trigger...!")
 
-        elif successful == len(to_blacklist):
+        elif successful == len(to_unblacklist):
             msg.reply_text(
                 "Removed <code>{}</code> triggers from the blacklist.".format(
                     successful), parse_mode=ParseMode.HTML)
@@ -90,12 +90,12 @@ def unblacklist(bot: Bot, update: Update):
         elif not successful:
             msg.reply_text(
                 "None of these triggers exist, so they weren't removed.".format(
-                    successful, len(to_blacklist) - successful), parse_mode=ParseMode.HTML)
+                    successful, len(to_unblacklist) - successful), parse_mode=ParseMode.HTML)
 
         else:
             msg.reply_text(
                 "Removed <code>{}</code> triggers from the blacklist. {} did not exist, "
-                "so were not removed.".format(successful, len(to_blacklist) - successful),
+                "so were not removed.".format(successful, len(to_unblacklist) - successful),
                 parse_mode=ParseMode.HTML)
     else:
         msg.reply_text("Tell me which words you would like to remove from the blacklist.")
