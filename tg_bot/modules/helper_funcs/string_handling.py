@@ -16,6 +16,8 @@ MATCH_MD = re.compile(r'\*(.*?)\*|'
                       r'(?<!\\)(\[.*?\])(\(.*?\))|'
                       r'(?P<esc>[*_`\[])')
 
+# regex to find []() links -> hyperlinks/buttons
+LINK_REGEX = re.compile(r'(?<!\\)\[.+?\]\((.*?)\)')
 BTN_URL_REGEX = re.compile(r"(?<!\\)(\[([^\[]+?)\]\(buttonurl:(?:/{0,2})(.+?)(:same)?\))")
 
 
@@ -61,14 +63,15 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset:
     if not entities:
         entities = {}
 
-    # regex to find []() links -> hyperlinks/buttons
-    pattern = re.compile(r'(?<!\\)\[.+?\]\((.*?)\)')
     prev = 0
     res = ""
     # Loop over all message entities, and:
     # reinsert code
     # escape free-standing urls
     for ent, ent_text in entities.items():
+        if ent.offset < -offset:
+            continue
+
         start = ent.offset + offset  # start of entity
         end = ent.offset + offset + ent.length - 1  # end of entity
 
@@ -81,7 +84,7 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset:
 
             # URL handling -> do not escape if in [](), escape otherwise.
             if ent.type == "url":
-                if any(match.start(1) <= start and end <= match.end(1) for match in pattern.finditer(txt)):
+                if any(match.start(1) <= start and end <= match.end(1) for match in LINK_REGEX.finditer(txt)):
                     continue
                 # else, check the escapes between the prev and last and forcefully escape the url to avoid mangling
                 else:
