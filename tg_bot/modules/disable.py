@@ -3,6 +3,7 @@ from typing import Union, List, Optional
 from future.utils import string_types
 from telegram import ParseMode, Update, Bot, Chat
 from telegram.ext import CommandHandler, RegexHandler, Filters
+from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher
 from tg_bot.modules.helper_funcs.misc import is_module_loaded
@@ -104,14 +105,13 @@ if is_module_loaded(FILENAME):
     # do not async
     def build_curr_disabled(chat_id: Union[str, int]) -> str:
         disabled = sql.get_all_disabled(chat_id)
-        if disabled:
-            result = ""
-            for cmd in disabled:
-                result += " - `{}`\n".format(cmd.command)
-            return "The following commands are currently restricted:\n{}".format(result)
-
-        else:
+        if not disabled:
             return "No commands are disabled!"
+
+        result = ""
+        for cmd in disabled:
+            result += " - `{}`\n".format(escape_markdown(cmd))
+        return "The following commands are currently restricted:\n{}".format(result)
 
 
     @run_async

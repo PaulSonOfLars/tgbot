@@ -21,12 +21,16 @@ class Disable(BASE):
 Disable.__table__.create(checkfirst=True)
 DISABLE_INSERTION_LOCK = threading.RLock()
 
+DISABLED = {}
+
 
 def disable_command(chat_id, disable):
     with DISABLE_INSERTION_LOCK:
         disabled = SESSION.query(Disable).get((str(chat_id), disable))
 
         if not disabled:
+            DISABLED.setdefault(str(chat_id), set()).add(disable)
+
             disabled = Disable(str(chat_id), disable)
             SESSION.add(disabled)
             SESSION.commit()
@@ -41,6 +45,9 @@ def enable_command(chat_id, enable):
         disabled = SESSION.query(Disable).get((str(chat_id), enable))
 
         if disabled:
+            if enable in DISABLED.get(str(chat_id)):  # sanity check
+                DISABLED.setdefault(str(chat_id), set()).remove(enable)
+
             SESSION.delete(disabled)
             SESSION.commit()
             return True
@@ -50,25 +57,11 @@ def enable_command(chat_id, enable):
 
 
 def is_command_disabled(chat_id, cmd):
-    try:
-        return bool(SESSION.query(Disable).get((str(chat_id), cmd)))
-    finally:
-        SESSION.close()
-
-
-def are_commands_disabled(chat_id, cmds):
-    try:
-        return bool(SESSION.query(Disable).filter(Disable.chat_id == str(chat_id),
-                                                  Disable.command.in_(v for v in cmds)).first())
-    finally:
-        SESSION.close()
+    return cmd in DISABLED.get(str(chat_id), set())
 
 
 def get_all_disabled(chat_id):
-    try:
-        return SESSION.query(Disable).filter(Disable.chat_id == str(chat_id)).all()
-    finally:
-        SESSION.close()
+    return DISABLED.get(str(chat_id), set())
 
 
 def num_chats():
@@ -88,9 +81,25 @@ def num_disabled():
 def migrate_chat(old_chat_id, new_chat_id):
     with DISABLE_INSERTION_LOCK:
         chats = SESSION.query(Disable).filter(Disable.chat_id == str(old_chat_id)).all()
-        if chats:
-            for chat in chats:
-                chat.chat_id = str(new_chat_id)
-                SESSION.add(chat)
+        for chat in chats:
+            chat.chat_id = str(new_chat_id)
+            SESSION.add(chat)
+
+        if str(old_chat_id) in DISABLED:
+            DISABLED[str(new_chat_id)] = DISABLED.get(str(old_chat_id), set())
 
         SESSION.commit()
+
+
+def __load_disabled_commands():
+    global DISABLED
+    try:
+        all_chats = SESSION.query(Disable).all()
+        for chat in all_chats:
+            DISABLED.setdefault(chat.chat_id, set()).add(chat.command)
+
+    finally:
+        SESSION.close()
+
+
+__load_disabled_commands()

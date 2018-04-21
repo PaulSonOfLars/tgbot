@@ -69,13 +69,6 @@ def get_flood_limit(chat_id):
     return CHAT_FLOOD.get(str(chat_id), DEF_OBJ)[2]
 
 
-def get_flood(chat_id):
-    try:
-        return SESSION.query(FloodControl).get(str(chat_id))
-    finally:
-        SESSION.close()
-
-
 def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:
         flood = SESSION.query(FloodControl).get(str(old_chat_id))
