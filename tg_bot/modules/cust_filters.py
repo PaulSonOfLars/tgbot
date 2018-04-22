@@ -9,6 +9,7 @@ from telegram.ext import CommandHandler, MessageHandler, DispatcherHandlerStop, 
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, LOGGER
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.filters import CustomFilters
@@ -223,7 +224,7 @@ __mod_name__ = "Filters"
 
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter)
-LIST_HANDLER = CommandHandler("filters", list_handlers)
+LIST_HANDLER = DisableAbleCommandHandler("filters", list_handlers, admin_ok=True)
 CUST_FILTER_HANDLER = MessageHandler(CustomFilters.has_text, reply_filter)
 
 dispatcher.add_handler(FILTER_HANDLER)

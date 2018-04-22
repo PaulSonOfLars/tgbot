@@ -11,6 +11,7 @@ from telegram.utils.helpers import escape_markdown
 
 import tg_bot.modules.sql.notes_sql as sql
 from tg_bot import dispatcher, MESSAGE_DUMP, LOGGER
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.misc import build_keyboard
@@ -262,7 +263,7 @@ SAVE_HANDLER = CommandHandler("save", save, filters=~Filters.reply)
 REPL_SAVE_HANDLER = CommandHandler("save", save_replied, filters=Filters.reply)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
 
-LIST_HANDLER = CommandHandler(["notes", "saved"], list_notes)
+LIST_HANDLER = DisableAbleCommandHandler(["notes", "saved"], list_notes, admin_ok=True)
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)

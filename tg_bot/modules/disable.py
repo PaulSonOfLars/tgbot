@@ -1,7 +1,7 @@
 from typing import Union, List, Optional
 
 from future.utils import string_types
-from telegram import ParseMode, Update, Bot, Chat
+from telegram import ParseMode, Update, Bot, Chat, User
 from telegram.ext import CommandHandler, RegexHandler, Filters
 from telegram.utils.helpers import escape_markdown
 
@@ -12,29 +12,42 @@ FILENAME = __name__.rsplit(".", 1)[-1]
 
 # If module is due to be loaded, then setup all the magical handlers
 if is_module_loaded(FILENAME):
-    from tg_bot.modules.helper_funcs.chat_status import user_admin
+    from tg_bot.modules.helper_funcs.chat_status import user_admin, is_user_admin
     from telegram.ext.dispatcher import run_async
 
     from tg_bot.modules.sql import disable_sql as sql
 
     DISABLE_CMDS = []
     DISABLE_OTHER = []
-
+    ADMIN_CMDS = []
 
     class DisableAbleCommandHandler(CommandHandler):
-        def __init__(self, command, callback, **kwargs):
+        def __init__(self, command, callback, admin_ok=False, **kwargs):
             super().__init__(command, callback, **kwargs)
+            self.admin_ok = admin_ok
             if isinstance(command, string_types):
                 DISABLE_CMDS.append(command)
+                if admin_ok:
+                    ADMIN_CMDS.append(command)
             else:
-                DISABLE_CMDS.extend(cmd for cmd in command)
+                DISABLE_CMDS.extend(command)
+                if admin_ok:
+                    ADMIN_CMDS.extend(command)
 
         def check_update(self, update):
-            chat = update.effective_chat
+            chat = update.effective_chat  # type: Optional[Chat]
+            user = update.effective_user  # type: Optional[User]
             if super().check_update(update):
                 # Should be safe since check_update passed.
                 command = update.effective_message.text_html.split(None, 1)[0][1:].split('@')[0]
-                return not sql.is_command_disabled(chat.id, command)
+
+                # disabled, admincmd, user admin
+                if sql.is_command_disabled(chat.id, command):
+                    return command in ADMIN_CMDS and is_user_admin(chat, user.id)
+
+                # not disabled
+                else:
+                    return True
 
             return False
 
@@ -95,7 +108,7 @@ if is_module_loaded(FILENAME):
         if DISABLE_CMDS + DISABLE_OTHER:
             result = ""
             for cmd in set(DISABLE_CMDS + DISABLE_OTHER):
-                result += " - `{}`\n".format(cmd)
+                result += " - `{}`\n".format(escape_markdown(cmd))
             update.effective_message.reply_text("The following commands are toggleable:\n{}".format(result),
                                                 parse_mode=ParseMode.MARKDOWN)
         else:
@@ -145,7 +158,7 @@ if is_module_loaded(FILENAME):
 
     DISABLE_HANDLER = CommandHandler("disable", disable, pass_args=True, filters=Filters.group)
     ENABLE_HANDLER = CommandHandler("enable", enable, pass_args=True, filters=Filters.group)
-    COMMANDS_HANDLER = CommandHandler("cmds", commands, filters=Filters.group)
+    COMMANDS_HANDLER = CommandHandler(["cmds", "disabled"], commands, filters=Filters.group)
     TOGGLE_HANDLER = CommandHandler("listcmds", list_cmds, filters=Filters.group)
 
     dispatcher.add_handler(DISABLE_HANDLER)

@@ -8,6 +8,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, run_async
 
 import tg_bot.modules.sql.blacklist_sql as sql
 from tg_bot import dispatcher, LOGGER
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import user_admin, user_not_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.misc import split_message
@@ -156,7 +157,7 @@ multiple triggers at once.
  - /rmblacklist <triggers>: Same as above.
 """
 
-BLACKLIST_HANDLER = CommandHandler("blacklist", blacklist, filters=Filters.group)
+BLACKLIST_HANDLER = DisableAbleCommandHandler("blacklist", blacklist, filters=Filters.group, admin_ok=True)
 ADD_BLACKLIST_HANDLER = CommandHandler("addblacklist", add_blacklist, filters=Filters.group)
 UNBLACKLIST_HANDLER = CommandHandler(["unblacklist", "rmblacklist"], unblacklist, filters=Filters.group)
 BLACKLIST_DEL_HANDLER = MessageHandler(
