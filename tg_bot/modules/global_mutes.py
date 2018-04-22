@@ -104,6 +104,10 @@ def gmute(bot: Bot, update: Update, args: List[str]):
                 pass
             elif excp.message == "Only the creator of a basic group can kick group administrators":
                 pass
+            elif excp.message == "Method is available only for supergroups":
+                pass
+            elif excp.message == "Can't demote chat creator":
+                pass
             else:
                 message.reply_text("Could not gmute due to: {}".format(excp.message))
                 send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gmute due to: {}".format(excp.message))
