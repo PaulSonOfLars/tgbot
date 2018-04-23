@@ -54,7 +54,14 @@ def extract_user_and_text(message: Message, args: List[str]) -> (Optional[int], 
 
     text = ""
 
-    if message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
+    
+    if prev_message:
+        user_id = prev_message.from_user.id
+        res = message.text.split(None, 1)
+        if len(res) >= 2:
+            text = res[1]
+
+    elif message.entities and message.parse_entities([MessageEntity.TEXT_MENTION]):
         entities = list(message.parse_entities([MessageEntity.TEXT_MENTION]))
         ent = entities[0]
         user_id = ent.user.id
@@ -79,12 +86,6 @@ def extract_user_and_text(message: Message, args: List[str]) -> (Optional[int], 
         res = message.text.split(None, 2)
         if len(res) >= 3:
             text = res[2]
-
-    elif prev_message:
-        user_id = prev_message.from_user.id
-        res = message.text.split(None, 1)
-        if len(res) >= 2:
-            text = res[1]
 
     else:
         return None, None
