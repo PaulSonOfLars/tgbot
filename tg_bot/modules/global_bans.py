@@ -27,6 +27,8 @@ GBAN_ERRORS = {
     "Need to be inviter of a user to kick it from a basic group",
     "Chat_admin_required",
     "Only the creator of a basic group can kick group administrators",
+    "Channel_private",
+    "Not in the chat"
 }
 
 UNGBAN_ERRORS = {
