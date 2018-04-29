@@ -17,6 +17,29 @@ from tg_bot.modules.sql.users_sql import get_all_chats
 
 GBAN_ENFORCE_GROUP = 6
 
+GBAN_ERRORS = {
+    "User is an administrator of the chat",
+    "Chat not found",
+    "Not enough rights to restrict/unrestrict chat member",
+    "User_not_participant",
+    "Peer_id_invalid",
+    "Group chat was deactivated",
+    "Need to be inviter of a user to kick it from a basic group",
+    "Chat_admin_required",
+    "Only the creator of a basic group can kick group administrators",
+}
+
+UNGBAN_ERRORS = {
+    "User is an administrator of the chat",
+    "Chat not found",
+    "Not enough rights to restrict/unrestrict chat member",
+    "User_not_participant",
+    "Method is available for supergroup and channel chats only",
+    "Not in the chat",
+    "Channel_private",
+    "Chat_admin_required",
+}
+
 
 @run_async
 def gban(bot: Bot, update: Update, args: List[str]):
@@ -86,23 +109,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
         try:
             bot.kick_chat_member(chat_id, user_id)
         except BadRequest as excp:
-            if excp.message == "User is an administrator of the chat":
-                pass
-            elif excp.message == "Chat not found":
-                pass
-            elif excp.message == "Not enough rights to restrict/unrestrict chat member":
-                pass
-            elif excp.message == "User_not_participant":
-                pass
-            elif excp.message == "Peer_id_invalid":  # Suspect this happens when a group is suspended by telegram.
-                pass
-            elif excp.message == "Group chat was deactivated":
-                pass
-            elif excp.message == "Need to be inviter of a user to kick it from a basic group":
-                pass
-            elif excp.message == "Chat_admin_required":
-                pass
-            elif excp.message == "Only the creator of a basic group can kick group administrators":
+            if excp.message in GBAN_ERRORS:
                 pass
             else:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
@@ -157,21 +164,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
                 bot.unban_chat_member(chat_id, user_id)
 
         except BadRequest as excp:
-            if excp.message == "User is an administrator of the chat":
-                pass
-            elif excp.message == "Chat not found":
-                pass
-            elif excp.message == "Not enough rights to restrict/unrestrict chat member":
-                pass
-            elif excp.message == "User_not_participant":
-                pass
-            elif excp.message == "Method is available for supergroup and channel chats only":
-                pass
-            elif excp.message == "Not in the chat":
-                pass
-            elif excp.message == "Channel_private":
-                pass
-            elif excp.message == "Chat_admin_required":
+            if excp.message in UNGBAN_ERRORS:
                 pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
