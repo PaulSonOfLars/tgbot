@@ -1,5 +1,4 @@
 import html
-import time
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
@@ -12,6 +11,7 @@ from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
     is_user_admin, is_user_in_chat
 from tg_bot.modules.helper_funcs.extraction import extract_user_and_text
+from tg_bot.modules.helper_funcs.string_handling import extract_time
 from tg_bot.modules.log_channel import loggable
 
 
@@ -45,7 +45,7 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     if user_id == bot.id:
-        update.effective_message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        message.reply_text("I'm not gonna BAN myself, are you crazy?")
         return ""
 
     log = "<b>{}:</b>" \
@@ -57,8 +57,8 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
         log += "\n<b>Reason:</b> {}".format(reason)
 
     try:
-        update.effective_chat.kick_member(user_id)
-        bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
+        chat.kick_member(user_id)
+        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned!")
         return log
 
@@ -106,40 +106,24 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     if user_id == bot.id:
-        update.effective_message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        message.reply_text("I'm not gonna BAN myself, are you crazy?")
         return ""
 
-    split_reason = reason.split(None, 1)
     if not reason:
         message.reply_text("You haven't specified a time to ban this user for!")
         return ""
 
+    split_reason = reason.split(None, 1)
+
+    time_val = split_reason[0].lower()
+    if len(split_reason) > 1:
+        reason = split_reason[1]
     else:
-        time_val = split_reason[0].lower()
-        if len(split_reason) > 1:
-            reason = split_reason[1]
-        else:
-            reason = ""
+        reason = ""
 
-    if any(time_val.endswith(unit) for unit in ('m', 'h', 'd')):
-        unit = time_val[-1]
-        time_num = time_val[:-1]  # type: str
-        if not time_num.isdigit():
-            message.reply_text("Invalid time amount specified.")
-            return ""
+    bantime = extract_time(message, time_val)
 
-        if unit == 'm':
-            bantime = int(time.time() + int(time_num) * 60)
-        elif unit == 'h':
-            bantime = int(time.time() + int(time_num) * 60 * 60)
-        elif unit == 'd':
-            bantime = int(time.time() + int(time_num) * 24 * 60 * 60)
-        else:
-            # how even...?
-            return ""
-
-    else:
-        message.reply_text("Invalid time type specified. Expected m,h, or d, got: {}".format(time_val[-1]))
+    if not bantime:
         return ""
 
     log = "<b>{}:</b>" \
@@ -152,15 +136,15 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
         log += "\n<b>Reason:</b> {}".format(reason)
 
     try:
-        update.effective_chat.kick_member(user_id, until_date=bantime)
-        bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
+        chat.kick_member(user_id, until_date=bantime)
+        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned! User will be banned for {}.".format(time_val))
         return log
 
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
-            message.reply_text("Banned!User will be banned for {}.".format(time_val), quote=False)
+            message.reply_text("Banned! User will be banned for {}.".format(time_val), quote=False)
             return log
         else:
             LOGGER.warning(update)
@@ -200,12 +184,12 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     if user_id == bot.id:
-        update.effective_message.reply_text("Yeahhh I'm not gonna do that")
+        message.reply_text("Yeahhh I'm not gonna do that")
         return ""
 
-    res = update.effective_chat.unban_member(user_id)  # unban on current user = kick
+    res = chat.unban_member(user_id)  # unban on current user = kick
     if res:
-        bot.send_sticker(update.effective_chat.id, BAN_STICKER)  # banhammer marie sticker
+        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Kicked!")
         log = "<b>{}:</b>" \
               "\n#KICKED" \
@@ -265,14 +249,14 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if user_id == bot.id:
-        update.effective_message.reply_text("How would I unban myself if I wasn't here...?")
+        message.reply_text("How would I unban myself if I wasn't here...?")
         return ""
 
     if is_user_in_chat(chat, user_id):
-        update.effective_message.reply_text("Why are you trying to unban someone that's already in the chat?")
+        message.reply_text("Why are you trying to unban someone that's already in the chat?")
         return ""
 
-    update.effective_chat.unban_member(user_id)
+    chat.unban_member(user_id)
     message.reply_text("Yep, this user can join!")
 
     log = "<b>{}:</b>" \
