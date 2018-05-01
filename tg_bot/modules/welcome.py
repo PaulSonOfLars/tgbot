@@ -11,7 +11,8 @@ import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
-from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser, markdown_parser, \
+from tg_bot.modules.helper_funcs.msg_types import get_welcome_type
+from tg_bot.modules.helper_funcs.string_handling import markdown_parser, \
     escape_invalid_curly_brackets
 from tg_bot.modules.log_channel import loggable
 
@@ -290,49 +291,15 @@ def set_welcome(bot: Bot, update: Update) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
-    raw_text = msg.text
-    args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
 
-    buttons = []
-    # determine what the contents of the filter are - text, image, sticker, etc
-    if len(args) >= 2:
-        offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
-        content, buttons = button_markdown_parser(args[1], entities=msg.parse_entities(), offset=offset)
-        if buttons:
-            data_type = sql.Types.BUTTON_TEXT
-        else:
-            data_type = sql.Types.TEXT
+    text, data_type, content, buttons = get_welcome_type(msg)
 
-    elif msg.reply_to_message and msg.reply_to_message.sticker:
-        content = msg.reply_to_message.sticker.file_id
-        data_type = sql.Types.STICKER
-
-    elif msg.reply_to_message and msg.reply_to_message.document:
-        content = msg.reply_to_message.document.file_id
-        data_type = sql.Types.DOCUMENT
-
-    elif msg.reply_to_message and msg.reply_to_message.photo:
-        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
-        data_type = sql.Types.PHOTO
-
-    elif msg.reply_to_message and msg.reply_to_message.audio:
-        content = msg.reply_to_message.audio.file_id
-        data_type = sql.Types.AUDIO
-
-    elif msg.reply_to_message and msg.reply_to_message.voice:
-        content = msg.reply_to_message.voice.file_id
-        data_type = sql.Types.VOICE
-
-    elif msg.reply_to_message and msg.reply_to_message.video:
-        content = msg.reply_to_message.video.file_id
-        data_type = sql.Types.VIDEO
-
-    else:
+    if data_type is None:
         msg.reply_text("You didn't specify what to reply with!")
         return ""
 
-    sql.set_custom_welcome(chat.id, content, data_type, buttons)
-    update.effective_message.reply_text("Successfully set custom welcome message!")
+    sql.set_custom_welcome(chat.id, content or text, data_type, buttons)
+    msg.reply_text("Successfully set custom welcome message!")
 
     return "<b>{}:</b>" \
            "\n#SET_WELCOME" \
@@ -363,49 +330,14 @@ def set_goodbye(bot: Bot, update: Update) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
-    raw_text = msg.text
-    args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
+    text, data_type, content, buttons = get_welcome_type(msg)
 
-    buttons = []
-    # determine what the contents of the filter are - text, image, sticker, etc
-    if len(args) >= 2:
-        offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
-        content, buttons = button_markdown_parser(args[1], entities=msg.parse_entities(), offset=offset)
-        if buttons:
-            data_type = sql.Types.BUTTON_TEXT
-        else:
-            data_type = sql.Types.TEXT
-
-    elif msg.reply_to_message and msg.reply_to_message.sticker:
-        content = msg.reply_to_message.sticker.file_id
-        data_type = sql.Types.STICKER
-
-    elif msg.reply_to_message and msg.reply_to_message.document:
-        content = msg.reply_to_message.document.file_id
-        data_type = sql.Types.DOCUMENT
-
-    elif msg.reply_to_message and msg.reply_to_message.photo:
-        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
-        data_type = sql.Types.PHOTO
-
-    elif msg.reply_to_message and msg.reply_to_message.audio:
-        content = msg.reply_to_message.audio.file_id
-        data_type = sql.Types.AUDIO
-
-    elif msg.reply_to_message and msg.reply_to_message.voice:
-        content = msg.reply_to_message.voice.file_id
-        data_type = sql.Types.VOICE
-
-    elif msg.reply_to_message and msg.reply_to_message.video:
-        content = msg.reply_to_message.video.file_id
-        data_type = sql.Types.VIDEO
-
-    else:
+    if data_type is None:
         msg.reply_text("You didn't specify what to reply with!")
         return ""
 
-    sql.set_custom_gdbye(chat.id, content, data_type, buttons)
-    update.effective_message.reply_text("Successfully set custom goodbye message!")
+    sql.set_custom_gdbye(chat.id, content or text, data_type, buttons)
+    msg.reply_text("Successfully set custom goodbye message!")
     return "<b>{}:</b>" \
            "\n#SET_GOODBYE" \
            "\n<b>Admin:</b> {}" \

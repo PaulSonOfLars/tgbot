@@ -13,11 +13,21 @@ import tg_bot.modules.sql.notes_sql as sql
 from tg_bot import dispatcher, MESSAGE_DUMP, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import user_admin
-from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.misc import build_keyboard
-from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser, markdown_parser
+from tg_bot.modules.helper_funcs.msg_types import get_note_type
 
 FILE_MATCHER = re.compile(r"^###file_id(!photo)?###:(.*?)(?:\s|$)")
+
+ENUM_FUNC_MAP = {
+    sql.Types.TEXT.value: dispatcher.bot.send_message,
+    sql.Types.BUTTON_TEXT.value: dispatcher.bot.send_message,
+    sql.Types.STICKER.value: dispatcher.bot.send_sticker,
+    sql.Types.DOCUMENT.value: dispatcher.bot.send_document,
+    sql.Types.PHOTO.value: dispatcher.bot.send_photo,
+    sql.Types.AUDIO.value: dispatcher.bot.send_audio,
+    sql.Types.VOICE.value: dispatcher.bot.send_voice,
+    sql.Types.VIDEO.value: dispatcher.bot.send_video
+}
 
 
 # Do not async
@@ -29,9 +39,9 @@ def get(bot, update, notename, show_none=True):
     if note:
         # If not is replying to a message, reply to that message (unless its an error)
         if message.reply_to_message:
-            reply_text = message.reply_to_message.reply_text
+            reply_id = message.reply_to_message.message_id
         else:
-            reply_text = message.reply_text
+            reply_id = message.message_id
 
         if note.is_reply:
             if MESSAGE_DUMP:
@@ -58,15 +68,21 @@ def get(bot, update, notename, show_none=True):
                         raise
         else:
             keyb = []
-            if note.has_buttons:
+            if note.msgtype == sql.Types.BUTTON_TEXT:
                 buttons = sql.get_buttons(chat_id, notename)
                 keyb = build_keyboard(buttons)
-
             keyboard = InlineKeyboardMarkup(keyb)
+
             try:
-                reply_text(note.value, parse_mode=ParseMode.MARKDOWN,
-                           disable_web_page_preview=True,
-                           reply_markup=keyboard)
+                if note.msgtype in (sql.Types.BUTTON_TEXT, sql.Types.TEXT):
+                    bot.send_message(chat_id, note.value, reply_to_message_id=reply_id,
+                                     parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True,
+                                     reply_markup=keyboard)
+                else:
+                    ENUM_FUNC_MAP[note.msgtype](chat_id, note.file, caption=note.value, reply_to_message_id=reply_id,
+                                                parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True,
+                                                reply_markup=keyboard)
+
             except BadRequest as excp:
                 if excp.message == "Entity_mention_user_invalid":
                     message.reply_text("Looks like you tried to mention someone I've never seen before. If you really "
@@ -104,42 +120,34 @@ def hash_get(bot: Bot, update: Update):
     get(bot, update, no_hash, show_none=False)
 
 
+# TODO: FIX THIS
 @run_async
 @user_admin
 def save_replied(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
-    text = update.effective_message.text
-    args = text.split(None, 3)  # use python's maxsplit to separate Cmd, note_name, and data
-    if len(args) == 3 and args[1] == "from":
-        notename = args[2]
-    elif len(args) >= 2:
-        notename = args[1]
-    else:
-        update.effective_message.reply_text("You need to give me a notename to save this message!")
+    msg = update.effective_message
+
+    notename, text, data_type, content, buttons = get_note_type(msg, replied=True)
+
+    if data_type is None:
+        msg.reply_text("Dude, there's no note")
         return
 
-    msg = update.effective_message.reply_to_message  # type: Optional[Message]
+    sql.add_note_to_db(chat_id, notename, text, data_type, buttons, content)
+    msg.reply_text("Yas! Added replied message {}".format(notename))
 
-    if msg.from_user.is_bot:
-        text = extract_text(msg)
+    if msg.reply_to_message.from_user.is_bot:
         if text:
-            sql.add_note_to_db(chat_id, notename, markdown_parser(text), is_reply=False)
-            update.effective_message.reply_text("Seems like you're trying to save a message from a bot. Unfortunately, "
-                                                "bots can't forward bot messages, so I can't save the exact message. "
-                                                "\nI'll save all the text I can, but if you want more, you'll have to "
-                                                "forward the message yourself, and then save it.")
+            msg.reply_text("Seems like you're trying to save a message from a bot. Unfortunately, "
+                           "bots can't forward bot messages, so I can't save the exact message. "
+                           "\nI'll save all the text I can, but if you want more, you'll have to "
+                           "forward the message yourself, and then save it.")
         else:
-            update.effective_message.reply_text("Bots are kinda handicapped by telegram, making it hard for bots to "
-                                                "interract with other bots, so I can't save this message "
-                                                "like I usually would - do you mind forwarding it and "
-                                                "then saving that new message? Thanks!")
+            msg.reply_text("Bots are kinda handicapped by telegram, making it hard for bots to "
+                           "interact with other bots, so I can't save this message "
+                           "like I usually would - do you mind forwarding it and "
+                           "then saving that new message? Thanks!")
         return
-
-    if MESSAGE_DUMP:
-        msg = bot.forward_message(chat_id=MESSAGE_DUMP, from_chat_id=chat_id, message_id=msg.message_id)
-
-    sql.add_note_to_db(chat_id, notename, msg.message_id, is_reply=True)
-    update.effective_message.reply_text("Yas! Added replied message {}".format(notename))
 
 
 @run_async
@@ -150,26 +158,16 @@ def save(bot: Bot, update: Update):
     raw_text = msg.text
     args = raw_text.split(None, 2)  # use python's maxsplit to separate Cmd, note_name, and data
 
-    if len(args) >= 3:
-        note_name = args[1]
-        note = args[2]
+    note_name, text, data_type, content, buttons = get_note_type(msg)
 
-        offset = len(note) - len(raw_text)  # set correct offset relative to command + notename
-        markdown_note, buttons = button_markdown_parser(note, entities=msg.parse_entities(), offset=offset)
-
-        note_data = markdown_note.strip()
-        if not note_data:
-            msg.reply_text("You can't save an empty message! If you added a button, you MUST "
-                           "have some text in the message too.")
-            return
-
-        sql.add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=buttons)
-
-        msg.reply_text(
-            "Yas! Added {note_name}.\nGet it with /get {note_name}, or #{note_name}".format(note_name=note_name))
-
-    else:
+    if data_type is None:
         msg.reply_text("Dude, there's no note")
+        return
+
+    sql.add_note_to_db(chat_id, note_name, text, data_type, buttons=buttons, file=content)
+
+    msg.reply_text(
+        "Yas! Added {note_name}.\nGet it with /get {note_name}, or #{note_name}".format(note_name=note_name))  
 
 
 @run_async
@@ -214,9 +212,9 @@ def __import_data__(chat_id, data):
             failures.append(notename)
             notedata = notedata[match.end():].strip()
             if notedata:
-                sql.add_note_to_db(chat_id, notename[1:], notedata)
+                sql.add_note_to_db(chat_id, notename[1:], notedata, sql.Types.TEXT)
         else:
-            sql.add_note_to_db(chat_id, notename[1:], notedata)
+            sql.add_note_to_db(chat_id, notename[1:], notedata, sql.Types.TEXT)
 
     if failures:
         with BytesIO(str.encode("\n".join(failures))) as output:

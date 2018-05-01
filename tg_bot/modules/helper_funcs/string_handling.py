@@ -63,6 +63,8 @@ def markdown_parser(txt: str, entities: Dict[MessageEntity, str] = None, offset:
     """
     if not entities:
         entities = {}
+    if not txt:
+        return ""
 
     prev = 0
     res = ""
