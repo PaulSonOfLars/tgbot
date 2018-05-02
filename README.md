@@ -89,7 +89,7 @@ The following env variables are supported:
 
 Install the necessary python dependencies by moving to the project directory and running:
 
-`pip3 install -r requirements.txt`.
+`sudo pip3 install -r requirements.txt`.
 
 This will install all necessary python packages.
 
