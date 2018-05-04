@@ -288,6 +288,7 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
 
 __help__ = """
  - /kickme: kicks the user who issued the command
+ - /banme: bans the user who issued the command
 
 *Admin only:*
  - /ban <userhandle>: bans a user. (via handle, or reply)
