@@ -59,6 +59,7 @@ RUN_STRINGS = (
     "It's funny, because no one cares.",
     "Ah, what a waste. I liked that one.",
     "Frankly, my dear, I don't give a damn.",
+    "My Trident is ready for ban-hammer time!",
     "My milkshake brings all the boys to yard... So run faster!",
     "You can't HANDLE the truth!",
     "A long time ago, in a galaxy far far away... Someone would've cared about that. Not anymore though.",
@@ -79,7 +80,7 @@ SLAP_TEMPLATES = (
     "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
     "{user1} grabs up a {item} and {hits} {user2} with it.",
     "{user1} ties {user2} to a chair and {throws} a {item} at them.",
-    "{user1} gave a friendly push to help {user2} learn to swim in lava."
+    "{user1} gave a friendly push to help {user2} learn to swim in a wild ocean."
 )
 
 ITEMS = (
@@ -102,6 +103,7 @@ ITEMS = (
     "laptop",
     "old television",
     "sack of rocks",
+    "trident",
     "rainbow trout",
     "rubber chicken",
     "spiked bat",
