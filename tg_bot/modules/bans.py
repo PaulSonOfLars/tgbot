@@ -139,7 +139,7 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
         log += "\n<b>Reason:</b> {}".format(reason)
 
     try:
-    	keyboard = []
+		keyboard = []
         chat.kick_member(user_id, until_date=bantime)
         bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         reply = "{} is temporarily banned for {}".format(mention_html(member.user.id, member.user.first_name)).format(time_val)
