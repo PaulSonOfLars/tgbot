@@ -167,13 +167,18 @@ def escape_invalid_curly_brackets(text: str, valids: List[str]) -> str:
     return new_text
 
 
+SMART_OPEN = '“'
+SMART_CLOSE = '”'
+START_CHAR = ('\'', '"', SMART_OPEN)
+
+
 def split_quotes(text: str) -> List:
-    if text.startswith('\'') or text.startswith('"'):
+    if any(text.startswith(char) for char in START_CHAR):
         counter = 1  # ignore first char -> is some kind of quote
         while counter < len(text):
             if text[counter] == "\\":
                 counter += 1
-            elif text[counter] == text[0]:
+            elif text[counter] == text[0] or (text[0] == SMART_OPEN and text[counter] == SMART_CLOSE):
                 break
             counter += 1
         else:
