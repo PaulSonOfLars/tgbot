@@ -211,6 +211,21 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
 @run_async
 @bot_admin
 @can_restrict
+def banme(bot: Bot, update: Update):
+    user_id = update.effective_message.from_user.id
+    if is_user_admin(update.effective_chat, user_id):
+        update.effective_message.reply_text("I wish I could... but you're an admin.")
+        return
+
+    res = update.effective_chat.kick_member(user_id)  
+    if res:
+        update.effective_message.reply_text("No problem, banned.")
+    else:
+        update.effective_message.reply_text("Huh? I can't :/")
+        
+@run_async
+@bot_admin
+@can_restrict
 def kickme(bot: Bot, update: Update):
     user_id = update.effective_message.from_user.id
     if is_user_admin(update.effective_chat, user_id):
@@ -273,6 +288,7 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
 
 __help__ = """
  - /kickme: kicks the user who issued the command
+ - /banme: bans the user who issued the command
 
 *Admin only:*
  - /ban <userhandle>: bans a user. (via handle, or reply)
@@ -288,9 +304,11 @@ TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, 
 KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.group)
 UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=Filters.group)
 KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=Filters.group)
+BANME_HANDLER = DisableAbleCommandHandler("banme", banme, filters=Filters.group)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(TEMPBAN_HANDLER)
 dispatcher.add_handler(KICK_HANDLER)
 dispatcher.add_handler(UNBAN_HANDLER)
 dispatcher.add_handler(KICKME_HANDLER)
+dispatcher.add_handler(BANME_HANDLER)
