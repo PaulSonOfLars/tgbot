@@ -1,6 +1,8 @@
 import telegram.ext as tg
 from telegram import Update
 
+CMD_STARTERS = ('/', '!')
+
 
 class CustomCommandHandler(tg.CommandHandler):
     def __init__(self, command, callback, **kwargs):
@@ -15,7 +17,7 @@ class CustomCommandHandler(tg.CommandHandler):
 
             if message.text and len(message.text) > 1:
                 fst_word = message.text_html.split(None, 1)[0]
-                if len(fst_word) > 1 and any(fst_word.startswith(start) for start in ('/', '!')):
+                if len(fst_word) > 1 and any(fst_word.startswith(start) for start in CMD_STARTERS):
                     command = fst_word[1:].split('@')
                     command.append(message.bot.username)  # in case the command was sent without a username
                     if self.filters is None:
