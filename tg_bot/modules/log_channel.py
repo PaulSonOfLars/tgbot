@@ -7,7 +7,7 @@ FILENAME = __name__.rsplit(".", 1)[-1]
 
 if is_module_loaded(FILENAME):
     from telegram import Bot, Update, ParseMode, Message, Chat
-    from telegram.error import BadRequest
+    from telegram.error import BadRequest, Unauthorized
     from telegram.ext import CommandHandler, run_async
     from telegram.utils.helpers import escape_markdown
 
@@ -27,7 +27,7 @@ if is_module_loaded(FILENAME):
                     result += "\n<b>Link:</b> " \
                               "<a href=\"http://telegram.me/{}/{}\">click here</a>".format(chat.username,
                                                                                            message.message_id)
-                log_chat = sql.get_chat_log_group(chat.id)
+                log_chat = sql.get_chat_log_channel(chat.id)
                 if log_chat:
                     send_log(bot, log_chat, chat.id, result)
             elif result == "":
@@ -61,7 +61,7 @@ if is_module_loaded(FILENAME):
         message = update.effective_message  # type: Optional[Message]
         chat = update.effective_chat  # type: Optional[Chat]
 
-        log_channel = sql.get_chat_log_group(chat.id)
+        log_channel = sql.get_chat_log_channel(chat.id)
         if log_channel:
             log_channel_info = bot.get_chat(log_channel)
             message.reply_text(
@@ -83,10 +83,24 @@ if is_module_loaded(FILENAME):
 
         elif message.forward_from_chat:
             sql.set_chat_log_channel(chat.id, message.forward_from_chat.id)
-            bot.send_message(message.forward_from_chat.id,
-                             "This channel has been set as the log channel for {}.".format(
-                                 chat.title or chat.first_name))
-            message.delete()
+            try:
+                message.delete()
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("Error deleting message in log channel. Should work anyway though.")
+
+            try:
+                bot.send_message(message.forward_from_chat.id,
+                                 "This channel has been set as the log channel for {}.".format(
+                                     chat.title or chat.first_name))
+            except Unauthorized as excp:
+                if excp.message == "Forbidden: bot is not a member of the channel chat":
+                    bot.send_message(chat.id, "Successfully set log channel!")
+                else:
+                    LOGGER.exception("ERROR in setting the log channel.")
+
             bot.send_message(chat.id, "Successfully set log channel!")
 
         else:
@@ -120,7 +134,7 @@ if is_module_loaded(FILENAME):
 
 
     def __chat_settings__(chat_id, user_id):
-        log_channel = sql.get_chat_log_group(chat_id)
+        log_channel = sql.get_chat_log_channel(chat_id)
         if log_channel:
             log_channel_info = dispatcher.bot.get_chat(log_channel)
             return "This group has all it's logs sent to: {} (`{}`)".format(escape_markdown(log_channel_info.title),

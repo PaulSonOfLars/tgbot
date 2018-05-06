@@ -197,12 +197,14 @@ def help_button(bot: Bot, update: Update):
         elif prev_match:
             curr_page = int(prev_match.group(1))
             query.message.reply_text(HELP_STRINGS,
+                                     parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(
                                          paginate_modules(curr_page - 1, HELPABLE, "help")))
 
         elif next_match:
             next_page = int(next_match.group(1))
             query.message.reply_text(HELP_STRINGS,
+                                     parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(
                                          paginate_modules(next_page + 1, HELPABLE, "help")))
 
@@ -213,11 +215,16 @@ def help_button(bot: Bot, update: Update):
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
+        query.message.delete()
     except BadRequest as excp:
         if excp.message == "Message is not modified":
             pass
+        elif excp.message == "Query_id_invalid":
+            pass
+        elif excp.message == "Message can't be deleted":
+            pass
         else:
-            raise
+            LOGGER.exception("Exception in help buttons. %s", str(query.data))
 
 
 @run_async
@@ -317,18 +324,23 @@ def settings_button(bot: Bot, update: Update):
             chat_id = back_match.group(1)
             chat = bot.get_chat(chat_id)
             query.message.reply_text(text="Hi there! There are quite a few settings for {} - go ahead and pick what "
-                                          "you're interested in.".format(chat.title),
+                                          "you're interested in.".format(escape_markdown(chat.title)),
                                      parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(paginate_modules(0, CHAT_SETTINGS, "stngs",
                                                                                         chat=chat_id)))
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
+        query.message.delete()
     except BadRequest as excp:
         if excp.message == "Message is not modified":
             pass
+        elif excp.message == "Query_id_invalid":
+            pass
+        elif excp.message == "Message can't be deleted":
+            pass
         else:
-            raise
+            LOGGER.exception("Exception in settings buttons. %s", str(query.data))
 
 
 @run_async

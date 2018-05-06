@@ -26,7 +26,7 @@ def send_rules(update, chat_id, from_pm=False):
         chat = bot.get_chat(chat_id)
     except BadRequest as excp:
         if excp.message == "Chat not found" and from_pm:
-            bot.send_message(user.id, "The rules shortcut hasn't been set properly for this chat! Ask admins to "
+            bot.send_message(user.id, "The rules shortcut for this chat hasn't been set properly! Ask admins to "
                                       "fix this.")
             return
         else:

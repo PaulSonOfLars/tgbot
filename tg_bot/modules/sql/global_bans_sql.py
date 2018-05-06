@@ -43,7 +43,8 @@ GbanSettings.__table__.create(checkfirst=True)
 
 GBANNED_USERS_LOCK = threading.RLock()
 GBAN_SETTING_LOCK = threading.RLock()
-GBANNED_LIST = []
+GBANNED_LIST = set()
+GBANSTAT_LIST = set()
 
 
 def gban_user(user_id, name, reason=None):
@@ -58,6 +59,19 @@ def gban_user(user_id, name, reason=None):
         SESSION.merge(user)
         SESSION.commit()
         __load_gbanned_userid_list()
+
+
+def update_gban_reason(user_id, name, reason=None):
+    with GBANNED_USERS_LOCK:
+        user = SESSION.query(GloballyBannedUsers).get(user_id)
+        if not user:
+            return False
+        user.name = name
+        user.reason = reason
+
+        SESSION.merge(user)
+        SESSION.commit()
+        return True
 
 
 def ungban_user(user_id):
@@ -97,6 +111,8 @@ def enable_gbans(chat_id):
         chat.setting = True
         SESSION.add(chat)
         SESSION.commit()
+        if str(chat_id) in GBANSTAT_LIST:
+            GBANSTAT_LIST.remove(str(chat_id))
 
 
 def disable_gbans(chat_id):
@@ -108,14 +124,11 @@ def disable_gbans(chat_id):
         chat.setting = False
         SESSION.add(chat)
         SESSION.commit()
+        GBANSTAT_LIST.add(str(chat_id))
 
 
 def does_chat_gban(chat_id):
-    try:
-        chat = SESSION.query(GbanSettings).get(str(chat_id))
-        return bool(not chat or chat.setting)
-    finally:
-        SESSION.close()
+    return str(chat_id) not in GBANSTAT_LIST
 
 
 def num_gbanned_users():
@@ -125,7 +138,15 @@ def num_gbanned_users():
 def __load_gbanned_userid_list():
     global GBANNED_LIST
     try:
-        GBANNED_LIST = [x.user_id for x in SESSION.query(GloballyBannedUsers).all()]
+        GBANNED_LIST = {x.user_id for x in SESSION.query(GloballyBannedUsers).all()}
+    finally:
+        SESSION.close()
+
+
+def __load_gban_stat_list():
+    global GBANSTAT_LIST
+    try:
+        GBANSTAT_LIST = {x.chat_id for x in SESSION.query(GbanSettings).all() if not x.setting}
     finally:
         SESSION.close()
 
@@ -142,3 +163,4 @@ def migrate_chat(old_chat_id, new_chat_id):
 
 # Create in memory userid to avoid disk access
 __load_gbanned_userid_list()
+__load_gban_stat_list()

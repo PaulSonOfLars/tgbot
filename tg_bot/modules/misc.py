@@ -1,3 +1,4 @@
+import html
 import json
 import random
 from datetime import datetime
@@ -7,7 +8,7 @@ import requests
 from telegram import Message, Chat, Update, Bot, MessageEntity
 from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import escape_markdown, mention_html
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS, BAN_STICKER
 from tg_bot.__main__ import STATS, USER_INFO
@@ -74,7 +75,6 @@ SLAP_TEMPLATES = (
     "{user1} {throws} a {item} at {user2}.",
     "{user1} grabs a {item} and {throws} it at {user2}'s face.",
     "{user1} launches a {item} in {user2}'s general direction.",
-    "{user1} sits on {user2}'s face while slamming a {item} into their crotch.",
     "{user1} starts slapping {user2} silly with a {item}.",
     "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
     "{user1} grabs up a {item} and {hits} {user2} with it.",
@@ -227,22 +227,24 @@ def info(bot: Bot, update: Update, args: List[str]):
 
     elif not msg.reply_to_message and (not args or (
             len(args) >= 1 and not args[0].startswith("@") and not args[0].isdigit() and not msg.parse_entities(
-            [MessageEntity.TEXT_MENTION]))):
+        [MessageEntity.TEXT_MENTION]))):
         msg.reply_text("I can't extract a user from this.")
         return
 
     else:
         return
 
-    text = "*User info*:" \
-           "\nID: `{}`" \
-           "\nFirst Name: {}".format(user.id, escape_markdown(user.first_name))
+    text = "<b>User info</b>:" \
+           "\nID: <code>{}</code>" \
+           "\nFirst Name: {}".format(user.id, html.escape(user.first_name))
 
     if user.last_name:
-        text += "\nLast Name: {}".format(escape_markdown(user.last_name))
+        text += "\nLast Name: {}".format(html.escape(user.last_name))
 
     if user.username:
-        text += "\nUsername: @{}".format(escape_markdown(user.username))
+        text += "\nUsername: @{}".format(html.escape(user.username))
+
+    text += "\nPermanent user link: {}".format(mention_html(user.id, "link"))
 
     if user.id == OWNER_ID:
         text += "\n\nThis person is my owner - I would never do anything against them!"
@@ -264,7 +266,7 @@ def info(bot: Bot, update: Update, args: List[str]):
         if mod_info:
             text += "\n\n" + mod_info
 
-    update.effective_message.reply_text(text, parse_mode=ParseMode.MARKDOWN)
+    update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
 @run_async
@@ -312,13 +314,15 @@ def get_time(bot: Bot, update: Update, args: List[str]):
 @run_async
 def echo(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
-    update.effective_message.reply_text(args[1], quote=False)
-    update.effective_message.delete()
+    message = update.effective_message
+    if message.reply_to_message:
+        message.reply_to_message.reply_text(args[1])
+    else:
+        message.reply_text(args[1], quote=False)
+    message.delete()
 
 
-@run_async
-def markdown_help(bot: Bot, update: Update):
-    update.effective_message.reply_text("""
+MARKDOWN_HELP = """
 Markdown is a very powerful formatting tool supported by telegram. {} has some enhancements, to make sure that \
 saved messages are correctly parsed, and to allow you to create buttons.
 
@@ -337,14 +341,19 @@ EG: <code>[This is a button](buttonurl:example.com)</code>
 If you want multiple buttons on the same line, use :same, as such:
 <code>[one](buttonurl://example.com)
 [two](buttonurl://google.com:same)</code>
-This will create two buttons on a single line, instead of one button p line.
+This will create two buttons on a single line, instead of one button per line.
 
 Keep in mind that your message <b>MUST</b> contain some text other than just a button!
-""".format(bot.first_name), parse_mode=ParseMode.HTML)
+""".format(dispatcher.bot.first_name)
+
+
+@run_async
+def markdown_help(bot: Bot, update: Update):
+    update.effective_message.reply_text(MARKDOWN_HELP, parse_mode=ParseMode.HTML)
     update.effective_message.reply_text("Try forwarding the following message to me, and you'll see!")
     update.effective_message.reply_text("/save test This is a markdown test. _italics_, *bold*, `code`, "
                                         "[URL](example.com) [button](buttonurl:github.com) "
-                                        "[button2](buttonurl://google.com:same)]")
+                                        "[button2](buttonurl://google.com:same)")
 
 
 @run_async
@@ -358,8 +367,9 @@ __help__ = """
  - /runs: reply a random string from an array of replies.
  - /slap: slap a user, or get slapped if not a reply.
  - /time <place>: gives the local time at the given place.
- - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
  - /info: get information about a user.
+
+ - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
 """
 
 __mod_name__ = "Misc"

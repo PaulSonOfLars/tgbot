@@ -33,12 +33,13 @@ def is_user_admin(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
     return member.status in ('administrator', 'creator')
 
 
-def is_bot_admin(chat: Chat, bot_id: int) -> bool:
+def is_bot_admin(chat: Chat, bot_id: int, bot_member: ChatMember = None) -> bool:
     if chat.type == 'private' \
             or chat.all_members_are_administrators:
         return True
 
-    bot_member = chat.get_member(bot_id)
+    if not bot_member:
+        bot_member = chat.get_member(bot_id)
     return bot_member.status in ('administrator', 'creator')
 
 
@@ -50,7 +51,7 @@ def is_user_in_chat(chat: Chat, user_id: int) -> bool:
 def bot_can_delete(func):
     @wraps(func)
     def delete_rights(bot: Bot, update: Update, *args, **kwargs):
-        if update.effective_chat.get_member(bot.id).can_delete_messages:
+        if can_delete(update.effective_chat, bot.id):
             return func(bot, update, *args, **kwargs)
         else:
             update.effective_message.reply_text("I can't delete messages here! "

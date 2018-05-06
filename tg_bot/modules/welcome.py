@@ -10,8 +10,9 @@ from telegram.utils.helpers import mention_markdown, mention_html, escape_markdo
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
-from tg_bot.modules.helper_funcs.misc import build_keyboard
-from tg_bot.modules.helper_funcs.string_handling import button_markdown_parser, markdown_parser, \
+from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
+from tg_bot.modules.helper_funcs.msg_types import get_welcome_type
+from tg_bot.modules.helper_funcs.string_handling import markdown_parser, \
     escape_invalid_curly_brackets
 from tg_bot.modules.log_channel import loggable
 
@@ -32,45 +33,47 @@ ENUM_FUNC_MAP = {
 # do not async
 def send(update, message, keyboard, backup_message):
     try:
-        update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+        msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except IndexError:
-        update.effective_message.reply_text(markdown_parser(backup_message +
-                                                            "\nNote: the current message was "
-                                                            "invalid due to markdown issues. Could be "
-                                                            "due to the user's name."),
-                                            parse_mode=ParseMode.MARKDOWN)
+        msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                  "\nNote: the current message was "
+                                                                  "invalid due to markdown issues. Could be "
+                                                                  "due to the user's name."),
+                                                  parse_mode=ParseMode.MARKDOWN)
     except KeyError:
-        update.effective_message.reply_text(markdown_parser(backup_message +
-                                                            "\nNote: the current message is "
-                                                            "invalid due to an issue with some misplaced "
-                                                            "curly brackets. Please update"),
-                                            parse_mode=ParseMode.MARKDOWN)
+        msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                  "\nNote: the current message is "
+                                                                  "invalid due to an issue with some misplaced "
+                                                                  "curly brackets. Please update"),
+                                                  parse_mode=ParseMode.MARKDOWN)
     except BadRequest as excp:
         if excp.message == "Button_url_invalid":
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: the current message has an invalid url in "
-                                                                "one of its buttons. Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: the current message has an invalid url "
+                                                                      "in one of its buttons. Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
         elif excp.message == "Unsupported url protocol":
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: the current message has buttons which use "
-                                                                "url protocols that are unsupported by telegram. "
-                                                                "Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: the current message has buttons which "
+                                                                      "use url protocols that are unsupported by "
+                                                                      "telegram. Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
         elif excp.message == "Wrong url host":
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: the current message has some bad urls. "
-                                                                "Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: the current message has some bad urls. "
+                                                                      "Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
             LOGGER.warning(message)
             LOGGER.warning(keyboard)
             LOGGER.exception("Could not parse! got invalid url host errors")
         else:
-            update.effective_message.reply_text(markdown_parser(backup_message +
-                                                                "\nNote: An error occured when sending the custom "
-                                                                "message. Please update."),
-                                                parse_mode=ParseMode.MARKDOWN)
+            msg = update.effective_message.reply_text(markdown_parser(backup_message +
+                                                                      "\nNote: An error occured when sending the "
+                                                                      "custom message. Please update."),
+                                                      parse_mode=ParseMode.MARKDOWN)
             LOGGER.exception()
+
+    return msg
 
 
 @run_async
@@ -79,6 +82,7 @@ def new_member(bot: Bot, update: Update):
 
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     if should_welc:
+        sent = None
         new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
             # Give the owner a special welcome
@@ -123,7 +127,18 @@ def new_member(bot: Bot, update: Update):
 
                 keyboard = InlineKeyboardMarkup(keyb)
 
-                send(update, res, keyboard, sql.DEFAULT_WELCOME.format(first=first_name))
+                sent = send(update, res, keyboard,
+                            sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
+
+        prev_welc = sql.get_clean_pref(chat.id)
+        if prev_welc:
+            try:
+                bot.delete_message(chat.id, prev_welc)
+            except BadRequest as excp:
+                pass
+
+            if sent:
+                sql.set_clean_welcome(chat.id, sent.message_id)
 
 
 @run_async
@@ -182,21 +197,32 @@ def left_member(bot: Bot, update: Update):
 def welcome(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
     # if no args, show current replies.
-    if len(args) == 0:
+    if len(args) == 0 or args[0] == "noformat":
+        noformat = args and args[0] == "noformat"
         pref, welcome_m, welcome_type = sql.get_welc_pref(chat.id)
         update.effective_message.reply_text(
-            "This chat has it's welcome setting set to: `{}`.\n*The welcome message is:*".format(pref),
+            "This chat has it's welcome setting set to: `{}`.\n*The welcome message "
+            "(not filling the {{}}) is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
 
         if welcome_type == sql.Types.BUTTON_TEXT:
             buttons = sql.get_welc_buttons(chat.id)
-            keyb = build_keyboard(buttons)
-            keyboard = InlineKeyboardMarkup(keyb)
+            if noformat:
+                welcome_m += revert_buttons(buttons)
+                update.effective_message.reply_text(welcome_m)
 
-            send(update, welcome_m, keyboard, sql.DEFAULT_WELCOME)
+            else:
+                keyb = build_keyboard(buttons)
+                keyboard = InlineKeyboardMarkup(keyb)
+
+                send(update, welcome_m, keyboard, sql.DEFAULT_WELCOME)
 
         else:
-            ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
+            if noformat:
+                ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m)
+
+            else:
+                ENUM_FUNC_MAP[welcome_type](chat.id, welcome_m, parse_mode=ParseMode.MARKDOWN)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
@@ -217,22 +243,32 @@ def welcome(bot: Bot, update: Update, args: List[str]):
 def goodbye(bot: Bot, update: Update, args: List[str]):
     chat = update.effective_chat  # type: Optional[Chat]
 
-    if len(args) == 0:
+    if len(args) == 0 or args[0] == "noformat":
+        noformat = args and args[0] == "noformat"
         pref, goodbye_m, goodbye_type = sql.get_gdbye_pref(chat.id)
         update.effective_message.reply_text(
-            "This chat has it's goodbye setting set to: `{}`.\n*The goodbye message is:*".format(pref),
+            "This chat has it's goodbye setting set to: `{}`.\n*The goodbye  message "
+            "(not filling the {{}}) is:*".format(pref),
             parse_mode=ParseMode.MARKDOWN)
 
         if goodbye_type == sql.Types.BUTTON_TEXT:
             buttons = sql.get_gdbye_buttons(chat.id)
-            keyb = build_keyboard(buttons)
+            if noformat:
+                goodbye_m += revert_buttons(buttons)
+                update.effective_message.reply_text(goodbye_m)
 
-            keyboard = InlineKeyboardMarkup(keyb)
+            else:
+                keyb = build_keyboard(buttons)
+                keyboard = InlineKeyboardMarkup(keyb)
 
-            send(update, goodbye_m, keyboard, sql.DEFAULT_GOODBYE)
+                send(update, goodbye_m, keyboard, sql.DEFAULT_GOODBYE)
 
         else:
-            ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
+            if noformat:
+                ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m)
+
+            else:
+                ENUM_FUNC_MAP[goodbye_type](chat.id, goodbye_m, parse_mode=ParseMode.MARKDOWN)
 
     elif len(args) >= 1:
         if args[0].lower() in ("on", "yes"):
@@ -255,49 +291,15 @@ def set_welcome(bot: Bot, update: Update) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
-    raw_text = msg.text
-    args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
 
-    buttons = []
-    # determine what the contents of the filter are - text, image, sticker, etc
-    if len(args) >= 2:
-        offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
-        content, buttons = button_markdown_parser(args[1], entities=msg.parse_entities(), offset=offset)
-        if buttons:
-            data_type = sql.Types.BUTTON_TEXT
-        else:
-            data_type = sql.Types.TEXT
+    text, data_type, content, buttons = get_welcome_type(msg)
 
-    elif msg.reply_to_message and msg.reply_to_message.sticker:
-        content = msg.reply_to_message.sticker.file_id
-        data_type = sql.Types.STICKER
-
-    elif msg.reply_to_message and msg.reply_to_message.document:
-        content = msg.reply_to_message.document.file_id
-        data_type = sql.Types.DOCUMENT
-
-    elif msg.reply_to_message and msg.reply_to_message.photo:
-        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
-        data_type = sql.Types.PHOTO
-
-    elif msg.reply_to_message and msg.reply_to_message.audio:
-        content = msg.reply_to_message.audio.file_id
-        data_type = sql.Types.AUDIO
-
-    elif msg.reply_to_message and msg.reply_to_message.voice:
-        content = msg.reply_to_message.voice.file_id
-        data_type = sql.Types.VOICE
-
-    elif msg.reply_to_message and msg.reply_to_message.video:
-        content = msg.reply_to_message.video.file_id
-        data_type = sql.Types.VIDEO
-
-    else:
+    if data_type is None:
         msg.reply_text("You didn't specify what to reply with!")
         return ""
 
-    sql.set_custom_welcome(chat.id, content, data_type, buttons)
-    update.effective_message.reply_text("Successfully set custom welcome message!")
+    sql.set_custom_welcome(chat.id, content or text, data_type, buttons)
+    msg.reply_text("Successfully set custom welcome message!")
 
     return "<b>{}:</b>" \
            "\n#SET_WELCOME" \
@@ -328,49 +330,14 @@ def set_goodbye(bot: Bot, update: Update) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
-    raw_text = msg.text
-    args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
+    text, data_type, content, buttons = get_welcome_type(msg)
 
-    buttons = []
-    # determine what the contents of the filter are - text, image, sticker, etc
-    if len(args) >= 2:
-        offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
-        content, buttons = button_markdown_parser(args[1], entities=msg.parse_entities(), offset=offset)
-        if buttons:
-            data_type = sql.Types.BUTTON_TEXT
-        else:
-            data_type = sql.Types.TEXT
-
-    elif msg.reply_to_message and msg.reply_to_message.sticker:
-        content = msg.reply_to_message.sticker.file_id
-        data_type = sql.Types.STICKER
-
-    elif msg.reply_to_message and msg.reply_to_message.document:
-        content = msg.reply_to_message.document.file_id
-        data_type = sql.Types.DOCUMENT
-
-    elif msg.reply_to_message and msg.reply_to_message.photo:
-        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
-        data_type = sql.Types.PHOTO
-
-    elif msg.reply_to_message and msg.reply_to_message.audio:
-        content = msg.reply_to_message.audio.file_id
-        data_type = sql.Types.AUDIO
-
-    elif msg.reply_to_message and msg.reply_to_message.voice:
-        content = msg.reply_to_message.voice.file_id
-        data_type = sql.Types.VOICE
-
-    elif msg.reply_to_message and msg.reply_to_message.video:
-        content = msg.reply_to_message.video.file_id
-        data_type = sql.Types.VIDEO
-
-    else:
+    if data_type is None:
         msg.reply_text("You didn't specify what to reply with!")
         return ""
 
-    sql.set_custom_gdbye(chat.id, content, data_type, buttons)
-    update.effective_message.reply_text("Successfully set custom goodbye message!")
+    sql.set_custom_gdbye(chat.id, content or text, data_type, buttons)
+    msg.reply_text("Successfully set custom goodbye message!")
     return "<b>{}:</b>" \
            "\n#SET_GOODBYE" \
            "\n<b>Admin:</b> {}" \
@@ -393,6 +360,43 @@ def reset_goodbye(bot: Bot, update: Update) -> str:
                                                  mention_html(user.id, user.first_name))
 
 
+@run_async
+@user_admin
+@loggable
+def clean_welcome(bot: Bot, update: Update, args: List[str]) -> str:
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+
+    if not args:
+        clean_pref = sql.get_clean_pref(chat.id)
+        if clean_pref:
+            update.effective_message.reply_text("I should be deleting welcome messages up to two days old.")
+        else:
+            update.effective_message.reply_text("I'm currently not deleting old welcome messages!")
+        return ""
+
+    if args[0].lower() in ("on", "yes"):
+        sql.set_clean_welcome(str(chat.id), True)
+        update.effective_message.reply_text("I'll try to delete old welcome messages!")
+        return "<b>{}:</b>" \
+               "\n#CLEAN_WELCOME" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas toggled clean welcomes to <code>ON</code>.".format(html.escape(chat.title),
+                                                                         mention_html(user.id, user.first_name))
+    elif args[0].lower() in ("off", "no"):
+        sql.set_clean_welcome(str(chat.id), False)
+        update.effective_message.reply_text("I won't delete old welcome messages.")
+        return "<b>{}:</b>" \
+               "\n#CLEAN_WELCOME" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas toggled clean welcomes to <code>OFF</code>.".format(html.escape(chat.title),
+                                                                          mention_html(user.id, user.first_name))
+    else:
+        # idek what you're writing, say yes or no
+        update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
+        return ""
+
+
 WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in multiple ways. If you want the messages" \
                 " to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
                 " - `{{first}}`: this represents the user's *first* name\n" \
@@ -407,12 +411,13 @@ WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in mu
                 " - `{{count}}`: this represents the user's *member number*.\n" \
                 " - `{{chatname}}`: this represents the *current chat name*.\n" \
                 "\nEach variable MUST be surrounded by `{{}}` to be replaced.\n" \
-                "Welcome messages also support markdown, so you can make any elements bold/italic/code/links." \
-                "Buttons are also supported, so you can make your welcomes look damn good with some sexy intro " \
+                "Welcome messages also support markdown, so you can make any elements bold/italic/code/links. " \
+                "Buttons are also supported, so you can make your welcomes look awesome with some nice intro " \
                 "buttons.\n" \
                 "To create a button linking to your rules, use this: `[Rules](buttonurl://t.me/{}?start=group_id)`. " \
                 "Simply replace `group_id` with your group's id, which can be obtained via /id, and you're good to " \
-                "go.\n" \
+                "go. Note that group ids are usually preceded by a `-` sign; this is required, so please don't " \
+                "remove it.\n" \
                 "If you're feeling fun, you can even set images/gifs/videos/voice messages as the welcome message by " \
                 "replying to the desired media, and calling /setwelcome.".format(dispatcher.bot.username)
 
@@ -447,15 +452,21 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
+{}
+
 *Admin only:*
- - /welcome <on/off>: enable/disable welcome messages. If used with no arg, shows current settings.
- - /goodbye <on/off>: enable/disable goodbye messages. If used with no arg, shows current settings.
+ - /welcome <on/off>: enable/disable welcome messages.
+ - /welcome: shows current welcome settings.
+ - /welcome noformat: shows current welcome settings, without the formatting - useful to recycle your welcome messages!
+ - /goodbye -> same usage and args as /welcome.
  - /setwelcome <sometext>: set a custom welcome message. If used replying to media, uses that media.
  - /setgoodbye <sometext>: set a custom goodbye message. If used replying to media, uses that media.
  - /resetwelcome: reset to the default welcome message.
  - /resetgoodbye: reset to the default goodbye message.
+ - /cleanwelcome <on/off>: On new member, try to delete the previous welcome message to avoid spamming the chat.
+
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
-"""
+""".format(WELC_HELP_TXT)
 
 __mod_name__ = "Welcomes/Goodbyes"
 
@@ -467,6 +478,7 @@ SET_WELCOME = CommandHandler("setwelcome", set_welcome, filters=Filters.group)
 SET_GOODBYE = CommandHandler("setgoodbye", set_goodbye, filters=Filters.group)
 RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
 RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.group)
+CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
 dispatcher.add_handler(NEW_MEM_HANDLER)
@@ -477,4 +489,5 @@ dispatcher.add_handler(SET_WELCOME)
 dispatcher.add_handler(SET_GOODBYE)
 dispatcher.add_handler(RESET_WELCOME)
 dispatcher.add_handler(RESET_GOODBYE)
+dispatcher.add_handler(CLEAN_WELCOME)
 dispatcher.add_handler(WELCOME_HELP)

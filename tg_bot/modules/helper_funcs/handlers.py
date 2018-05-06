@@ -3,6 +3,11 @@ from telegram import Update
 
 
 class CustomCommandHandler(tg.CommandHandler):
+    def __init__(self, command, callback, **kwargs):
+        if "admin_ok" in kwargs:
+            del kwargs["admin_ok"]
+        super().__init__(command, callback, **kwargs)
+
     def check_update(self, update):
         if (isinstance(update, Update)
                 and (update.message or update.edited_message and self.allow_edited)):

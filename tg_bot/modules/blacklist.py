@@ -3,10 +3,12 @@ import re
 from typing import Optional
 
 from telegram import Message, Chat, Update, Bot, ParseMode
+from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, Filters, run_async
 
 import tg_bot.modules.sql.blacklist_sql as sql
-from tg_bot import dispatcher
+from tg_bot import dispatcher, LOGGER
+from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import user_admin, user_not_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.misc import split_message
@@ -24,8 +26,8 @@ def blacklist(bot: Bot, update: Update):
     all_blacklisted = sql.get_chat_blacklist(chat.id)
 
     filter_list = BASE_BLACKLIST_STRING
-    for handler in all_blacklisted:
-        filter_list += " - <code>{}</code>\n".format(html.escape(handler.trigger))
+    for trigger in all_blacklisted:
+        filter_list += " - <code>{}</code>\n".format(html.escape(trigger))
 
     split_text = split_message(filter_list)
     for text in split_text:
@@ -43,7 +45,7 @@ def add_blacklist(bot: Bot, update: Update):
     words = msg.text.split(None, 1)
     if len(words) > 1:
         text = words[1]
-        to_blacklist = text.split("\n")
+        to_blacklist = list(set(trigger.strip() for trigger in text.split("\n") if trigger.strip()))
         for trigger in to_blacklist:
             sql.add_to_blacklist(chat.id, trigger.lower())
 
@@ -67,21 +69,21 @@ def unblacklist(bot: Bot, update: Update):
     words = msg.text.split(None, 1)
     if len(words) > 1:
         text = words[1]
-        to_blacklist = text.split("\n")
+        to_unblacklist = list(set(trigger.strip() for trigger in text.split("\n") if trigger.strip()))
         successful = 0
-        for trigger in to_blacklist:
+        for trigger in to_unblacklist:
             success = sql.rm_from_blacklist(chat.id, trigger.lower())
             if success:
                 successful += 1
 
-        if len(to_blacklist) == 1:
+        if len(to_unblacklist) == 1:
             if successful:
-                msg.reply_text("Removed <code>{}</code> from the blacklist!".format(html.escape(to_blacklist[0])),
+                msg.reply_text("Removed <code>{}</code> from the blacklist!".format(html.escape(to_unblacklist[0])),
                                parse_mode=ParseMode.HTML)
             else:
                 msg.reply_text("This isn't a blacklisted trigger...!")
 
-        elif successful == len(to_blacklist):
+        elif successful == len(to_unblacklist):
             msg.reply_text(
                 "Removed <code>{}</code> triggers from the blacklist.".format(
                     successful), parse_mode=ParseMode.HTML)
@@ -89,12 +91,12 @@ def unblacklist(bot: Bot, update: Update):
         elif not successful:
             msg.reply_text(
                 "None of these triggers exist, so they weren't removed.".format(
-                    successful, len(to_blacklist) - successful), parse_mode=ParseMode.HTML)
+                    successful, len(to_unblacklist) - successful), parse_mode=ParseMode.HTML)
 
         else:
             msg.reply_text(
                 "Removed <code>{}</code> triggers from the blacklist. {} did not exist, "
-                "so were not removed.".format(successful, len(to_blacklist) - successful),
+                "so were not removed.".format(successful, len(to_unblacklist) - successful),
                 parse_mode=ParseMode.HTML)
     else:
         msg.reply_text("Tell me which words you would like to remove from the blacklist.")
@@ -105,15 +107,22 @@ def unblacklist(bot: Bot, update: Update):
 def del_blacklist(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
-    chat_filters = sql.get_chat_blacklist(chat.id)
     to_match = extract_text(message)
     if not to_match:
         return
 
-    for filt in chat_filters:
-        pattern = r"( |^|[^\w])" + re.escape(filt.trigger) + r"( |$|[^\w])"
+    chat_filters = sql.get_chat_blacklist(chat.id)
+    for trigger in chat_filters:
+        pattern = r"( |^|[^\w])" + re.escape(trigger) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
-            message.delete()
+            try:
+                message.delete()
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("Error while deleting blacklist message.")
+            break
 
 
 def __migrate__(old_chat_id, new_chat_id):
@@ -126,7 +135,8 @@ def __chat_settings__(chat_id, user_id):
 
 
 def __stats__():
-    return "{} blacklist triggers, across {} chats.".format(sql.num_blacklist_filters(), sql.num_blacklist_filter_chats())
+    return "{} blacklist triggers, across {} chats.".format(sql.num_blacklist_filters(),
+                                                            sql.num_blacklist_filter_chats())
 
 
 __mod_name__ = "Word Blacklists"
@@ -147,7 +157,7 @@ multiple triggers at once.
  - /rmblacklist <triggers>: Same as above.
 """
 
-BLACKLIST_HANDLER = CommandHandler("blacklist", blacklist, filters=Filters.group)
+BLACKLIST_HANDLER = DisableAbleCommandHandler("blacklist", blacklist, filters=Filters.group, admin_ok=True)
 ADD_BLACKLIST_HANDLER = CommandHandler("addblacklist", add_blacklist, filters=Filters.group)
 UNBLACKLIST_HANDLER = CommandHandler(["unblacklist", "rmblacklist"], unblacklist, filters=Filters.group)
 BLACKLIST_DEL_HANDLER = MessageHandler(

@@ -1,24 +1,12 @@
 import threading
-from enum import IntEnum, unique
 
-from sqlalchemy import Column, String, Boolean, UnicodeText, Integer
+from sqlalchemy import Column, String, Boolean, UnicodeText, Integer, BigInteger
 
+from tg_bot.modules.helper_funcs.msg_types import Types
 from tg_bot.modules.sql import SESSION, BASE
 
 DEFAULT_WELCOME = "Hey {first}, how are you?"
 DEFAULT_GOODBYE = "Nice knowing ya!"
-
-
-@unique
-class Types(IntEnum):
-    TEXT = 0
-    BUTTON_TEXT = 1
-    STICKER = 2
-    DOCUMENT = 3
-    PHOTO = 4
-    AUDIO = 5
-    VOICE = 6
-    VIDEO = 7
 
 
 class Welcome(BASE):
@@ -32,6 +20,8 @@ class Welcome(BASE):
 
     custom_leave = Column(UnicodeText, default=DEFAULT_GOODBYE)
     leave_type = Column(Integer, default=Types.TEXT.value)
+
+    clean_welcome = Column(BigInteger)
 
     def __init__(self, chat_id, should_welcome=True, should_goodbye=True):
         self.chat_id = chat_id
@@ -99,6 +89,28 @@ def get_gdbye_pref(chat_id):
     else:
         # Welcome by default.
         return True, DEFAULT_GOODBYE, Types.TEXT
+
+
+def set_clean_welcome(chat_id, clean_welcome):
+    with INSERTION_LOCK:
+        curr = SESSION.query(Welcome).get(str(chat_id))
+        if not curr:
+            curr = Welcome(str(chat_id))
+
+        curr.clean_welcome = int(clean_welcome)
+
+        SESSION.add(curr)
+        SESSION.commit()
+
+
+def get_clean_pref(chat_id):
+    welc = SESSION.query(Welcome).get(str(chat_id))
+    SESSION.close()
+
+    if welc:
+        return welc.clean_welcome
+
+    return False
 
 
 def set_welc_preference(chat_id, should_welcome):

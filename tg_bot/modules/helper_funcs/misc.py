@@ -76,7 +76,7 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False, html=Fal
             if markdown:
                 bot.send_message(user_id, message, parse_mode=ParseMode.MARKDOWN)
             elif html:
-                bot.send_message(user_id, parse_mode=ParseMode.HTML)
+                bot.send_message(user_id, message, parse_mode=ParseMode.HTML)
             else:
                 bot.send_message(user_id, message)
         except TelegramError:
@@ -92,6 +92,17 @@ def build_keyboard(buttons):
             keyb.append([InlineKeyboardButton(btn.name, url=btn.url)])
 
     return keyb
+
+
+def revert_buttons(buttons):
+    res = ""
+    for btn in buttons:
+        if btn.same_line:
+            res += "\n[{}](buttonurl://{}:same)".format(btn.name, btn.url)
+        else:
+            res += "\n[{}](buttonurl://{})".format(btn.name, btn.url)
+
+    return res
 
 
 def is_module_loaded(name):

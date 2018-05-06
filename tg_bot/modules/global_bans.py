@@ -1,10 +1,11 @@
+import html
 from io import BytesIO
 from typing import Optional, List
 
 from telegram import Message, Update, Bot, User, Chat
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import mention_html
 
 import tg_bot.modules.sql.global_bans_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
@@ -15,6 +16,31 @@ from tg_bot.modules.helper_funcs.misc import send_to_list
 from tg_bot.modules.sql.users_sql import get_all_chats
 
 GBAN_ENFORCE_GROUP = 6
+
+GBAN_ERRORS = {
+    "User is an administrator of the chat",
+    "Chat not found",
+    "Not enough rights to restrict/unrestrict chat member",
+    "User_not_participant",
+    "Peer_id_invalid",
+    "Group chat was deactivated",
+    "Need to be inviter of a user to kick it from a basic group",
+    "Chat_admin_required",
+    "Only the creator of a basic group can kick group administrators",
+    "Channel_private",
+    "Not in the chat"
+}
+
+UNGBAN_ERRORS = {
+    "User is an administrator of the chat",
+    "Chat not found",
+    "Not enough rights to restrict/unrestrict chat member",
+    "User_not_participant",
+    "Method is available for supergroup and channel chats only",
+    "Not in the chat",
+    "Channel_private",
+    "Chat_admin_required",
+}
 
 
 @run_async
@@ -49,16 +75,28 @@ def gban(bot: Bot, update: Update, args: List[str]):
         message.reply_text("That's not a user!")
         return
 
+    if sql.is_user_gbanned(user_id):
+        if not reason:
+            message.reply_text("This user is already gbanned; I'd change the reason, but you haven't given me one...")
+            return
+
+        success = sql.update_gban_reason(user_id, user_chat.username or user_chat.first_name, reason)
+        if success:
+            message.reply_text("This user is already gbanned; I've gone and updated the gban reason though!")
+        else:
+            message.reply_text("Do you mind trying again? I thought this person was gbanned, but then they weren't? "
+                               "Am very confused")
+
+        return
+
     message.reply_text("*Blows dust off of banhammer* 😉")
 
     banner = update.effective_user  # type: Optional[User]
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
-                 "[{}](tg://user?id={}) is gbanning user [{}](tg://user?id={}) "
-                 "because:\n{}".format(escape_markdown(banner.first_name),
-                                       banner.id,
-                                       escape_markdown(user_chat.first_name),
-                                       user_chat.id, reason or "No reason given"),
-                 markdown=True)
+                 "{} is gbanning user {} "
+                 "because:\n{}".format(mention_html(banner.id, banner.first_name),
+                                       mention_html(user_chat.id, user_chat.first_name), reason or "No reason given"),
+                 html=True)
 
     sql.gban_user(user_id, user_chat.username or user_chat.first_name, reason)
 
@@ -73,17 +111,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
         try:
             bot.kick_chat_member(chat_id, user_id)
         except BadRequest as excp:
-            if excp.message == "User is an administrator of the chat":
-                pass
-            elif excp.message == "Chat not found":
-                pass
-            elif excp.message == "Not enough rights to restrict/unrestrict chat member":
-                pass
-            elif excp.message == "User_not_participant":
-                pass
-            elif excp.message == "Peer_id_invalid":  # Suspect this happens when a group is suspended by telegram.
-                pass
-            elif excp.message == "Group chat was deactivated":
+            if excp.message in GBAN_ERRORS:
                 pass
             else:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
@@ -120,12 +148,9 @@ def ungban(bot: Bot, update: Update, args: List[str]):
     message.reply_text("I'll give {} a second chance, globally.".format(user_chat.first_name))
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
-                 "[{}](tg://user?id={}) has ungbanned user [{}](tg://user?id={})".format(
-                     escape_markdown(banner.first_name),
-                     banner.id,
-                     escape_markdown(user_chat.first_name),
-                     user_chat.id),
-                 markdown=True)
+                 "{} has ungbanned user {}".format(mention_html(banner.id, banner.first_name),
+                                                   mention_html(user_chat.id, user_chat.first_name)),
+                 html=True)
 
     chats = get_all_chats()
     for chat in chats:
@@ -141,19 +166,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
                 bot.unban_chat_member(chat_id, user_id)
 
         except BadRequest as excp:
-            if excp.message == "User is an administrator of the chat":
-                pass
-            elif excp.message == "Chat not found":
-                pass
-            elif excp.message == "Not enough rights to restrict/unrestrict chat member":
-                pass
-            elif excp.message == "User_not_participant":
-                pass
-            elif excp.message == "Method is available for supergroup and channel chats only":
-                pass
-            elif excp.message == "Not in the chat":
-                pass
-            elif excp.message == "Channel_private":
+            if excp.message in UNGBAN_ERRORS:
                 pass
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
@@ -246,12 +259,12 @@ def __stats__():
 def __user_info__(user_id):
     is_gbanned = sql.is_user_gbanned(user_id)
 
-    text = "Globally banned: *{}*"
+    text = "Globally banned: <b>{}</b>"
     if is_gbanned:
         text = text.format("Yes")
         user = sql.get_gbanned_user(user_id)
         if user.reason:
-            text += "\nReason: {}".format(escape_markdown(user.reason))
+            text += "\nReason: {}".format(html.escape(user.reason))
     else:
         text = text.format("No")
     return text

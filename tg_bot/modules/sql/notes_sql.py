@@ -3,6 +3,7 @@ import threading
 
 from sqlalchemy import Column, String, Boolean, UnicodeText, Integer, func, distinct
 
+from tg_bot.modules.helper_funcs.msg_types import Types
 from tg_bot.modules.sql import SESSION, BASE
 
 
@@ -11,15 +12,17 @@ class Notes(BASE):
     chat_id = Column(String(14), primary_key=True)
     name = Column(UnicodeText, primary_key=True)
     value = Column(UnicodeText, nullable=False)
+    file = Column(UnicodeText)
     is_reply = Column(Boolean, default=False)
     has_buttons = Column(Boolean, default=False)
+    msgtype = Column(Integer, default=Types.BUTTON_TEXT.value)
 
-    def __init__(self, chat_id, name, value, is_reply=False, has_buttons=False):
+    def __init__(self, chat_id, name, value, msgtype, file=None):
         self.chat_id = str(chat_id)  # ensure string
         self.name = name
         self.value = value
-        self.is_reply = is_reply
-        self.has_buttons = has_buttons
+        self.msgtype = msgtype
+        self.file = file
 
     def __repr__(self):
         return "<Note %s>" % self.name
@@ -49,7 +52,7 @@ NOTES_INSERTION_LOCK = threading.RLock()
 BUTTONS_INSERTION_LOCK = threading.RLock()
 
 
-def add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=None):
+def add_note_to_db(chat_id, note_name, note_data, msgtype, buttons=None, file=None):
     if not buttons:
         buttons = []
 
@@ -62,8 +65,7 @@ def add_note_to_db(chat_id, note_name, note_data, is_reply=False, buttons=None):
                 for btn in prev_buttons:
                     SESSION.delete(btn)
             SESSION.delete(prev)
-        note = Notes(str(chat_id), note_name, note_data, is_reply=is_reply, has_buttons=bool(buttons))
-
+        note = Notes(str(chat_id), note_name, note_data or "", msgtype=msgtype.value, file=file)
         SESSION.add(note)
         SESSION.commit()
 
