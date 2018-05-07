@@ -3,5 +3,6 @@ emoji
 requests
 sqlalchemy
 python-telegram-bot>=8.0.0
+feedparser
 psycopg2-binary
 feedparser
