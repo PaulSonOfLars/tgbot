@@ -221,9 +221,8 @@ def __import_data__(chat_id, data):
             output.name = "failed_imports.txt"
             dispatcher.bot.send_document(chat_id, document=output, filename="failed_imports.txt",
                                          caption="These files/photos failed to import due to originating "
-                                                 "from another bot. This is a telegram API restriction - each bot sees "
-                                                 "files with a different file_id, to avoid one bot accessing another's "
-                                                 "files. Sorry for the inconvenience!")
+                                                 "from another bot. This is a telegram API restriction, and can't "
+                                                 "be avoided. Sorry for the inconvenience!")
 
 
 def __stats__():
