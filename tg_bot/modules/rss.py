@@ -84,7 +84,7 @@ def add_url(bot, update, args):
 
         # check if link is a valid RSS Feed link
         if link_processed.bozo == 0:
-            if len(link_processed.entries[0] >= 1):
+            if len(link_processed.entries[0]) >= 1:
                 tg_old_entry_link = link_processed.entries[0].link
             else:
                 tg_old_entry_link = ""
