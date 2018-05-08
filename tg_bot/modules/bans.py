@@ -51,11 +51,11 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
 
     log = "<b>{}:</b>" \
           "\n#BANNED" \
-          "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
+          "\n<b>• Admin:</b> {}" \
+          "\n<b>• User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
                                      mention_html(member.user.id, member.user.first_name))
     if reason:
-        log += "\n<b>Reason:</b> {}".format(reason)
+        log += "\n<b>• Reason:</b> {}".format(reason)
 
     try:
         chat.kick_member(user_id)
@@ -130,13 +130,13 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     log = "<b>{}:</b>" \
-          "\n#TEMP BANNED" \
-          "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {}" \
-          "\n<b>Time:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
+          "\n#TEMPBAN" \
+          "\n<b>• Admin:</b> {}" \
+          "\n<b>• User:</b> {}" \
+          "\n<b>• Time:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
                                      mention_html(member.user.id, member.user.first_name), time_val)
     if reason:
-        log += "\n<b>Reason:</b> {}".format(reason)
+        log += "\n<b>• Reason:</b> {}".format(reason)
 
     try:
         chat.kick_member(user_id, until_date=bantime)
@@ -198,12 +198,12 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
         message.reply_text("Kicked!")
         log = "<b>{}:</b>" \
               "\n#KICKED" \
-              "\n<b>Admin:</b> {}" \
-              "\n<b>User:</b> {}".format(html.escape(chat.title),
+              "\n<b>• Admin:</b> {}" \
+              "\n<b>• User:</b> {}".format(html.escape(chat.title),
                                          mention_html(user.id, user.first_name),
                                          mention_html(member.user.id, member.user.first_name))
         if reason:
-            log += "\n<b>Reason:</b> {}".format(reason)
+            log += "\n<b>• Reason:</b> {}".format(reason)
 
         return log
 
@@ -281,12 +281,12 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
 
     log = "<b>{}:</b>" \
           "\n#UNBANNED" \
-          "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {}".format(html.escape(chat.title),
+          "\n<b>• Admin:</b> {}" \
+          "\n<b>• User:</b> {}".format(html.escape(chat.title),
                                      mention_html(user.id, user.first_name),
                                      mention_html(member.user.id, member.user.first_name))
     if reason:
-        log += "\n<b>Reason:</b> {}".format(reason)
+        log += "\n<b>• Reason:</b> {}".format(reason)
 
     return log
 

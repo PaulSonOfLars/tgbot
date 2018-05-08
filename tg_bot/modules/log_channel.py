@@ -24,8 +24,8 @@ if is_module_loaded(FILENAME):
             message = update.effective_message  # type: Optional[Message]
             if result:
                 if chat.type == chat.SUPERGROUP and chat.username:
-                    result += "\n<b>Link:</b> " \
-                              "<a href=\"http://telegram.me/{}/{}\">click here</a>".format(chat.username,
+                    result += "\n<b>• Link:</b> " \
+                              "<a href=\"http://telegram.me/{}/{}\">go to message/a>".format(chat.username,
                                                                                            message.message_id)
                 log_chat = sql.get_chat_log_channel(chat.id)
                 if log_chat:
