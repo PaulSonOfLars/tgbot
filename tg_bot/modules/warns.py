@@ -59,7 +59,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                      "\n<b>Reason:</b> {}"\
                      "\n<b>Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
                                                           warner_tag,
-                                                          mention_html(user.id, user.first_name), 
+                                                                  mention_html(user.id, user.first_name), 
                                                           reason, num_warns, limit)
 
     else:
@@ -78,7 +78,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                      "\n<b>Reason:</b> {}"\
                      "\n<b>Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
                                                           warner_tag,
-                                                          mention_html(user.id, user.first_name), 
+                                                                  mention_html(user.id, user.first_name), 
                                                           reason, num_warns, limit)
 
     try:
