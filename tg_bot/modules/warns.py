@@ -56,9 +56,10 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                      "\n#WARN_BAN" \
                      "\n<b>Admin:</b> {}" \
                      "\n<b>User:</b> {}" \
-                     "\n<b>Reason:</b> {}".format(html.escape(chat.title),
+                     "\n<b>Reason:</b> {}"\
+                     "\n<b>Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
                                                   warner_tag,
-                                                  mention_html(user.id, user.first_name), reason)
+                                                  mention_html(user.id, user.first_name), reason, num_warns, limit)
 
     else:
         keyboard = InlineKeyboardMarkup(
@@ -73,9 +74,10 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                      "\n#WARN" \
                      "\n<b>Admin:</b> {}" \
                      "\n<b>User:</b> {}" \
-                     "\n<b>Reason:</b> {}".format(html.escape(chat.title),
+                     "\n<b>Reason:</b> {}"\
+                     "\n<b>Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
                                                   warner_tag,
-                                                  mention_html(user.id, user.first_name), reason)
+                                                  mention_html(user.id, user.first_name), reason, num_warns, limit)
 
     try:
         message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
