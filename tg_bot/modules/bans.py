@@ -9,10 +9,25 @@ from telegram.utils.helpers import mention_html
 from tg_bot import dispatcher, BAN_STICKER, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
-    is_user_admin, is_user_in_chat
+    is_user_admin, is_user_in_chat, is_bot_admin
 from tg_bot.modules.helper_funcs.extraction import extract_user_and_text
 from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.helper_funcs.filters import CustomFilters
+
+RBAN_ERRORS = {
+    "User is an administrator of the chat",
+    "Chat not found",
+    "Not enough rights to restrict/unrestrict chat member",
+    "User_not_participant",
+    "Peer_id_invalid",
+    "Group chat was deactivated",
+    "Need to be inviter of a user to kick it from a basic group",
+    "Chat_admin_required",
+    "Only the creator of a basic group can kick group administrators",
+    "Channel_private",
+    "Not in the chat"
+}
+
 
 @run_async
 @bot_admin
@@ -210,7 +225,7 @@ def rban(bot: Bot, update: Update, args: List[str]):
         return
 
     try:
-        chat = bot.get_chat(chat_id)
+        chat = bot.get_chat(chat_id.split()[0])
     except BadRequest as excp:
         if excp.message == "Chat not found":
             message.reply_text("Chat not found! Make sure you entered a valid chat ID and I'm part of that chat.")
@@ -222,7 +237,7 @@ def rban(bot: Bot, update: Update, args: List[str]):
         message.reply_text("I'm sorry, but that's a private chat!")
         return
 
-    if not is_bot_admin(chat, bot.id) and not chat.get_member(bot.id).can_restrict_members:
+    if not is_bot_admin(chat, bot.id) or not chat.get_member(bot.id).can_restrict_members:
         message.reply_text("I can't restrict people there! Make sure I'm admin and can ban users.")
         return
 
@@ -250,16 +265,8 @@ def rban(bot: Bot, update: Update, args: List[str]):
         if excp.message == "Reply message not found":
             # Do not reply
             message.reply_text('Banned!', quote=False)
-        elif excp.message == "User_not_participant":
-            message.reply_text("This user is not a participant of the chat!")
-        elif excp.message == "Group chat was deactivated":
-            message.reply_text("This group chat was deactivated!")
-        elif excp.message == "Need to be inviter of a user to kick it from a basic group":
+        elif excp.message in RBAN_ERRORS:
             message.reply_text(excp.message)
-        elif excp.message == "Only the creator of a basic group can kick group administrators":
-            message.reply_text(excp.message)
-        elif excp.message == "Peer_id_invalid":
-            message.reply_text("Could not ban user. Perhaps the group has been suspended by Telegram.")
         else:
             LOGGER.warning(update)
             LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id,
