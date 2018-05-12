@@ -2,3 +2,4 @@ tg_bot/config.py
 *.pyc
 .idea/
 .DS_Store
+*.orig
