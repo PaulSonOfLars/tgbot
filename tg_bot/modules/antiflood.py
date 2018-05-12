@@ -40,7 +40,7 @@ def check_flood(bot: Bot, update: Update) -> str:
 
         return "<b>{}:</b>" \
                "\n#BANNED" \
-               "\n<b>User:</b> {}" \
+               "\n<b>• User:</b> {}" \
                "\nFlooded the group.".format(html.escape(chat.title),
                                              mention_html(user.id, user.first_name))
 
@@ -74,7 +74,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
                 message.reply_text("Antiflood has been disabled.")
                 return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
-                       "\n<b>Admin:</b> {}" \
+                       "\n<b>• Admin:</b> {}" \
                        "\nDisabled antiflood.".format(html.escape(chat.title), mention_html(user.id, user.first_name))
 
             elif amount < 3:
@@ -86,7 +86,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
                 message.reply_text("Antiflood has been updated and set to {}".format(amount))
                 return "<b>{}:</b>" \
                        "\n#SETFLOOD" \
-                       "\n<b>Admin:</b> {}" \
+                       "\n<b>• Admin:</b> {}" \
                        "\nSet antiflood to <code>{}</code>.".format(html.escape(chat.title),
                                                                     mention_html(user.id, user.first_name), amount)
 

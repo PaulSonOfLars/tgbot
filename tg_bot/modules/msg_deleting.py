@@ -50,7 +50,7 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
             bot.send_message(chat.id, "Purge complete.")
             return "<b>{}:</b>" \
                    "\n#PURGE" \
-                   "\n<b>Admin:</b> {}" \
+                   "\n<b>• Admin:</b> {}" \
                    "\nPurged <code>{}</code> messages.".format(html.escape(chat.title),
                                                                mention_html(user.id, user.first_name),
                                                                delete_to - message_id)
@@ -73,7 +73,7 @@ def del_message(bot: Bot, update: Update) -> str:
             update.effective_message.delete()
             return "<b>{}:</b>" \
                    "\n#DEL" \
-                   "\n<b>Admin:</b> {}" \
+                   "\n<b>• Admin:</b> {}" \
                    "\nMessage deleted.".format(html.escape(chat.title),
                                                mention_html(user.id, user.first_name))
     else:

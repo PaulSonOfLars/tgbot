@@ -43,8 +43,8 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
             message.reply_text("Muted!")
             return "<b>{}:</b>" \
                    "\n#MUTE" \
-                   "\n<b>Admin:</b> {}" \
-                   "\n<b>User:</b> {}".format(html.escape(chat.title),
+                   "\n<b>• Admin:</b> {}" \
+                   "\n<b>• User:</b> {}".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
                                               mention_html(member.user.id, member.user.first_name))
 
@@ -85,8 +85,8 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
             message.reply_text("Unmuted!")
             return "<b>{}:</b>" \
                    "\n#UNMUTE" \
-                   "\n<b>Admin:</b> {}" \
-                   "\n<b>User:</b> {}".format(html.escape(chat.title),
+                   "\n<b>• Admin:</b> {}" \
+                   "\n<b>• User:</b> {}".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
                                               mention_html(member.user.id, member.user.first_name))
     else:
@@ -148,9 +148,9 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
 
     log = "<b>{}:</b>" \
           "\n#TEMP MUTED" \
-          "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {}" \
-          "\n<b>Time:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
+          "\n<b>• Admin:</b> {}" \
+          "\n<b>• User:</b> {}" \
+          "\n<b>• Time:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
                                      mention_html(member.user.id, member.user.first_name), time_val)
     if reason:
         log += "\n<b>Reason:</b> {}".format(reason)

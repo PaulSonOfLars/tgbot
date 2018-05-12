@@ -56,8 +56,8 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
     message.reply_text("Successfully promoted!")
     return "<b>{}:</b>" \
            "\n#PROMOTED" \
-           "\n<b>Admin:</b> {}" \
-           "\n<b>User:</b> {}".format(html.escape(chat.title),
+           "\n<b>• Admin:</b> {}" \
+           "\n<b>• User:</b> {}".format(html.escape(chat.title),
                                       mention_html(user.id, user.first_name),
                                       mention_html(user_member.user.id, user_member.user.first_name))
 
@@ -103,8 +103,8 @@ def demote(bot: Bot, update: Update, args: List[str]) -> str:
         message.reply_text("Successfully demoted!")
         return "<b>{}:</b>" \
                "\n#DEMOTED" \
-               "\n<b>Admin:</b> {}" \
-               "\n<b>User:</b> {}".format(html.escape(chat.title),
+               "\n<b>• Admin:</b> {}" \
+               "\n<b>• User:</b> {}".format(html.escape(chat.title),
                                           mention_html(user.id, user.first_name),
                                           mention_html(user_member.user.id, user_member.user.first_name))
 
@@ -141,7 +141,7 @@ def pin(bot: Bot, update: Update, args: List[str]) -> str:
                 raise
         return "<b>{}:</b>" \
                "\n#PINNED" \
-               "\n<b>Admin:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name))
+               "\n<b>• Admin:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name))
 
     return ""
 
@@ -165,7 +165,7 @@ def unpin(bot: Bot, update: Update) -> str:
 
     return "<b>{}:</b>" \
            "\n#UNPINNED" \
-           "\n<b>Admin:</b> {}".format(html.escape(chat.title),
+           "\n<b>• Admin:</b> {}".format(html.escape(chat.title),
                                        mention_html(user.id, user.first_name))
 
 
