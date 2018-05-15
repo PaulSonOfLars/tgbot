@@ -14,6 +14,10 @@ I'll also help when a database schema changes, and some table column needs to be
 Join the [news channel](https://t.me/MarieNews) if you just want to stay in the loop about new features or
 announcements.
 
+## One click installation on Heroku for n00bs
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+
 ## Starting the bot.
 
 Once you've setup your database and your configuration (see below) is complete, simply run:
