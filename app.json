@@ -12,43 +12,35 @@
   "env": {
     "ENV": {
       "description": "Setting this to ANYTHING will enable env variables",
-      "value": "ANYTHING",
-	  "required": True
+      "value": "ANYTHING"
     },
     "TOKEN": {
       "description": "Your bot token, as a string.",
-      "value": "",
-	  "required": True
+      "value": ""
     },
 	"OWNER_ID": {
 	  "description": "An integer of consisting of your owner ID",
-	  "value": "",
-	  "required": True
+	  "value": ""
 	},
 	"OWNER_USERNAME": {
 	  "description": "Your username",
-	  "value": "",
-	  "required": True
+	  "value": ""
 	},
 	"DATABASE_URL": {
 	  "description": "Your database URL",
-	  "value": "",
-	  "required": True
+	  "value": ""
 	},
 	"WEBHOOK": {
 	  "description": "Setting this to ANYTHING will enable webhooks when in env mode messages",
-	  "value": "ANYTHING",
-	  "required": True
+	  "value": "ANYTHING"
 	},
 	"URL": {
 	  "description": "The Heroku App URL similar to https://<appname>.herokuapp.com/",
-	  "value": "",
-	  "required": True
+	  "value": ""
 	},
 	"MESSAGE_DUMP": {
 	  "description": "optional: a chat where your replied saved messages are stored, to stop people deleting their old",
-	  "value": "",
-	  "required": True
+	  "value": ""
 	},
 	"LOAD": {
 	  "description": "Space separated list of modules you would like to load",
@@ -60,8 +52,7 @@
 	},
 	"SUDO_USERS": {
 	  "description": "A space separated list of user_ids which should be considered sudo users",
-	  "value": "18673980, 83489514",
-	  "required": True
+	  "value": "18673980, 83489514"
 	},
 	"SUPPORT_USERS": {
 	  "description": "A space separated list of user_ids which should be considered support users (can gban/ungban, nothing else)",
@@ -77,36 +68,25 @@
 	},
 	"PORT": {
 	  "description": "Port to use for your webhooks",
-	  "value": "8443",
-	  "required": True
+	  "value": "8443"
 	},
 	"DEL_CMDS": {
 	  "description": "Whether to delete commands from users which don't have rights to use that command",
-	  "value": "True",
-	  "required": True
+	  "value": "True"
 	},
 	"STRICT_GBAN": {
 	  "description": "Enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.",
-	  "value": "True",
-	  "required": True
+	  "value": "True"
 	},
 	"ALLOW_EXCL": {
 	  "description": "Whether to allow using exclamation marks ! for commands as well as /.",
-	  "value": "True",
-	  "required": True
+	  "value": "True"
 	},
 	"BAN_STICKER": {
 	  "description": "Which sticker to use when banning people. Use https://telegram.dog/ShowJsonBot to get the file_id",
 	  "value": "CAADAgADOwADPPEcAXkko5EB3YGYAg"
 	}
   },
-  "formation": {
-    "web": {
-      "quantity": 2,
-      "size": "Performance-M"
-    }
-  },
-  "image": "heroku/python",
   "addons": [
     {
       "plan": "heroku-postgresql",
