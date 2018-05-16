@@ -20,11 +20,11 @@
     },
 	"OWNER_ID": {
 	  "description": "An integer of consisting of your owner ID",
-	  "value": ""
+	  "value": "254318997"
 	},
 	"OWNER_USERNAME": {
 	  "description": "Your username",
-	  "value": ""
+	  "value": "SonOfLars"
 	},
 	"DATABASE_URL": {
 	  "description": "Your database URL",
