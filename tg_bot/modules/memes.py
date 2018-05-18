@@ -61,7 +61,7 @@ def angrymoji(bot: Bot, update: Update):
         if i == " ":
             reply_text += " 😤 "
         else:
-            reply_text += I
+            reply_text += i
     reply_text += " 😠"
     message.reply_to_message.reply_text(reply_text)
 
@@ -75,7 +75,7 @@ CLAPMOJI_HANDLER = DisableAbleCommandHandler("clapmoji", clapmoji)
 CLAPMOJI_ALIAS_HANDLER = DisableAbleCommandHandler("👏", clapmoji)
 BMOJI_HANDLER = DisableAbleCommandHandler("🅱️", bmoji)
 BMOJI_ALIAS_HANDLER = DisableAbleCommandHandler("️b", bmoji)
-ANGRYMOJI_HANDLER = DisableAblecommandHandler("angrymoji",)
+ANGRYMOJI_HANDLER = DisableAblecommandHandler("😡",)
 
 dispatcher.add_handler(COPYPASTA_HANDLER)
 dispatcher.add_handler(COPYPASTA_ALIAS_HANDLER)
