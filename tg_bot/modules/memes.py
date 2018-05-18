@@ -57,7 +57,7 @@ def clapmoji(bot: Bot, update: Update):
 def angrymoji(bot: Bot, update: Update):
     message = update.effective_message
     reply_text ="😡 "
-    for i in message reply_to_message.text:
+    for i in message.reply_to_message.text:
         if i == " ":
             reply_text += " 😤 "
         else:
