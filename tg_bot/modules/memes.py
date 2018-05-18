@@ -53,9 +53,21 @@ def clapmoji(bot: Bot, update: Update):
     reply_text += " 👏"
     message.reply_to_message.reply_text(reply_text)
 
-__help__ = "many memz"  # no help string
+@run_async
+def angrymoji(bot: Bot, update: Update):
+    message = update.effective_message.text:
+    reply_text ="😡 "
+    for i in message reply_to_message.text:
+        if i == " ":
+            reply_text += " 😤 "
+        else:
+            reply_text += I
+    reply_text += " 😠"
+    message.reply_to_message.reply_text(reply_text)
 
-__mod_name__ = "Memes"
+help = "many memz"  # no help string
+
+mod_name = "Memes"
 
 COPYPASTA_HANDLER = DisableAbleCommandHandler("copypasta", copypasta)
 COPYPASTA_ALIAS_HANDLER = DisableAbleCommandHandler("😂", copypasta)
@@ -63,6 +75,7 @@ CLAPMOJI_HANDLER = DisableAbleCommandHandler("clapmoji", clapmoji)
 CLAPMOJI_ALIAS_HANDLER = DisableAbleCommandHandler("👏", clapmoji)
 BMOJI_HANDLER = DisableAbleCommandHandler("🅱️", bmoji)
 BMOJI_ALIAS_HANDLER = DisableAbleCommandHandler("️b", bmoji)
+ANGRYMOJI_HANDLER = DisableAblecommandHandler("😡",angrymoji)
 
 dispatcher.add_handler(COPYPASTA_HANDLER)
 dispatcher.add_handler(COPYPASTA_ALIAS_HANDLER)
@@ -70,3 +83,5 @@ dispatcher.add_handler(CLAPMOJI_HANDLER)
 dispatcher.add_handler(CLAPMOJI_ALIAS_HANDLER)
 dispatcher.add_handler(BMOJI_HANDLER)
 dispatcher.add_handler(BMOJI_ALIAS_HANDLER)
+dispatcher.add_handler(ANGRYMOJI_HANDLER)
+dispatcher.add_handler(ANGRYMOJI_ALIAS_HANDLER)
