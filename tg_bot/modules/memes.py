@@ -75,7 +75,7 @@ CLAPMOJI_HANDLER = DisableAbleCommandHandler("clapmoji", clapmoji)
 CLAPMOJI_ALIAS_HANDLER = DisableAbleCommandHandler("👏", clapmoji)
 BMOJI_HANDLER = DisableAbleCommandHandler("🅱️", bmoji)
 BMOJI_ALIAS_HANDLER = DisableAbleCommandHandler("️b", bmoji)
-ANGRYMOJI_HANDLER = DisableAblecommandHandler("angrymoji", angrymoji)
+ANGRYMOJI_HANDLER = DisableAblecommandHandler("angrymoji",)
 
 dispatcher.add_handler(COPYPASTA_HANDLER)
 dispatcher.add_handler(COPYPASTA_ALIAS_HANDLER)
