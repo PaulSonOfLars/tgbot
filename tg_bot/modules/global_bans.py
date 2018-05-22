@@ -98,11 +98,10 @@ def gban(bot: Bot, update: Update, args: List[str]):
                  "\n<b>Status:</b> <code>Enforced</code>" \
                  "\n<b>Sudo Admin:</b> {}" \
                  "\n<b>User:</b> {}" \
-                 "\n<b>Reason:</b> {}" \
-                 "\n<b>ID:</b> <code>{}</code>".format(mention_html(banner.id, banner.first_name),
-                                                       mention_html(user_chat.id, user_chat.first_name), 
-                                                                    reason or "No reason given", 
-                                                                    user_chat.id), 
+                 "\n<b>ID:</b> <code>{}</code>" \
+                 "\n<b>Reason:</b> {}".format(mention_html(banner.id, banner.first_name),
+                                              mention_html(user_chat.id, user_chat.first_name), 
+                                                           user_chat.id, reason or "No reason given"), 
                 html=True)
 
     sql.gban_user(user_id, user_chat.username or user_chat.first_name, reason)
