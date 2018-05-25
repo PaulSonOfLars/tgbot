@@ -1,7 +1,8 @@
 # New chat added -> setup permissions
 import threading
+import re
 
-from sqlalchemy import Column, String, Boolean
+from sqlalchemy import Column, String, Boolean, UnicodeText
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -61,13 +62,27 @@ class Restrictions(BASE):
     def __repr__(self):
         return "<Restrictions for %s>" % self.chat_id
 
+class URLWhitelist(BASE):
+    __tablename__ = "permissions_urls"
+    chat_id = Column(String(14), primary_key=True, nullable=False)
+    url = Column(UnicodeText, primary_key=True, nullable=False)
+
+    def __init__(self, chat_id, url):
+        self.chat_id = str(chat_id)  # ensure string
+        self.url = url
+
+    def __repr__(self):
+        return "<Permission url whitelist for %s>" % self.chat_id
 
 Permissions.__table__.create(checkfirst=True)
 Restrictions.__table__.create(checkfirst=True)
+URLWhitelist.__table__.create(checkfirst=True)
 
 
 PERM_LOCK = threading.RLock()
 RESTR_LOCK = threading.RLock()
+WHITELIST_LOCK = threading.RLock()
+CHAT_WHITELIST = {}
 
 
 def init_permissions(chat_id, reset=False):
@@ -216,6 +231,64 @@ def get_restr(chat_id):
         SESSION.close()
 
 
+def get_whitelist(chat_id):
+    return CHAT_WHITELIST.get(str(chat_id), {})
+
+
+def add_whitelist(chat_id, url):
+    global CHAT_WHITELIST
+    with WHITELIST_LOCK:
+        url = re.search(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?(\S*)', url, flags=re.I).group(3).lower()
+        if url.endswith('/'):
+            url = url[:-1]
+        prev = SESSION.query(URLWhitelist).get((str(chat_id), url))
+        if not prev:
+            whitelisted = URLWhitelist(str(chat_id), url)
+            SESSION.add(whitelisted)
+            SESSION.commit()
+        chat_whitelist = CHAT_WHITELIST.setdefault(str(chat_id), {})
+        chat_whitelist.update(
+                {url: re.compile(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?'+re.escape(url)+'($|\W)', flags=re.I)}
+            )
+        return True
+
+
+def remove_whitelist(chat_id, url):
+    global CHAT_WHITELIST
+    with WHITELIST_LOCK:
+        url = re.search(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?(\S*)', url, flags=re.I).group(3).lower()
+        if url.endswith('/'):
+            url = url[:-1]
+        CHAT_WHITELIST.get(str(chat_id), {}).pop(url, None)
+        white = SESSION.query(URLWhitelist).get((str(chat_id), url))
+        if white:
+            SESSION.delete(white)
+            SESSION.commit()
+            return True
+
+        SESSION.close()
+        return False
+
+
+def __load_chat_whitelist():
+    #whitelist for each group is a dict(url: compiled_regexp for url in group)
+    global CHAT_WHITELIST
+    try:
+        chats = SESSION.query(URLWhitelist.chat_id).distinct().all()
+        for (chat_id,) in chats:  # remove tuple by ( ,)
+            CHAT_WHITELIST[str(chat_id)] = {}
+
+        all_whites = SESSION.query(URLWhitelist).all()
+        for row in all_whites:
+            CHAT_WHITELIST[str(row.chat_id)].update(
+                    {row.url: re.compile(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?'+re.escape(row.url)+'($|\W)',
+                                         flags=re.I
+                                         )
+                    }
+                )
+    finally:
+        SESSION.close()
+
 def migrate_chat(old_chat_id, new_chat_id):
     with PERM_LOCK:
         perms = SESSION.query(Permissions).get(str(old_chat_id))
@@ -228,3 +301,11 @@ def migrate_chat(old_chat_id, new_chat_id):
         if rest:
             rest.chat_id = str(new_chat_id)
         SESSION.commit()
+
+    with WHITELIST_LOCK:
+        white = SESSION.query(URLWhitelist).filter(URLWhitelist.chat_id == str(old_chat_id)).all()
+        for row in white:
+            row.chat_id = str(new_chat_id)
+        SESSION.commit()
+
+__load_chat_whitelist()

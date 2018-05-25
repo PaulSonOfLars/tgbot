@@ -1,12 +1,12 @@
 import html
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot, ParseMode, User, MessageEntity
+from telegram import Message, Chat, Update, Bot, ParseMode, User, MessageEntity, MAX_MESSAGE_LENGTH
 from telegram import TelegramError
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, Filters
 from telegram.ext.dispatcher import run_async
-from telegram.utils.helpers import mention_html
+from telegram.utils.helpers import mention_html, escape_markdown
 
 import tg_bot.modules.sql.locks_sql as sql
 from tg_bot import dispatcher, SUDO_USERS, LOGGER
@@ -25,7 +25,10 @@ LOCK_TYPES = {'sticker': Filters.sticker,
               'contact': Filters.contact,
               'photo': Filters.photo,
               'gif': Filters.document & CustomFilters.mime_type("video/mp4"),
-              'url': Filters.entity(MessageEntity.URL) | Filters.caption_entity(MessageEntity.URL),
+              'url': Filters.entity(MessageEntity.URL) |
+                     Filters.caption_entity(MessageEntity.URL) |
+                     Filters.entity(MessageEntity.TEXT_LINK) |
+                     Filters.caption_entity(MessageEntity.TEXT_LINK),
               'bots': Filters.status_update.new_chat_members,
               'forward': Filters.forwarded,
               'game': Filters.game
@@ -78,6 +81,59 @@ def unrestr_members(bot, chat_id, members, messages=True, media=True, other=True
 @run_async
 def locktypes(bot: Bot, update: Update):
     update.effective_message.reply_text("\n - ".join(["Locks: "] + list(LOCK_TYPES) + list(RESTRICTION_TYPES)))
+
+
+@user_admin
+def add_whitelist(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
+    entities = message.parse_entities(MessageEntity.URL)
+    added = []
+    for url in entities.values():
+        if sql.add_whitelist(chat.id, url):
+            added.append(url)
+    if added:
+        message.reply_text("Added {} to whitelist.".format(', '.join(w for w in added)))
+    else:
+        message.reply_text("No URLs were added to the whitelist")
+
+
+@user_admin
+def remove_whitelist(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
+    entities = message.parse_entities(MessageEntity.URL)
+    removed = []
+    for url in entities.values():
+        if sql.remove_whitelist(chat.id, url):
+            removed.append(url)
+    if removed:
+        message.reply_text("Removed `{}` from whitelist.".format('`, `'.join(escape_markdown(w) for w in removed)),
+            parse_mode=ParseMode.MARKDOWN)
+    else:
+        message.reply_text("Could not remove URL from whitelist or URL not found.")
+
+def list_white(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
+    all_whitelisted = sql.get_whitelist(chat.id)
+
+    if not all_whitelisted:
+        message.reply_text("No URLs are whitelisted here!")
+        return
+
+    BASIC_WHITE_STRING = "Whitelisted URLs:\n"
+    listwhite = BASIC_WHITE_STRING
+    for url in sorted(all_whitelisted.keys()):
+        entry = "{}, ".format(url)
+        if len(entry) + len(listwhite) > MAX_MESSAGE_LENGTH:
+            message.reply_text(listwhite)
+            listwhite = entry
+        else:
+            listwhite += entry
+
+    if not listwhite == BASIC_WHITE_STRING:
+        update.effective_message.reply_text(listwhite)
 
 
 @user_admin
@@ -199,6 +255,16 @@ def del_lockables(bot: Bot, update: Update):
                         chat.kick_member(new_mem.id)
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
+                #allow whitelisted URLs
+                if lockable == 'url':
+                    entities = set(url for url in message.parse_entities(MessageEntity.URL).values())
+                    #MessageEntity.TEXT_LINK could be added in the filter above, but would return the text, not the url,
+                    #so add all entities that have a 'url' field separately
+                    entities = entities | set(entity.url for entity in message.entities if entity.url)
+                    #if all URLs are any of the whitelisted ones, accept the message
+                    if all( any(regexp.search(text) for regexp in sql.get_whitelist(chat.id).values())
+                            for text in entities):
+                        continue
                 try:
                     message.delete()
                 except BadRequest as excp:
@@ -279,11 +345,14 @@ def __chat_settings__(chat_id, user_id):
 
 __help__ = """
  - /locktypes: a list of possible locktypes
+- /whitelisted: lists urls in this chat's whitelist
 
 *Admin only:*
  - /lock <type>: lock items of a certain type (not available in private)
  - /unlock <type>: unlock items of a certain type (not available in private)
  - /locks: the current list of locks in this chat.
+ - /whitelist <url>: add url to whitelist so it's not deleted by URL lock (accepts multiple)
+ - /unwhitelist <url>: remove url from whitelist (accepts multiple)
 
 Locks can be used to restrict a group's users.
 eg:
@@ -298,11 +367,17 @@ LOCKTYPES_HANDLER = DisableAbleCommandHandler("locktypes", locktypes)
 LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=Filters.group)
 UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True, filters=Filters.group)
 LOCKED_HANDLER = CommandHandler("locks", list_locks, filters=Filters.group)
+WHITELIST_HANDLER = CommandHandler("whitelist", add_whitelist, filters=Filters.group)
+UNWHITELIST_HANDLER = CommandHandler("unwhitelist", remove_whitelist, filters=Filters.group)
+WHITELISTED_HANDLER = DisableAbleCommandHandler("whitelisted", list_white, filters=Filters.group, admin_ok=True)
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(UNLOCK_HANDLER)
 dispatcher.add_handler(LOCKTYPES_HANDLER)
 dispatcher.add_handler(LOCKED_HANDLER)
+dispatcher.add_handler(WHITELIST_HANDLER)
+dispatcher.add_handler(UNWHITELIST_HANDLER)
+dispatcher.add_handler(WHITELISTED_HANDLER)
 
 dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, del_lockables), PERM_GROUP)
 dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, rest_handler), REST_GROUP)
