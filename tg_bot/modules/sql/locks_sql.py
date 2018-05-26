@@ -83,6 +83,7 @@ PERM_LOCK = threading.RLock()
 RESTR_LOCK = threading.RLock()
 WHITELIST_LOCK = threading.RLock()
 CHAT_WHITELIST = {}
+URL_REGEXP = re.compile(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?(\S*)', flags=re.I)
 
 
 def init_permissions(chat_id, reset=False):
@@ -236,27 +237,26 @@ def get_whitelist(chat_id):
 
 
 def add_whitelist(chat_id, url):
-    global CHAT_WHITELIST
+    url = URL_REGEXP.search(url).group(3).lower()
+    if url.endswith('/'):
+        url = url[:-1]
     with WHITELIST_LOCK:
-        url = re.search(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?(\S*)', url, flags=re.I).group(3).lower()
-        if url.endswith('/'):
-            url = url[:-1]
         prev = SESSION.query(URLWhitelist).get((str(chat_id), url))
         if not prev:
             whitelisted = URLWhitelist(str(chat_id), url)
             SESSION.add(whitelisted)
             SESSION.commit()
-        chat_whitelist = CHAT_WHITELIST.setdefault(str(chat_id), {})
-        chat_whitelist.update(
-                {url: re.compile(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?'+re.escape(url)+'($|\W)', flags=re.I)}
-            )
+            chat_whitelist = CHAT_WHITELIST.setdefault(str(chat_id), {})
+            chat_whitelist.update(
+                    {url: re.compile(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?'+re.escape(url)+'($|\W)',
+                                     flags=re.I)})
         return True
 
 
 def remove_whitelist(chat_id, url):
     global CHAT_WHITELIST
     with WHITELIST_LOCK:
-        url = re.search(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?(\S*)', url, flags=re.I).group(3).lower()
+        url = URL_REGEXP.search(url).group(3).lower()
         if url.endswith('/'):
             url = url[:-1]
         CHAT_WHITELIST.get(str(chat_id), {}).pop(url, None)
@@ -282,10 +282,7 @@ def __load_chat_whitelist():
         for row in all_whites:
             CHAT_WHITELIST[str(row.chat_id)].update(
                     {row.url: re.compile(r'(^http:\/\/|^https:\/\/|^ftp:\/\/|^)(www\.)?'+re.escape(row.url)+'($|\W)',
-                                         flags=re.I
-                                         )
-                    }
-                )
+                                         flags=re.I)})
     finally:
         SESSION.close()
 
