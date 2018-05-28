@@ -173,11 +173,6 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
                     unrestr_members(bot, chat.id, members, True, True, True, True)
                 """
                 message.reply_text("Unlocked {} for everyone!".format(args[0]))
-                message.reply_text(
-                    "NOTE: due to a recent abuse of locking, {} will now only be deleting messages, and not "
-                    "restricting users via the tg api. This shouldn't affect all you users though, so dont worry! "
-                    "Just means that any restricted users should be manually unrestricted from the chat "
-                    "admin pannel.".format(bot.first_name))
 
                 return "<b>{}:</b>" \
                        "\n#UNLOCK" \
