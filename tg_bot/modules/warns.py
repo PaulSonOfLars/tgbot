@@ -56,11 +56,12 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                      "\n#WARN_BAN" \
                      "\n<b>• Admin:</b> {}" \
                      "\n<b>• User:</b> {}" \
+                     "\n<b>• ID:</b> <code>{}</code>" \
                      "\n<b>• Reason:</b> {}"\
                      "\n<b>• Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
-                                                  warner_tag,
-                                                  mention_html(user.id, user.first_name), 
-                                                  reason, num_warns, limit)
+                                                                    warner_tag,
+                                                                    mention_html(user.id, user.first_name), user.id, 
+                                                                    reason, num_warns, limit)
 
     else:
         keyboard = InlineKeyboardMarkup(
@@ -75,11 +76,12 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                      "\n#WARN" \
                      "\n<b>• Admin:</b> {}" \
                      "\n<b>• User:</b> {}" \
+                     "\n<b>• ID:</b> <code>{}</code>" \
                      "\n<b>• Reason:</b> {}"\
                      "\n<b>• Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
-                                                  warner_tag,
-                                                  mention_html(user.id, user.first_name), 
-                                                  reason, num_warns, limit)
+                                                                    warner_tag,
+                                                                    mention_html(user.id, user.first_name), user.id, 
+                                                                    reason, num_warns, limit)
 
     try:
         message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
@@ -162,9 +164,11 @@ def reset_warns(bot: Bot, update: Update, args: List[str]) -> str:
         return "<b>{}:</b>" \
                "\n#RESETWARNS" \
                "\n<b>• Admin:</b> {}" \
-               "\n<b>• User:</b> {}".format(html.escape(chat.title),
-                                          mention_html(user.id, user.first_name),
-                                          mention_html(warned.id, warned.first_name))
+               "\n<b>• User:</b> {}" \
+               "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title),
+                                                       mention_html(user.id, user.first_name),
+                                                       mention_html(warned.id, warned.first_name),
+                                                       warned.id)
     else:
         message.reply_text("No user has been designated!")
     return ""

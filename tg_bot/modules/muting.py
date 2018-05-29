@@ -44,9 +44,10 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
             return "<b>{}:</b>" \
                    "\n#MUTE" \
                    "\n<b>• Admin:</b> {}" \
-                   "\n<b>• User:</b> {}".format(html.escape(chat.title),
+                   "\n<b>• User:</b> {}" \
+                   "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
-                                              mention_html(member.user.id, member.user.first_name))
+                                              mention_html(member.user.id, member.user.first_name), user_id)
 
         else:
             message.reply_text("This user is already muted!")
@@ -86,9 +87,10 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
             return "<b>{}:</b>" \
                    "\n#UNMUTE" \
                    "\n<b>• Admin:</b> {}" \
-                   "\n<b>• User:</b> {}".format(html.escape(chat.title),
-                                              mention_html(user.id, user.first_name),
-                                              mention_html(member.user.id, member.user.first_name))
+                   "\n<b>• User:</b> {}" \
+                   "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title),
+                                                           mention_html(user.id, user.first_name),
+                                                           mention_html(member.user.id, member.user.first_name), user_id)
     else:
         message.reply_text("This user isn't even in the chat, unmuting them won't make them talk more than they "
                            "already do!")
@@ -150,10 +152,11 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
           "\n#TEMP MUTED" \
           "\n<b>• Admin:</b> {}" \
           "\n<b>• User:</b> {}" \
+          "\n<b>• ID:</b> <code>{}</code>" \
           "\n<b>• Time:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
-                                     mention_html(member.user.id, member.user.first_name), time_val)
+                                       mention_html(member.user.id, member.user.first_name), user_id, time_val)
     if reason:
-        log += "\n<b>Reason:</b> {}".format(reason)
+        log += "\n<b>• Reason:</b> {}".format(reason)
 
     try:
         if member.can_send_messages is None or member.can_send_messages:
