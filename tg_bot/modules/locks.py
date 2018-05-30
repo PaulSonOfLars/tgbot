@@ -35,7 +35,7 @@ LOCK_TYPES = {'sticker': Filters.sticker,
 GIF = Filters.document & CustomFilters.mime_type("video/mp4")
 OTHER = Filters.game | Filters.sticker | GIF
 MEDIA = Filters.audio | Filters.document | Filters.video | Filters.voice | Filters.photo
-MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | Filters.command | MEDIA | OTHER
+MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | MEDIA | OTHER
 PREVIEWS = Filters.entity("url")
 
 RESTRICTION_TYPES = {'messages': MESSAGES,
