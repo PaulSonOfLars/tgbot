@@ -94,6 +94,15 @@ Install the necessary python dependencies by moving to the project directory and
 
 This will install all necessary python packages.
 
+### Developer verification
+
+To run this bot it is required for you to verify that you have some basic python knowledge. To do so copy the `captcha_template.py` file
+to a file named `captcha.py`, this file should be placed in your `tg_bot` folder, alongside the `__main__.py` file.
+
+Now follow the instructions in said file and read the output at the beginning of `python3 -m tg_bot` to figure out a solution. Good Luck!
+
+> Keep in mind that we won't help you figure out the solution to the dynamic captcha. If you can't figure it out we're afraid you probably shouldn't be using tgbot
+
 ### Database
 
 If you wish to use a database-dependent module (eg: locks, notes, userinfo, users, filters, welcomes),
