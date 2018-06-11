@@ -4,8 +4,4 @@ requests
 sqlalchemy
 python-telegram-bot>=10.1.0
 psycopg2-binary
-<<<<<<< HEAD
 feedparser
-=======
-
->>>>>>> 5978786... Introducing ping module :D
