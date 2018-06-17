@@ -518,7 +518,7 @@ __help__ = """
 
 *Admin only:*
  - /ban <userhandle>: bans a user. (via handle, or reply)
-  - /sban <userhandle>: silently bans a user. (via handle, or reply)
+ - /sban <userhandle>: silently bans a user. (via handle, or reply)
  - /tban <userhandle> x(m/h/d): bans a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
  - /unban <userhandle>: unbans a user. (via handle, or reply)
  - /kick <userhandle>: kicks a user, (via handle, or reply)
