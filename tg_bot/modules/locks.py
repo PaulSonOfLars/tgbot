@@ -30,11 +30,11 @@ LOCK_TYPES = {'sticker': Filters.sticker,
               'bots': Filters.status_update.new_chat_members,
               'forward': Filters.forwarded,
               'game': Filters.game,
-              'location': Filters.location
+              'location': Filters.location,
               }
 
 GIF = Filters.document & CustomFilters.mime_type("video/mp4")
-OTHER = Filters.game | Filters.sticker | Filters.location | GIF
+OTHER = Filters.game | Filters.sticker | GIF
 MEDIA = Filters.audio | Filters.document | Filters.video | Filters.voice | Filters.photo
 MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | Filters.command | MEDIA | OTHER
 PREVIEWS = Filters.entity("url")
@@ -258,8 +258,8 @@ def build_lock_message(chat_id):
                    "\n - forward = `{}`" \
                    "\n - game = `{}`" \
                    "\n - location = `{}`".format(locks.sticker, locks.audio, locks.voice, locks.document,
-                                             locks.video, locks.contact, locks.photo, locks.gif, locks.url, locks.bots,
-                                             locks.forward, locks.game, locks.location)
+                                                 locks.video, locks.contact, locks.photo, locks.gif, locks.url,
+                                                 locks.bots, locks.forward, locks.game, locks.location)
         if restr:
             res += "\n - messages = `{}`" \
                    "\n - media = `{}`" \
