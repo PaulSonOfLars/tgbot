@@ -259,7 +259,7 @@ def build_lock_message(chat_id):
                    "\n - game = `{}`" \
                    "\n - location = `{}`".format(locks.sticker, locks.audio, locks.voice, locks.document,
                                                  locks.video, locks.contact, locks.photo, locks.gif, locks.url,
-                                                 locks.bots, locks.forward, locks.game, locks.locations)
+                                                 locks.bots, locks.forward, locks.game, locks.location)
         if restr:
             res += "\n - messages = `{}`" \
                    "\n - media = `{}`" \
