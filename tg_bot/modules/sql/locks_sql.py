@@ -22,6 +22,7 @@ class Permissions(BASE):
     bots = Column(Boolean, default=False)
     forward = Column(Boolean, default=False)
     game = Column(Boolean, default=False)
+    location = Column(Boolean, default=False)
 
     def __init__(self, chat_id):
         self.chat_id = str(chat_id)  # ensure string
@@ -37,6 +38,7 @@ class Permissions(BASE):
         self.bots = False
         self.forward = False
         self.game = False
+        self.location = False
 
     def __repr__(self):
         return "<Permissions for %s>" % self.chat_id
@@ -122,6 +124,8 @@ def update_lock(chat_id, lock_type, locked):
             curr_perm.forward = locked
         elif lock_type == 'game':
             curr_perm.game = locked
+        elif lock_type == 'location':
+            curr_perm.location = locked
 
         SESSION.add(curr_perm)
         SESSION.commit()
@@ -181,6 +185,8 @@ def is_locked(chat_id, lock_type):
         return curr_perm.forward
     elif lock_type == "game":
         return curr_perm.game
+    elif lock_type == "location":
+        return curr_perm.location
 
 
 def is_restr_locked(chat_id, lock_type):
