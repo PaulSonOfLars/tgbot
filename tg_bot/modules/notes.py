@@ -5,7 +5,7 @@ from typing import Optional, List
 from telegram import MAX_MESSAGE_LENGTH, ParseMode, InlineKeyboardMarkup
 from telegram import Message, Update, Bot
 from telegram.error import BadRequest
-from telegram.ext import CommandHandler, RegexHandler, Filters
+from telegram.ext import CommandHandler, RegexHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 
@@ -127,42 +127,11 @@ def hash_get(bot: Bot, update: Update):
     get(bot, update, no_hash, show_none=False)
 
 
-# TODO: FIX THIS
-@run_async
-@user_admin
-def save_replied(bot: Bot, update: Update):
-    chat_id = update.effective_chat.id
-    msg = update.effective_message
-
-    notename, text, data_type, content, buttons = get_note_type(msg, replied=False)
-
-    if data_type is None:
-        msg.reply_text("Dude, there's no note")
-        return
-
-    sql.add_note_to_db(chat_id, notename, text, data_type, buttons, content)
-    msg.reply_text("Yas! Added replied message {}".format(notename))
-
-    if msg.reply_to_message.from_user.is_bot:
-        if text:
-            msg.reply_text("Seems like you're trying to save a message from a bot. Unfortunately, "
-                           "bots can't forward bot messages, so I can't save the exact message. "
-                           "\nI'll save all the text I can, but if you want more, you'll have to "
-                           "forward the message yourself, and then save it.")
-        else:
-            msg.reply_text("Bots are kinda handicapped by telegram, making it hard for bots to "
-                           "interact with other bots, so I can't save this message "
-                           "like I usually would - do you mind forwarding it and "
-                           "then saving that new message? Thanks!")
-        return
-
-
 @run_async
 @user_admin
 def save(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     msg = update.effective_message  # type: Optional[Message]
-    raw_text = msg.text
 
     note_name, text, data_type, content, buttons = get_note_type(msg)
 
@@ -174,6 +143,19 @@ def save(bot: Bot, update: Update):
 
     msg.reply_text(
         "Yas! Added {note_name}.\nGet it with /get {note_name}, or #{note_name}".format(note_name=note_name))
+
+    if msg.reply_to_message and msg.reply_to_message.from_user.is_bot:
+        if text:
+            msg.reply_text("Seems like you're trying to save a message from a bot. Unfortunately, "
+                           "bots can't forward bot messages, so I can't save the exact message. "
+                           "\nI'll save all the text I can, but if you want more, you'll have to "
+                           "forward the message yourself, and then save it.")
+        else:
+            msg.reply_text("Bots are kinda handicapped by telegram, making it hard for bots to "
+                           "interact with other bots, so I can't save this message "
+                           "like I usually would - do you mind forwarding it and "
+                           "then saving that new message? Thanks!")
+        return
 
 
 @run_async
@@ -265,15 +247,13 @@ __mod_name__ = "Notes"
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 HASH_GET_HANDLER = RegexHandler(r"^#[^\s]+", hash_get)
 
-SAVE_HANDLER = CommandHandler("save", save, filters=~Filters.reply)
-REPL_SAVE_HANDLER = CommandHandler("save", save_replied, filters=Filters.reply)
+SAVE_HANDLER = CommandHandler("save", save)
 DELETE_HANDLER = CommandHandler("clear", clear, pass_args=True)
 
 LIST_HANDLER = DisableAbleCommandHandler(["notes", "saved"], list_notes, admin_ok=True)
 
 dispatcher.add_handler(GET_HANDLER)
 dispatcher.add_handler(SAVE_HANDLER)
-dispatcher.add_handler(REPL_SAVE_HANDLER)
 dispatcher.add_handler(LIST_HANDLER)
 dispatcher.add_handler(DELETE_HANDLER)
 dispatcher.add_handler(HASH_GET_HANDLER)

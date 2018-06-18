@@ -17,7 +17,7 @@ class Types(IntEnum):
     VIDEO = 7
 
 
-def get_note_type(msg: Message, replied=False):
+def get_note_type(msg: Message):
     data_type = None
     content = None
     text = ""
@@ -36,47 +36,45 @@ def get_note_type(msg: Message, replied=False):
         else:
             data_type = Types.TEXT
 
-    elif len(args) >= 2 and replied and msg.reply_to_message and msg.reply_to_message.text:  # not caption, text
-        text, buttons = button_markdown_parser(msg.reply_to_message.text,
-                                               entities=msg.reply_to_message.parse_entities())
-        if buttons:
-            data_type = Types.BUTTON_TEXT
-        else:
-            data_type = Types.TEXT
+    elif msg.reply_to_message:
+        entities = msg.reply_to_message.parse_entities()
+        msgtext = msg.reply_to_message.text or msg.reply_to_message.caption
+        if len(args) >= 2 and msg.reply_to_message.text:  # not caption, text
+            text, buttons = button_markdown_parser(msgtext,
+                                                   entities=entities)
+            if buttons:
+                data_type = Types.BUTTON_TEXT
+            else:
+                data_type = Types.TEXT
 
-    elif msg.reply_to_message and msg.reply_to_message.sticker:
-        content = msg.reply_to_message.sticker.file_id
-        data_type = Types.STICKER
+        elif msg.reply_to_message.sticker:
+            content = msg.reply_to_message.sticker.file_id
+            data_type = Types.STICKER
 
-    elif msg.reply_to_message and msg.reply_to_message.document:
-        content = msg.reply_to_message.document.file_id
-        text, buttons = button_markdown_parser(msg.reply_to_message.caption,
-                                               entities=msg.reply_to_message.parse_entities())
-        data_type = Types.DOCUMENT
+        elif msg.reply_to_message.document:
+            content = msg.reply_to_message.document.file_id
+            text, buttons = button_markdown_parser(msgtext, entities=entities)
+            data_type = Types.DOCUMENT
 
-    elif msg.reply_to_message and msg.reply_to_message.photo:
-        content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
-        text, buttons = button_markdown_parser(msg.reply_to_message.caption,
-                                               entities=msg.reply_to_message.parse_entities())
-        data_type = Types.PHOTO
+        elif msg.reply_to_message.photo:
+            content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
+            text, buttons = button_markdown_parser(msgtext, entities=entities)
+            data_type = Types.PHOTO
 
-    elif msg.reply_to_message and msg.reply_to_message.audio:
-        content = msg.reply_to_message.audio.file_id
-        text, buttons = button_markdown_parser(msg.reply_to_message.caption,
-                                               entities=msg.reply_to_message.parse_entities())
-        data_type = Types.AUDIO
+        elif msg.reply_to_message.audio:
+            content = msg.reply_to_message.audio.file_id
+            text, buttons = button_markdown_parser(msgtext, entities=entities)
+            data_type = Types.AUDIO
 
-    elif msg.reply_to_message and msg.reply_to_message.voice:
-        content = msg.reply_to_message.voice.file_id
-        text, buttons = button_markdown_parser(msg.reply_to_message.caption,
-                                               entities=msg.reply_to_message.parse_entities())
-        data_type = Types.VOICE
+        elif msg.reply_to_message.voice:
+            content = msg.reply_to_message.voice.file_id
+            text, buttons = button_markdown_parser(msgtext, entities=entities)
+            data_type = Types.VOICE
 
-    elif msg.reply_to_message and msg.reply_to_message.video:
-        content = msg.reply_to_message.video.file_id
-        text, buttons = button_markdown_parser(msg.reply_to_message.caption,
-                                               entities=msg.reply_to_message.parse_entities())
-        data_type = Types.VIDEO
+        elif msg.reply_to_message.video:
+            content = msg.reply_to_message.video.file_id
+            text, buttons = button_markdown_parser(msgtext, entities=entities)
+            data_type = Types.VIDEO
 
     return note_name, text, data_type, content, buttons
 
