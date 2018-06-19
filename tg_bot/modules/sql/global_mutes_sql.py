@@ -65,13 +65,14 @@ def update_gmute_reason(user_id, name, reason=None):
     with GMUTED_USERS_LOCK:
         user = SESSION.query(GloballyMutedUsers).get(user_id)
         if not user:
-            return False
+            return None
+        old_reason = user.reason
         user.name = name
         user.reason = reason
 
         SESSION.merge(user)
         SESSION.commit()
-        return True
+        return old_reason
 
 
 def ungmute_user(user_id):
