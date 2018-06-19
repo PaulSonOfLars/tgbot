@@ -1,7 +1,7 @@
 from telegram import Message
 from telegram.ext import BaseFilter
 
-from tg_bot import SUPPORT_USERS, SUDO_USERS
+from tg_bot import SUPPORT_USERS, SUDO_USERS, SUPER_ADMINS
 
 
 class CustomFilters(object):
@@ -16,6 +16,12 @@ class CustomFilters(object):
             return bool(message.from_user and message.from_user.id in SUDO_USERS)
 
     sudo_filter = _Sudoers()
+    
+    class _SuperAdminers(BaseFilter):
+        def filter(self, message: Message):
+            return bool(message.from_user and message.from_user.id in SUPER_ADMINS)
+
+    super_admins_filter = _SuperAdminers()
 
     class _MimeType(BaseFilter):
         def __init__(self, mimetype):

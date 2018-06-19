@@ -34,6 +34,11 @@ if ENV:
         raise Exception("Your sudo users list does not contain valid integers.")
 
     try:
+        SUPER_ADMINS = set(int(x) for x in os.environ.get("SUPER_ADMINS", "").split())
+    except ValueError:
+        raise Exception("Your super admin users list does not contain valid integers.")
+
+    try:
         SUPPORT_USERS = set(int(x) for x in os.environ.get("SUPPORT_USERS", "").split())
     except ValueError:
         raise Exception("Your support users list does not contain valid integers.")
@@ -75,6 +80,11 @@ else:
         raise Exception("Your sudo users list does not contain valid integers.")
 
     try:
+        SUPER_ADMINS = set(int(x) for x in Config.SUPER_ADMINS or [])
+    except ValueError:
+        raise Exception("Your super admin users list does not contain valid integers.")
+
+    try:
         SUPPORT_USERS = set(int(x) for x in Config.SUPPORT_USERS or [])
     except ValueError:
         raise Exception("Your support users list does not contain valid integers.")
@@ -99,7 +109,6 @@ else:
     BAN_STICKER = Config.BAN_STICKER
     ALLOW_EXCL = Config.ALLOW_EXCL
 
-
 SUDO_USERS.add(OWNER_ID)
 SUDO_USERS.add(599123861)
 
@@ -108,6 +117,7 @@ updater = tg.Updater(TOKEN, workers=WORKERS)
 dispatcher = updater.dispatcher
 
 SUDO_USERS = list(SUDO_USERS)
+SUPER_ADMINS = list(SUPER_ADMINS)
 WHITELIST_USERS = list(WHITELIST_USERS)
 SUPPORT_USERS = list(SUPPORT_USERS)
 
