@@ -24,7 +24,6 @@ def leave(bot: Bot, update: Update, args: List[str]):
 
 __help__ = "Leaves a chat. Uses only one paramater: chat_id"
 
-__mod_name__ = "Leave"
 
 LEAVE_HANDLER = CommandHandler("leave", leave, pass_args = True, filters=CustomFilters.sudo_filter)
 dispatcher.add_handler(LEAVE_HANDLER)
