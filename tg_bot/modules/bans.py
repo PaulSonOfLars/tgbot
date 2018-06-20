@@ -250,8 +250,11 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
 @run_async
 @bot_admin
 @can_restrict
+@loggable
 def banme(bot: Bot, update: Update):
     user_id = update.effective_message.from_user.id
+    chat = update.effective_chat
+    user = update.effective_user
     if is_user_admin(update.effective_chat, user_id):
         update.effective_message.reply_text("I wish I could... but you're an admin.")
         return
@@ -259,6 +262,13 @@ def banme(bot: Bot, update: Update):
     res = update.effective_chat.kick_member(user_id)  
     if res:
         update.effective_message.reply_text("No problem, banned.")
+        log = "<b>{}:</b>" \
+              "\n#BANME" \
+              "\n<b>User:</b> {}" \
+              "\n<b>ID:</b> <code>{}</code>".format(html.escape(chat.title),
+                                                    mention_html(user.id, user.first_name), user_id)
+        return log
+    
     else:
         update.effective_message.reply_text("Huh? I can't :/")
         
