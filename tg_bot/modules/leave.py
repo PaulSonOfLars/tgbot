@@ -7,7 +7,7 @@ from typing import List
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 
 import telegram
-from tg_bot import dispatcher
+from tg_bot import dispatcher, OWNER_ID
 
 @run_async
 def leave(bot: Bot, update: Update, args: List[str]):
