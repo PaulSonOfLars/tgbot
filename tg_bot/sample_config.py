@@ -20,7 +20,7 @@ class Config(object):
     LOAD = []
     # sed has been disabled after the discovery that certain long-running sed commands maxed out cpu usage
     # and killed the bot. Be careful re-enabling it!
-    NO_LOAD = ['translation', 'rss', 'sed']
+    NO_LOAD = ['translation',]
     WEBHOOK = False
     URL = None
 
@@ -36,6 +36,7 @@ class Config(object):
     WORKERS = 8  # Number of subthreads to use. This is the recommended amount - see for yourself what works best!
     BAN_STICKER = 'CAADAgADOwADPPEcAXkko5EB3YGYAg'  # banhammer marie sticker
     ALLOW_EXCL = False  # Allow ! commands as well as /
+    API_OPENWEATHER = None # OpenWeather API
 
 
 class Production(Config):
