@@ -302,7 +302,7 @@ def get_time(bot: Bot, update: Update, args: List[str]):
             elif country:
                 location = country
 
-            timenow = int(datetime.utcnow().strftime("%s"))
+            timenow = int(datetime.utcnow().timestamp())
             res = requests.get(GMAPS_TIME, params=dict(location="{},{}".format(lat, long), timestamp=timenow))
             if res.status_code == 200:
                 offset = json.loads(res.text)['dstOffset']
