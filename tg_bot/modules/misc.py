@@ -11,6 +11,7 @@ from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown, mention_html
 
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, SUPER_ADMINS, WHITELIST_USERS, BAN_STICKER
+from tg_bot.__main__ import GDPR
 from tg_bot.__main__ import STATS, USER_INFO
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.extraction import extract_user
@@ -327,12 +328,21 @@ def echo(bot: Bot, update: Update):
         message.reply_text(args[1], quote=False)
     message.delete()
 
-def ping(bot: Bot, update: Update):
-    start_time = time.time()
-    requests.get('https://api.telegram.org')
-    end_time = time.time()
-    ping_time = float(end_time - start_time)*1000
-    update.effective_message.reply_text(" Ping speed was : {}ms".format(ping_time))
+
+@run_async
+def gdpr(bot: Bot, update: Update):
+    update.effective_message.reply_text("Deleting identifiable data...")
+    for mod in GDPR:
+        mod.__gdpr__(update.effective_user.id)
+
+    update.effective_message.reply_text("Your personal data has been deleted.\n\nNote that this will not unban "
+                                        "you from any chats, as that is telegram data, not Marie data. "
+                                        "Flooding, warns, and gbans are also preserved, as of "
+                                        "[this](https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/individual-rights/right-to-erasure/), "
+                                        "which clearly states that the right to erasure does not apply "
+                                        "\"for the performance of a task carried out in the public interest\", as is "
+                                        "the case for the aforementioned pieces of data.",
+                                        parse_mode=ParseMode.MARKDOWN)
 
 
 MARKDOWN_HELP = """
@@ -381,6 +391,7 @@ __help__ = """
  - /slap: slap a user, or get slapped if not a reply.
  - /time <place>: gives the local time at the given place.
  - /info: get information about a user.
+ - /gdpr: deletes your information from the bot's database. Private chats only.
 
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
 """
@@ -400,6 +411,7 @@ ECHO_HANDLER = CommandHandler("echo", echo, filters=Filters.user(OWNER_ID))
 MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.private)
 
 STATS_HANDLER = CommandHandler("stats", stats, filters=CustomFilters.sudo_filter)
+GDPR_HANDLER = CommandHandler("gdpr", gdpr, filters=Filters.private)
 
 dispatcher.add_handler(ID_HANDLER)
 dispatcher.add_handler(PING_HANDLER)
@@ -411,3 +423,4 @@ dispatcher.add_handler(INFO_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
 dispatcher.add_handler(STATS_HANDLER)
+dispatcher.add_handler(GDPR_HANDLER)
