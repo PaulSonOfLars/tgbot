@@ -112,6 +112,11 @@ def __user_info__(user_id):
         return ""
 
 
+def __gdpr__(user_id):
+    sql.clear_user_info(user_id)
+    sql.clear_user_bio(user_id)
+
+
 __help__ = """
  - /setbio <text>: while replying, will save another user's bio
  - /bio: will get your or another user's bio. This cannot be set by yourself.
