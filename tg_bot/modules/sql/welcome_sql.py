@@ -22,6 +22,7 @@ class Welcome(BASE):
     leave_type = Column(Integer, default=Types.TEXT.value)
 
     clean_welcome = Column(BigInteger)
+    del_joined = Column(BigInteger)
 
     def __init__(self, chat_id, should_welcome=True, should_goodbye=True):
         self.chat_id = chat_id
@@ -109,6 +110,28 @@ def get_clean_pref(chat_id):
 
     if welc:
         return welc.clean_welcome
+
+    return False
+
+
+def set_del_joined(chat_id, del_joined):
+    with INSERTION_LOCK:
+        curr = SESSION.query(Welcome).get(str(chat_id))
+        if not curr:
+            curr = Welcome(str(chat_id))
+
+        curr.del_joined = int(del_joined)
+
+        SESSION.add(curr)
+        SESSION.commit()
+
+
+def get_del_pref(chat_id):
+    welc = SESSION.query(Welcome).get(str(chat_id))
+    SESSION.close()
+
+    if welc:
+        return welc.del_joined
 
     return False
 
