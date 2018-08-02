@@ -125,7 +125,7 @@ def gmute(bot: Bot, update: Update, args: List[str]):
             pass
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, 
-                  "{} has been gmuted, successfully!".format(mention_html(user_chat.id, user_chat.first_name)),
+                  "{} has been successfully gmuted!".format(mention_html(user_chat.id, user_chat.first_name)),
                 html=True)
                   
     message.reply_text("Person has been gmuted.")
@@ -208,7 +208,7 @@ def ungmute(bot: Bot, update: Update, args: List[str]):
     sql.ungmute_user(user_id)
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, 
-                  "{} has been pardoned from gmute, successfully!".format(mention_html(user_chat.id, 
+                  "{} has been pardoned from gmute!".format(mention_html(user_chat.id, 
                                                                          user_chat.first_name)),
                   html=True)
 
