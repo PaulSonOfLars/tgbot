@@ -129,12 +129,6 @@ def new_member(bot: Bot, update: Update):
 
                 sent = send(update, res, keyboard,
                             sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
-<<<<<<< HEAD
-            del_message = sql.get_del_pref(chat.id)
-
-=======
->>>>>>> parent of 8c7b632... delete service messages
-
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:
             try:
