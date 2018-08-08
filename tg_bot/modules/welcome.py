@@ -418,16 +418,16 @@ def del_joined(bot: Bot, update: Update, args: List[str]) -> str:
         sql.set_del_joined(str(chat.id), True)
         update.effective_message.reply_text("I'll try to delete old joined messages!")
         return "<b>{}:</b>" \
-               "\n#CLEAN_WELCOME" \
-               "\n<b>Admin:</b> {}" \
-               "\nHas toggled clean welcomes to <code>ON</code>.".format(html.escape(chat.title),
+               "\n#CLEAN_SERVICE" \
+               "\n<b>• Admin:</b> {}" \
+               "\nHas toggled joined deletion to <code>ON</code>.".format(html.escape(chat.title),
                                                                          mention_html(user.id, user.first_name))
     elif args[0].lower() in ("off", "no"):
         sql.set_del_joined(str(chat.id), False)
         update.effective_message.reply_text("I won't delete old joined messages.")
         return "<b>{}:</b>" \
-               "\n#CLEAN_WELCOME" \
-               "\n<b>Admin:</b> {}" \
+               "\n#CLEAN_SERVICE" \
+               "\n<b>• Admin:</b> {}" \
                "\nHas toggled joined deletion to <code>OFF</code>.".format(html.escape(chat.title),
                                                                           mention_html(user.id, user.first_name))
     else:
@@ -513,7 +513,7 @@ __help__ = """
  - /resetwelcome: reset to the default welcome message.
  - /resetgoodbye: reset to the default goodbye message.
  - /cleanwelcome <on/off>: On new member, try to delete the previous welcome message to avoid spamming the chat.
- - /rmjoin <on/off>: when someone joins, try to delete the *user* joined the group message.
+ - /cleanservice <on/off>: when someone joins, try to delete the *user* joined the group message.
 
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
 """.format(WELC_HELP_TXT)
@@ -529,7 +529,7 @@ SET_GOODBYE = CommandHandler("setgoodbye", set_goodbye, filters=Filters.group)
 RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
 RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.group)
 CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
-DEL_JOINED = CommandHandler("rmjoin", del_joined, pass_args=True, filters=Filters.group)
+DEL_JOINED = CommandHandler(["rmjoin", "cleanservice"], del_joined, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
 dispatcher.add_handler(NEW_MEM_HANDLER)
