@@ -6,6 +6,7 @@ from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import mention_html
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode, User, CallbackQuery
 
 from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_admin, can_restrict
@@ -41,6 +42,9 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
         elif member.can_send_messages is None or member.can_send_messages:
             bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
             message.reply_text("Muted!")
+            keyboard = []
+            reply = "{} is muted!".format(mention_html(member.user.id, member.user.first_name))
+            message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
             return "<b>{}:</b>" \
                    "\n#MUTE" \
                    "\n<b>• Admin:</b> {}" \
@@ -84,6 +88,9 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
                                      can_send_other_messages=True,
                                      can_add_web_page_previews=True)
             message.reply_text("Unmuted!")
+            keyboard = []
+            reply = "Yep, {} can start talking again!".format(mention_html(member.user.id, member.user.first_name))
+            message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
             return "<b>{}:</b>" \
                    "\n#UNMUTE" \
                    "\n<b>• Admin:</b> {}" \
