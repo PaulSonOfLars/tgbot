@@ -198,7 +198,10 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
     res = chat.unban_member(user_id)  # unban on current user = kick
     if res:
         bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-        message.reply_text("Kicked!")
+        keyboard = []
+        reply = "{} has been kicked!".format(mention_html(member.user.id, member.user.first_name))
+        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+
         log = "<b>{}:</b>" \
               "\n#KICKED" \
               "\n<b>• Admin:</b> {}" \
