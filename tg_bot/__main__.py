@@ -19,21 +19,15 @@ from tg_bot.modules.helper_funcs.chat_status import is_user_admin
 from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 PM_START_TEXT = """
-Hi {}, my name is {}! If you have any questions on how to use me, read /help - and then head to @MarieSupport.
-
-I'm a group manager bot maintained by [this wonderful person](tg://user?id={}). I'm built in python3, using the \
-python-telegram-bot library, and am fully opensource - you can find what makes me tick \
-[here](github.com/PaulSonOfLars/tgbot)!
-
-Feel free to submit pull requests on github, or to contact my support group, @MarieSupport, with any bugs, questions \
-or feature requests you might have :)
-I also have a news channel, @MarieNews for announcements on new features, downtime, etc.
-
-You can find the list of available commands with /help.
-
-If you're enjoying using me, and/or would like to help me survive in the wild, hit /donate to help fund/upgrade my VPS!
+ഹായ് {}, നിങ്ങൾ തേടികൊണ്ടിരിക്കുന്നത് എന്നെ തന്നെയാണ്.
+എന്റെ പേര് {}!  ഞാൻ ടെലിഗ്രാമിലെ ഒരു കിടിലൻ  ഗ്രൂപ്പ് മാനേജിങ് ബോട്ട് ആണ്.
+✪ ✪ ✪ ᴀ sɪᴍᴘʟᴇ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴɪsᴛʀᴀᴛɪᴏɴ ʙᴏᴛ ғᴏʀ ᴍᴀʟʟᴜs✪ ✪ ✪
+എന്നെ നോക്കി നടത്തുന്നത്  [ഇദ്ദേഹം](tg://user?id={}) ആണ് ...
+എന്നെ ഉപയോഗിക്കേണ്ടത് എങ്ങനെ ആണെന്നുള്ളതിൽ എന്തേലും സംശയം ഉണ്ടെങ്കിൽ /help കൊടുത്താൽ മതിയാകും....
+ടെലിഗ്രാമിനെകുറിച്ചുള്ള നിങ്ങളുടെ എന്ത് സംശയങ്ങൾക്കും [BUJI](https://t.me/buji_bot)-യെ ഉപയോഗിക്കാവുന്നതാണ്...
+ഞാനും മറിയ ബോട്ടിന്റെ തലച്ചോറിൽ തന്നെയാണ് വർക്ക് ചെയ്യുന്നത്. 
+അതെ [ഇദ്ദേഹം](https://t.me/tonyjr_online) തന്നെയാണ് എന്റെ മാസ്റ്റർ!!
 """
-
 HELP_STRINGS = """
 Hey there! My name is *{}*.
 I'm a modular group management bot with a few fun extras! Have a look at the following for an idea of some of \
@@ -52,11 +46,9 @@ the things I can help you with.
 And the following:
 """.format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n")
 
-DONATE_STRING = """Heya, glad to hear you want to donate!
-It took lots of work for [my creator](t.me/SonOfLars) to get me to where I am now, and every donation helps \
-motivate him to make me even better. All the donation money will go to a better VPS to host me, and/or beer \
-(see his bio!). He's just a poor student, so every little helps!
-There are two ways of paying him; [PayPal](paypal.me/PaulSonOfLars), or [Monzo](monzo.me/paulnionvestergaardlarsen)."""
+DONATE_STRING = """നമസ്കാരം, നിങ്ങൾ സംഭാവന ചെയ്യാൻ പോകുന്നു എന്ന് കേൾക്കുന്നതിൽ അതിയായ സന്തോഷം ഉണ്ട്!
+[എന്റെ മൊതലാളി](https://t.me/TonyJr_online) വളരെ കഷ്ടപ്പെട്ടാണ് എന്നെ നിർമിച്ചിരിക്കുന്നത്... നിങ്ങൾ തരുന്ന ഓരോ സംഭാവനയും എന്നെ കൂടുതൽ നന്നാക്കുന്നതിൽ പ്രെചോദനം ആകും 
+എനിക്ക് സംഭാവന നൽകാൻ [ഇദ്ദേഹം](http://t.me/TonyJrbot) ആയി  ബന്ധപ്പെടുക.... നന്ദി"""
 
 IMPORTED = {}
 MIGRATEABLE = []
