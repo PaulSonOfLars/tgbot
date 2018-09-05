@@ -87,6 +87,7 @@ The following env variables are supported:
  - `ALLOW_EXCL`: Whether to allow using exclamation marks ! for commands as well as /.
  - `WHITELIST_CHATS`: Whitelist the chats where you want your bot to be used in, leaving the other chats that are not in the list
  - `BLACKLIST_CHATS`: Blacklist the chats where you don't want your bot to be used in. __Note__ that if both whitelist and blacklist will be used, the blacklist will be the one used.
+ __Also:__  BLACKLIST_CHATS and WHITELIST_CHATS may require you to disable privacy mode in BotFather to allow the bot to see the incoming group messages.
 ### Python dependencies
 
 Install the necessary python dependencies by moving to the project directory and running:
