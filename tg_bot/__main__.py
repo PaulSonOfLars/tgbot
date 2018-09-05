@@ -416,30 +416,33 @@ def migrate_chats(bot: Bot, update: Update):
     raise DispatcherHandlerStop
 
 def is_chat_allowed(bot, update):
-    if len(WHITELIST_CHATS) =! 0:
+    if len(WHITELIST_CHATS) != 0:
         chat_id = update.effective_message.chat_id
         if chat_id not in WHITELIST_CHATS:
             bot.send_message(chat_id=update.message.chat_id,
                              text='Unallowed chat! Leaving...')
-            bot.leave_chat(chat_id)
-        else:
-            pass
-    elif len(BLACKLIST_CHATS) != 0:
+            try:
+                bot.leave_chat(chat_id)
+            finally:
+                raise DispatcherHandlerStop
+    if len(BLACKLIST_CHATS) != 0:
         chat_id = update.effective_message.chat_id
         if chat_id in BLACKLIST_CHATS:
             bot.send_message(chat_id=update.message.chat_id,
                              text='Unallowed chat! Leaving...')
-            bot.leave_chat(chat_id)
-        else:
-            pass
-    elif len(WHITELIST_CHATS) =! 0 and len(BLACKLIST_CHATS) != 0:
+            try:
+                bot.leave_chat(chat_id)
+            finally:
+                raise DispatcherHandlerStop
+    if len(WHITELIST_CHATS) != 0 and len(BLACKLIST_CHATS) != 0:
         chat_id = update.effective_message.chat_id
         if chat_id in BLACKLIST_CHATS:
             bot.send_message(chat_id=update.message.chat_id,
                              text='Unallowed chat, leaving')
-            bot.leave_chat(chat_id)
-        else:
-            pass
+            try:
+                bot.leave_chat(chat_id)
+            finally:
+                raise DispatcherHandlerStop
     else:
         pass
 
@@ -456,7 +459,7 @@ def main():
 
     donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
-    is_chat_allowed_handler(MessageHandler(Filters.all & (~ Filters.private), is_chat_allowed)))
+    is_chat_allowed_handler = MessageHandler(Filters.group, is_chat_allowed)
 
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
