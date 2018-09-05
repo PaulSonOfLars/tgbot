@@ -94,11 +94,11 @@ else:
     try:
         WHITELIST_CHATS = set(int(x) for x in Config.WHITELIST_CHATS or [])
     except ValueError:
-        raise Exception("Your whitelisted users list does not contain valid integers.")
+        raise Exception("Your whitelisted chats list does not contain valid integers.")
     try:
         BLACKLIST_CHATS = set(int(x) for x in Config.BLACKLIST_CHATS or [])
     except ValueError:
-        raise Exception("Your whitelisted users list does not contain valid integers.")
+        raise Exception("Your blacklisted chats list does not contain valid integers.")
 
     WEBHOOK = Config.WEBHOOK
     URL = Config.URL
