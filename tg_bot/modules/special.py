@@ -10,7 +10,7 @@ from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown
 from tg_bot.modules.helper_funcs.chat_status import is_user_ban_protected, user_admin
 
-import random
+import random, re
 import telegram
 import tg_bot.modules.sql.users_sql as sql
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, LOGGER
