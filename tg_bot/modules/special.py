@@ -49,25 +49,25 @@ def snipe(bot: Bot, update: Update, args: List[str]):
 def getlink(bot: Bot, update: Update, args: List[int]):
     message = update.effective_message
     if args:
-        chat_id = int(args[0])
+        pattern = re.compile(r'-\d+')
     else:
         message.reply_text("You don't seem to be referring to any chats.")
     links = "Invite link(s):\n"
-    for chat_id in args:
+    for chat_id in pattern.findall(message.text):
         try:
             chat = bot.getChat(chat_id)
             bot_member = chat.get_member(bot.id)
             if bot_member.can_invite_users:
                 invitelink = bot.exportChatInviteLink(chat_id)
-                links += chat_id + ":\n" + invitelink + "\n"
+                links += str(chat_id) + ":\n" + invitelink + "\n"
             else:
-                links += "I don't have access to the invite link." + "\n"
+                links += str(chat_id) + ":\nI don't have access to the invite link." + "\n"
         except BadRequest as excp:
-                links += chat_id + "\n" + excp.message + "\n"
+                links += str(chat_id) + ":\n" + excp.message + "\n"
         except TelegramError as excp:
-                links += chat_id + "\n" + excp.message + "\n"
+                links += str(chat_id) + ":\n" + excp.message + "\n"
 
-    message.reply_text(links + "\n", parse_mode=ParseMode.MARKDOWN)
+    message.reply_text(links)
 
 @run_async
 def slist(bot: Bot, update: Update):
