@@ -63,9 +63,9 @@ def getlink(bot: Bot, update: Update, args: List[int]):
             else:
                 links += "I don't have access to the invite link." + "\n"
         except BadRequest as excp:
-                links = excp.message + " " + str(chat_id) + "\n"
+                links += chat_id + "\n" + excp.message + "\n"
         except TelegramError as excp:
-                links = excp.message + " " + str(chat_id) + "\n"
+                links += chat_id + "\n" + excp.message + "\n"
 
     message.reply_text(links + "\n", parse_mode=ParseMode.MARKDOWN)
 
