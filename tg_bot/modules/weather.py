@@ -29,6 +29,8 @@ def weather(bot, update, args):
         temperature = theweather.get_temperature(unit='celsius').get('temp')
         if temperature == None:
             temperature = "Unknown"
+        
+        status = theweather._detailed_status
 
         update.message.reply_text("Today in {} is being {}, around {}°C.\n".format(thelocation,
                 status, temperature))
