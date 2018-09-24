@@ -225,7 +225,7 @@ def help_button(bot: Bot, update: Update):
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
-    except BadRequest as excp:
+    except Exception as excp:
         if excp.message == "Message is not modified":
             pass
         elif excp.message == "Query_id_invalid":
@@ -233,6 +233,9 @@ def help_button(bot: Bot, update: Update):
         elif excp.message == "Message can't be deleted":
             pass
         else:
+            bot.edit_message_text(chat_id=query.message.chat_id,
+                                    message_id=query.message.message_id,
+                                    text=excp.message)
             LOGGER.exception("Exception in help buttons. %s", str(query.data))
 
 
@@ -348,7 +351,7 @@ def settings_button(bot: Bot, update: Update):
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
-    except BadRequest as excp:
+    except Exception as excp:
         if excp.message == "Message is not modified":
             pass
         elif excp.message == "Query_id_invalid":
@@ -356,6 +359,9 @@ def settings_button(bot: Bot, update: Update):
         elif excp.message == "Message can't be deleted":
             pass
         else:
+            bot.edit_message_text(chat_id=query.message.chat_id,
+                                    message_id=query.message.message_id,
+                                    text=excp.message)
             LOGGER.exception("Exception in settings buttons. %s", str(query.data))
 
 
