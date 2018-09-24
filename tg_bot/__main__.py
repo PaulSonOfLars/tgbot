@@ -192,11 +192,11 @@ def help_button(bot: Bot, update: Update):
             text = "Here is the help for the *{}* module:\n".format(HELPABLE[module].__mod_name__) \
                    + HELPABLE[module].__help__
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text=text,
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(
-                                         [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
+                                  message_id=query.message.message_id,
+                                  text=text,
+                                  parse_mode=ParseMode.MARKDOWN,
+                                  reply_markup=InlineKeyboardMarkup(
+                                        [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
@@ -210,22 +210,22 @@ def help_button(bot: Bot, update: Update):
         elif next_match:
             next_page = int(next_match.group(1))
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text=HELP_STRINGS,
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(
+                                  message_id=query.message.message_id,
+                                  text=HELP_STRINGS,
+                                  parse_mode=ParseMode.MARKDOWN,
+                                  reply_markup=InlineKeyboardMarkup(
                                         paginate_modules(next_page + 1, HELPABLE, "help")))
 
         elif back_match:
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text=HELP_STRINGS,
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help")))
+                                  message_id=query.message.message_id,
+                                  text=HELP_STRINGS,
+                                  parse_mode=ParseMode.MARKDOWN,
+                                  reply_markup=InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help")))
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
-    except Exception as excp:
+    except BadRequest as excp:
         if excp.message == "Message is not modified":
             pass
         elif excp.message == "Query_id_invalid":
@@ -234,8 +234,8 @@ def help_button(bot: Bot, update: Update):
             pass
         else:
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text=excp.message)
+                                  message_id=query.message.message_id,
+                                  text=excp.message)
             LOGGER.exception("Exception in help buttons. %s", str(query.data))
 
 
@@ -307,10 +307,10 @@ def settings_button(bot: Bot, update: Update):
                                                                                      CHAT_SETTINGS[module].__mod_name__) + \
                    CHAT_SETTINGS[module].__chat_settings__(chat_id, user.id)
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text=text,
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(
+                                  message_id=query.message.message_id,
+                                  text=text,
+                                  parse_mode=ParseMode.MARKDOWN,
+                                  reply_markup=InlineKeyboardMarkup(
                                         [[InlineKeyboardButton(text="Back",
                                                                callback_data="stngs_back({})".format(chat_id))]]))
 
@@ -319,39 +319,39 @@ def settings_button(bot: Bot, update: Update):
             curr_page = int(prev_match.group(2))
             chat = bot.get_chat(chat_id)
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text="Hi there! There are quite a few settings for {} - go ahead and pick what "
-                                     "you're interested in.".format(chat.title),
-                                    reply_markup=InlineKeyboardMarkup(
+                                  message_id=query.message.message_id,
+                                  text="Hi there! There are quite a few settings for {} - go ahead and pick what "
+                                       "you're interested in.".format(chat.title),
+                                  reply_markup=InlineKeyboardMarkup(
                                         paginate_modules(curr_page - 1, CHAT_SETTINGS, "stngs",
-                                                        chat=chat_id)))
+                                                         chat=chat_id)))
 
         elif next_match:
             chat_id = next_match.group(1)
             next_page = int(next_match.group(2))
             chat = bot.get_chat(chat_id)
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text="Hi there! There are quite a few settings for {} - go ahead and pick what "
-                                     "you're interested in.".format(chat.title),
-                                    reply_markup=InlineKeyboardMarkup(
+                                  message_id=query.message.message_id,
+                                  text="Hi there! There are quite a few settings for {} - go ahead and pick what "
+                                       "you're interested in.".format(chat.title),
+                                  reply_markup=InlineKeyboardMarkup(
                                         paginate_modules(next_page + 1, CHAT_SETTINGS, "stngs",
-                                                        chat=chat_id)))
+                                                         chat=chat_id)))
 
         elif back_match:
             chat_id = back_match.group(1)
             chat = bot.get_chat(chat_id)
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text="Hi there! There are quite a few settings for {} - go ahead and pick what "
-                                          "you're interested in.".format(escape_markdown(chat.title)),
-                                    parse_mode=ParseMode.MARKDOWN,
-                                    reply_markup=InlineKeyboardMarkup(paginate_modules(0, CHAT_SETTINGS, "stngs",
-                                                                                        chat=chat_id)))
+                                  message_id=query.message.message_id,
+                                  text="Hi there! There are quite a few settings for {} - go ahead and pick what "
+                                       "you're interested in.".format(escape_markdown(chat.title)),
+                                  parse_mode=ParseMode.MARKDOWN,
+                                  reply_markup=InlineKeyboardMarkup(paginate_modules(0, CHAT_SETTINGS, "stngs",
+                                                                                     chat=chat_id)))
 
         # ensure no spinny white circle
         bot.answer_callback_query(query.id)
-    except Exception as excp:
+    except BadRequest as excp:
         if excp.message == "Message is not modified":
             pass
         elif excp.message == "Query_id_invalid":
@@ -360,8 +360,8 @@ def settings_button(bot: Bot, update: Update):
             pass
         else:
             bot.edit_message_text(chat_id=query.message.chat_id,
-                                    message_id=query.message.message_id,
-                                    text=excp.message)
+                                  message_id=query.message.message_id,
+                                  text=excp.message)
             LOGGER.exception("Exception in settings buttons. %s", str(query.data))
 
 
