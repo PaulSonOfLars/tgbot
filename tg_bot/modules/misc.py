@@ -314,7 +314,7 @@ def get_time(bot: Bot, update: Update, args: List[str]):
             if res.status_code == 200:
                 offset = json.loads(res.text)['dstOffset']
                 timestamp = json.loads(res.text)['rawOffset']
-                time_there = datetime.fromtimestamp(timenow + timestamp + offset).strftime("%H:%M:%S on %A %d %B")
+                time_there = datetime.fromtimestamp(timenow + timestamp + offset).strftime("%I:%M:%S %p on %A %d %B")
                 update.message.reply_text("It's {} in {}".format(time_there, location))
 
 
@@ -329,6 +329,13 @@ def echo(bot: Bot, update: Update):
     message.delete()
 
 
+def ping(bot: Bot, update: Update):
+    start_time = time.time()
+    requests.get('https://api.telegram.org')
+    end_time = time.time()
+    ping_time = float(end_time - start_time)*1000
+    update.effective_message.reply_text(" Ping speed was : {}ms".format(ping_time))
+    
 @run_async
 def gdpr(bot: Bot, update: Update):
     update.effective_message.reply_text("Deleting identifiable data...")
