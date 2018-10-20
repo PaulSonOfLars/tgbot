@@ -14,18 +14,17 @@ from tg_bot import dispatcher, SUDO_USERS, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
     bot_can_delete, is_bot_admin
-from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import users_sql
 
 LOCK_TYPES = {'sticker': Filters.sticker,
               'audio': Filters.audio,
               'voice': Filters.voice,
-              'document': Filters.document,
+              'document': Filters.document & ~Filters.animation,
               'video': Filters.video,
               'contact': Filters.contact,
               'photo': Filters.photo,
-              'gif': Filters.document & CustomFilters.mime_type("video/mp4"),
+              'gif': Filters.animation,
               'url': Filters.entity(MessageEntity.URL) | Filters.caption_entity(MessageEntity.URL),
               'bots': Filters.status_update.new_chat_members,
               'forward': Filters.forwarded,
@@ -33,7 +32,7 @@ LOCK_TYPES = {'sticker': Filters.sticker,
               'location': Filters.location,
               }
 
-GIF = Filters.document & CustomFilters.mime_type("video/mp4")
+GIF = Filters.animation
 OTHER = Filters.game | Filters.sticker | GIF
 MEDIA = Filters.audio | Filters.document | Filters.video | Filters.voice | Filters.photo
 MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | Filters.command | MEDIA | OTHER
