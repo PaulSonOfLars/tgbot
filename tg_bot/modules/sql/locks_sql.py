@@ -4,6 +4,7 @@ import threading
 from sqlalchemy import Column, String, Boolean
 
 from tg_bot.modules.sql import SESSION, BASE
+from telegram.files import videonote
 
 
 class Permissions(BASE):
