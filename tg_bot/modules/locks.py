@@ -22,6 +22,7 @@ LOCK_TYPES = {'sticker': Filters.sticker,
               'voice': Filters.voice,
               'document': Filters.document & ~Filters.animation,
               'video': Filters.video,
+              'videonote': Filters.video_note,
               'contact': Filters.contact,
               'photo': Filters.photo,
               'gif': Filters.animation,
@@ -34,7 +35,7 @@ LOCK_TYPES = {'sticker': Filters.sticker,
 
 GIF = Filters.animation
 OTHER = Filters.game | Filters.sticker | GIF
-MEDIA = Filters.audio | Filters.document | Filters.video | Filters.voice | Filters.photo
+MEDIA = Filters.audio | Filters.document | Filters.video | Filters.video_note | Filters.voice | Filters.photo
 MESSAGES = Filters.text | Filters.contact | Filters.location | Filters.venue | Filters.command | MEDIA | OTHER
 PREVIEWS = Filters.entity("url")
 
@@ -249,6 +250,7 @@ def build_lock_message(chat_id):
                    "\n - voice = `{}`" \
                    "\n - document = `{}`" \
                    "\n - video = `{}`" \
+                   "\n - videonote = `{}`" \
                    "\n - contact = `{}`" \
                    "\n - photo = `{}`" \
                    "\n - gif = `{}`" \
