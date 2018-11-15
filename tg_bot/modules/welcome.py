@@ -80,7 +80,6 @@ def send(update, message, keyboard, backup_message):
 @run_async
 def new_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
-
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     if should_welc:
         sent = None
@@ -158,6 +157,7 @@ def new_member(bot: Bot, update: Update):
 def left_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     should_goodbye, cust_goodbye, goodbye_type = sql.get_gdbye_pref(chat.id)
+    
     if should_goodbye:
         left_mem = update.effective_message.left_chat_member
         if left_mem:
