@@ -3,6 +3,7 @@ from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode, InlineKeyboardMarkup
+from telegram import TelegramError
 from telegram.error import BadRequest
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
@@ -139,7 +140,19 @@ def new_member(bot: Bot, update: Update):
 
             if sent:
                 sql.set_clean_welcome(chat.id, sent.message_id)
-
+                
+        mute_user = sql.get_mute_pref(chat.id)
+        if mute_user:
+            try:
+                bot.restrict_chat_member(chat.id, new_mem.id,
+                                     can_send_messages=False,
+                                     can_send_media_messages=False,
+                                     can_send_other_messages=False,
+                                     can_add_web_page_previews=False)
+            except TelegramError:
+                pass
+                
+                
 
 @run_async
 def left_member(bot: Bot, update: Update):
@@ -397,6 +410,43 @@ def clean_welcome(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
 
+@run_async
+@user_admin
+@loggable
+def welcome_mute(bot: Bot, update: Update, args: List[str]) -> str:
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+    
+    if not args:
+        mute_pref = sql.get_mute_pref(chat.id)
+        if mute_pref:
+            update.effective_message.reply_text("I'm silencing new users.")
+        else:
+            update.effective_message.reply_text("I'm not silencing new users.")
+        return ""
+
+    if args[0].lower() in ("on", "yes"):
+        sql.set_welcome_mute(str(chat.id), True)
+        update.effective_message.reply_text("I'll try to mute new users!")
+        return "<b>{}:</b>" \
+               "\n#WELCOME_MUTE" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas changed the silencing of new members to: <code>ON</code>.".format(html.escape(chat.title),
+                                                                         mention_html(user.id, user.first_name))
+    elif args[0].lower() in ("off", "no"):
+        sql.set_welcome_mute(str(chat.id), False)
+        update.effective_message.reply_text("I will not silence the new users.")
+        return "<b>{}:</b>" \
+               "\n#WELCOME_MUTE" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas changed the silencing of new members to: <code>OFF</code>.".format(html.escape(chat.title),
+                                                                          mention_html(user.id, user.first_name))
+    else:
+        # idek what you're writing, say yes or no
+        update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
+        return ""
+
+
 WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in multiple ways. If you want the messages" \
                 " to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
                 " - `{{first}}`: this represents the user's *first* name\n" \
@@ -426,7 +476,6 @@ WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in mu
 @user_admin
 def welcome_help(bot: Bot, update: Update):
     update.effective_message.reply_text(WELC_HELP_TXT, parse_mode=ParseMode.MARKDOWN)
-
 
 # TODO: get welcome data from group butler snap
 # def __import_data__(chat_id, data):
@@ -464,7 +513,7 @@ __help__ = """
  - /resetwelcome: reset to the default welcome message.
  - /resetgoodbye: reset to the default goodbye message.
  - /cleanwelcome <on/off>: On new member, try to delete the previous welcome message to avoid spamming the chat.
-
+ - /welcomemute <on/off>: all users that join, get muted.
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
 """.format(WELC_HELP_TXT)
 
@@ -479,6 +528,7 @@ SET_GOODBYE = CommandHandler("setgoodbye", set_goodbye, filters=Filters.group)
 RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
 RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.group)
 CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
+WELCOME_MUTE = CommandHandler("welcomemute", welcome_mute, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
 dispatcher.add_handler(NEW_MEM_HANDLER)
@@ -490,4 +540,5 @@ dispatcher.add_handler(SET_GOODBYE)
 dispatcher.add_handler(RESET_WELCOME)
 dispatcher.add_handler(RESET_GOODBYE)
 dispatcher.add_handler(CLEAN_WELCOME)
+dispatcher.add_handler(WELCOME_MUTE)
 dispatcher.add_handler(WELCOME_HELP)
