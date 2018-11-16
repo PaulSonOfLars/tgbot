@@ -78,9 +78,11 @@ def send(update, message, keyboard, backup_message):
 
 
 @run_async
+@loggable
 def new_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
+    
     if should_welc:
         sent = None
         new_members = update.effective_message.new_chat_members
@@ -150,6 +152,12 @@ def new_member(bot: Bot, update: Update):
                                      can_add_web_page_previews=False)
             except TelegramError:
                 pass
+            
+        return "<b>{}:</b>" \
+           "\n#NEW_USER" \
+           "\n<b>User:</b> {}" \
+           "\n<b>User ID:</b> <code>{}</code>".format(html.escape(chat.title),
+                                                        mention_html(new_mem.id, new_mem.first_name), new_mem.id)
                 
                 
 
