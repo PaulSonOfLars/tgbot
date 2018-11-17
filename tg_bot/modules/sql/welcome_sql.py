@@ -22,6 +22,8 @@ class Welcome(BASE):
     leave_type = Column(Integer, default=Types.TEXT.value)
 
     clean_welcome = Column(BigInteger)
+    welcome_mute = Column(Boolean, default=False)
+
 
     def __init__(self, chat_id, should_welcome=True, should_goodbye=True):
         self.chat_id = chat_id
@@ -103,12 +105,34 @@ def set_clean_welcome(chat_id, clean_welcome):
         SESSION.commit()
 
 
+def set_welcome_mute(chat_id, welcome_mute):
+    with INSERTION_LOCK:
+        curr = SESSION.query(Welcome).get(str(chat_id))
+        if not curr:
+            curr = Welcome(str(chat_id))
+
+        curr.welcome_mute = welcome_mute
+
+        SESSION.add(curr)
+        SESSION.commit()
+
+
 def get_clean_pref(chat_id):
     welc = SESSION.query(Welcome).get(str(chat_id))
     SESSION.close()
 
     if welc:
         return welc.clean_welcome
+
+    return False
+
+
+def get_mute_pref(chat_id):
+    welc = SESSION.query(Welcome).get(str(chat_id))
+    SESSION.close()
+
+    if welc:
+        return welc.welcome_mute
 
     return False
 

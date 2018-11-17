@@ -153,7 +153,7 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     log = "<b>{}:</b>" \
-          "\n#TEMP MUTED" \
+          "\n#TEMP_MUTED" \
           "\n<b>Admin:</b> {}" \
           "\n<b>User:</b> {}" \
           "\n<b>Time:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
