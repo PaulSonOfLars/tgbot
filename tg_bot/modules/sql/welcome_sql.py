@@ -24,7 +24,6 @@ class Welcome(BASE):
     clean_welcome = Column(BigInteger)
     welcome_mute = Column(Boolean, default=False)
 
-
     def __init__(self, chat_id, should_welcome=True, should_goodbye=True):
         self.chat_id = chat_id
         self.should_welcome = should_welcome
