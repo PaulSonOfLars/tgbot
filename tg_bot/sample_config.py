@@ -18,7 +18,7 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqldbtype://username:pw@hostname:port/db_name'  # needed for any database modules
     MESSAGE_DUMP = None  # needed to make sure 'save from' messages persist
     LOAD = []
-    NO_LOAD = ['translation', 'rss']
+    NO_LOAD = ['translation', 'rss', 'weather']
     WEBHOOK = False
     URL = None
 
@@ -34,6 +34,7 @@ class Config(object):
     WORKERS = 8  # Number of subthreads to use. This is the recommended amount - see for yourself what works best!
     BAN_STICKER = 'CAADAgADOwADPPEcAXkko5EB3YGYAg'  # banhammer marie sticker
     ALLOW_EXCL = False  # Allow ! commands as well as /
+    API_OPENWEATHER = None # OpenWeather API
 
 
 class Production(Config):
