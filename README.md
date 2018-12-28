@@ -23,7 +23,7 @@ Once you've setup your database and your configuration (see below) is complete, 
 
 
 ## Setting up the bot (Read this before trying to use!):
-Please make sure to use python3.6, as I cannot guarantee everything will work as expected on older python versions!
+Please make sure to use [python3.7](https://www.python.org/downloads/), as I cannot guarantee everything will work as expected on older python versions!
 This is because markdown parsing is done by iterating through a dict, which are ordered by default in 3.6.
 
 ### Configuration
