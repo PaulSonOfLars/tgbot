@@ -299,7 +299,7 @@ __help__ = """
 
 Locks can be used to restrict a group's users.
 eg:
-Locking urls will auto-delete all messages with urls which haven't been whitelisted, locking stickers will delete all \
+Locking urls will auto-delete all messages with urls, locking stickers will delete all \
 stickers, etc.
 Locking bots will stop non-admins from adding bots to the chat.
 """
