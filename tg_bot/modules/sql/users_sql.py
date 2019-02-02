@@ -31,6 +31,18 @@ class Chats(BASE):
     def __repr__(self):
         return "<Chat {} ({})>".format(self.chat_name, self.chat_id)
 
+class Channels(BASE):
+    __tablename__ = "channels"
+    chat_id = Column(String(14), primary_key=True)
+    chat_name = Column(UnicodeText, nullable=False)
+
+    def __init__(self, chat_id, chat_name):
+        self.chat_id = str(chat_id)
+        self.chat_name = chat_name
+
+    def __repr__(self):
+        return "<Chat {} ({})>".format(self.chat_name, self.chat_id)
+
 
 class ChatMembers(BASE):
     __tablename__ = "chat_members"
@@ -59,6 +71,7 @@ class ChatMembers(BASE):
 
 Users.__table__.create(checkfirst=True)
 Chats.__table__.create(checkfirst=True)
+Channels.__table__.create(checkfirst=True)
 ChatMembers.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
@@ -191,3 +204,14 @@ def del_user(user_id):
         SESSION.commit()
         SESSION.close()
     return False
+
+
+
+def add_channel(chat_id, chat_name):
+    with INSERTION_LOCK:
+        channel_id = SESSION.query(Channels).get(chat_id)
+        if not channel_id:
+            channel_id = UserInfo(chat_id, chat_name)
+
+        SESSION.add(channel_id)
+        SESSION.commit()
