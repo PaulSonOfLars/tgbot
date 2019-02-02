@@ -13,7 +13,7 @@ from tg_bot.modules.helper_funcs.chat_status import user_admin, is_user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_user, extract_user_and_text
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.helper_funcs.misc import send_to_list
-from tg_bot.modules.sql.users_sql import get_all_chats
+from tg_bot.modules.sql.users_sql import get_all_chats, get_all_channels
 
 GBAN_ENFORCE_GROUP = 6
 
@@ -122,6 +122,27 @@ def gban(bot: Bot, update: Update, args: List[str]):
                 return
         except TelegramError:
             pass
+
+    channels = get_all_channels()
+    for channel in channels:
+        chat_id = channel.chat_id
+        print(chat_id)
+
+        try:
+            bot.kick_chat_member(chat_id, user_id)
+        except BadRequest as excp:
+            if excp.message in GBAN_ERRORS:
+                pass
+            else:
+                message.reply_text("Could not gban due to: {}".format(excp.message))
+                send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
+                sql.ungban_user(user_id)
+                return
+        except TelegramError:
+            pass
+
+
+
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
     message.reply_text("Person has been gbanned.")

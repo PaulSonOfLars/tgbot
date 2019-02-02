@@ -113,10 +113,9 @@ __mod_name__ = "chatlist"
 CHATSS_HANDLER = CommandHandler("list_chats", chats, filters=CustomFilters.sudo_filter)
 
 
-ADDCHANNEL_HANDLER = CommandHandler("add_channel", add_channel, filters=CustomFilters.sudo_filter)
-LISTCHANNELS_HANDLER = CommandHandler("list_channels", list_channels, filters=CustomFilters.sudo_filter)
-DELCHANNEL_HANDLER = CommandHandler("del_channel", del_channel, filters=CustomFilters.sudo_filter)
-
+ADDCHANNEL_HANDLER = CommandHandler("add_channel", add_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+LISTCHANNELS_HANDLER = CommandHandler("list_channels", list_channels, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+DELCHANNEL_HANDLER = CommandHandler("del_channel", del_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
 
 
