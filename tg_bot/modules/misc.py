@@ -17,6 +17,9 @@ from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.extraction import extract_user
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 
+
+import tg_bot.modules.sql.userinfo_sql as sql
+
 RUN_STRINGS = (
     "Where do you think you're going?",
     "Huh? what? did they get away?",
@@ -323,6 +326,19 @@ def echo(bot: Bot, update: Update):
     message.delete()
 
 
+
+@run_async
+def add_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(None, 1)
+    message = update.effective_message
+    text = "Channel "+args[1]+" has been added to the List"
+    if message.reply_to_message:
+        message.reply_to_message.reply_text(text)
+    else:
+        message.reply_text(text, quote=False)
+
+
+
 @run_async
 def gdpr(bot: Bot, update: Update):
     update.effective_message.reply_text("Deleting identifiable data...")
@@ -392,7 +408,7 @@ __help__ = """
 __mod_name__ = "Misc"
 
 ID_HANDLER = DisableAbleCommandHandler("id", get_id, pass_args=True)
-IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
+#IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
 
 TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
@@ -406,8 +422,10 @@ MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.
 STATS_HANDLER = CommandHandler("stats", stats, filters=CustomFilters.sudo_filter)
 GDPR_HANDLER = CommandHandler("gdpr", gdpr, filters=Filters.private)
 
+ADDCHANNEL_HANDLER = CommandHandler("add_channel", add_channel, filters=CustomFilters.sudo_filter)
+
 dispatcher.add_handler(ID_HANDLER)
-dispatcher.add_handler(IP_HANDLER)
+#dispatcher.add_handler(IP_HANDLER)
 # dispatcher.add_handler(TIME_HANDLER)
 dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
@@ -416,3 +434,5 @@ dispatcher.add_handler(ECHO_HANDLER)
 dispatcher.add_handler(MD_HELP_HANDLER)
 dispatcher.add_handler(STATS_HANDLER)
 dispatcher.add_handler(GDPR_HANDLER)
+
+dispatcher.add_handler(ADDCHANNEL_HANDLER)
