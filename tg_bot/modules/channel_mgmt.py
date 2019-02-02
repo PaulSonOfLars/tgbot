@@ -86,7 +86,7 @@ def del_channel(bot: Bot, update: Update):
                 message.reply_to_message.reply_text(text)
             else:
                 message.reply_text(text, quote=False)
-    except Exception, e:
+    except Exception as e:
         text = "You need to give me a channel id to delete something!"
         if message.reply_to_message:
             message.reply_to_message.reply_text(text)
