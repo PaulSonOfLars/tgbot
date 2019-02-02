@@ -39,22 +39,29 @@ def add_channel(bot: Bot, update: Update):
     data = args[1]
     args2 = data.split(None, 1)
     channel_id = args2[0]
-    channel_name = args2[1]
-    retval = sql.add_channel(channel_id, channel_name)
 
-    if retval:
-        text = "Channel "+channel_name+" ("+channel_id+") has been added to the List"
-        if message.reply_to_message:
-            message.reply_to_message.reply_text(text)
+    if len(channel_id) >=1:
+        channel_name = args2[1]
+        retval = sql.add_channel(channel_id, channel_name)
+
+        if retval:
+            text = "Channel "+channel_name+" ("+channel_id+") has been added to the List"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
         else:
-            message.reply_text(text, quote=False)
+            text = "Channel "+channel_name+" ("+channel_id+") is already on your List"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
     else:
-        text = "Channel "+channel_name+" ("+channel_id+") is already on your List"
+        text = "You need to give me a channel id and a name in order to add it!\n/addchannel <chat id> <chat name>"
         if message.reply_to_message:
             message.reply_to_message.reply_text(text)
         else:
             message.reply_text(text, quote=False)
-
 
 
 
@@ -65,20 +72,27 @@ def del_channel(bot: Bot, update: Update):
     message = update.effective_message
 
     channel_id = args[1]
-    retval = sql.del_channel(channel_id)
-    if retval:
-        text = "Channel "+args[1]+" has been removed from the List"
-        if message.reply_to_message:
-            message.reply_to_message.reply_text(text)
-        else:
-            message.reply_text(text, quote=False)
-    else:
-        text = "Channel "+args[1]+" is not on your List"
-        if message.reply_to_message:
-            message.reply_to_message.reply_text(text)
-        else:
-            message.reply_text(text, quote=False)
 
+    if len(channel_id) >=1:
+        retval = sql.del_channel(channel_id)
+        if retval:
+            text = "Channel "+args[1]+" has been removed from the List"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
+        else:
+            text = "Channel "+args[1]+" is not on your List"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
+    else:
+        text = "You need to give me a channel id to delete something!"
+        if message.reply_to_message:
+            message.reply_to_message.reply_text(text)
+        else:
+            message.reply_text(text, quote=False)
 
 
 
@@ -121,7 +135,7 @@ In Order to gban a user from your channels also you need to add the channel to t
 __mod_name__ = "Channel Management"
 
 
-CHATSS_HANDLER = CommandHandler("list_chats", chats, filters=CustomFilters.sudo_filter)
+CHATSS_HANDLER = CommandHandler("listchats", chats, filters=CustomFilters.sudo_filter)
 
 
 ADDCHANNEL_HANDLER = CommandHandler("addchannel", add_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
