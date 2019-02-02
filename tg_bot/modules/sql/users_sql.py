@@ -131,6 +131,13 @@ def get_all_chats():
         SESSION.close()
 
 
+def get_all_channels():
+    try:
+        return SESSION.query(Channels).all()
+    finally:
+        SESSION.close()
+
+
 def get_user_num_chats(user_id):
     try:
         return SESSION.query(ChatMembers).filter(ChatMembers.user == int(user_id)).count()
