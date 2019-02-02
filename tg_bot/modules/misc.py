@@ -355,6 +355,7 @@ def del_channel(bot: Bot, update: Update):
 @run_async
 def list_channels(bot: Bot, update: Update):
     text = "Here is your List of manually added Channels:\n-fake1\n-fake2"
+    message = update.effective_message
     if message.reply_to_message:
         message.reply_to_message.reply_text(text)
     else:
