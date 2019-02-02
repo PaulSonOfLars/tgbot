@@ -63,11 +63,22 @@ def add_channel(bot: Bot, update: Update):
 def del_channel(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
-    text = "Channel "+args[1]+" has been removed from the List"
-    if message.reply_to_message:
-        message.reply_to_message.reply_text(text)
-    else:
-        message.reply_text(text, quote=False)
+
+    retval = sql.del_channel(channel_id)
+
+    if retval:
+	    text = "Channel "+args[1]+" has been removed from the List"
+	    if message.reply_to_message:
+	        message.reply_to_message.reply_text(text)
+	    else:
+	        message.reply_text(text, quote=False)
+	else:
+	    text = "Channel "+args[1]+" is not on your List"
+	    if message.reply_to_message:
+	        message.reply_to_message.reply_text(text)
+	    else:
+	        message.reply_text(text, quote=False)
+
 
 
 
