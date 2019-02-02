@@ -17,8 +17,7 @@ from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.extraction import extract_user
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 
-
-import tg_bot.modules.sql.userinfo_sql as sql
+import tg_bot.modules.sql.channel_mgmt_sql as sql
 
 RUN_STRINGS = (
     "Where do you think you're going?",
