@@ -126,8 +126,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
     channels = get_all_channels()
     for channel in channels:
         chat_id = channel.chat_id
-        print(chat_id)
-
+        
         try:
             bot.kick_chat_member(chat_id, user_id)
         except BadRequest as excp:
