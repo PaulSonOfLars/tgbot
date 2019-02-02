@@ -16,29 +16,20 @@ from tg_bot.modules.helper_funcs.filters import CustomFilters
 
 @run_async
 def chats(bot: Bot, update: Update):
+    message = update.effective_message
     chats = sql.get_all_chats() or []
 
-    chatfile = 'List of chats.\n'
+    chatlist = ''
     for chat in chats:
-        chatfile += "[x] {} - {}\n".format(chat.chat_name, chat.chat_id)
-
-    with BytesIO(str.encode(chatfile)) as output:
-        output.name = "chatlist.txt"
-        update.effective_message.reply_document(document=output, filename="chatlist.txt",
-                                                caption="Here is the list of chats in my database.")
+        chatlist += "[-]{} ({})\n".format(chat.chat_id, chat.chat_name)
 
 
-def list_channels(bot: Bot, update: Update):
-    chats = sql.get_all_chats() or []
+    text = "List of Groups the bot is member of:"+chatlist
 
-    chatfile = 'List of chats.\n'
-    for chat in chats:
-        chatfile += "[x] {} - {}\n".format(chat.chat_name, chat.chat_id)
-
-    with BytesIO(str.encode(chatfile)) as output:
-        output.name = "chatlist.txt"
-        update.effective_message.reply_document(document=output, filename="chatlist.txt",
-                                                caption="Here is the list of chats in my database.")
+    if message.reply_to_message:
+        message.reply_to_message.reply_text(text)
+    else:
+        message.reply_text(text, quote=False)
 
 
 
@@ -70,8 +61,16 @@ def del_channel(bot: Bot, update: Update):
 
 @run_async
 def list_channels(bot: Bot, update: Update):
-    text = "Here is your List of manually added Channels:\n-fake1\n-fake2"
     message = update.effective_message
+    chats = sql.get_all_channels() or []
+
+    chatlist = ''
+    for chat in chats:
+        chatlist += "[-]{} ({})\n".format(chat.chat_id, chat.chat_name)
+
+
+    text = "List of Channels the bot has been manually added to:"+chatlist
+
     if message.reply_to_message:
         message.reply_to_message.reply_text(text)
     else:
