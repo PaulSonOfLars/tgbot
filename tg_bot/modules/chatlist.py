@@ -40,7 +40,7 @@ def add_channel(bot: Bot, update: Update):
     args2 = data.split(None, 1)
     channel_id = args2[0]
     channel_name = args2[1]
-    retval = sql.add_channel(chat_id, chat_name)
+    retval = sql.add_channel(channel_id, channel_name)
 
     if retval:
         text = "Channel "+channel_name+" ("+channel_id+") has been added to the List"
