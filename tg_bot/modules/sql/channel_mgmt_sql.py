@@ -15,6 +15,7 @@ class Channels(BASE):
         self.chat_name = chat_name
 
     def __repr__(self):
+        return "<Chat {} ({})>".format(self.chat_name, self.chat_id)
 
 
 Channels.__table__.create(checkfirst=True)
