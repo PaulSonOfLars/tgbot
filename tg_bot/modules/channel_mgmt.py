@@ -105,9 +105,20 @@ def list_channels(bot: Bot, update: Update):
 
 
 
-__help__ = ""  # no help string
+__help__ = """This module allows you to expand the gban feature to channels your bot is a member of.
+In Order to gban a user from your channels also you need to add the channel to the list.
 
-__mod_name__ = "chatlist"
+*Admin only:*
+ - /list_channels : Will show you a list of all manually added channels
+ - /list_chats : Will show you a list of chats your bot is member of
+
+ - /add_channel <chat id> <channel name> : Adds a channel to your List
+ - /del_channel <chat id> : Removes a channel from your List
+
+
+"""  # no help string
+
+__mod_name__ = "Channel Management"
 
 
 CHATSS_HANDLER = CommandHandler("list_chats", chats, filters=CustomFilters.sudo_filter)
