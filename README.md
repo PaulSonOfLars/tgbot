@@ -2,7 +2,7 @@
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
 
-Can be found on telegram as [Klikdiklak](@Klikdiklak_bot).
+Can be found on telegram as [Klikdiklak](https://t.me/Klikdiklak_bot).
 
 ## Starting the bot.
 
