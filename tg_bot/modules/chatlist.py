@@ -37,14 +37,24 @@ def add_channel(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
     data = args[1]
-    args2 = data.split(None)
+    args2 = data.split(None, 1)
     channel_id = args2[0]
     channel_name = args2[1]
-    text = "Channel "+channel_name+"("+channel_id+") has been added to the List"
-    if message.reply_to_message:
-        message.reply_to_message.reply_text(text)
+    retval = sql.add_channel(chat_id, chat_name)
+
+    if retval:
+        text = "Channel "+channel_name+" ("+channel_id+") has been added to the List"
+        if message.reply_to_message:
+            message.reply_to_message.reply_text(text)
+        else:
+            message.reply_text(text, quote=False)
     else:
-        message.reply_text(text, quote=False)
+        text = "Channel "+channel_name+" ("+channel_id+") is already on your List"
+        if message.reply_to_message:
+            message.reply_to_message.reply_text(text)
+        else:
+            message.reply_text(text, quote=False)
+
 
 
 
