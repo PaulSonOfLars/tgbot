@@ -72,12 +72,12 @@ def del_channel(bot: Bot, update: Update):
 	        message.reply_to_message.reply_text(text)
 	    else:
 	        message.reply_text(text, quote=False)
-	else:
+    else:
 	    text = "Channel "+args[1]+" is not on your List"
-	    if message.reply_to_message:
+        if message.reply_to_message:
 	        message.reply_to_message.reply_text(text)
-	    else:
-	        message.reply_text(text, quote=False)
+        else:
+            message.reply_text(text, quote=False)
 
 
 
