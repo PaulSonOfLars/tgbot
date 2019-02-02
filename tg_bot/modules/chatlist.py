@@ -81,7 +81,10 @@ def list_channels(bot: Bot, update: Update):
         chatlist += "●{} ({})\n".format(chat.chat_name, chat.chat_id)
 
 
-    text = "List of Channels the bot has been manually added to:\n\n"+chatlist
+    if len(chats) >= 1:
+        text = "List of Channels the bot has been manually added to:\n\n"+chatlist
+    else:
+        text = "There are no Channels added to your List"
 
     if message.reply_to_message:
         message.reply_to_message.reply_text(text)
