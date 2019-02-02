@@ -223,7 +223,6 @@ def add_channel(chat_id, chat_name):
 def del_channel(chat_id):
     with INSERTION_LOCK:
         channel_id = SESSION.query(Channels).get(chat_id)
-        curr = SESSION.query(Users).get(user_id)
         if channel_id:
             SESSION.delete(curr)
             SESSION.commit()
