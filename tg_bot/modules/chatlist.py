@@ -24,7 +24,7 @@ def chats(bot: Bot, update: Update):
         chatlist += "[-]{} ({})\n".format(chat.chat_name, chat.chat_id)
 
 
-    text = "List of Groups the bot is member of:"+chatlist
+    text = "List of Groups the bot is member of:\n\n"+chatlist
 
     if message.reply_to_message:
         message.reply_to_message.reply_text(text)
@@ -69,7 +69,7 @@ def list_channels(bot: Bot, update: Update):
         chatlist += "[-]{} ({})\n".format(chat.chat_name, chat.chat_id)
 
 
-    text = "List of Channels the bot has been manually added to:"+chatlist
+    text = "List of Channels the bot has been manually added to:\n\n"+chatlist
 
     if message.reply_to_message:
         message.reply_to_message.reply_text(text)
