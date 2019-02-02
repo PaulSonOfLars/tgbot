@@ -109,11 +109,11 @@ __help__ = """This module allows you to expand the gban feature to channels your
 In Order to gban a user from your channels also you need to add the channel to the list.
 
 *Admin only:*
- - /list__channels : Will show you a list of all manually added channels
- - /list_chats : Will show you a list of chats your bot is member of
+ - /listchannels : Will show you a list of all manually added channels
+ - /listchats : Will show you a list of chats your bot is member of
 
- - /add_channel <chat id> <channel name> : Adds a channel to your List
- - /del_channel <chat id> : Removes a channel from your List
+ - /addchannel <chat id> <channel name> : Adds a channel to your List
+ - /delchannel <chat id> : Removes a channel from your List
 
 
 """  # no help string
@@ -124,9 +124,9 @@ __mod_name__ = "Channel Management"
 CHATSS_HANDLER = CommandHandler("list_chats", chats, filters=CustomFilters.sudo_filter)
 
 
-ADDCHANNEL_HANDLER = CommandHandler("add_channel", add_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-LISTCHANNELS_HANDLER = CommandHandler("list_channels", list_channels, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-DELCHANNEL_HANDLER = CommandHandler("del_channel", del_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+ADDCHANNEL_HANDLER = CommandHandler("addchannel", add_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+LISTCHANNELS_HANDLER = CommandHandler("listchannels", list_channels, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+DELCHANNEL_HANDLER = CommandHandler("delchannel", del_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
 
 
