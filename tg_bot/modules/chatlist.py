@@ -38,8 +38,8 @@ def add_channel(bot: Bot, update: Update):
     message = update.effective_message
     data = args[1]
     args2 = data.split(None)
-    channel_id = args2[1]
-    channel_name = args2[2]
+    channel_id = args2[0]
+    channel_name = args2[1]
     text = "Channel "+channel_name+"("+channel_id+") has been added to the List"
     if message.reply_to_message:
         message.reply_to_message.reply_text(text)
