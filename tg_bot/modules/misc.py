@@ -339,6 +339,29 @@ def add_channel(bot: Bot, update: Update):
 
 
 
+
+@run_async
+def del_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(None, 1)
+    message = update.effective_message
+    text = "Channel "+args[1]+" has been removed from the List"
+    if message.reply_to_message:
+        message.reply_to_message.reply_text(text)
+    else:
+        message.reply_text(text, quote=False)
+
+
+
+@run_async
+def list_channels(bot: Bot, update: Update):
+    text = "Here is your List of manually added Channels:\n-fake1\n-fake2"
+    if message.reply_to_message:
+        message.reply_to_message.reply_text(text)
+    else:
+        message.reply_text(text, quote=False)
+
+
+
 @run_async
 def gdpr(bot: Bot, update: Update):
     update.effective_message.reply_text("Deleting identifiable data...")
@@ -423,6 +446,10 @@ STATS_HANDLER = CommandHandler("stats", stats, filters=CustomFilters.sudo_filter
 GDPR_HANDLER = CommandHandler("gdpr", gdpr, filters=Filters.private)
 
 ADDCHANNEL_HANDLER = CommandHandler("add_channel", add_channel, filters=CustomFilters.sudo_filter)
+LISTCHANNELS_HANDLER = CommandHandler("list_channels", list_channels, filters=CustomFilters.sudo_filter)
+DELCHANNEL_HANDLER = CommandHandler("del_channel", del_channel, filters=CustomFilters.sudo_filter)
+
+
 
 dispatcher.add_handler(ID_HANDLER)
 #dispatcher.add_handler(IP_HANDLER)
@@ -436,3 +463,5 @@ dispatcher.add_handler(STATS_HANDLER)
 dispatcher.add_handler(GDPR_HANDLER)
 
 dispatcher.add_handler(ADDCHANNEL_HANDLER)
+dispatcher.add_handler(DELCHANNEL_HANDLER)
+dispatcher.add_handler(LISTCHANNELS_HANDLER)
