@@ -71,9 +71,8 @@ def del_channel(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
 
-    channel_id = args[1]
-
-    if len(channel_id) >=1:
+    try:
+        channel_id = args[1]
         retval = sql.del_channel(channel_id)
         if retval:
             text = "Channel "+args[1]+" has been removed from the List"
@@ -87,7 +86,7 @@ def del_channel(bot: Bot, update: Update):
                 message.reply_to_message.reply_text(text)
             else:
                 message.reply_text(text, quote=False)
-    else:
+    except Exception, e:
         text = "You need to give me a channel id to delete something!"
         if message.reply_to_message:
             message.reply_to_message.reply_text(text)
