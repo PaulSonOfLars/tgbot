@@ -36,11 +36,11 @@ def chats(bot: Bot, update: Update):
 def add_channel(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
-    data = args[1]
-    args2 = data.split(None, 1)
-    channel_id = args2[0]
+    try:
+        data = args[1]
+        args2 = data.split(None, 1)
+        channel_id = args2[0]
 
-    if len(channel_id) >=1:
         channel_name = args2[1]
         retval = sql.add_channel(channel_id, channel_name)
 
@@ -56,7 +56,7 @@ def add_channel(bot: Bot, update: Update):
                 message.reply_to_message.reply_text(text)
             else:
                 message.reply_text(text, quote=False)
-    else:
+    except Exception as e:
         text = "You need to give me a channel id and a name in order to add it!\n/addchannel <chat id> <chat name>"
         if message.reply_to_message:
             message.reply_to_message.reply_text(text)
