@@ -17,4 +17,4 @@ class Channels(BASE):
     def __repr__(self):
 
 
-Chats.__table__.create(checkfirst=True)
+Channels.__table__.create(checkfirst=True)
