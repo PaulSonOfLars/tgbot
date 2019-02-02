@@ -21,7 +21,7 @@ def chats(bot: Bot, update: Update):
 
     chatlist = ''
     for chat in chats:
-        chatlist += "[-]{} ({})\n".format(chat.chat_name, chat.chat_id)
+        chatlist += "●{} ({})\n".format(chat.chat_name, chat.chat_id)
 
 
     text = "List of Groups the bot is member of:\n\n"+chatlist
@@ -66,7 +66,7 @@ def list_channels(bot: Bot, update: Update):
 
     chatlist = ''
     for chat in chats:
-        chatlist += "[-]{} ({})\n".format(chat.chat_name, chat.chat_id)
+        chatlist += "●{} ({})\n".format(chat.chat_name, chat.chat_id)
 
 
     text = "List of Channels the bot has been manually added to:\n\n"+chatlist
@@ -84,7 +84,7 @@ __help__ = ""  # no help string
 __mod_name__ = "chatlist"
 
 
-CHATSS_HANDLER = CommandHandler("chats", chats, filters=CustomFilters.sudo_filter)
+CHATSS_HANDLER = CommandHandler("list_chats", chats, filters=CustomFilters.sudo_filter)
 
 
 ADDCHANNEL_HANDLER = CommandHandler("add_channel", add_channel, filters=CustomFilters.sudo_filter)
