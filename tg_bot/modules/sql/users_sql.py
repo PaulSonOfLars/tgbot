@@ -212,6 +212,8 @@ def add_channel(chat_id, chat_name):
         channel_id = SESSION.query(Channels).get(chat_id)
         if not channel_id:
             channel_id = UserInfo(chat_id, chat_name)
-
-        SESSION.add(channel_id)
-        SESSION.commit()
+            SESSION.add(channel_id)
+            SESSION.commit()
+            return True
+        else:
+            return False
