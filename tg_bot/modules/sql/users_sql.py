@@ -224,7 +224,7 @@ def del_channel(chat_id):
     with INSERTION_LOCK:
         channel_id = SESSION.query(Channels).get(chat_id)
         if channel_id:
-            SESSION.delete(curr)
+            SESSION.delete(channel_id)
             SESSION.commit()
             return True
         else:
