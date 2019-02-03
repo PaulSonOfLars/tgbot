@@ -21,10 +21,9 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 import tg_bot.modules.sql.users_sql as sql
 
 PM_START_TEXT = """
-Hi {}, my name is {}! I am a private modification of the group management bot Marie!
+Hi {}, my name is *{}*!
+I am a private modification of the group management bot Marie! Which can be found [here](@BanhammerMarie\_bot)!
 This modification focuses on expanding the gban feature to channels!
-
-The original Bot can be found @BanhammerMarie\_bot
 
 You can find the list of available commands with /help.
 """
