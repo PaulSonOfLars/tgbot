@@ -463,7 +463,7 @@ def main():
 
     else:
         LOGGER.info("Using long polling.")
-        updater.start_polling(timeout=15, read_latency=4, allowed_updates="")
+        updater.start_polling(timeout=15, read_latency=4, allowed_updates=[“message”, “edited_channel_post”, “callback_query”])
 
     updater.idle()
 
@@ -525,5 +525,4 @@ def process_update(self, update):
 
 if __name__ == '__main__':
     LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
-    Update.edited_channel_post=True
     main()
