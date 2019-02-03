@@ -200,8 +200,11 @@ def del_user(user_id):
             SESSION.commit()
             return True
 
-        ChatMembers.query.filter(ChatMembers.user == user_id).delete()
-        SESSION.commit()
+        try:
+            ChatMembers.query.filter(ChatMembers.user == user_id).delete()
+            SESSION.commit()
+        except Exception as e:
+            pass
         SESSION.close()
     return False
 
