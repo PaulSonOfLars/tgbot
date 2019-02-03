@@ -18,6 +18,10 @@ from tg_bot.modules import ALL_MODULES
 from tg_bot.modules.helper_funcs.chat_status import is_user_admin
 from tg_bot.modules.helper_funcs.misc import paginate_modules
 
+import tg_bot.modules.sql.users_sql as sql
+
+import channel_mgmt as channel_mgmt
+
 PM_START_TEXT = """
 Hi {}, my name is {}! If you have any questions on how to use me, read /help - and then head to @MarieSupport.
 
@@ -483,14 +487,17 @@ CHATS_TIME = {}
 def process_update(self, update):
     #print(update.effective_message)
 
-    chat = update.effective_chat.type  # type: Optional[Chat]
+    chat_type = update.effective_chat.type  # type: Optional[Chat]
     chat_id = update.effective_chat.id
     chat_name = dispatcher.bot.getChat(chat_id).title
 #    msg = update.effective_message.text
-    print(chat_id)
-    print(chat_name)
-    print(chat)
 
+    if (chat_type == "channel"):
+        print("Channel found:")
+        print(chat_id)
+        print(chat_name)
+        print("")
+    
 #    print(msg)
 
     # An error happened while polling
