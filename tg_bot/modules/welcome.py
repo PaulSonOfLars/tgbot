@@ -75,6 +75,10 @@ def send(update, message, keyboard, backup_message):
 
     return msg
 
+@run_async
+def status_messages(bot: Bot, update: Update):
+    print("new status message")
+
 
 @run_async
 def new_member(bot: Bot, update: Update):
@@ -470,6 +474,7 @@ __help__ = """
 
 __mod_name__ = "Welcomes/Goodbyes"
 
+STATUS_HANDLER = MessageHandler(Filters.status_update, status_messages)
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)
 WELC_PREF_HANDLER = CommandHandler("welcome", welcome, pass_args=True, filters=Filters.group)
@@ -481,6 +486,7 @@ RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.gr
 CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
+dispatcher.add_handler(STATUS_HANDLER)
 dispatcher.add_handler(NEW_MEM_HANDLER)
 dispatcher.add_handler(LEFT_MEM_HANDLER)
 dispatcher.add_handler(WELC_PREF_HANDLER)
