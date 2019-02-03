@@ -420,8 +420,11 @@ def testf(bot, update):
     """Echo the user message."""
     print("testf")
 
+    chat_id = update.effective_chat.id  # type: Optional[Chat]
+
     msg = update.effective_message  # type: Optional[Message]
-    update.message.reply_text(update.message.text)
+    dispatcher.bot.send_message(chat_id, msg,
+                                        parse_mode=ParseMode.MARKDOWN)
 
 def main():
     test_handler = MessageHandler(Filters.text, testf)
@@ -478,13 +481,17 @@ CHATS_TIME = {}
 
 
 def process_update(self, update):
-    print(update.effective_message)
+    #print(update.effective_message)
 
-    chat = update.effective_chat  # type: Optional[Chat]
-    msg = update.effective_message.text
+    chat = update.effective_chat.type  # type: Optional[Chat]
+    chat_id = update.effective_chat.id
+    chat_name = dispatcher.bot.getChat(chat_id).title
+#    msg = update.effective_message.text
+    print(chat_id)
+    print(chat_name)
     print(chat)
 
-    print(msg)
+#    print(msg)
 
     # An error happened while polling
     if isinstance(update, TelegramError):
