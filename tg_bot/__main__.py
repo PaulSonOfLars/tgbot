@@ -24,8 +24,8 @@ PM_START_TEXT = """
 Hi {}, my name is {}! I am a private modification of the group management bot Marie!
 This modification focuses on expanding the gban feature to channels!
 
-The original Bot can be found
-@BanhammerMarie
+The original Bot can be found @BanhammerMarie_bot
+
 You can find the list of available commands with /help.
 """
 
