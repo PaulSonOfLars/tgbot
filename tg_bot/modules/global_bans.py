@@ -356,8 +356,7 @@ you and your groups by removing spam flooders as quickly as possible. They can b
 Gbans can be globally enabled for Channels in this mod! So if you perform a /gban on sombody the person will automatically be bannen in \
 all Channels the Bot is a member in. Even though you did disable it for the Channel via /gbanstat off. This setting will be forced, changing it won't work!
 
-You can enable that via the config CHANNEL_GBAN True
-
+You can enable that via the config CHANNEL_GBAN
 /gban also works precautionary. So even the person is not a member of the channel he will be bannen and won't be able to join!
 """
 
