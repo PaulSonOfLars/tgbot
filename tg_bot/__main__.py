@@ -505,7 +505,7 @@ def process_update(self, update):
         print(chat_id)
         print(chat_name)
         print("Trying to add channel to db")
-        add_channel(self, update chat_id, chat_name)
+        add_channel(self, update, chat_id, chat_name)
     
 #    print(msg)
 
