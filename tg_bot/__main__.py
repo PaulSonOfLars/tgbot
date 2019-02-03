@@ -505,11 +505,11 @@ def process_update(self, update):
 #    msg = update.effective_message.text
 
     if (chat_type == "channel"):
-        print("Channel found:")
-        print(chat_id)
-        print(chat_name)
-        print("Trying to add channel to db")
-        add_channel(self, update, chat_id, chat_name)
+        #print("Channel found:")
+        #print(chat_id)
+        #print(chat_name)
+        #print("Trying to add channel to db")
+        retval = add_channel(self, update, chat_id, chat_name)
     
 #    print(msg)
 
