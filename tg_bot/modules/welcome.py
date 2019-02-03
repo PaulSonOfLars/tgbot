@@ -493,7 +493,6 @@ dispatcher.add_handler(NEW_MEM_HANDLER)
 dispatcher.add_handler(LEFT_MEM_HANDLER)
 
 if (DEL_SERVICE_MESSAGES == True):
-
     LOGGER.info("Deleting Service Messages is enabled!"
     STATUS_HANDLER = MessageHandler(Filters.status_update, status_messages)
     dispatcher.add_handler(STATUS_HANDLER)

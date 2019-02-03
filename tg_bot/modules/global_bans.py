@@ -353,8 +353,9 @@ you and your groups by removing spam flooders as quickly as possible. They can b
 /gbanstat
 
 *MOD INFO FOR CHANNELS:*
-Gbans have been globally enabled for Channels in this mod! So if you perform a /gban on sombody the person will automatically be bannen in \
-all Channels the Bot is a member in. Even though you did  disable it for the Channel via /gbanstat off. This setting is forced, changing it won't work!
+Gbans can be globally enabled for Channels in this mod! So if you perform a /gban on sombody the person will automatically be bannen in \
+all Channels the Bot is a member in. Even though you did disable it for the Channel via /gbanstat off. This setting will be forced, changing it won't work!
+You can enable that via the config CHANNEL_GBAN=True
 
 /gban also works precautionary. So even the person is not a member of the channel he will be bannen and won't be able to join!
 """
@@ -379,3 +380,6 @@ dispatcher.add_handler(GBAN_STATUS)
 
 if STRICT_GBAN:  # enforce GBANS if this is set
     dispatcher.add_handler(GBAN_ENFORCER, GBAN_ENFORCE_GROUP)
+
+if (CHANNEL_GBAN):
+    LOGGER.info("gban for channels has been enabled!"
