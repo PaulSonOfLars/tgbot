@@ -70,7 +70,9 @@ The following env variables are supported:
  - `CERT_PATH`: Path to your webhook certificate
  - `PORT`: Port to use for your webhooks
  - `DEL_CMDS`: Whether to delete commands from users which don't have rights to use that command
+ - `DEL_SERVICE_MESSAGES`: Whether to delete service messages
  - `STRICT_GBAN`: Enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.
+ - `CHANNEL_GBAN`: Enforce gbans across channels.
  - `WORKERS`: Number of threads to use. 8 is the recommended (and default) amount, but your experience may vary.
  __Note__ that going crazy with more threads wont necessarily speed up your bot, given the large amount of sql data 
  accesses, and the way python asynchronous calls work.
