@@ -143,10 +143,10 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
                     return ""
             except TelegramError:
                 pass
-        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
+        #send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
         message.reply_text("{} wurde in allen Gruppen und Kanälen gesperrt".format(user_chat.first_name))
     else:
-        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
+        #send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
         message.reply_text("{} wurde in allen Gruppen gesperrt".format(user_chat.first_name))
 
 
@@ -232,10 +232,10 @@ def ungban(bot: Bot, update: Update, args: List[str]) -> str:
                 pass
 
         message.reply_text("{} wurde in allen Gruppen und Kanälen entsperrt".format(user_chat.first_name))
-        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
+        #send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
     else:
         message.reply_text("{} wurde in allen Gruppen entsperrt".format(user_chat.first_name))
-        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
+        #send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
 
 
     sql.ungban_user(user_id)
@@ -251,7 +251,7 @@ def gbanlist(bot: Bot, update: Update):
     banned_users = sql.get_gban_list()
 
     if not banned_users:
-        update.effective_message.reply_text("There aren't any gbanned users! You're kinder than I expected...")
+        update.effective_message.reply_text("Bisher ist kein Benutzer global gesperrt.")
         return
 
     banfile = 'Screw these guys.\n'
@@ -263,14 +263,14 @@ def gbanlist(bot: Bot, update: Update):
     with BytesIO(str.encode(banfile)) as output:
         output.name = "gbanlist.txt"
         update.effective_message.reply_document(document=output, filename="gbanlist.txt",
-                                                caption="Here is the list of currently gbanned users.")
+                                                caption="Hier ist die Liste der aktuell global gesperrten Benutzer.")
 
 
 def check_and_ban(update, user_id, should_message=True):
     if sql.is_user_gbanned(user_id):
         update.effective_chat.kick_member(user_id)
         if should_message:
-            update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
+            update.effective_message.reply_text("Dieser Benutzer steht auf der Liste, ich kicke ihn wieder!")
 
 
 @run_async
