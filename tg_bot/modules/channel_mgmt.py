@@ -107,8 +107,6 @@ def del_channel(bot: Bot, update: Update):
 
     try:
         retval=bot.leaveChat(channel_id)
-        if (retval):
-            print("Bot left the channel")
     except Exception as e:
         pass
 
@@ -144,11 +142,9 @@ def del_chat(bot: Bot, update: Update):
 
     try:
         retval=bot.leaveChat(channel_id)
-        if (retval):
-            print("Bot left the chat")
     except Exception as e:
         pass
-        
+
     try:
         retval = sql.del_chat(channel_id)
         if retval:
