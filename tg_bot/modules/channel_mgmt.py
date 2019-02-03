@@ -103,9 +103,15 @@ def del_channel(bot: Bot, update: Update):
 def del_channel(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
+    channel_id = args[1]
 
     try:
-        channel_id = args[1]
+        retval=bot.leaveChat(channel_id)
+        if (retval):
+            print("Bot left the channel")
+    except Exception as e:
+
+    try:
         retval = sql.del_channel(channel_id)
         if retval:
             text = "Channel "+args[1]+" has been removed from the DB"
@@ -133,9 +139,15 @@ def del_channel(bot: Bot, update: Update):
 def del_chat(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
+    channel_id = args[1]
 
     try:
-        channel_id = args[1]
+        retval=bot.leaveChat(channel_id)
+        if (retval):
+            print("Bot left the chat")
+    except Exception as e:
+
+    try:
         retval = sql.del_chat(channel_id)
         if retval:
             text = "Chat "+args[1]+" has been removed from the DB"

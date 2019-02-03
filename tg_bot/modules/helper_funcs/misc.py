@@ -83,6 +83,16 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False, html=Fal
             pass  # ignore users who fail
 
 
+
+def leave_chat(bot: Bot, update: Update, chat_id) -> None:
+    try:
+        retval=bot.leaveChat(chat_id)
+        return retval
+    except Exceptio as:
+        return False
+
+
+send_to_list
 def build_keyboard(buttons):
     keyb = []
     for btn in buttons:
