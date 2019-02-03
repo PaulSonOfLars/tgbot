@@ -20,6 +20,8 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 import tg_bot.modules.sql.users_sql as sql
 
+import tg_bot.modules.sql.users_sql as sql
+
 PM_START_TEXT = """
 Hi {}, my name is {}! If you have any questions on how to use me, read /help - and then head to @MarieSupport.
 
@@ -422,7 +424,7 @@ def migrate_chats(bot: Bot, update: Update):
 @run_async
 def add_channel(bot, update, channel_id, channel_name):
     try:
-        retval = sql.add_channel(channel_id, channel_name)
+        retval = sql.add_channel(str(channel_id), str(channel_name))
         print(retval)
     except Exception as e:
         print(e)
