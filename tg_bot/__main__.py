@@ -419,6 +419,8 @@ def migrate_chats(bot: Bot, update: Update):
 def testf(bot, update):
     """Echo the user message."""
     print("testf")
+
+    msg = update.effective_message  # type: Optional[Message]
     update.message.reply_text(update.message.text)
 
 def main():
@@ -476,7 +478,13 @@ CHATS_TIME = {}
 
 
 def process_update(self, update):
-    print(update.effective_message.text)
+    print(update.effective_message)
+
+    chat = update.effective_chat  # type: Optional[Chat]
+    msg = update.effective_message.text
+    print(chat)
+
+    print(msg)
 
     # An error happened while polling
     if isinstance(update, TelegramError):
