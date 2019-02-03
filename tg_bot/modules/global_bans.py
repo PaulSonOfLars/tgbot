@@ -91,7 +91,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
 
         return
 
-    message.reply_text("*Blows dust off of banhammer* 😉")
+    #message.reply_text("*Blows dust off of banhammer* 😉")
 
     banner = update.effective_user  # type: Optional[User]
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
@@ -144,7 +144,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
 
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
-    message.reply_text("Person has been gbanned.")
+    message.reply_text("{} has been banned globally.".format(user_chat.first_name))
 
 
 @run_async
@@ -167,7 +167,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
 
     banner = update.effective_user  # type: Optional[User]
 
-    message.reply_text("{} has been globally ungbanned.".format(user_chat.first_name))
+    message.reply_text("{} has been  gbanned globally.".format(user_chat.first_name))
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
                  "{} has ungbanned user {}".format(mention_html(banner.id, banner.first_name),
@@ -222,7 +222,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
         except TelegramError:
             pass
 
-                        
+
     sql.ungban_user(user_id)
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
