@@ -182,12 +182,11 @@ def list_channels(bot: Bot, update: Update):
 
 
 
-__help__ = """This module allows you to expand the gban feature to channels your bot is a member of.
-In Order to gban a user from your channels also you need to add the channel to the list.
+__help__ = """This module does let you add or remove channels and groups manually. It also allows you to list them.
 
 *Admin only:*
  - /listchannels : Will show you a list of all added channels
- - /listchats : Will show you a list of chats your bot is member of
+ - /listchats : Will show you a list of chats your bot is a member of
 
  - /addchannel <chat id> <channel name> : Adds a channel to your DB (you still need to add the bot manually to the channel)
  - /delchannel <chat id> : Removes a channel from your DB (It will be added again once it recieves data from the channel)
