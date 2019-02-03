@@ -22,7 +22,7 @@ import tg_bot.modules.sql.users_sql as sql
 
 PM_START_TEXT = """
 Hi {}, my name is *{}*!
-I am a private modification of the group management bot Marie! Which can be found [here](@BanhammerMarie\_bot)!
+I am a private modification of the group management bot Marie! Which can be found @BanhammerMarie\_bot!
 This modification focuses on expanding the gban feature to channels!
 
 You can find the list of available commands with /help.
