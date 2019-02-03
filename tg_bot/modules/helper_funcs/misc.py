@@ -83,8 +83,6 @@ def send_to_list(bot: Bot, send_to: list, message: str, markdown=False, html=Fal
             pass  # ignore users who fail
 
 
-
-send_to_list
 def build_keyboard(buttons):
     keyb = []
     for btn in buttons:
