@@ -155,12 +155,12 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
 
     return "<b>NEW GLOBAL BAN</b>" \
            "\n<b>USER:</b> {}" \
-           "\n<b>USER_ID:</b> {}".format(html.escape(user.first_name), html.escape(user.id))
+           "\n<b>USER_ID:</b> {}".format(html.escape(user_chat.first_name), html.escape(user_id))
 
 @run_async
 @user_admin
 @loggable
-def ungban(bot: Bot, update: Update, args: List[str]):
+def ungban(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
@@ -238,6 +238,9 @@ def ungban(bot: Bot, update: Update, args: List[str]):
     sql.ungban_user(user_id)
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
+    return "<b>NEW GLOBAL BAN</b>" \
+           "\n<b>USER:</b> {}" \
+           "\n<b>USER_ID:</b> {}".format(html.escape(user_chat.first_name), html.escape(user_id))
 
 #    message.reply_text("Person has been un-gbanned.")
 
