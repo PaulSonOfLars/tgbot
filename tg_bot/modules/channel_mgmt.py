@@ -1,3 +1,4 @@
+import html
 from io import BytesIO
 from typing import Optional, List
 from telegram import TelegramError, Chat, Message
