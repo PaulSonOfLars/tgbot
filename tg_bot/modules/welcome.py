@@ -77,9 +77,6 @@ def send(update, message, keyboard, backup_message):
 
 @run_async
 def status_messages(bot: Bot, update: Update):
-    print("new status message")
-    print(update.effective_message.message_id)
-    print(update.effective_message.chat.id)
     bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
@@ -146,9 +143,6 @@ def new_member(bot: Bot, update: Update):
             if sent:
                 sql.set_clean_welcome(chat.id, sent.message_id)
 
-    print("new status welcome message")
-    print(update.effective_message.message_id)
-    print(update.effective_message.chat.id)
     bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
@@ -201,9 +195,6 @@ def left_member(bot: Bot, update: Update):
 
             send(update, res, keyboard, sql.DEFAULT_GOODBYE)
 
-    print("new status left message")
-    print(update.effective_message.message_id)
-    print(update.effective_message.chat.id)
     bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
