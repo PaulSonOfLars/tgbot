@@ -197,6 +197,32 @@ def ungban(bot: Bot, update: Update, args: List[str]):
         except TelegramError:
             pass
 
+
+
+
+    channels = get_all_channels()
+    for channel in channels:
+        chat_id = channel.chat_id
+        # Check if this group has disabled gbans
+        if not sql.does_chat_gban(chat_id):
+            continue
+
+        try:
+            member = bot.get_chat_member(chat_id, user_id)
+            if member.status == 'kicked':
+                bot.unban_chat_member(chat_id, user_id)
+
+        except BadRequest as excp:
+            if excp.message in UNGBAN_ERRORS:
+                pass
+            else:
+                message.reply_text("Could not un-gban due to: {}".format(excp.message))
+                bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
+                return
+        except TelegramError:
+            pass
+
+                        
     sql.ungban_user(user_id)
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
