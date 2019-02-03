@@ -8,7 +8,7 @@ from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import mention_html
 
 import tg_bot.modules.sql.global_bans_sql as sql
-from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, STRICT_GBAN, CHANNEL_GBAN
 from tg_bot.modules.helper_funcs.chat_status import user_admin, is_user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_user, extract_user_and_text
 from tg_bot.modules.helper_funcs.filters import CustomFilters
@@ -126,29 +126,28 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
                 return ""
         except TelegramError:
             pass
-
-    channels = get_all_channels()
-    for channel in channels:
-        chat_id = channel.chat_id
-        
-        try:
-            bot.kick_chat_member(chat_id, user_id)
-        except BadRequest as excp:
-            if excp.message in GBAN_ERRORS:
+    if (CHANNEL_GBAN == True):
+        channels = get_all_channels()
+        for channel in channels:
+            chat_id = channel.chat_id
+            
+            try:
+                bot.kick_chat_member(chat_id, user_id)
+            except BadRequest as excp:
+                if excp.message in GBAN_ERRORS:
+                    pass
+                else:
+                    message.reply_text("Could not gban due to: {}".format(excp.message))
+                    send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
+                    sql.ungban_user(user_id)
+                    return ""
+            except TelegramError:
                 pass
-            else:
-                message.reply_text("Could not gban due to: {}".format(excp.message))
-                send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
-                sql.ungban_user(user_id)
-                return ""
-        except TelegramError:
-            pass
-
-
-
-
-    send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
-    message.reply_text("{} wurde in allen Gruppen und Kanälen gesperrt".format(user_chat.first_name))
+        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
+        message.reply_text("{} wurde in allen Gruppen und Kanälen gesperrt".format(user_chat.first_name))
+    else:
+        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "gban complete!")
+        message.reply_text("{} wurde in allen Gruppen gesperrt".format(user_chat.first_name))
 
 
     user_id, reason = extract_user_and_text(message, args)
@@ -178,9 +177,6 @@ def ungban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     banner = update.effective_user  # type: Optional[User]
-
-    message.reply_text("{} wurde in allen Gruppen und Kanälen entsperrt".format(user_chat.first_name))
-
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
                  "{} has ungbanned user {}".format(mention_html(banner.id, banner.first_name),
                                                    mention_html(user_chat.id, user_chat.first_name)),
@@ -211,33 +207,39 @@ def ungban(bot: Bot, update: Update, args: List[str]) -> str:
 
 
 
+    if (CHANNEL_GBAN == True):
+        channels = get_all_channels()
+        for channel in channels:
+            chat_id = channel.chat_id
+            # Check if this group has disabled gbans
+            if not sql.does_chat_gban(chat_id):
+                continue
 
-    channels = get_all_channels()
-    for channel in channels:
-        chat_id = channel.chat_id
-        # Check if this group has disabled gbans
-        if not sql.does_chat_gban(chat_id):
-            continue
+            try:
+                member = bot.get_chat_member(chat_id, user_id)
+                if member.status == 'kicked':
+                    bot.unban_chat_member(chat_id, user_id)
 
-        try:
-            member = bot.get_chat_member(chat_id, user_id)
-            if member.status == 'kicked':
-                bot.unban_chat_member(chat_id, user_id)
+            except BadRequest as excp:
+                if excp.message in UNGBAN_ERRORS:
+                    pass
+                else:
+                    message.reply_text("Could not un-gban due to: {}".format(excp.message))
+                    bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
+                    return ""
+            except TelegramError:
 
-        except BadRequest as excp:
-            if excp.message in UNGBAN_ERRORS:
                 pass
-            else:
-                message.reply_text("Could not un-gban due to: {}".format(excp.message))
-                bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
-                return ""
-        except TelegramError:
-            pass
+
+        message.reply_text("{} wurde in allen Gruppen und Kanälen entsperrt".format(user_chat.first_name))
+        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
+    else:
+        message.reply_text("{} wurde in allen Gruppen entsperrt".format(user_chat.first_name))
+        send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
 
 
     sql.ungban_user(user_id)
 
-    send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
     return "<b>NEW GLOBAL UNBAN</b>" \
            "\n<b>USER:</b> "+str(mention_html(user_id, user_chat.first_name))+ \
            "\n<b>USER_ID:</b> "+str(user_id)

@@ -61,11 +61,12 @@ if ENV:
     NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
     DEL_CMDS = bool(os.environ.get('DEL_CMDS', False))
     STRICT_GBAN = bool(os.environ.get('STRICT_GBAN', False))
+    CHANNEL_GBAN = bool(os.environ.get('CHANNEL_GBAN', False))
     WORKERS = int(os.environ.get('WORKERS', 8))
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
     DEL_SERVICE_MESSAGES = bool(os.environ.get('DEL_SERVICE_MESSAGES', False))
-    
+
 else:
     from tg_bot.config import Development as Config
     TOKEN = Config.API_KEY
@@ -103,6 +104,7 @@ else:
     NO_LOAD = Config.NO_LOAD
     DEL_CMDS = Config.DEL_CMDS
     STRICT_GBAN = Config.STRICT_GBAN
+    CHANNEL_GBAN = Config.CHANNEL_GBAN
     WORKERS = Config.WORKERS
     BAN_STICKER = Config.BAN_STICKER
     ALLOW_EXCL = Config.ALLOW_EXCL
