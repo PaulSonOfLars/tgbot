@@ -20,7 +20,7 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 import tg_bot.modules.sql.users_sql as sql
 
-import channel_mgmt as channel_mgmt
+import tg_bot.modules.channel_mgmt as channel_mgmt
 
 PM_START_TEXT = """
 Hi {}, my name is {}! If you have any questions on how to use me, read /help - and then head to @MarieSupport.
