@@ -463,7 +463,7 @@ def main():
 
     else:
         LOGGER.info("Using long polling.")
-        updater.start_polling(timeout=15, read_latency=4, allowed_updates=[“message”, “edited_channel_post”, “callback_query”])
+        updater.start_polling(timeout=15, read_latency=4, allowed_updates=["message", "edited_channel_post", "callback_query"])
 
     updater.idle()
 
