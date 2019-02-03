@@ -64,7 +64,8 @@ if ENV:
     WORKERS = int(os.environ.get('WORKERS', 8))
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
-
+    DEL_SERVICE_MESSAGES = bool(os.environ.get('DEL_SERVICE_MESSAGES', False))
+    
 else:
     from tg_bot.config import Development as Config
     TOKEN = Config.API_KEY
@@ -105,6 +106,7 @@ else:
     WORKERS = Config.WORKERS
     BAN_STICKER = Config.BAN_STICKER
     ALLOW_EXCL = Config.ALLOW_EXCL
+    DEL_SERVICE_MESSAGES = Config.DEL_SERVICE_MESSAGES
 
 
 SUDO_USERS.add(OWNER_ID)

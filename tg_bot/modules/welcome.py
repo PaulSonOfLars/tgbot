@@ -8,7 +8,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
-from tg_bot import dispatcher, OWNER_ID, LOGGER
+from tg_bot import dispatcher, OWNER_ID, LOGGER, DEL_SERVICE_MESSAGES
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
 from tg_bot.modules.helper_funcs.msg_types import get_welcome_type
@@ -477,7 +477,6 @@ __help__ = """
 
 __mod_name__ = "Welcomes/Goodbyes"
 
-STATUS_HANDLER = MessageHandler(Filters.status_update, status_messages)
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)
 WELC_PREF_HANDLER = CommandHandler("welcome", welcome, pass_args=True, filters=Filters.group)
@@ -489,9 +488,16 @@ RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.gr
 CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
+
 dispatcher.add_handler(NEW_MEM_HANDLER)
 dispatcher.add_handler(LEFT_MEM_HANDLER)
-dispatcher.add_handler(STATUS_HANDLER)
+
+if (DEL_SERVICE_MESSAGES == True):
+
+    LOGGER.info("Deleting Service Messages is enabled!"
+    STATUS_HANDLER = MessageHandler(Filters.status_update, status_messages)
+    dispatcher.add_handler(STATUS_HANDLER)
+
 dispatcher.add_handler(WELC_PREF_HANDLER)
 dispatcher.add_handler(GOODBYE_PREF_HANDLER)
 dispatcher.add_handler(SET_WELCOME)
