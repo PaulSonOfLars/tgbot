@@ -473,6 +473,8 @@ CHATS_TIME = {}
 
 
 def process_update(self, update):
+    print(update.effective_message.text)
+    
     # An error happened while polling
     if isinstance(update, TelegramError):
         try:
