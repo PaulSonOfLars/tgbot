@@ -486,7 +486,7 @@ CHATS_TIME = {}
 
 
 def process_update(self, update):
-
+    print(update.effective_chat)
     add_channel(self, update)
     
 #    print(msg)
