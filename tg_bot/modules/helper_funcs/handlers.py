@@ -12,8 +12,8 @@ class CustomCommandHandler(tg.CommandHandler):
 
     def check_update(self, update):
         if (isinstance(update, Update)
-                and (update.channel_post or update.new_channel_post or update.message or update.edited_message and self.allow_edited)):
-            message = update.message or update.edited_message or update.new_channel_post or update.channel_post
+                and (update.message or update.edited_message and self.allow_edited)):
+            message = update.message or update.edited_message
 
             if message.text and len(message.text) > 1:
                 fst_word = message.text_html.split(None, 1)[0]
