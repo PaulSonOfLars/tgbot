@@ -345,12 +345,8 @@ def dsgvo(bot: Bot, update: Update):
     for mod in GDPR:
         mod.__gdpr__(update.effective_user.id)
 
-    update.effective_message.reply_text("Deine persönlichen Daten wurden gelöscht.\n\nDas wird dich trotzdem nicht "
-                                        "entsperren in den Chats in den du gesperrt bist, denn das sind telegram Daten "
-                                        "und keine Daten des Klikdiklak Bots."
-                                        "Flooding-Status, Warnungen und Globale Sperren bleiben auf Grundlage der [Datenschutzverordnung](https://www.datenschutz-grundverordnung.eu/grundverordnung/art-17-ds-gvo/) "
-                                        "erhalten da hier das 'Recht auf Löschung' im Sinne des öffentlichen "
-                                        "Interesse verwirkt wurde.",
+    update.effective_message.reply_text(
+"""Die von uns verarbeiteten Daten werden nach Maßgabe der Art. 17 und 18 DSGVO gelöscht oder in ihrer Verarbeitung eingeschränkt. Sofern nicht im Rahmen dieser Datenschutzerklärung ausdrücklich angegeben, werden die bei uns gespeicherten Daten gelöscht, sobald sie für ihre Zweckbestimmung nicht mehr erforderlich sind und der Löschung keine gesetzlichen Aufbewahrungspflichten entgegenstehen. Sofern die Daten nicht gelöscht werden, weil sie für andere und gesetzlich zulässige Zwecke erforderlich sind, wird deren Verarbeitung eingeschränkt. D.h. die Daten werden gesperrt und nicht für andere Zwecke verarbeitet. Das gilt z.B. für Daten, die aus handels- oder steuerrechtlichen Gründen aufbewahrt werden müssen oder für Daten, an denen wir ein "berechtigtes Interesse" für eine Langzeitaufbewahrung haben (z.B. Sperrungen des Bots wegen ungebührlichen Verhaltens, die die Speicherung der Telegram-Chat-ID, eines Datums, sowie des Grundes der Sperrung umfassen).""",
                                         parse_mode=ParseMode.MARKDOWN)
 
 
