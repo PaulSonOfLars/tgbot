@@ -7,7 +7,7 @@ import telegram.ext as tg
 pid = os.getpid()
 
 pidpath = '/var/run/Klikdiklak.pid'
-pidfile = open(path,'w')
+pidfile = open(pidpath,'w')
 pidfile.write(pid)
 pidfile.close()
 
