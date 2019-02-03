@@ -155,7 +155,8 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
 
     return "<b>NEW GLOBAL BAN</b>" \
            "\n<b>USER:</b> "+str(user_chat.first_name)+ \
-           "\n<b>USER_ID:</b> "+str(user_id)
+           "\n<b>USER_ID:</b> "+str(user_id)+ \
+           "\n<b>LINK:</b> "+str(mention_html(user_id, user_chat.first_name))
 
 @run_async
 @user_admin
@@ -240,7 +241,8 @@ def ungban(bot: Bot, update: Update, args: List[str]) -> str:
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "un-gban complete!")
     return "<b>NEW GLOBAL UNBAN</b>" \
            "\n<b>USER:</b> "+str(user_chat.first_name)+ \
-           "\n<b>USER_ID:</b> "+str(user_id)
+           "\n<b>USER_ID:</b> "+str(user_id)+ \
+           "\n<b>LINK:</b> "+str(mention_html(user_id, user_chat.first_name))
 #    message.reply_text("Person has been un-gbanned.")
 
 
