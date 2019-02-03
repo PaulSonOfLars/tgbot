@@ -20,8 +20,6 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 import tg_bot.modules.sql.users_sql as sql
 
-import tg_bot.modules.channel_mgmt as channel_mgmt
-
 PM_START_TEXT = """
 Hi {}, my name is {}! If you have any questions on how to use me, read /help - and then head to @MarieSupport.
 
@@ -420,6 +418,16 @@ def migrate_chats(bot: Bot, update: Update):
 
 
 
+
+@run_async
+def add_channel(bot, update, channel_id, channel_name):
+    try:
+        retval = sql.add_channel(channel_id, channel_name)
+    except Exception as e:
+        pass
+
+
+
 def testf(bot, update):
     """Echo the user message."""
     print("testf")
@@ -496,7 +504,8 @@ def process_update(self, update):
         print("Channel found:")
         print(chat_id)
         print(chat_name)
-        print("")
+        print("Trying to add channel to db")
+        add_channel(self, update chat_id, chat_name)
     
 #    print(msg)
 
