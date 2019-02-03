@@ -196,7 +196,7 @@ __help__ = """This module does let you add or remove channels and groups manuall
 
 """  # no help string
 
-__mod_name__ = "Groups and Channels"
+__mod_name__ = "Groups & Channels"
 
 CHATSS_HANDLER = CommandHandler("listchats", chats, filters=CustomFilters.sudo_filter)
 ADDCHANNEL_HANDLER = CommandHandler("addchannel", add_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
