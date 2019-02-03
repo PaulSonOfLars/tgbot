@@ -341,7 +341,7 @@ def gdpr(bot: Bot, update: Update):
 
 @run_async
 def dsgvo(bot: Bot, update: Update):
-    update.effective_message.reply_text("Deleting identifiable data...")
+    update.effective_message.reply_text("Lösche personenbezogene Daten...")
     for mod in GDPR:
         mod.__gdpr__(update.effective_user.id)
 
