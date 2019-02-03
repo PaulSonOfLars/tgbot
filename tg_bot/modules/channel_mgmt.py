@@ -121,11 +121,11 @@ __help__ = """This module allows you to expand the gban feature to channels your
 In Order to gban a user from your channels also you need to add the channel to the list.
 
 *Admin only:*
- - /listchannels : Will show you a list of all manually added channels
+ - /listchannels : Will show you a list of all added channels
  - /listchats : Will show you a list of chats your bot is member of
 
  - /addchannel <chat id> <channel name> : Adds a channel to your List
- - /delchannel <chat id> : Removes a channel from your List
+ - /delchannel <chat id> : Removes a channel from your List (It will be added again once it recieves data from the channel)
 
 
 """  # no help string
