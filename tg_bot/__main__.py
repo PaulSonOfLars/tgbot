@@ -431,18 +431,25 @@ def testf(bot, update):
     dispatcher.bot.send_message(chat_id, msg,
                                         parse_mode=ParseMode.MARKDOWN)
 
+
+
+
+def status_messages(bot, update):
+    """Echo the user message."""
+    print("status_message recieved")
+    print(update)
+
 def main():
     #test_handler = MessageHandler(Filters.text, testf)
     start_handler = CommandHandler("start", start, pass_args=True)
-
     help_handler = CommandHandler("help", get_help)
     help_callback_handler = CallbackQueryHandler(help_button, pattern=r"help_")
-
     settings_handler = CommandHandler("settings", get_settings)
     settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"stngs_")
-
     #donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
+
+    status_handler = MessageHandler(Filters.status_update, status_messages)
 
 
     #dispatcher.add_handler(test_handler)
@@ -453,6 +460,7 @@ def main():
     dispatcher.add_handler(help_callback_handler)
     dispatcher.add_handler(settings_callback_handler)
     dispatcher.add_handler(migrate_handler)
+    dispatcher.add_handler(status_handler)
     #dispatcher.add_handler(donate_handler)
 
 
@@ -476,7 +484,7 @@ def main():
 
     else:
         LOGGER.info("Using long polling.")
-        updater.start_polling(timeout=15, read_latency=4, allowed_updates=[])
+        updater.start_polling(timeout=15, read_latency=4, allowed_updates=[], status_update=[])
 
     updater.idle()
 
@@ -486,7 +494,6 @@ CHATS_TIME = {}
 
 
 def process_update(self, update):
-    print(update)
     add_channel(self, update)
     
 #    print(msg)
