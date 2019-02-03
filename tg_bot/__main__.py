@@ -422,7 +422,7 @@ def testf(bot, update):
     update.message.reply_text(update.message.text)
 
 def main():
-    test_handler = CommandHandler(Filters.text, testf)
+    test_handler = MessageHandler(Filters.text, testf)
     start_handler = CommandHandler("start", start, pass_args=True)
 
     help_handler = CommandHandler("help", get_help)
