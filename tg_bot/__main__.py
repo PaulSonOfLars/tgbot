@@ -432,10 +432,7 @@ def main():
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
 
-    test_handler = MessageHandler(Filters.all, testf, edited_channel_post=True)
-
     # dispatcher.add_handler(test_handler)
-    dispatcher.add_handler(test_handler)
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
@@ -528,4 +525,5 @@ def process_update(self, update):
 
 if __name__ == '__main__':
     LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
+    Update.edited_channel_post=True
     main()
