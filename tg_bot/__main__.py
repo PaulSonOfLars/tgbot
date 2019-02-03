@@ -452,15 +452,15 @@ def main():
     status_handler = MessageHandler(Filters.status_update, status_messages)
 
 
-    #dispatcher.add_handler(test_handler)
 
+    #dispatcher.add_handler(test_handler)
+    dispatcher.add_handler(status_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
     dispatcher.add_handler(settings_handler)
     dispatcher.add_handler(help_callback_handler)
     dispatcher.add_handler(settings_callback_handler)
     dispatcher.add_handler(migrate_handler)
-    dispatcher.add_handler(status_handler)
     #dispatcher.add_handler(donate_handler)
 
 
