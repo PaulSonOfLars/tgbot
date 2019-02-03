@@ -1,6 +1,8 @@
 # Fork of tgbot
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
+This is a private modification of the group management bot Marie! Which can be found [here](https://t.me/BanhammerMarie_bot)! 
+This modification focuses on expanding the gban feature to channels, and to delete service messages
 
 Can be found on telegram as [Klikdiklak](https://t.me/Klikdiklak_bot).
 
