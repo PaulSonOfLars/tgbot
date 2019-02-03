@@ -20,8 +20,6 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 import tg_bot.modules.sql.users_sql as sql
 
-import tg_bot.modules.sql.users_sql as sql
-
 PM_START_TEXT = """
 Hi {}, my name is {}! If you have any questions on how to use me, read /help - and then head to @MarieSupport.
 
@@ -422,13 +420,15 @@ def migrate_chats(bot: Bot, update: Update):
 
 
 @run_async
-def add_channel(bot, update, channel_id, channel_name):
-    try:
-        retval = sql.add_channel(str(channel_id), str(channel_name))
-        print(retval)
-    except Exception as e:
-        print(e)
-        pass
+def add_channel(bot, update):
+    if (update.effective_chat.type == "channel"):
+        chat_id = update.effective_chat.id
+        chat_name = dispatcher.bot.getChat(chat_id).title
+        try:
+            retval = sql.add_channel(str(channel_id), str(channel_name))
+        except Exception as e:
+            print(e)
+            pass
 
 
 
@@ -497,19 +497,8 @@ CHATS_TIME = {}
 
 
 def process_update(self, update):
-    #print(update.effective_message)
 
-    chat_type = update.effective_chat.type  # type: Optional[Chat]
-    chat_id = update.effective_chat.id
-    chat_name = dispatcher.bot.getChat(chat_id).title
-#    msg = update.effective_message.text
-
-    if (chat_type == "channel"):
-        #print("Channel found:")
-        #print(chat_id)
-        #print(chat_name)
-        #print("Trying to add channel to db")
-        retval = add_channel(self, update, chat_id, chat_name)
+    add_channel(self, update)
     
 #    print(msg)
 
