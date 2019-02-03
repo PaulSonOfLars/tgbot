@@ -8,7 +8,7 @@ pid = os.getpid()
 
 pidpath = '/var/run/Klikdiklak.pid'
 pidfile = open(pidpath,'w')
-pidfile.write(pid)
+pidfile.write(str(pid))
 pidfile.close()
 
 # enable logging
