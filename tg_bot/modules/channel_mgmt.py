@@ -3,6 +3,7 @@ from typing import Optional, List
 from telegram import TelegramError, Chat, Message
 from telegram import Update, Bot
 from telegram.ext import MessageHandler, Filters, CommandHandler
+from tg_bot.modules.helper_funcs.chat_status import user_admin, is_user_admin
 from telegram.ext.dispatcher import run_async
 
 import tg_bot.modules.sql.users_sql as sql
@@ -11,7 +12,9 @@ from tg_bot import dispatcher, OWNER_ID, LOGGER
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 
 
+
 @run_async
+@user_admin
 def chats(bot: Bot, update: Update):
     message = update.effective_message
     chats = sql.get_all_chats() or []
@@ -32,6 +35,7 @@ def chats(bot: Bot, update: Update):
 
 
 @run_async
+@user_admin
 def add_channel(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
@@ -66,6 +70,7 @@ def add_channel(bot: Bot, update: Update):
 
 
 @run_async
+@user_admin
 def del_channel(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
@@ -93,8 +98,68 @@ def del_channel(bot: Bot, update: Update):
             message.reply_text(text, quote=False)
 
 
+@run_async
+@user_admin
+def del_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(None, 1)
+    message = update.effective_message
+
+    try:
+        channel_id = args[1]
+        retval = sql.del_channel(channel_id)
+        if retval:
+            text = "Channel "+args[1]+" has been removed from the DB"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
+        else:
+            text = "Channel "+args[1]+" is not on your DB"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
+    except Exception as e:
+        text = "You need to give me a channel id to delete something!"
+        if message.reply_to_message:
+            message.reply_to_message.reply_text(text)
+        else:
+            message.reply_text(text, quote=False)
+
+
 
 @run_async
+@user_admin
+def del_chat(bot: Bot, update: Update):
+    args = update.effective_message.text.split(None, 1)
+    message = update.effective_message
+
+    try:
+        channel_id = args[1]
+        retval = sql.del_chat(channel_id)
+        if retval:
+            text = "Chat "+args[1]+" has been removed from the DB"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
+        else:
+            text = "Chat "+args[1]+" is not on your DB"
+            if message.reply_to_message:
+                message.reply_to_message.reply_text(text)
+            else:
+                message.reply_text(text, quote=False)
+    except Exception as e:
+        text = "You need to give me a chat id to delete something!"
+        if message.reply_to_message:
+            message.reply_to_message.reply_text(text)
+        else:
+            message.reply_text(text, quote=False)
+
+
+
+@run_async
+@user_admin
 def list_channels(bot: Bot, update: Update):
     message = update.effective_message
     chats = sql.get_all_channels() or []
@@ -124,26 +189,24 @@ In Order to gban a user from your channels also you need to add the channel to t
  - /listchannels : Will show you a list of all added channels
  - /listchats : Will show you a list of chats your bot is member of
 
- - /addchannel <chat id> <channel name> : Adds a channel to your List
- - /delchannel <chat id> : Removes a channel from your List (It will be added again once it recieves data from the channel)
+ - /addchannel <chat id> <channel name> : Adds a channel to your DB (you still need to add the bot manually to the channel)
+ - /delchannel <chat id> : Removes a channel from your DB (It will be added again once it recieves data from the channel)
+
+ - /delchat <chat id> : Removes a channel from your DB (It will be added again once it recieves data from the channel)
 
 
 """  # no help string
 
 __mod_name__ = "Channel Management"
 
-
 CHATSS_HANDLER = CommandHandler("listchats", chats, filters=CustomFilters.sudo_filter)
-
-
 ADDCHANNEL_HANDLER = CommandHandler("addchannel", add_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 LISTCHANNELS_HANDLER = CommandHandler("listchannels", list_channels, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 DELCHANNEL_HANDLER = CommandHandler("delchannel", del_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-
-
+DELCHAT_HANDLER = CommandHandler("delchat", del_chat, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
 dispatcher.add_handler(CHATSS_HANDLER)
-
 dispatcher.add_handler(ADDCHANNEL_HANDLER)
 dispatcher.add_handler(DELCHANNEL_HANDLER)
 dispatcher.add_handler(LISTCHANNELS_HANDLER)
+dispatcher.add_handler(DELCHAT_HANDLER)

@@ -232,3 +232,16 @@ def del_channel(chat_id):
             return True
         else:
             return False
+
+
+
+
+def del_chat(chat_id):
+    with INSERTION_LOCK:
+        chat_id = SESSION.query(Chats).get(chat_id)
+        if chat_id:
+            SESSION.delete(chat_id)
+            SESSION.commit()
+            return True
+        else:
+            return False
