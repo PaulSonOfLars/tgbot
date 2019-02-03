@@ -415,11 +415,14 @@ def migrate_chats(bot: Bot, update: Update):
     raise DispatcherHandlerStop
 
 
-def testf():
-    print("true that")
+
+def testf(bot, update):
+    """Echo the user message."""
+    print("testf")
+    update.message.reply_text(update.message.text)
 
 def main():
-    test_handler = CommandHandler("test", test)
+    test_handler = CommandHandler(Filter.text, testf)
     start_handler = CommandHandler("start", start, pass_args=True)
 
     help_handler = CommandHandler("help", get_help)
@@ -432,7 +435,7 @@ def main():
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
 
-    # dispatcher.add_handler(test_handler)
+    dispatcher.add_handler(test_handler)
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
@@ -474,7 +477,7 @@ CHATS_TIME = {}
 
 def process_update(self, update):
     print(update.effective_message.text)
-    
+
     # An error happened while polling
     if isinstance(update, TelegramError):
         try:
