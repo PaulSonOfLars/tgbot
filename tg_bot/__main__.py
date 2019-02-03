@@ -423,7 +423,9 @@ def migrate_chats(bot: Bot, update: Update):
 def add_channel(bot, update, channel_id, channel_name):
     try:
         retval = sql.add_channel(channel_id, channel_name)
+        print(retval)
     except Exception as e:
+        print(e)
         pass
 
 
