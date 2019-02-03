@@ -416,7 +416,7 @@ def migrate_chats(bot: Bot, update: Update):
 
 
 def testf():
-    print "true that"
+    print(true that)
 
 def main():
     test_handler = CommandHandler("test", test)
