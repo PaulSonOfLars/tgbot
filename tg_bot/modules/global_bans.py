@@ -304,9 +304,15 @@ __help__ = """
 *Admin only:*
  - /gbanstat <on/off/yes/no>: Will disable the effect of global bans on your group, or return your current settings.
 
-Gbans, also known as global bans, are used by the bot owners to ban spammers across all groups. This helps protect \
+Gbans, also known as global bans, are used by the bot owners to ban spammers across all *groups*. This helps protect \
 you and your groups by removing spam flooders as quickly as possible. They can be disabled for you group by calling \
 /gbanstat
+
+*CHANNELS*
+Gbans have been globally enabled for Channels! If you perform a /gban on sombody the person will automatically be bannen in \
+all Channels the Bot is a member in.
+
+/gban also works precautionary. So even the person is not a member of the channel he will be bannen and won't be able to join!
 """
 
 __mod_name__ = "Bans - Global"

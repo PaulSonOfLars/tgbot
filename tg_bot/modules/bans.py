@@ -286,6 +286,9 @@ __help__ = """
  - /tban <userhandle> x(m/h/d): bans a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
  - /unban <userhandle>: unbans a user. (via handle, or reply)
  - /kick <userhandle>: kicks a user, (via handle, or reply)
+
+ - /gban <userhandle> bans a user. (via handle, or reply)
+ - /ungban <userhandle> bans a user. (via handle, or reply)
 """
 
 __mod_name__ = "Bans - Local"
