@@ -421,47 +421,12 @@ def add_channel(bot, update):
 
 
 
-def testf(bot, update):
-    """Echo the user message."""
-    print("testf")
-
-    chat_id = update.effective_chat.id  # type: Optional[Chat]
-
-    msg = update.effective_message  # type: Optional[Message]
-    dispatcher.bot.send_message(chat_id, msg,
-                                        parse_mode=ParseMode.MARKDOWN)
-
-
-
-
-@run_async
-def new_member(bot: Bot, update: Update):
-    chat = update.effective_chat  # type: Optional[Chat]
-    print(update)
-    print("new")
-
-@run_async
-def left_member(bot: Bot, update: Update):
-    chat = update.effective_chat  # type: Optional[Chat]
-    print(update)
-    print("left")
-
-
-
 def status_messages(bot: Bot, update: Update):
     """Echo the user message."""
     print("status_message recieved")
     print(update)
 
 def main():
-    status_handler = MessageHandler(Filters.status_update, status_messages)
-
-
-
-    NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
-    LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)
-
-    #test_handler = MessageHandler(Filters.text, testf)
     start_handler = CommandHandler("start", start, pass_args=True)
     help_handler = CommandHandler("help", get_help)
     help_callback_handler = CallbackQueryHandler(help_button, pattern=r"help_")
@@ -470,10 +435,6 @@ def main():
     #donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
-
-
-    #dispatcher.add_handler(test_handler)
-    dispatcher.add_handler(status_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
     dispatcher.add_handler(settings_handler)
@@ -482,11 +443,6 @@ def main():
     dispatcher.add_handler(migrate_handler)
     #dispatcher.add_handler(donate_handler)
 
-
-    dispatcher.add_handler(NEW_MEM_HANDLER)
-    dispatcher.add_handler(LEFT_MEM_HANDLER)
-
-    # dispatcher.add_error_handler(error_callback)
 
     # add antiflood processor
     Dispatcher.process_update = process_update
