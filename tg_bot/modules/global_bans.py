@@ -55,34 +55,34 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
 
     if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
-        return
+        return ""
 
     if int(user_id) in SUDO_USERS:
         message.reply_text("I spy, with my little eye... a sudo user war! Why are you guys turning on each other?")
-        return
+        return ""
 
     if int(user_id) in SUPPORT_USERS:
         message.reply_text("OOOH someone's trying to gban a support user! *grabs popcorn*")
-        return
+        return ""
 
     if user_id == bot.id:
         message.reply_text("-_- So funny, lets gban myself why don't I? Nice try.")
-        return
+        return ""
 
     try:
         user_chat = bot.get_chat(user_id)
     except BadRequest as excp:
         message.reply_text(excp.message)
-        return
+        return ""
 
     if user_chat.type != 'private':
         message.reply_text("That's not a user!")
-        return
+        return ""
 
     if sql.is_user_gbanned(user_id):
         if not reason:
             message.reply_text("This user is already gbanned; I'd change the reason, but you haven't given me one...")
-            return
+            return ""
 
         old_reason = sql.update_gban_reason(user_id, user_chat.username or user_chat.first_name, reason)
         if old_reason:
@@ -93,7 +93,7 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
         else:
             message.reply_text("This user is already gbanned, but had no reason set; I've gone and updated it!")
 
-        return
+        return ""
 
     #message.reply_text("*Blows dust off of banhammer* 😉")
 
@@ -123,7 +123,7 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
                 send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
                 sql.ungban_user(user_id)
-                return
+                return ""
         except TelegramError:
             pass
 
@@ -140,7 +140,7 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
                 message.reply_text("Could not gban due to: {}".format(excp.message))
                 send_to_list(bot, SUDO_USERS + SUPPORT_USERS, "Could not gban due to: {}".format(excp.message))
                 sql.ungban_user(user_id)
-                return
+                return ""
         except TelegramError:
             pass
 
@@ -171,11 +171,11 @@ def ungban(bot: Bot, update: Update, args: List[str]) -> str:
     user_chat = bot.get_chat(user_id)
     if user_chat.type != 'private':
         message.reply_text("That's not a user!")
-        return
+        return ""
 
     if not sql.is_user_gbanned(user_id):
         message.reply_text("This user is not gbanned!")
-        return
+        return ""
 
     banner = update.effective_user  # type: Optional[User]
 
@@ -205,7 +205,7 @@ def ungban(bot: Bot, update: Update, args: List[str]) -> str:
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
                 bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
-                return
+                return ""
         except TelegramError:
             pass
 
@@ -230,7 +230,7 @@ def ungban(bot: Bot, update: Update, args: List[str]) -> str:
             else:
                 message.reply_text("Could not un-gban due to: {}".format(excp.message))
                 bot.send_message(OWNER_ID, "Could not un-gban due to: {}".format(excp.message))
-                return
+                return ""
         except TelegramError:
             pass
 
