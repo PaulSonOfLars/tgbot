@@ -528,5 +528,4 @@ def process_update(self, update):
 
 if __name__ == '__main__':
     LOGGER.info("Successfully loaded modules: " + str(ALL_MODULES))
-    update.edited_channel_post=True
     main()
