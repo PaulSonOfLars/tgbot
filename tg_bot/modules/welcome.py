@@ -143,7 +143,8 @@ def new_member(bot: Bot, update: Update):
             if sent:
                 sql.set_clean_welcome(chat.id, sent.message_id)
 
-    bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+    if (DEL_SERVICE_MESSAGES == True):
+        bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
 def left_member(bot: Bot, update: Update):
@@ -194,8 +195,9 @@ def left_member(bot: Bot, update: Update):
             keyboard = InlineKeyboardMarkup(keyb)
 
             send(update, res, keyboard, sql.DEFAULT_GOODBYE)
-
-    bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+            
+    if (DEL_SERVICE_MESSAGES == True):
+        bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
 @user_admin
