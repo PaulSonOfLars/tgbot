@@ -15,6 +15,9 @@ from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.helper_funcs.misc import send_to_list
 from tg_bot.modules.sql.users_sql import get_all_chats, get_all_channels
 
+
+from tg_bot.modules.log_channel import loggable
+
 GBAN_ENFORCE_GROUP = 6
 
 GBAN_ERRORS = {
