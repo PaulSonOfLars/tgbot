@@ -339,6 +339,20 @@ def gdpr(bot: Bot, update: Update):
                                         "the case for the aforementioned pieces of data.",
                                         parse_mode=ParseMode.MARKDOWN)
 
+@run_async
+def dsgvo(bot: Bot, update: Update):
+    update.effective_message.reply_text("Deleting identifiable data...")
+    for mod in GDPR:
+        mod.__gdpr__(update.effective_user.id)
+
+    update.effective_message.reply_text("Deine persönlichen Daten wurden gelöscht.\n\nDas wird dich trotzdem nicht "
+                                        "entsperren in den Chats in den du gesperrt bist, denn das sind telegram Daten "
+                                        "und keine Daten des Klikdiklak Bots."
+                                        "Flooding-Status, Warnungen und Globale Sperren bleiben auf Grundlage der [Datenschutzverordnung](https://www.datenschutz-grundverordnung.eu/grundverordnung/art-17-ds-gvo/) "
+                                        "erhalten da hier das 'Recht auf Löschung' im Sinne des öffentlichen "
+                                        "Interesse verwirkt wurde.",
+                                        parse_mode=ParseMode.MARKDOWN)
+
 
 MARKDOWN_HELP = """
 Markdown is a very powerful formatting tool supported by telegram. {} has some enhancements, to make sure that \
@@ -386,6 +400,7 @@ __help__ = """
  - /slap: slap a user, or get slapped if not a reply.
  - /info: get information about a user.
  - /gdpr: deletes your information from the bot's database. Private chats only.
+ - /dsgvo: Löscht Informationen zu deiner Person aus der Datenbank des Bots. Funktioniert nur im privaten Chat mit dem Bot.
 
  - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
 """
@@ -406,6 +421,7 @@ MD_HELP_HANDLER = CommandHandler("markdownhelp", markdown_help, filters=Filters.
 
 STATS_HANDLER = CommandHandler("stats", stats, filters=CustomFilters.sudo_filter)
 GDPR_HANDLER = CommandHandler("gdpr", gdpr, filters=Filters.private)
+GDPR_HANDLER = CommandHandler("dsgvo", dsgvo, filters=Filters.private)
 
 
 dispatcher.add_handler(ID_HANDLER)
