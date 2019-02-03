@@ -4,6 +4,13 @@ import sys
 
 import telegram.ext as tg
 
+pid = os.getpid()
+
+pidpath = '/var/run/Klikdiklak.pid'
+pidfile = open(path,'w')
+pidfile.write(pid)
+pidfile.close()
+
 # enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
