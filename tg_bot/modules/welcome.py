@@ -146,6 +146,10 @@ def new_member(bot: Bot, update: Update):
             if sent:
                 sql.set_clean_welcome(chat.id, sent.message_id)
 
+    print("new status welcome message")
+    print(update.effective_message.message_id)
+    print(update.effective_message.chat.id)
+    bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
 def left_member(bot: Bot, update: Update):
@@ -197,6 +201,10 @@ def left_member(bot: Bot, update: Update):
 
             send(update, res, keyboard, sql.DEFAULT_GOODBYE)
 
+    print("new status left message")
+    print(update.effective_message.message_id)
+    print(update.effective_message.chat.id)
+    bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
 @user_admin
@@ -488,9 +496,9 @@ RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.gr
 CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
 
-dispatcher.add_handler(STATUS_HANDLER)
 dispatcher.add_handler(NEW_MEM_HANDLER)
 dispatcher.add_handler(LEFT_MEM_HANDLER)
+dispatcher.add_handler(STATUS_HANDLER)
 dispatcher.add_handler(WELC_PREF_HANDLER)
 dispatcher.add_handler(GOODBYE_PREF_HANDLER)
 dispatcher.add_handler(SET_WELCOME)
