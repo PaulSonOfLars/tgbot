@@ -27,7 +27,7 @@ def chats(bot: Bot, update: Update):
     text = "List of Groups the bot is member of:\n\n"+chatlist
 
     if message.reply_to_message:
-        message.reply_to_message.reply_text(text)
+        message.reply_to_message.reply_text(text, parse_mode=ParseMode.HTML)
     else:
         message.reply_text(text, quote=False)
 
@@ -185,7 +185,7 @@ def list_channels(bot: Bot, update: Update):
         text = "There are not a member of any Channel"
 
     if message.reply_to_message:
-        message.reply_to_message.reply_text(text)
+        message.reply_to_message.reply_text(text, parse_mode=ParseMode.HTML)
     else:
         message.reply_text(text, quote=False)
 
