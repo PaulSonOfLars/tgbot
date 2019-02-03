@@ -155,7 +155,7 @@ def gban(bot: Bot, update: Update, args: List[str]) -> str:
 
     return "<b>NEW GLOBAL BAN</b>" \
            "\n<b>USER:</b> {}" \
-           "\n<b>USER_ID:</b> {}".format(html.escape(str(user_chat.first_name), html.escape(str(user_id)))
+           "\n<b>USER_ID:</b> {}".format(html.escape(str(user_chat.first_name), html.escape(str(user_id))))
 
 @run_async
 @user_admin
