@@ -78,7 +78,7 @@ def send(update, message, keyboard, backup_message):
 @run_async
 def status_messages(bot: Bot, update: Update):
     print("new status message")
-    print(update)
+    print(update.effective_message)
 
 
 @run_async
