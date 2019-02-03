@@ -427,7 +427,7 @@ def testf(bot, update):
                                         parse_mode=ParseMode.MARKDOWN)
 
 def main():
-    test_handler = MessageHandler(Filters.text, testf)
+    #test_handler = MessageHandler(Filters.text, testf)
     start_handler = CommandHandler("start", start, pass_args=True)
 
     help_handler = CommandHandler("help", get_help)
@@ -440,7 +440,7 @@ def main():
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
 
-    dispatcher.add_handler(test_handler)
+    #dispatcher.add_handler(test_handler)
 
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
