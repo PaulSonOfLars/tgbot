@@ -21,18 +21,11 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 import tg_bot.modules.sql.users_sql as sql
 
 PM_START_TEXT = """
-Hi {}, my name is {}! If you have any questions on how to use me, read /help - and then head to @MarieSupport.
+Hi {}, my name is {}! I am a modification of the group management bot Marie! Which can be found [here](https://web.telegram.org/#/im?p=%40BanhammerMarie_bot)! 
 
-I'm a group manager bot built in python3, using the python-telegram-bot library, and am fully opensource; \
-you can find what makes me tick [here](github.com/PaulSonOfLars/tgbot)!
-
-Feel free to submit pull requests on github, or to contact my support group, @MarieSupport, with any bugs, questions \
-or feature requests you might have :)
-I also have a news channel, @MarieNews for announcements on new features, downtime, etc.
+This modification focuses on expanding the gban feature to channels!
 
 You can find the list of available commands with /help.
-
-If you're enjoying using me, and/or would like to help me survive in the wild, hit /donate to help fund/upgrade my VPS!
 """
 
 HELP_STRINGS = """
