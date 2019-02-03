@@ -21,7 +21,7 @@ def chats(bot: Bot, update: Update):
 
     chatlist = ''
     for chat in chats:
-        chatlist += "●{} ({})\n".format(chat.chat_name, chat.chat_id)
+        chatlist += "●{} (<code>{}</code>)\n".format(chat.chat_name, chat.chat_id)
 
 
     text = "List of Groups the bot is member of:\n\n"+chatlist
@@ -176,7 +176,7 @@ def list_channels(bot: Bot, update: Update):
 
     chatlist = ''
     for chat in chats:
-        chatlist += "●{} ({})\n".format(chat.chat_name, chat.chat_id)
+        chatlist += "●{} (<code>{}</code>)\n".format(chat.chat_name, chat.chat_id)
 
 
     if len(chats) >= 1:
