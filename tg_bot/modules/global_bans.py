@@ -44,6 +44,7 @@ UNGBAN_ERRORS = {
 
 
 @run_async
+@loggable
 def gban(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
 
@@ -148,6 +149,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
 
 
 @run_async
+@loggable
 def ungban(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
 
