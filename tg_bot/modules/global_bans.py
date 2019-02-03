@@ -45,10 +45,10 @@ UNGBAN_ERRORS = {
     "Chat_admin_required",
 }
 
-
 @run_async
+@user_admin
 @loggable
-def gban(bot: Bot, update: Update, args: List[str]):
+def gban(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
 
     user_id, reason = extract_user_and_text(message, args)
@@ -151,7 +151,14 @@ def gban(bot: Bot, update: Update, args: List[str]):
     message.reply_text("{} has been banned globally.".format(user_chat.first_name))
 
 
+    user_id, reason = extract_user_and_text(message, args)
+
+    return "<b>NEW GLOBAL BAN</b>" \
+           "\n<b>USER:</b> {}" \
+           "\n<b>USER_ID:</b> {}".format(html.escape(user.first_name), html.escape(user.id))
+
 @run_async
+@user_admin
 @loggable
 def ungban(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
