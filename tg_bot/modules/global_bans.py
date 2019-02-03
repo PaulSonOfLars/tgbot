@@ -382,4 +382,4 @@ if STRICT_GBAN:  # enforce GBANS if this is set
     dispatcher.add_handler(GBAN_ENFORCER, GBAN_ENFORCE_GROUP)
 
 if (CHANNEL_GBAN):
-    LOGGER.info("gban for channels has been enabled!"
+    LOGGER.info("gban for channels has been enabled!")
