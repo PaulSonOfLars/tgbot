@@ -80,7 +80,7 @@ def status_messages(bot: Bot, update: Update):
     print("new status message")
     print(update.effective_message.message_id)
     print(update.effective_message.chat.id)
-
+    bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
 
 @run_async
 def new_member(bot: Bot, update: Update):
