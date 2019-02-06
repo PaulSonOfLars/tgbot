@@ -83,24 +83,24 @@ SLAP_TEMPLATES = (
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n Die Attacke ist sehr effektiv!",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n Die Attacke ist nicht sehr effektiv!",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n Die Attacke hat {user2} knapp verfehlt!",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} liegt nun k/o auf dem Boden!",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} liegt nun k.o. auf dem Boden!",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} nimmt die Beine in die Hand und flüchtet!",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} war nicht vorbereitet und ist nun k/o",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} war nicht vorbereitet und ist nun **k.o.**",
     "{user1} beauftragt das Shiggy-Squad {user2} zu übefallen. Sie machen es sogar umsonst!",
     "{user1} packt seine 100%IV Pokémon aus und lässt {user2} vermöbeln!",
     "{user1} lässt {user2} von seinem Buddy-Pokémon verdreschen!",
     "{user1} holt seine Legendären raus und verpasst {user2} eine Abreibung!",
     "{user1} präsentiert {user2} seine Community-Day Attacken und gibt {user2} Saures!",
-    "{user1} zeigt {user2} was PVP bedeutet!\n{user2} hat keine Zeit zu reagieren und geht k/o..",
+    "{user1} zeigt {user2} was PVP bedeutet!\n{user2} hat keine Zeit zu reagieren und geht **k.o.**",
 )
 
 
 
 HIT = (
-    "verprügelt",
-    "verdrischt",
-    "vermöbelt",
-    "haut",
+    "**verprügelt**",
+    "**verdrischt**",
+    "**vermöbelt**",
+    "**haut**",
 )
 
 
