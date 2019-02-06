@@ -96,9 +96,7 @@ SLAP_TEMPLATES = (
 
 
 EXTRAFUN = (
-    "\n\n_Lubutzi wurde leider in Mitleidenschaft gezogen!_",
-    "\n\n_Moritz wurde leider in Mitleidenschaft gezogen!_",
-    "n\n_Ein Frankfurter Admin wurde leider in Mitleidenschaft gezogen!_",
+    "\n\n_wurde leider in Mitleidenschaft gezogen!_",
     "",
     "",
     "",
@@ -109,6 +107,7 @@ EXTRAFUN = (
 EXTRAFUN_USER = (
     "@lubutzi",
     "@Finte25",
+    "Ein Frankfurter Admin",
 )
 
 
@@ -218,10 +217,13 @@ def slap(bot: Bot, update: Update, args: List[str]):
     throw = random.choice(THROW)
     extraf = random.choice(EXTRAFUN)
 
+    extrauser = random.choice(EXTRAFUN_USER)
 
 
-    if ( str(user2) in EXTRAFUN_USER ):
-        extraf = ""
+    if ( str(extraf) != "" ):
+        while ( str(user2) == str(extrauser) ):
+            extrauser = random.choice(EXTRAFUN_USER)
+        extraf = "_" + extrauser + "_ " + extraf
 
     repl = temp.format(user1=user1, user2=user2, item1=item1, item2=item2, hits=hit, throws=throw, pokemonaction=pokemonaction, extraf=extraf)
 
