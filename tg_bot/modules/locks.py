@@ -257,7 +257,7 @@ def del_lockables(bot: Bot, update: Update):
             else:
                 print("3")
                 try:
-                    send_lock_msg(bot, update)
+                    #send_lock_msg(bot, update)
                     message.delete()
                 except BadRequest as excp:
                     if excp.message == "Message to delete not found":
