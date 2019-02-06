@@ -80,6 +80,8 @@ def send(update, message, keyboard):
 
 def send_lock_msg(bot: Bot, update: Update):
     user_id = update.effective_message
+
+    print(user_id)
     user_id = user_id.from
 
     print(user_id)
