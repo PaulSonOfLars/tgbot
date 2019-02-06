@@ -135,7 +135,7 @@ POKEMON = (
     "Tornupto! Lohekanonade!",
     "Impergator! Hydropumpe!",
     "Impergator, du bist dran!",
-    "Gealdro, du bist dran!",
+    "Gewaldro, du bist dran!",
     "Lohgock, du bist dran!",
     "Sumpex, du bist dran!",
     "Chelterrar, du bist dran!",
