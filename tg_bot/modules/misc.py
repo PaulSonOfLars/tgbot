@@ -79,28 +79,28 @@ SLAP_TEMPLATES = (
     "{user1} fesselt {user2} and einen Stuhl und jeder {throws} ein {item1} an den Kopf.",
     "{user1} nimmt eine verstaubte {item2} und {throws} sie {user2} an den Kopf.",
     "{user1} fesselt {user2} and einen Stuhl und jeder {throws} eine {item2} an den Kopf.",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n__Doch es erscheint ein verwirrtes Enton!__\n\n**ENTON ENTON**",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n__Die Attacke ist sehr effektiv!__",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n__Die Attacke ist nicht sehr effektiv!__",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n__Die Attacke hat {user2} knapp verfehlt!__",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n{user2} __liegt nun k.o. auf dem Boden!__",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n{user2} __nimmt die Beine in die Hand und flüchtet!__",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n{user2} __war nicht vorbereitet und ist nun k.o.__",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n_Doch es erscheint ein verwirrtes Enton!__\n\n*ENTON ENTON*",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n_Die Attacke ist sehr effektiv!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n_Die Attacke ist nicht sehr effektiv!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n_Die Attacke hat {user2} knapp verfehlt!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n{user2} _liegt nun k.o. auf dem Boden!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n{user2} _nimmt die Beine in die Hand und flüchtet!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n{user2} _war nicht vorbereitet und ist nun k.o._",
     "{user1} beauftragt das Shiggy-Squad {user2} zu übefallen. Sie machen es sogar umsonst!",
     "{user1} packt seine 100%IV Pokémon aus und lässt {user2} vermöbeln!",
     "{user1} lässt {user2} von seinem Buddy-Pokémon verdreschen!",
     "{user1} holt seine Legendären raus und verpasst {user2} eine Abreibung!",
     "{user1} präsentiert {user2} seine Community-Day Attacken und gibt {user2} Saures!",
-    "{user1} zeigt {user2} was PVP bedeutet!\n{user2} hat keine Zeit zu reagieren und geht **k.o.**",
+    "{user1} zeigt {user2} was PVP bedeutet!\n{user2} hat keine Zeit zu reagieren und geht *k.o.*",
 )
 
 
 
 HIT = (
-    "**verprügelt**",
-    "**verdrischt**",
-    "**vermöbelt**",
-    "**haut**",
+    "verprügelt",
+    "verdrischt",
+    "vermöbelt",
+    "haut",
 )
 
 
