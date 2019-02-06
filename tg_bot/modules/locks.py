@@ -79,7 +79,7 @@ def send(update, message, keyboard):
 
 
 def send_lock_msg(bot: Bot, update: Update):
-    user_id = update.effective_message
+    user_id = update.effective_message.caht
 
     print(user_id)
 
