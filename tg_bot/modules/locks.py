@@ -257,8 +257,8 @@ def del_lockables(bot: Bot, update: Update):
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
                 try:
-                    message.delete()
                     send_lock_msg(bot, update)
+                    message.delete()
                 except BadRequest as excp:
                     if excp.message == "Message to delete not found":
                         pass
