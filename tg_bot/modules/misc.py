@@ -92,6 +92,19 @@ SLAP_TEMPLATES = (
     "{user1} holt seine *Legendären* raus und verpasst {user2} eine Abreibung!{extraf}",
     "{user1} präsentiert {user2} seine *Community-Day Attacken* und gibt {user2} Saures!{extraf}",
     "{user1} zeigt {user2} was *PVP* bedeutet!\n\n_{user2} hat keine Zeit zu reagieren und geht k.o._{extraf}",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Doch es erscheint ein verwirrtes Enton!_\n\n*ENTON ENTON*",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke ist sehr effektiv!_{extraf}",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke ist nicht sehr effektiv!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke hat {user2} knapp verfehlt!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_{user2} liegt nun k.o. auf dem Boden!_{extraf}",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_{user2} nimmt die Beine in die Hand und flüchtet!_",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_{user2} war nicht vorbereitet und ist nun k.o._{extraf}",
+    "{user1} beauftragt das *Shiggy-Squad* {user2} zu übefallen.\n_Sie machen es sogar umsonst!_{extraf}",
+    "{user1} packt seine 100%IV Pokémon aus und lässt {user2} vermöbeln!{extraf}",
+    "{user1} lässt {user2} von seinem *Buddy-Pokémon* verdreschen!{extraf}",
+    "{user1} holt seine *Legendären* raus und verpasst {user2} eine Abreibung!{extraf}",
+    "{user1} präsentiert {user2} seine *Community-Day Attacken* und gibt {user2} Saures!{extraf}",
+    "{user1} zeigt {user2} was *PVP* bedeutet!\n\n_{user2} hat keine Zeit zu reagieren und geht k.o._{extraf}",
 )
 
 
