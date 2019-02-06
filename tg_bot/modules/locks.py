@@ -78,7 +78,7 @@ def send(update, message):
 
 
 @user_admin
-def send_lock_msg(bot: Bot, update: Update):
+def send_lock_msg(bot, update):
     #text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
     #keyb = []
     #keyboard = InlineKeyboardMarkup(keyb)
