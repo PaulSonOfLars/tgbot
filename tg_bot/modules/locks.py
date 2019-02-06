@@ -93,7 +93,7 @@ def send_lock_msg(bot, update):
                 bot.delete_message(chat_id, prev_msg)
             except BadRequest as excp:
                 pass
-        retval = sql.set_lock_msgid(chat_id, sentid)
+        retval = sql.set_lock_msgid(chat_id, sentid.message_id)
     except Exception as e:
         print(e)
         pass
