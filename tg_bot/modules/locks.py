@@ -78,7 +78,7 @@ def send(update, message, keyboard):
 
 
 def send_lock_msg(bot, update):
-    text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
+    text = "_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
     keyb = []
     keyboard = InlineKeyboardMarkup(keyb)
     sentid = send(update, text, keyboard)  # type: Optional[Message]
