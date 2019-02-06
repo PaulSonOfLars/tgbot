@@ -41,7 +41,20 @@ class Channels(BASE):
         self.chat_name = chat_name
 
     def __repr__(self):
-        return "<Chat {} ({})>".format(self.chat_name, self.chat_id)
+        return "<Channel {} ({})>".format(self.chat_name, self.chat_id)
+
+
+class LastLockMessage(BASE):
+    __tablename__ = "lastlockmessage"
+    chat_id = Column(String(14), primary_key=True)
+    msg_id = Column(String(14), nullable=False)
+
+    def __init__(self, chat_id, msg_id):
+        self.chat_id = str(chat_id)
+        self.msg_id = str(msg_id)
+
+    def __repr__(self):
+        return "<MSGID {} ({})>".format(self.chat_id, self.msg_id)
 
 
 class ChatMembers(BASE):
@@ -72,6 +85,7 @@ class ChatMembers(BASE):
 Users.__table__.create(checkfirst=True)
 Chats.__table__.create(checkfirst=True)
 Channels.__table__.create(checkfirst=True)
+lastlockmessage.__table__.create(checkfirst=True)
 ChatMembers.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
