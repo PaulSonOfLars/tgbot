@@ -77,7 +77,6 @@ def send(update, message):
 
 
 
-@run_async
 @user_admin
 def send_lock_msg(bot: Bot, update: Update):
     #text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
