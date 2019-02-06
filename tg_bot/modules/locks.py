@@ -2,7 +2,7 @@ import html
 from typing import Optional, List
 
 import telegram.ext as tg
-from telegram import Message, Chat, Update, Bot, ParseMode, User, MessageEntity
+from telegram import Message, Chat, Update, Bot, ParseMode, User, MessageEntity, InlineKeyboardMarkup
 from telegram import TelegramError
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, Filters
