@@ -74,11 +74,11 @@ RUN_STRINGS = (
 SLAP_TEMPLATES = (
     "{user1} {hits} {user2} mit einem {item1}.",
     "{user1} {hits} {user2} ein wenig mit einem {item1}.",
-    "{user1} {throws} ein vergammeltes {item1} auf {user2}.",
-    "{user1} nimmt ein {item1} und {throws} es {user2} an den Kopf.",
-    "{user1} fesselt {user2} and einen Stuhl und jeder {throws} ein {item1} in Richtung Stuhl.",
-    "{user1} nimmt eine verstaubte {item2} und {throws} sie {user2} an den Kopf.",
-    "{user1} fesselt {user2} and einen Stuhl und jeder {throws} eine {item2} in Richtung Stuhl.",
+    "{user1} {throws} ein vergammeltes {item1} auf {user2}.{extraf}",
+    "{user1} nimmt ein {item1} und {throws} es {user2} an den Kopf.{extraf}",
+    "{user1} fesselt {user2} and einen Stuhl und jeder {throws} ein {item1} in Richtung Stuhl.{extraf}",
+    "{user1} nimmt eine verstaubte {item2} und {throws} sie {user2} an den Kopf.{extraf}",
+    "{user1} fesselt {user2} and einen Stuhl und jeder {throws} eine {item2} in Richtung Stuhl.{extraf}",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Doch es erscheint ein verwirrtes Enton!__\n\n*ENTON ENTON*",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke ist sehr effektiv!_",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke ist nicht sehr effektiv!_",
@@ -86,14 +86,28 @@ SLAP_TEMPLATES = (
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_{user2} liegt nun k.o. auf dem Boden!_",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_{user2} nimmt die Beine in die Hand und flüchtet!_",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_{user2} war nicht vorbereitet und ist nun k.o._",
-    "{user1} beauftragt das *Shiggy-Squad* {user2} zu übefallen. _Sie machen es sogar umsonst!_",
+    "{user1} beauftragt das *Shiggy-Squad* {user2} zu übefallen. _Sie machen es sogar umsonst!_{extraf}",
     "{user1} packt seine 100%IV Pokémon aus und lässt {user2} vermöbeln!",
     "{user1} lässt {user2} von seinem *Buddy-Pokémon* verdreschen!",
-    "{user1} holt seine *Legendären* raus und verpasst {user2} eine Abreibung!",
-    "{user1} präsentiert {user2} seine *Community-Day Attacken* und gibt {user2} Saures!",
-    "{user1} zeigt {user2} was PVP bedeutet!\n_{user2} hat keine Zeit zu reagieren und geht k.o._",
+    "{user1} holt seine *Legendären* raus und verpasst {user2} eine Abreibung!{extraf}",
+    "{user1} präsentiert {user2} seine *Community-Day Attacken* und gibt {user2} Saures!{extraf}",
+    "{user1} zeigt {user2} was PVP bedeutet!\n_{user2} hat keine Zeit zu reagieren und geht k.o._{extraf}",
 )
 
+
+EXTRAFUN = (
+    "\n\n_Lubutzi wurde leider in Mitleidenschaft gezogen!_",
+    "\n\n_Moritz wurde leider in Mitleidenschaft gezogen!_",
+    "",
+    "",
+    "",
+    "",
+)
+
+EXTRAFUN_USER = (
+    "@Finte25",
+    "@lubutzi",
+)
 
 
 HIT = (
@@ -200,8 +214,14 @@ def slap(bot: Bot, update: Update, args: List[str]):
 
     hit = random.choice(HIT)
     throw = random.choice(THROW)
+    extraf = random.choice(EXTRAFUN)
 
-    repl = temp.format(user1=user1, user2=user2, item1=item1, item2=item2, hits=hit, throws=throw, pokemonaction=pokemonaction)
+
+
+    if ( str(user2) in EXTRAFUN_USER ):
+        extraf = ""
+
+    repl = temp.format(user1=user1, user2=user2, item1=item1, item2=item2, hits=hit, throws=throw, pokemonaction=pokemonaction, extraf=extraf)
 
     reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
