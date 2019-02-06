@@ -2,7 +2,9 @@
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
 This is a private modification of the group management bot Marie! Which can be found [here](https://t.me/BanhammerMarie_bot)! 
-This modification focuses on expanding the gban feature to channels, and to delete service messages
+This modification focuses on expanding the gban feature to channels, and to delete service messages.
+
+Many things have been translated to german internally, and the slap function has been mofified to reflect pokémon go attacks
 
 Can be found on telegram as [Klikdiklak](https://t.me/Klikdiklak_bot).
 
