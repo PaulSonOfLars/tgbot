@@ -78,12 +78,17 @@ def send(update, message, keyboard):
 
 
 def send_lock_msg(bot, update):
-    text = "_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
+    msg = update.effective_message  # type: Optional[Message]
+    curr_user = "@" + escape_markdown(msg.from_user.username)
+
+    text = "Hey "+curr_user+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
     keyb = []
     keyboard = InlineKeyboardMarkup(keyb)
     sentid = send(update, text, keyboard)  # type: Optional[Message]
 
     chat = update.effective_chat  # type: Optional[Chat]
+
+
     try:
         chat_id = chat.id
         prev_msg = sql.get_lock_msgid(chat_id)
