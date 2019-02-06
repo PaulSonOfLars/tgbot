@@ -249,8 +249,6 @@ def del_lockables(bot: Bot, update: Update):
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
                 try:              
-                    curr_user = "@" + escape_markdown(message.from_user.username)
-                    print(curr_user)
 
                     send_lock_msg(bot, update)
                     message.delete()
