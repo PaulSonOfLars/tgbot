@@ -70,6 +70,7 @@ def send(update, message, keyboard):
     try:
         msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
+        print("1")
         print(e)
 
     return msg
@@ -80,13 +81,9 @@ def send(update, message, keyboard):
 @user_admin
 def send_lock_msg(bot: Bot, update: Update):
     text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
-    print("1")
     keyb = []
     keyboard = InlineKeyboardMarkup(keyb)
-    print("2")
     sentid = send(update, text, keyboard)  # type: Optional[Message]
-    print("3")
-
 
     chat = update.effective_chat  # type: Optional[Chat]
     try:
@@ -241,9 +238,11 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
 def del_lockables(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
-
+    print("1.5")
     for lockable, filter in LOCK_TYPES.items():
+        print("1.8")
         if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
+            print("2")
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
                 for new_mem in new_members:
@@ -256,6 +255,7 @@ def del_lockables(bot: Bot, update: Update):
                         chat.kick_member(new_mem.id)
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
+                print("3")
                 try:
                     send_lock_msg(bot, update)
                     message.delete()
