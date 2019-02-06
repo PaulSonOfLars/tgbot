@@ -87,7 +87,7 @@ def send_lock_msg(bot: Bot, update: Update, args: List[str]):
    #         user2 = "@" + escape_markdown(slapped_user.username)
    #     else:
    #         user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-                                                   slapped_user.id)
+   #                                                slapped_user.id)
 
 
 
