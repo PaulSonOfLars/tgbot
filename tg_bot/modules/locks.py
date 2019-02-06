@@ -78,7 +78,23 @@ def send(update, message, keyboard):
 
 
 def send_lock_msg(bot, update):
-    text = "Hey "+curr_user+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
+    user_id = extract_user(update.effective_message)
+    if user_id:
+        slapped_user = bot.get_chat(user_id)
+        if slapped_user.username:
+            user2 = "@" + escape_markdown(slapped_user.username)
+        else:
+            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
+                                                   slapped_user.id)
+
+
+
+
+    #msg = update.effective_message  # type: Optional[Message]
+    #curr_user = "@" + escape_markdown(msg.from_user.username)
+    print(user2)
+
+    text = "Hey "+user2+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
     keyb = []
     keyboard = InlineKeyboardMarkup(keyb)
     sentid = send(update, text, keyboard)  # type: Optional[Message]
@@ -248,8 +264,7 @@ def del_lockables(bot: Bot, update: Update):
                         chat.kick_member(new_mem.id)
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
-                try:              
-
+                try:
                     send_lock_msg(bot, update)
                     message.delete()
                 except BadRequest as excp:
