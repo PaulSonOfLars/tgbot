@@ -79,13 +79,14 @@ def send(update, message, keyboard):
 
 
 def send_lock_msg(bot: Bot, update: Update, args: List[str]):
-    user_id = extract_user(update.effective_message, args)
-    if user_id:
-        slapped_user = bot.get_chat(user_id)
-        if slapped_user.username:
-            user2 = "@" + escape_markdown(slapped_user.username)
-        else:
-            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
+    user_id = update.effective_message
+    print(user_id)
+   # if user_id:
+   #     slapped_user = bot.get_chat(user_id)
+   #     if slapped_user.username:
+   #         user2 = "@" + escape_markdown(slapped_user.username)
+   #     else:
+   #         user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
                                                    slapped_user.id)
 
 
@@ -93,7 +94,7 @@ def send_lock_msg(bot: Bot, update: Update, args: List[str]):
 
     #msg = update.effective_message  # type: Optional[Message]
     #curr_user = "@" + escape_markdown(msg.from_user.username)
-    print(user2)
+    #print(user2)
 
     text = "Hey "+user2+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
     keyb = []
@@ -266,7 +267,7 @@ def del_lockables(bot: Bot, update: Update):
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
                 try:
-                    send_lock_msg(bot, update, [])
+                    send_lock_msg(bot, update)
                     message.delete()
                 except BadRequest as excp:
                     if excp.message == "Message to delete not found":
