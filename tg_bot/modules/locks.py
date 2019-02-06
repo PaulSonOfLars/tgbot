@@ -79,9 +79,7 @@ def send(update, message, keyboard):
 
 
 def send_lock_msg(bot: Bot, update: Update):
-    user_id = update.effective_message.'from'
-
-    print(user_id)
+    user_id = update.callback_query.from_user
 
     print(user_id)
    # if user_id:
