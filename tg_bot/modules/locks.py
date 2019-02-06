@@ -78,7 +78,7 @@ def send(update, message, keyboard):
 
 
 
-def send_lock_msg(bot, update):
+def send_lock_msg(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(update.effective_message)
     if user_id:
         slapped_user = bot.get_chat(user_id)
