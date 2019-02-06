@@ -80,8 +80,6 @@ def send(update, message, keyboard):
 
 def send_lock_msg(bot: Bot, update: Update):
     user_id = update.effective_user.id
-
-    print(user_id)
     if user_id:
         slapped_user = bot.get_chat(user_id)
         if slapped_user.username:
@@ -89,21 +87,15 @@ def send_lock_msg(bot: Bot, update: Update):
         else:
             user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
                                                    slapped_user.id)
+        text = "Hey "+user2+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
+    else:
+        text = "_Die letzte Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
 
-
-
-
-    #msg = update.effective_message  # type: Optional[Message]
-    #curr_user = "@" + escape_markdown(msg.from_user.username)
-    #print(user2)
-
-    text = "Hey "+user2+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
     keyb = []
     keyboard = InlineKeyboardMarkup(keyb)
     sentid = send(update, text, keyboard)  # type: Optional[Message]
 
     chat = update.effective_chat  # type: Optional[Chat]
-
 
     try:
         chat_id = chat.id
@@ -361,6 +353,9 @@ eg:
 Locking urls will auto-delete all messages with urls, locking stickers will delete all \
 stickers, etc.
 Locking bots will stop non-admins from adding bots to the chat.
+
+Once a message has been deleted a notification will be shown and the last sent \
+notification will be deleted.
 """
 
 __mod_name__ = "Media Type Locks"
