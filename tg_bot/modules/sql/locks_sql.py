@@ -88,6 +88,7 @@ LastLockMessage.__table__.create(checkfirst=True)
 PERM_LOCK = threading.RLock()
 RESTR_LOCK = threading.RLock()
 
+INSERTION_LOCK = threading.RLock()
 
 def init_permissions(chat_id, reset=False):
     curr_perm = SESSION.query(Permissions).get(str(chat_id))
