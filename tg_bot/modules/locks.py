@@ -86,6 +86,7 @@ def send_lock_msg(bot: Bot, update: Update):
     sentid = "999"
 
     chat = update.effective_chat  # type: Optional[Chat]
+    print(chat.id)
     try:
         chat_id = chat.id
         prev_msg = sql.get_lock_msgid(chat_id)
