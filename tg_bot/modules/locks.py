@@ -85,6 +85,7 @@ def send_lock_msg(bot: Bot, update: Update):
     #sentid = send(update, text, keyboard)  # type: Optional[Message]
     sentid = "999"
 
+    print("blaaa")
     chat = update.effective_chat  # type: Optional[Chat]
     print(chat.id)
     try:
