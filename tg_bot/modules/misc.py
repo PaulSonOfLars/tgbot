@@ -73,7 +73,7 @@ RUN_STRINGS = (
 
 SLAP_TEMPLATES = (
     "{user1} {hits} {user2} mit einem {item1}.",
-    "{user1} {hits} {user2} ein wenig mit einem {itemm}.",
+    "{user1} {hits} {user2} ein wenig mit einem {item1}.",
     "{user1} {throws} ein vergammeltes {item1} auf {user2}.",
     "{user1} nimmt ein {item1} und {throws} es {user2} an den Kopf.",
     "{user1} fesselt {user2} and einen Stuhl und jeder {throws} ein {item1} an den Kopf.",
