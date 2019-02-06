@@ -78,7 +78,7 @@ def send(update, message, keyboard):
 
 
 
-def send_lock_msg(bot: Bot, update: Update, args: List[str]):
+def send_lock_msg(bot: Bot, update: Update):
     user_id = update.effective_message
     print(user_id)
    # if user_id:
