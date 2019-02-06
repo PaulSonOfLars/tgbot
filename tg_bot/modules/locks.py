@@ -66,7 +66,7 @@ tg.CommandHandler = CustomCommandHandler
 
 
 # do not async
-def send(update, message, keyboard):
+def send(update, message):
     try:
         msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
