@@ -80,10 +80,11 @@ def send(update, message, keyboard):
 @run_async
 @user_admin
 def send_lock_msg(bot: Bot, update: Update):
-    text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
-    keyb = []
-    keyboard = InlineKeyboardMarkup(keyb)
-    sentid = send(update, text, keyboard)  # type: Optional[Message]
+    #text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
+    #keyb = []
+    #keyboard = InlineKeyboardMarkup(keyb)
+    #sentid = send(update, text, keyboard)  # type: Optional[Message]
+    sentid = "999"
 
     chat = update.effective_chat  # type: Optional[Chat]
     try:
@@ -95,10 +96,7 @@ def send_lock_msg(bot: Bot, update: Update):
                 bot.delete_message(chat_id, prev_msg)
             except BadRequest as excp:
                 pass
-
         retval = sql.set_lock_msgid(chat_id, sentid)
-
-
     except Exception as e:
         print(e)
         pass
@@ -257,7 +255,7 @@ def del_lockables(bot: Bot, update: Update):
             else:
                 print("3")
                 try:
-                    #send_lock_msg(bot, update)
+                    send_lock_msg(bot, update)
                     message.delete()
                 except BadRequest as excp:
                     if excp.message == "Message to delete not found":
