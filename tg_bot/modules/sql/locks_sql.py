@@ -261,12 +261,12 @@ def migrate_chat(old_chat_id, new_chat_id):
 
 def set_lock_msgid(chat_id, msg_id):
     with INSERTION_LOCK:
-        msgid = SESSION.query(LastLockMessage).get(chat_id)
+        msgid = SESSION.query(LastLockMessage).get(str(chat_id))
         print(msgid)
         if msgid:
             SESSION.delete(msgid)
             SESSION.commit()
-        msgid = LastLockMessage(chat_id, msg_id)
+        msgid = LastLockMessage(str(chat_id), str(msg_id))
         SESSION.add(msgid)
         SESSION.commit()
         
