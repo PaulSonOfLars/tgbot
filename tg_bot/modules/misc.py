@@ -86,12 +86,12 @@ SLAP_TEMPLATES = (
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n{user2} _liegt nun k.o. auf dem Boden!_",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n{user2} _nimmt die Beine in die Hand und flüchtet!_",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n{user2} _war nicht vorbereitet und ist nun k.o._",
-    "{user1} beauftragt das *Shiggy-Squad* {user2} zu übefallen.\n_Sie machen es sogar umsonst!_",
+    "{user1} beauftragt das Shiggy-Squad {user2} zu übefallen. Sie machen es sogar umsonst!",
     "{user1} packt seine 100%IV Pokémon aus und lässt {user2} vermöbeln!",
-    "{user1} lässt {user2} von seinem *Buddy-Pokémon* verdreschen!",
-    "{user1} holt seine *Legendären* raus und verpasst {user2} eine Abreibung!",
-    "{user1} präsentiert {user2} seine *Community-Day Attacken* und gibt {user2} Saures!",
-    "{user1} zeigt {user2} was *PVP* bedeutet!\n{user2} _hat keine Zeit zu reagieren und geht k.o._",
+    "{user1} lässt {user2} von seinem Buddy-Pokémon verdreschen!",
+    "{user1} holt seine Legendären raus und verpasst {user2} eine Abreibung!",
+    "{user1} präsentiert {user2} seine Community-Day Attacken und gibt {user2} Saures!",
+    "{user1} zeigt {user2} was PVP bedeutet!\n{user2} hat keine Zeit zu reagieren und geht *k.o.*",
 )
 
 
