@@ -63,26 +63,45 @@ tg.CommandHandler = CustomCommandHandler
 
 
 
+
+
+# do not async
+def send(update, message, keyboard):
+    try:
+        msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+    except Exception as e:
+        print(e)
+
+    return msg
+
+
+
 @run_async
 @user_admin
-def add_lockmsg(bot: Bot, update: Update):
-    args = update.effective_message.text.split(None, 1)
-    message = update.effective_message
-    try:
-        data = args[1]
-        args2 = data.split(None, 1)
-        channel_id = args2[0]
+def send_lock_msg(bot: Bot, update: Update):
+    text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
+    keyb = []
+    keyboard = InlineKeyboardMarkup(keyb)
+    sentid = send(update, text, keyboard)  # type: Optional[Message]
 
-        channel_name = args2[1]
-        retval = sql.add_lock_msgid(channel_id, msg_id)
+
+    chat = update.effective_chat  # type: Optional[Chat]
+    try:
+        chat_id = chat.id
+        prev_msg = sql.get_lock_msgid(chat_id)
+
+        if prev_msg:
+            try:
+                bot.delete_message(chat_id, prev_msg)
+            except BadRequest as excp:
+                pass
+
+        retval = sql.set_lock_msgid(chat_id, sentid)
+
 
     except Exception as e:
-        text = "You need to give me a channel id and a name in order to add it!\n/addchannel <chat id> <chat name>"
-        if message.reply_to_message:
-            message.reply_to_message.reply_text(text)
-        else:
-            message.reply_text(text, quote=False)
-
+        print(e)
+        pass
 
 
 
@@ -236,6 +255,7 @@ def del_lockables(bot: Bot, update: Update):
             else:
                 try:
                     message.delete()
+                    send_lock_msg(bot, update)
                 except BadRequest as excp:
                     if excp.message == "Message to delete not found":
                         pass
