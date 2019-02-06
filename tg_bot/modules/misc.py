@@ -479,7 +479,7 @@ ID_HANDLER = DisableAbleCommandHandler("id", get_id, pass_args=True)
 
 #RUNS_HANDLER = DisableAbleCommandHandler("runs", runs)
 SLAP_HANDLER = DisableAbleCommandHandler("slap", slap, pass_args=True)
-ATTACK_HANDLER = DisableAbleCommandHandler("attack", attack, pass_args=True)
+ATTACK_HANDLER = DisableAbleCommandHandler("attack", slap, pass_args=True)
 
 INFO_HANDLER = DisableAbleCommandHandler("info", info, pass_args=True)
 
