@@ -85,7 +85,7 @@ class ChatMembers(BASE):
 Users.__table__.create(checkfirst=True)
 Chats.__table__.create(checkfirst=True)
 Channels.__table__.create(checkfirst=True)
-lastlockmessage.__table__.create(checkfirst=True)
+LastLockMessage.__table__.create(checkfirst=True)
 ChatMembers.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
