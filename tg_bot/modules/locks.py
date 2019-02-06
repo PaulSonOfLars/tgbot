@@ -62,6 +62,31 @@ class CustomCommandHandler(tg.CommandHandler):
 tg.CommandHandler = CustomCommandHandler
 
 
+
+@run_async
+@user_admin
+def add_lockmsg(bot: Bot, update: Update):
+    args = update.effective_message.text.split(None, 1)
+    message = update.effective_message
+    try:
+        data = args[1]
+        args2 = data.split(None, 1)
+        channel_id = args2[0]
+
+        channel_name = args2[1]
+        retval = sql.add_lock_msgid(channel_id, msg_id)
+
+    except Exception as e:
+        text = "You need to give me a channel id and a name in order to add it!\n/addchannel <chat id> <chat name>"
+        if message.reply_to_message:
+            message.reply_to_message.reply_text(text)
+        else:
+            message.reply_text(text, quote=False)
+
+
+
+
+
 # NOT ASYNC
 def restr_members(bot, chat_id, members, messages=False, media=False, other=False, previews=False):
     for mem in members:

@@ -66,9 +66,24 @@ class Restrictions(BASE):
         return "<Restrictions for %s>" % self.chat_id
 
 
+
+class LastLockMessage(BASE):
+    __tablename__ = "lastlockmessage"
+    chat_id = Column(String(14), primary_key=True)
+    msg_id = Column(String(14), nullable=False)
+
+    def __init__(self, chat_id, msg_id):
+        self.chat_id = str(chat_id)
+        self.msg_id = str(msg_id)
+
+    def __repr__(self):
+        return "<MSGID {} ({})>".format(self.chat_id, self.msg_id)
+
+
+
 Permissions.__table__.create(checkfirst=True)
 Restrictions.__table__.create(checkfirst=True)
-
+LastLockMessage.__table__.create(checkfirst=True)
 
 PERM_LOCK = threading.RLock()
 RESTR_LOCK = threading.RLock()
@@ -240,3 +255,18 @@ def migrate_chat(old_chat_id, new_chat_id):
         if rest:
             rest.chat_id = str(new_chat_id)
         SESSION.commit()
+
+
+
+def add_lock_msgid(chat_id, msg_id):
+    with INSERTION_LOCK:
+        msgid = SESSION.query(LastLockMessage).get(chat_id)
+        if msgid:
+            SESSION.delete(msgid)
+            SESSION.commit()
+        msgid = Channels(chat_id, msg_id)
+        SESSION.add(msgid)
+        SESSION.commit()
+        
+
+
