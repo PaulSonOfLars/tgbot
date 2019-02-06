@@ -79,7 +79,7 @@ SLAP_TEMPLATES = (
     "{user1} fesselt {user2} and einen Stuhl und jeder {throws} ein {item1} in Richtung Stuhl.{extraf}",
     "{user1} nimmt eine verstaubte {item2} und {throws} sie {user2} an den Kopf.{extraf}",
     "{user1} fesselt {user2} and einen Stuhl und jeder {throws} eine {item2} in Richtung Stuhl.{extraf}",
-    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Doch es erscheint ein verwirrtes Enton!__\n\n*ENTON ENTON*",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Doch es erscheint ein verwirrtes Enton!_\n\n*ENTON ENTON*",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke ist sehr effektiv!_",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke ist nicht sehr effektiv!_",
     "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '_{pokemonaction}_'...\n\n_Die Attacke hat {user2} knapp verfehlt!_",
