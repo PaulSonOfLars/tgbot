@@ -16,7 +16,7 @@ from tg_bot.__main__ import STATS, USER_INFO
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.extraction import extract_user
 from tg_bot.modules.helper_funcs.filters import CustomFilters
-
+from tg_bot.modules.helper_funcs.chat_status import user_admin, is_user_admin
 
 RUN_STRINGS = (
     "Where do you think you're going?",
@@ -285,6 +285,7 @@ def get_id(bot: Bot, update: Update, args: List[str]):
 
 
 @run_async
+@user_admin
 def info(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     user_id = extract_user(update.effective_message, args)
@@ -476,7 +477,7 @@ ID_HANDLER = DisableAbleCommandHandler("id", get_id, pass_args=True)
 
 #TIME_HANDLER = CommandHandler("time", get_time, pass_args=True)
 
-RUNS_HANDLER = DisableAbleCommandHandler("runs", runs)
+#RUNS_HANDLER = DisableAbleCommandHandler("runs", runs)
 SLAP_HANDLER = DisableAbleCommandHandler("slap", slap, pass_args=True)
 INFO_HANDLER = DisableAbleCommandHandler("info", info, pass_args=True)
 
@@ -491,7 +492,7 @@ GDPR_HANDLER = CommandHandler("dsgvo", dsgvo, filters=Filters.private)
 dispatcher.add_handler(ID_HANDLER)
 #dispatcher.add_handler(IP_HANDLER)
 # dispatcher.add_handler(TIME_HANDLER)
-dispatcher.add_handler(RUNS_HANDLER)
+#dispatcher.add_handler(RUNS_HANDLER)
 dispatcher.add_handler(SLAP_HANDLER)
 dispatcher.add_handler(INFO_HANDLER)
 dispatcher.add_handler(ECHO_HANDLER)
