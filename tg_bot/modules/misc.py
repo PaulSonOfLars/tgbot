@@ -105,7 +105,6 @@ EXTRAFUN = (
 )
 
 EXTRAFUN_USER = (
-    "@Finte25",
     "@lubutzi",
 )
 
