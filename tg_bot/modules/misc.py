@@ -222,6 +222,8 @@ def slap(bot: Bot, update: Update, args: List[str]):
 
     repl = temp.format(user1=user1, user2=user2, item1=item1, item2=item2, hits=hit, throws=throw, pokemonaction=pokemonaction, extraf=extraf)
 
+    print(repl)
+
     reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
 
