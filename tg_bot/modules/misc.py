@@ -70,66 +70,89 @@ RUN_STRINGS = (
     "As The Doctor would say... RUN!",
 )
 
+
 SLAP_TEMPLATES = (
-    "{user1} {hits} {user2} with a {item}.",
-    "{user1} {hits} {user2} in the face with a {item}.",
-    "{user1} {hits} {user2} around a bit with a {item}.",
-    "{user1} {throws} a {item} at {user2}.",
-    "{user1} grabs a {item} and {throws} it at {user2}'s face.",
-    "{user1} launches a {item} in {user2}'s general direction.",
-    "{user1} starts slapping {user2} silly with a {item}.",
-    "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
-    "{user1} grabs up a {item} and {hits} {user2} with it.",
-    "{user1} ties {user2} to a chair and {throws} a {item} at them.",
-    "{user1} gave a friendly push to help {user2} learn to swim in lava."
+    "{user1} {hits} {user2} mit einem {item1}.",
+    "{user1} {hits} {user2} ein wenig mit einem {itemm}.",
+    "{user1} {throws} ein vergammeltes {item1} auf {user2}.",
+    "{user1} nimmt ein {item1} und {throws} es {user2} an den Kopf.",
+    "{user1} fesselt {user2} and einen Stuhl und jeder {throws} ein {item1} an den Kopf.",
+    "{user1} nimmt eine verstaubte {item2} und {throws} sie {user2} an den Kopf.",
+    "{user1} fesselt {user2} and einen Stuhl und jeder {throws} eine {item2} an den Kopf.",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n Doch es erscheint ein verwirrtes Enton!\n\n**ENTON ENTON**",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n Die Attacke ist sehr effektiv!",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n Die Attacke ist nicht sehr effektiv!",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n Die Attacke hat {user2} knapp verfehlt!",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} liegt nun k/o auf dem Boden!",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} nimmt die Beine in die Hand und flüchtet!",
+    "{user1} {throws} einen Pokéball in Richtung {user2} und ruft '{pokemonaction}'...\n\n {user2} war nicht vorbereitet und ist nun k/o",
+    "{user1} beauftragt das Shiggy-Squad {user2} zu übefallen. Sie machen es sogar umsonst!",
+    "{user1} packt seine 100%IV Pokémon aus und lässt {user2} vermöbeln!",
+    "{user1} lässt {user2} von seinem Buddy-Pokémon verdreschen!",
+    "{user1} holt seine Legendären raus und verpasst {user2} eine Abreibung!",
+    "{user1} präsentiert {user2} seine Community-Day Attacken und gibt {user2} Saures!",
+    "{user1} zeigt {user2} was PVP bedeutet!\n{user2} hat keine Zeit zu reagieren und geht k/o..",
 )
 
-ITEMS = (
-    "cast iron skillet",
-    "large trout",
-    "baseball bat",
-    "cricket bat",
-    "wooden cane",
-    "nail",
-    "printer",
-    "shovel",
-    "CRT monitor",
-    "physics textbook",
-    "toaster",
-    "portrait of Richard Stallman",
-    "television",
-    "five ton truck",
-    "roll of duct tape",
-    "book",
-    "laptop",
-    "old television",
-    "sack of rocks",
-    "rainbow trout",
-    "rubber chicken",
-    "spiked bat",
-    "fire extinguisher",
-    "heavy rock",
-    "chunk of dirt",
-    "beehive",
-    "piece of rotten meat",
-    "bear",
-    "ton of bricks",
+
+
+HIT = (
+    "verprügelt",
+    "verdrischt",
+    "vermöbelt",
+    "haut",
+)
+
+
+ITEMS1 = (
+    "Glücksei",
+    "Lockmodul",
+    "Geschenk",
+    "Sternenstück",
+    "Up-Grade",
+    "Sonderbonbon",
+)
+
+ITEMS2 = (
+    "Drachenhaut",
+    "Ei-Brutmaschine",
+    "Himmihbeere",
+    "Sananabeere",
+    "Sofort-TM",
+)
+
+
+
+POKEMON = (
+    "Bisaknosp, du bist dran!",
+    "Glurak! Lohekanonade!",
+    "Machomei, nutz deinen Wuchtschlag!",
+    "Turtok, du bist dran!",
+    "Turtok! Aquahaubitze!",
+    "Meganie, du bist dran!",
+    "Meganie! Flora-Statue!",
+    "Tornupto, du bist dran!",
+    "Tornupto! Lohekanonade!",
+    "Impergator! Hydropumpe!",
+    "Impergator, du bist dran!",
+    "Gealdro, du bist dran!",
+    "Lohgock, du bist dran!",
+    "Sumpex, du bist dran!",
+    "Chelterrar, du bist dran!",
+    "Panferno, du bist dran!",
+    "Impoleon, du bist dran!",
 )
 
 THROW = (
-    "throws",
-    "flings",
-    "chucks",
-    "hurls",
+    "wirft",
+    "schleudert",
+    "schmettert",
+    "feuert",
+    "katapultiert",
+    "schmeißt",
 )
 
-HIT = (
-    "hits",
-    "whacks",
-    "slaps",
-    "smacks",
-    "bashes",
-)
+
 
 GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
 GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
@@ -169,11 +192,16 @@ def slap(bot: Bot, update: Update, args: List[str]):
         user2 = curr_user
 
     temp = random.choice(SLAP_TEMPLATES)
-    item = random.choice(ITEMS)
+    item1 = random.choice(ITEMS1)
+    item2 = random.choice(ITEMS2)
+
+
+    pokemonaction = random.choice(POKEMON)
+
     hit = random.choice(HIT)
     throw = random.choice(THROW)
 
-    repl = temp.format(user1=user1, user2=user2, item=item, hits=hit, throws=throw)
+    repl = temp.format(user1=user1, user2=user2, item1=item1, item2=item2, hits=hit, throws=throw, pokemonaction=pokemonaction)
 
     reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
