@@ -66,7 +66,7 @@ tg.CommandHandler = CustomCommandHandler
 
 
 # do not async
-def send(update, message):
+def send(update, message, keyboard):
     try:
         msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
@@ -78,8 +78,25 @@ def send(update, message):
 
 
 def send_lock_msg(bot, update):
-    print("test")
+    text = "Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!\nDaher wurde sie gelöscht!"
+    keyb = []
+    keyboard = InlineKeyboardMarkup(keyb)
+    sentid = send(update, text, keyboard)  # type: Optional[Message]
 
+    chat = update.effective_chat  # type: Optional[Chat]
+    try:
+        chat_id = chat.id
+        prev_msg = sql.get_lock_msgid(chat_id)
+
+        if prev_msg:
+            try:
+                bot.delete_message(chat_id, prev_msg)
+            except BadRequest as excp:
+                pass
+        retval = sql.set_lock_msgid(chat_id, sentid)
+    except Exception as e:
+        print(e)
+        pass
 
 
 
