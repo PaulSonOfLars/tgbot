@@ -79,16 +79,16 @@ def send(update, message, keyboard):
 
 
 def send_lock_msg(bot: Bot, update: Update):
-    user_id = update.effective_user
+    user_id = update.effective_user.id
 
     print(user_id)
-   # if user_id:
-   #     slapped_user = bot.get_chat(user_id)
-   #     if slapped_user.username:
-   #         user2 = "@" + escape_markdown(slapped_user.username)
-   #     else:
-   #         user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-   #                                                slapped_user.id)
+    if user_id:
+        slapped_user = bot.get_chat(user_id)
+        if slapped_user.username:
+            user2 = "@" + escape_markdown(slapped_user.username)
+        else:
+            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
+                                                   slapped_user.id)
 
 
 
