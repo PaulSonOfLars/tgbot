@@ -34,7 +34,7 @@ class iLikes_Clicks(BASE):
     thanks = Column(Integer, nullable=False)
     notfound = Column(Integer, nullable=False)
 
-    def __init__(self, ilikes_click_id, user_id, found, thanks, notfound):
+    def __init__(self, ilikes_click_id, found, thanks, notfound):
         self.ilikes_click_id = str(ilikes_id)
         self.found = str(found)
         self.thanks = str(thanks)
@@ -64,6 +64,24 @@ def add_iLike(chat_id, msg_id):
         ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
         if not ilikes_id:
             ilikes_id = iLikes(new_ilikes_id)
+            SESSION.add(ilikes_id)
+            SESSION.commit()
+            return True
+        else:
+            return False
+
+
+def add_iLike_Click(chat_id, msg_id, user_id, key):
+    with INSERTION_LOCK:
+        new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
+        ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
+        if not ilikes_id:
+        	if ( str(key) == "thanks_key1"):
+                ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
+        	if ( str(key) == "thanks_key2"):
+                ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
+        	if ( str(key) == "thanks_key3"):
+                ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
             SESSION.add(ilikes_id)
             SESSION.commit()
             return True
