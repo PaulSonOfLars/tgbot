@@ -26,7 +26,7 @@ def send(update, message, keyboard):
     try:
         chat_id = update.effective_chat.id
         #msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
-        bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+        msg = bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
         print(e)
 
