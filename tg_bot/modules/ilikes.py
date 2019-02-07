@@ -103,7 +103,7 @@ def get_like_buttons(bot: Bot, update: Update):
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
 
-    print(sentid)
+    print(sent_id)
 
 
 __help__ = """
