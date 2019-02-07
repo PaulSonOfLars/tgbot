@@ -80,7 +80,7 @@ def settings_button(bot: Bot, update: Update):
     user = update.effective_user
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
-    message_id = update.effective_message.id
+    message_id = update.effective_message.message_id
     print("button pressed")
     print(query.data)
     print("")
