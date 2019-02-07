@@ -64,7 +64,8 @@ def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     if Filters.location(msg):
-        get_like_buttons(bot, update)
+        if ( sql.ilikes_enabled(chat.id) == True ):
+            get_like_buttons(bot, update)
 
 
 @run_async
@@ -141,8 +142,9 @@ This module sends Buttons if a Location has been sent to a chat.
 
 __mod_name__ = "Location Likes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
+settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
+dispatcher.add_handler(settings_callback_handler)
 
 settings_handler = CommandHandler("ilike", get_like_buttons)
-settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
 dispatcher.add_handler(settings_handler)
-dispatcher.add_handler(settings_callback_handler)
+
