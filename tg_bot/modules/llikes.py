@@ -200,6 +200,10 @@ def rest_handler(bot: Bot, update: Update):
 
     for restriction, filter in RESTRICTION_TYPES.items():
         print("hi")
+        if Filters.location(msg):
+            print("treffer")
+
+
         if filter(msg):
             try:
                 print("bla")
