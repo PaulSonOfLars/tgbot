@@ -47,16 +47,20 @@ def settings_button(bot: Bot, update: Update):
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
     message_id = update.effective_message.message_id
-    print("button pressed")
-    print(query.data)
-    print("")
-    print(query)
-    print("")
-    print(user_id)
-    print("")
-    print(chat_id)
-    print("")
-    print(message_id)
+    key = query.data
+#    print("button pressed")
+#    print(query.data)
+#    print("")
+#    print(query)
+#    print("")
+#    print(user_id)
+#    print("")
+#    print(chat_id)
+#    print("")
+#    print(message_id)
+
+
+    sql.add_iLike_Click(chat_id, message_id, user_id, key):
 
             # ensure no spinny white circle
     bot.answer_callback_query(query.id)
