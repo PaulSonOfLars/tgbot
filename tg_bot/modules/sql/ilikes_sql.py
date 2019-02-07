@@ -117,21 +117,25 @@ def del_notfound_count(ilikes_id):
 
 def add_iLike_Click(chat_id, msg_id, user_id, key):
     with INSERTION_LOCK:
+        new_ilikes_main_id = str(chat_id)+str(msg_id)
         new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
         ilikes_id = SESSION.query(iLikes_Clicks).get(str(new_ilikes_id))
         if not ilikes_id:
             if ( str(key) == "thanks_key1"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
+            	add_found_count(new_ilikes_main_id)
             if ( str(key) == "thanks_key2"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
+            	add_thanks_count(new_ilikes_main_id)
             if ( str(key) == "thanks_key3"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
+            	add_notfound_count(new_ilikes_main_id)
             SESSION.add(ilikes_id)
             SESSION.commit()
             return True
         else:
 
-            new_ilikes_id = str(chat_id)+str(msg_id)
+            new_ilikes_id = new_ilikes_main_id
             old_found = ilikes_id.found
             old_thanks = ilikes_id.thanks
             old_notfound = ilikes_id.notfound
