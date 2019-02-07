@@ -107,10 +107,7 @@ def get_settings(bot: Bot, update: Update):
 
     text = "Danke für deinen Beitrag!"
     msg.reply_text(text,
-                   reply_markup=InlineKeyboardMarkup(
-                       [[InlineKeyboardButton(text="Settings",
-                                              url="t.me/{}?start=stngs_{}".format(
-                                                          bot.username, chat.id))]]))
+                   reply_markup=reply_markup)
 
 
 
