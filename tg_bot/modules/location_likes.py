@@ -79,6 +79,8 @@ def settings_button(bot: Bot, update: Update):
     query = update.callback_query
     user = update.effective_user
     print("button pressed")
+            # ensure no spinny white circle
+    bot.answer_callback_query(query.id)
 
 def build_menu(buttons,
                n_cols,
@@ -116,7 +118,6 @@ def get_settings(bot: Bot, update: Update):
         InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
-
 
     text = "Danke für deinen Beitrag!"
     msg.reply_text(text,
