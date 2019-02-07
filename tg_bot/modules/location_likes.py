@@ -79,6 +79,16 @@ def settings_button(bot: Bot, update: Update):
     query = update.callback_query
     user = update.effective_user
 
+def build_menu(buttons,
+               n_cols,
+               header_buttons=None,
+               footer_buttons=None):
+    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
+    if header_buttons:
+        menu.insert(0, header_buttons)
+    if footer_buttons:
+        menu.append(footer_buttons)
+    return menu
 
 @run_async
 def get_settings(bot: Bot, update: Update):
@@ -92,11 +102,18 @@ def get_settings(bot: Bot, update: Update):
         InlineKeyboardButton("col2", callback_data=...),
         InlineKeyboardButton("row 2", callback_data=...)
     ]
-    reply_markup = InlineKeyboardMarkup(util.build_menu(button_list, n_cols=2))
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
 
 
     text = "Danke für deinen Beitrag!"
-    msg.reply_text(text, reply_markup=reply_markup)
+    msg.reply_text(text,
+                   reply_markup=InlineKeyboardMarkup(
+                       [[InlineKeyboardButton(text="Settings",
+                                              url="t.me/{}?start=stngs_{}".format(
+                                                          bot.username, chat.id))]]))
+
+
+
 
 __help__ = """
 This module sends Buttons if a Location has been sent to a chat.
