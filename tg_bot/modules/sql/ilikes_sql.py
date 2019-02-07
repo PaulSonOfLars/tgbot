@@ -157,11 +157,14 @@ def toggle_ilikes(chat_id):
             ilike_setting = iLikes_Settings(chat_id)
             SESSION.add(ilike_setting)
             SESSION.commit()
+            return True
         else:
             if ( ilikes_data.enabled == True ):
                 disable_ilikes(chat_id)
+                return False
             else:
                 enable_ilikes(chat_id)
+                return True
 
 
 def add_iLike_Click(chat_id, msg_id, user_id, key):

@@ -28,7 +28,15 @@ def send(bot: Bot, update: Update, message, keyboard):
         msg = bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
         print(e)
+    return msg
 
+
+
+def send_reply(update, message, keyboard):
+    try:
+        msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+    except Exception as e:
+        print(e)
     return msg
 
 
@@ -105,7 +113,12 @@ def build_menu(buttons,
 @user_admin
 def toggle_ilikes(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
-    sql.toggle_ilikes(chat_id)
+    retval = sql.toggle_ilikes(chat_id)
+    if ( retval == True ):
+        msg = "iLikes wurde für Standorte aktiviert"
+    else:
+        msg = "iLikes wurde für Standorte wieder de-aktiviert"
+    send_reply(update, msg, [])
 
 
 @run_async
