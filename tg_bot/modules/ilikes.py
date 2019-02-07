@@ -60,7 +60,7 @@ def settings_button(bot: Bot, update: Update):
 #    print(message_id)
 
 
-    sql.add_iLike_Click(chat_id, message_id, user_id, key):
+    sql.add_iLike_Click(chat_id, message_id, user_id, key)
 
             # ensure no spinny white circle
     bot.answer_callback_query(query.id)
