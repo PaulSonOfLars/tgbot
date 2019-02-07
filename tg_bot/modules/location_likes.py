@@ -105,4 +105,4 @@ dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_han
 settings_handler = CommandHandler("likeit", get_settings)
 settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"stngs_")
 dispatcher.add_handler(settings_handler)
-sdispatcher.add_handler(settings_callback_handler)
+dispatcher.add_handler(settings_callback_handler)
