@@ -146,11 +146,13 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                     found = 0
                     del_found_count(new_ilikes_id)
                 else:
-                	add_found_count(new_ilikes_id)
-                ilikes_id.found = found
-                ilikes_id.thanks = old_thanks
-                ilikes_id.notfound = old_notfound
+                    add_found_count(new_ilikes_id)
+                    if ( old_notfound  == 1 ):
+                        notfound = 0
+                        del_notfound_count(new_ilikes_id)
+                        ilikes_id.notfound = notfound
 
+                ilikes_id.found = found
                 SESSION.commit()
 
             elif ( str(key) == "thanks_key2" ):
@@ -159,11 +161,8 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                     thanks = 0
                     del_thanks_count(new_ilikes_id)
                 else:
-                	add_thanks_count(new_ilikes_id)
-                ilikes_id.found = old_found
+                    add_thanks_count(new_ilikes_id)
                 ilikes_id.thanks = thanks
-                ilikes_id.notfound = old_notfound
-
                 SESSION.commit()
 
             elif ( str(key) == "thanks_key3" ):
@@ -172,9 +171,12 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                     notfound = 0
                     del_notfound_count(new_ilikes_id)
                 else:
-                	add_notfound_count(new_ilikes_id)
-                ilikes_id.found = old_found
-                ilikes_id.thanks = old_thanks
+                    add_notfound_count(new_ilikes_id)
+                    if ( found  == 1 ):
+                        found = 0
+                        del_notfound_count(new_ilikes_id)
+                        ilikes_id.found = found
+
                 ilikes_id.notfound = notfound
 
                 SESSION.commit()
