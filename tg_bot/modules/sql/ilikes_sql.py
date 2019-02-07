@@ -154,7 +154,7 @@ def toggle_ilikes(chat_id):
     with INSERTION_LOCK:
         ilikes_data = SESSION.query(iLikes_Settings).get(str(chat_id))
         if not ilikes_data:
-            ilike_setting = iLikes_Settings(chat_id, True)
+            ilike_setting = iLikes_Settings(chat_id)
             SESSION.add(ilike_setting)
             SESSION.commit()
         else:
