@@ -52,9 +52,9 @@ def get_keyboard(chat_id, message_id):
     data = sql.get_iLikes(chat_id, message_id)
     (found, thanks, notfound) = data
     
-    tfound = img_found + " " + found
-    tthanks = img_thanks + " " + thanks
-    tnotfound = img_notfound + " " + notfound
+    tfound = img_found + " " + str(found)
+    tthanks = img_thanks + " " + str(thanks)
+    tnotfound = img_notfound + " " + str(notfound)
 
 
 
