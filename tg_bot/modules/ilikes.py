@@ -89,7 +89,7 @@ def get_like_buttons(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
-    args = msg.text.split(None, 1)
+
 
     button_list = [
         InlineKeyboardButton(tfound, callback_data="thanks_key1"),
@@ -103,6 +103,9 @@ def get_like_buttons(bot: Bot, update: Update):
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
 
+    chat_id = chat.id
+
+    sql.add_iLike(sent_id)
     print(sent_id)
 
 
