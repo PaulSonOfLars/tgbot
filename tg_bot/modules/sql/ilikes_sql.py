@@ -16,7 +16,7 @@ class iLikes(BASE):
     timestamp = Column(String(50), nullable=False)
 
     def __init__(self, ilikes_id):
-        self.ilikes_id = str(chat_id)
+        self.ilikes_id = str(ilikes_id)
         self.found = 0
         self.thanks = 0
         self.notfound = 0
