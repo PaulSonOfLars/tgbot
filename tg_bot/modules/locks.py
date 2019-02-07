@@ -84,8 +84,8 @@ def send_lock_msg(bot: Bot, update: Update):
         if locked_user.username:
             user2 = "@" + escape_markdown(locked_user.username)
         else:
-            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-                                                   slapped_user.id)
+            user2 = "[{}](tg://user?id={})".format(locked_user.first_name,
+                                                   locked_user.id)
         text = "Hey "+user2+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
     else:
         text = "_Die letzte Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
