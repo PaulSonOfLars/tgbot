@@ -18,17 +18,6 @@ from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import users_sql
 from tg_bot.modules.helper_funcs.extraction import extract_user
 
-LOCK_TYPES = {'location': Filters.location,
-              }
-
-
-MESSAGES = Filters.location
-
-RESTRICTION_TYPES = {'messages': MESSAGES}
-
-PERM_GROUP = 1
-REST_GROUP = 2
-
 
 class CustomCommandHandler(tg.CommandHandler):
     def __init__(self, command, callback, **kwargs):
@@ -99,18 +88,6 @@ def rest_handler(bot: Bot, update: Update):
     if Filters.location(msg):
         print("location found")
 
-    for restriction, filter in RESTRICTION_TYPES.items():
-        if filter(msg):
-            try:
-                pass
-            except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
-                    LOGGER.exception("ERROR in restrictions")
-            break
-
-
 
 __help__ = """
 This module sends Buttons if a Location has been sent to a chat.
@@ -118,4 +95,4 @@ This module sends Buttons if a Location has been sent to a chat.
 """
 
 __mod_name__ = "Location Likes"
-dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), REST_GROUP)
+dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
