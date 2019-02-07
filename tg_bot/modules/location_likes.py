@@ -49,7 +49,7 @@ def send_lock_msg(bot: Bot, update: Update):
 
     keyb = []
     keyboard = InlineKeyboardMarkup(keyb)
-    sentid = send(update, text, keyboard)  # type: Optional[Message]
+    sentid = send(bot, update, text, keyboard)  # type: Optional[Message]
 
     chat = update.effective_chat  # type: Optional[Chat]
 
@@ -136,7 +136,7 @@ def get_like_buttons(bot: Bot, update: Update):
 
     text = "Danke für deinen Beitrag!"
 
-    send(update, text, reply_markup)
+    send(bot, update, text, reply_markup)
 
 
 
