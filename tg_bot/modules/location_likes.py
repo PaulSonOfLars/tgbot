@@ -87,13 +87,16 @@ def get_settings(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     args = msg.text.split(None, 1)
 
+    button_list = [
+        InlineKeyboardButton("col1", callback_data=...),
+        InlineKeyboardButton("col2", callback_data=...),
+        InlineKeyboardButton("row 2", callback_data=...)
+    ]
+    reply_markup = InlineKeyboardMarkup(util.build_menu(button_list, n_cols=2))
 
-    text = "Click here to get this chat's settings, as well as yours."
-    msg.reply_text(text,
-                   reply_markup=InlineKeyboardMarkup(
-                       [[InlineKeyboardButton(text="Settings",
-                                              url="t.me/{}?start=stngs_{}".format(
-                                                          bot.username, chat.id))]]))
+
+    text = "Danke für deinen Beitrag!"
+    msg.reply_text(text, reply_markup=reply_markup)
 
 __help__ = """
 This module sends Buttons if a Location has been sent to a chat.
