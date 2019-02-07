@@ -66,7 +66,6 @@ def send_lock_msg(bot: Bot, update: Update):
 
 
 @run_async
-@user_not_admin
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
