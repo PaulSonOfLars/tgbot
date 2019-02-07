@@ -32,31 +32,24 @@ def send(bot: Bot, update: Update, message, keyboard):
     return msg
 
 
-def UpdateStats(bot: Bot, update: Update, message, keyboard):
-    try:
-        chat_id = update.effective_chat.id
-        msg = bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
-    except Exception as e:
-        print(e)
-
-    return msg
-
-
 def get_keyboard(chat_id, message_id):
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
 
-
-
     data = sql.get_iLikes(chat_id, message_id)
     (found, thanks, notfound) = data
     
+    if found >= 100:
+        found = "99+"
+    if thanks >= 100:
+        thanks = "99+"
+    if notfound >= 100:
+        notfound = "99+"
+
     tfound = img_found + " " + str(found)
     tthanks = img_thanks + " " + str(thanks)
     tnotfound = img_notfound + " " + str(notfound)
-
-
 
     button_list = [
         InlineKeyboardButton(tfound, callback_data="thanks_key1"),
@@ -98,7 +91,7 @@ def settings_button(bot: Bot, update: Update):
 
 
     keyboard = get_keyboard(chat_id, message_id)
-    bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard)
+    bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
             # ensure no spinny white circle
     bot.answer_callback_query(query.id)
