@@ -112,18 +112,24 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 thanks = 1
                 if old_thanks == 1:
                     thanks = 0
-                ilikes_id = iLikes_Clicks(new_ilikes_id, old_found, thanks, old_notfound)
+                ilikes_id.ilikes_click_id = new_ilikes_id
+                ilikes_id.found = fold_ound
+                ilikes_id.thanks = thanks
+                ilikes_id.notfound = old_notfound
 
-                SESSION.add(ilikes_id)
                 SESSION.commit()
+
             elif ( str(key) == "thanks_key3" ):
                 notfound = 1
                 if old_notfound == 1:
                     notfound = 0
-                ilikes_id = iLikes_Clicks(new_ilikes_id, old_found, old_thanks, notfound)
+                ilikes_id.ilikes_click_id = new_ilikes_id
+                ilikes_id.found = old_found
+                ilikes_id.thanks = old_thanks
+                ilikes_id.notfound = notfound
 
-                SESSION.add(ilikes_id)
                 SESSION.commit()
+
 
             return True
 
