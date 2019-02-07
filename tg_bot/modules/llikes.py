@@ -197,6 +197,7 @@ def del_lockables(bot: Bot, update: Update):
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
+    print("hi")
     for restriction, filter in RESTRICTION_TYPES.items():
         if filter(msg) and sql.is_restr_locked(chat.id, restriction) and can_delete(chat, bot.id):
             try:
@@ -258,7 +259,7 @@ This module sends Buttons if a Location has been sent to a chat.
 
 __mod_name__ = "Location Likes"
 
-LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=Filters.group)
+LOCK_HANDLER = CommandHandler("locki", lock, pass_args=True, filters=Filters.group)
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, del_lockables), PERM_GROUP)
