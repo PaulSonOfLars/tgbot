@@ -107,7 +107,7 @@ def build_menu(buttons,
     return menu
 
 @run_async
-def get_settings(bot: Bot, update: Update):
+def get_like_buttons(bot: Bot, update: Update):
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
@@ -147,7 +147,7 @@ This module sends Buttons if a Location has been sent to a chat.
 __mod_name__ = "Location Likes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
 
-settings_handler = CommandHandler("likeit", get_settings)
+settings_handler = CommandHandler("likeit", get_like_buttons)
 settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
 dispatcher.add_handler(settings_handler)
 dispatcher.add_handler(settings_callback_handler)
