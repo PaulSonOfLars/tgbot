@@ -35,7 +35,7 @@ class iLikes_Clicks(BASE):
     notfound = Column(Integer, nullable=False)
 
     def __init__(self, ilikes_click_id, found, thanks, notfound):
-        self.ilikes_click_id = str(ilikes_id)
+        self.ilikes_click_id = str(ilikes_click_id)
         self.found = str(found)
         self.thanks = str(thanks)
         self.notfound = str(notfound)
