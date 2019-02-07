@@ -68,12 +68,12 @@ def get_keyboard(chat_id, message_id):
     return reply_markup
 
 @run_async
-def rest_handler(bot: Bot, update: Update, args: List[str]):
+def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     if Filters.location(msg):
         if ( sql.ilikes_enabled(chat.id) == True ):
-            send_like_buttons(bot, update, args)
+            send_like_buttons(bot, update)
 
 
 @run_async
@@ -123,22 +123,14 @@ def toggle_ilikes(bot: Bot, update: Update):
 
 @run_async
 def get_like_buttons(bot: Bot, update: Update, args: List[str]):
-
     user_id = extract_user(update.effective_message, args)
     if user_id:
-        send_like_buttons(bot, update, args)
+        send_like_buttons(bot, update)
 
 
 
 @run_async
-def send_like_buttons(bot: Bot, update: Update, args: List[str]):
-    slapped_user = bot.get_chat(user_id)
-    user1 = curr_user
-    if slapped_user.username:
-        user2 = "@" + escape_markdown(slapped_user.username)
-    else:
-        user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-                                               slapped_user.id)
+def send_like_buttons(bot: Bot, update: Update):
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
@@ -179,7 +171,7 @@ This module sends Buttons if a Location has been sent to a chat.
 """
 
 __mod_name__ = "Location Likes"
-dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler, pass_args=True ), 2)
+dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
 
 
 settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
