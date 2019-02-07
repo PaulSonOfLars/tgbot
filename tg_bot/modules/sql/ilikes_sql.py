@@ -92,19 +92,19 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
             old_notfound = ilikes_id.notfound
 
             if ( str(key) == "thanks_key1"):
-            	found = 1
-            	if old_found == 1:
-            		found = 0
+                found = 1
+                if old_found == 1:
+                    found = 0
                 ilikes_id = iLikes_Clicks(new_ilikes_id, found, old_thanks, old_notfound)
             if ( str(key) == "thanks_key2"):
-            	thanks = 1
-            	if old_thanks == 1:
-            		thanks = 0
+                thanks = 1
+                if old_thanks == 1:
+                    thanks = 0
                 ilikes_id = iLikes_Clicks(new_ilikes_id, old_found, thanks, old_notfound)
             if ( str(key) == "thanks_key3"):
-            	notfound = 1
-            	if old_notfound == 1:
-            		notfound = 0
+                notfound = 1
+                if old_notfound == 1:
+                    notfound = 0
                 ilikes_id = iLikes_Clicks(new_ilikes_id, old_found, old_thanks, notfound)
 
 
