@@ -123,13 +123,13 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
         if not ilikes_id:
             if ( str(key) == "thanks_key1"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
-            	add_found_count(new_ilikes_main_id)
+                add_found_count(new_ilikes_main_id)
             if ( str(key) == "thanks_key2"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
-            	add_thanks_count(new_ilikes_main_id)
+                add_thanks_count(new_ilikes_main_id)
             if ( str(key) == "thanks_key3"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
-            	add_notfound_count(new_ilikes_main_id)
+                add_notfound_count(new_ilikes_main_id)
             SESSION.add(ilikes_id)
             SESSION.commit()
             return True
