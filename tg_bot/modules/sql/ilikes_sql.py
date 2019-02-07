@@ -174,7 +174,7 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                     add_notfound_count(new_ilikes_id)
                     if ( old_found  == 1 ):
                         found = 0
-                        del_notfound_count(new_ilikes_id)
+                        del_found_count(new_ilikes_id)
                         ilikes_id.found = found
 
                 ilikes_id.notfound = notfound
