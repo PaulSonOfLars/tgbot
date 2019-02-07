@@ -64,7 +64,6 @@ def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     if Filters.location(msg):
-        print("location found")
         get_like_buttons(bot, update)
 
 
