@@ -14,7 +14,7 @@ class iLikes(BASE):
     found = Column(Integer, nullable=False)
     thanks = Column(Integer, nullable=False)
     notfound = Column(Integer, nullable=False)
-    timestamp = Column(String(14), nullable=False)
+    timestamp = Column(String(50), nullable=False)
 
     def __init__(self, chat_id, msg_id):
         self.chat_id = str(chat_id)
