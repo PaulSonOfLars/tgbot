@@ -71,7 +71,6 @@ def send(update, message, keyboard):
     try:
         msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
-        print("1")
         print(e)
 
     return msg
@@ -81,9 +80,9 @@ def send(update, message, keyboard):
 def send_lock_msg(bot: Bot, update: Update):
     user_id = update.effective_user.id
     if user_id:
-        slapped_user = bot.get_chat(user_id)
-        if slapped_user.username:
-            user2 = "@" + escape_markdown(slapped_user.username)
+        locked_user = bot.get_chat(user_id)
+        if locked_user.username:
+            user2 = "@" + escape_markdown(locked_user.username)
         else:
             user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
                                                    slapped_user.id)
