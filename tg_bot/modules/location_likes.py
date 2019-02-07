@@ -134,7 +134,7 @@ def get_like_buttons(bot: Bot, update: Update):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-    text = "*Danke für deinen Beitrag!*"
+    text = " "
 
     send(bot, update, text, reply_markup)
 
