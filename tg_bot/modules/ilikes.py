@@ -32,6 +32,16 @@ def send(bot: Bot, update: Update, message, keyboard):
     return msg
 
 
+def UpdateStats(bot: Bot, update: Update, message, keyboard):
+    try:
+        chat_id = update.effective_chat.id
+        msg = bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+    except Exception as e:
+        print(e)
+
+    return msg
+
+
 @run_async
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
@@ -48,16 +58,20 @@ def settings_button(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     message_id = update.effective_message.message_id
     key = query.data
-#    print("button pressed")
-#    print(query.data)
-#    print("")
-#    print(query)
-#    print("")
-#    print(user_id)
-#    print("")
-#    print(chat_id)
-#    print("")
-#    print(message_id)
+    print("button pressed")
+    print(query.data)
+    print("")
+    print(query)
+    print("")
+    print(user_id)
+    print("")
+    print(chat_id)
+    print("")
+    print(message_id)
+
+    print(update.effective_message.text)
+
+#    bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=random_song(), reply_markup=keyboard)
 
 
     sql.add_iLike_Click(chat_id, message_id, user_id, key)
