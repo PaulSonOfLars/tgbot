@@ -79,6 +79,8 @@ def settings_button(bot: Bot, update: Update):
     query = update.callback_query
     user = update.effective_user
     print("button pressed")
+    print(query.data)
+
             # ensure no spinny white circle
     bot.answer_callback_query(query.id)
 
