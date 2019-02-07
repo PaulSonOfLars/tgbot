@@ -197,16 +197,12 @@ def del_lockables(bot: Bot, update: Update):
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
-
     for restriction, filter in RESTRICTION_TYPES.items():
-        print("hi")
         if Filters.location(msg):
-            print("treffer")
-
-
+            pass
         if filter(msg):
             try:
-                print("bla")
+                pass
             except BadRequest as excp:
                 if excp.message == "Message to delete not found":
                     pass
@@ -267,5 +263,5 @@ __mod_name__ = "Location Likes"
 LOCK_HANDLER = CommandHandler("locki", lock, pass_args=True, filters=Filters.group)
 
 dispatcher.add_handler(LOCK_HANDLER)
-dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, del_lockables), PERM_GROUP)
-dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, rest_handler), REST_GROUP)
+dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, del_lockables), PERM_GROUP)
+dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), REST_GROUP)
