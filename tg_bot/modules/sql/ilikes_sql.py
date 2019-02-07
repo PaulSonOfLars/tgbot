@@ -95,14 +95,14 @@ def del_thanks_count(ilikes_id):
 
 
 
-def add_notfound_count():
+def add_notfound_count(ilikes_id):
         ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.notfound = ilikes_data.notfound + 1
-        SESSION.commit()
+        SESSION.commit(ilikes_id)
 def del_notfound_count():
         ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.notfound = ilikes_data.notfound - 1
-        SESSION.commit()
+        SESSION.commit(ilikes_id)
 
 
 def add_iLike_Click(chat_id, msg_id, user_id, key):
@@ -120,6 +120,8 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
             SESSION.commit()
             return True
         else:
+
+            new_ilikes_id = str(chat_id)+str(msg_id)
             old_found = ilikes_id.found
             old_thanks = ilikes_id.thanks
             old_notfound = ilikes_id.notfound
