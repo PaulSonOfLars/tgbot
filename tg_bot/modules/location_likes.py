@@ -2,7 +2,7 @@ import html
 from typing import Optional, List
 
 import telegram.ext as tg
-from telegram import Message, Chat, Update, Bot, ParseMode, User, MessageEntity
+from telegram import Message, Chat, Update, Bot, ParseMode, User, MessageEntity, Utils
 from telegram import ParseMode, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram import TelegramError
 from telegram.error import BadRequest
@@ -102,7 +102,7 @@ def get_settings(bot: Bot, update: Update):
         InlineKeyboardButton("col2", callback_data=...),
         InlineKeyboardButton("row 2", callback_data=...)
     ]
-    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
+    reply_markup = InlineKeyboardMarkup(utils.build_menu(button_list, n_cols=2))
 
 
     text = "Danke für deinen Beitrag!"
