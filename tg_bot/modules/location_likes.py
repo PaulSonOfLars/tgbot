@@ -73,6 +73,27 @@ def rest_handler(bot: Bot, update: Update):
         print("location found")
 
 
+@run_async
+def settings_button(bot: Bot, update: Update):
+    query = update.callback_query
+    user = update.effective_user
+
+
+@run_async
+def get_settings(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+    msg = update.effective_message  # type: Optional[Message]
+    args = msg.text.split(None, 1)
+
+
+    text = "Click here to get this chat's settings, as well as yours."
+    msg.reply_text(text,
+                   reply_markup=InlineKeyboardMarkup(
+                       [[InlineKeyboardButton(text="Settings",
+                                              url="t.me/{}?start=stngs_{}".format(
+                                                          bot.username, chat.id))]]))
+
 __help__ = """
 This module sends Buttons if a Location has been sent to a chat.
 
@@ -80,3 +101,8 @@ This module sends Buttons if a Location has been sent to a chat.
 
 __mod_name__ = "Location Likes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
+
+settings_handler = CommandHandler("likeit", get_settings)
+settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"stngs_")
+dispatcher.add_handler(settings_handler)
+sdispatcher.add_handler(settings_callback_handler)
