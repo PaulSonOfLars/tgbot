@@ -74,7 +74,7 @@ def add_iLike(chat_id, msg_id):
 def add_iLike_Click(chat_id, msg_id, user_id, key):
     with INSERTION_LOCK:
         new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
-        ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
+        ilikes_id = SESSION.query(iLikes_Clicks).get(str(new_ilikes_id))
         if not ilikes_id:
             if ( str(key) == "thanks_key1"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
