@@ -100,9 +100,9 @@ def get_settings(bot: Bot, update: Update):
     button_list = [
         InlineKeyboardButton("col1", callback_data="key1"),
         InlineKeyboardButton("col2", callback_data="key2"),
-        InlineKeyboardButton("row 2", callback_data="key3")
+        InlineKeyboardButton("col3", callback_data="key3")
     ]
-    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=1))
 
 
     text = "Danke für deinen Beitrag!"
