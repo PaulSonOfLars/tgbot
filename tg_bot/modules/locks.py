@@ -245,12 +245,6 @@ def del_lockables(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
     for lockable, filter in LOCK_TYPES.items():
-        print(filter(message))
-        print(sql.is_locked(chat.id, lockable))
-        print(can_delete(chat, bot.id))
-        print(lockable)
-        print(LOCK_TYPES.items())
-        print("")
         if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
@@ -324,6 +318,7 @@ def build_lock_message(chat_id):
                    "\n - previews = `{}`" \
                    "\n - all = `{}`".format(restr.messages, restr.media, restr.other, restr.preview,
                                             all([restr.messages, restr.media, restr.other, restr.preview]))
+    print(res)
     return res
 
 
