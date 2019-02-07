@@ -99,7 +99,7 @@ def add_notfound_count(ilikes_id):
         ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.notfound = ilikes_data.notfound + 1
         SESSION.commit(ilikes_id)
-def del_notfound_count():
+def del_notfound_count(ilikes_id):
         ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.notfound = ilikes_data.notfound - 1
         SESSION.commit(ilikes_id)
