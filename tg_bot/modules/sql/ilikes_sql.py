@@ -53,7 +53,7 @@ class iLikes_Clicks(BASE):
 
 
 iLikes.__table__.create(checkfirst=True)
-iLikesClicks.__table__.create(checkfirst=True)
+iLikes_Clicks.__table__.create(checkfirst=True)
 
 
 
