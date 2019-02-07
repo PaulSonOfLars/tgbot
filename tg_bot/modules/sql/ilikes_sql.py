@@ -76,11 +76,11 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
         new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
         ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
         if not ilikes_id:
-        	if ( str(key) == "thanks_key1"):
+            if ( str(key) == "thanks_key1"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
-        	if ( str(key) == "thanks_key2"):
+            if ( str(key) == "thanks_key2"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
-        	if ( str(key) == "thanks_key3"):
+            if ( str(key) == "thanks_key3"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
             SESSION.add(ilikes_id)
             SESSION.commit()
