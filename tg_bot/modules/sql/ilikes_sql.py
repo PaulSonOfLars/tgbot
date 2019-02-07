@@ -130,7 +130,7 @@ def del_notfound_count(ilikes_id):
 
 
 def enable_ilikes(chat_id):
-	with INSERTION_LOCK:
+    with INSERTION_LOCK:
         ilikes_data = SESSION.query(iLikes_Settings).get(str(chat_id))
         ilikes_data.enabled = True
         SESSION.commit()
@@ -147,7 +147,7 @@ def ilikes_enabled(chat_id):
         if not ilikes_data:
             return False
         else:
-        	return ilikes_data.enabled
+            return ilikes_data.enabled
 
 def add_iLike_Click(chat_id, msg_id, user_id, key):
     with INSERTION_LOCK:
