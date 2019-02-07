@@ -26,7 +26,7 @@ class iLikes(BASE):
         return "<iLikes for %s>" % self.chat_id
 
 
-class iLikesSettings(BASE):
+class iLikes_Settings(BASE):
     __tablename__ = "ilikes_settings"
     chat_id = Column(String(100), primary_key=True)
     enabled = Column(Boolean, nullable=False)
