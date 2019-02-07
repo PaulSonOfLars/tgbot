@@ -110,9 +110,9 @@ def get_like_buttons(bot: Bot, update: Update):
     thanks = "0"
     notfound = "0"
 
-    tfound = img_found + " " + found
-    tthanks = img_thanks + " " + thanks
-    tnotfound = img_notfound + " " + notfound
+    tfound = img_found + "  " + found
+    tthanks = img_thanks + "  " + thanks
+    tnotfound = img_notfound + "  " + notfound
 
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
