@@ -248,6 +248,9 @@ def del_lockables(bot: Bot, update: Update):
         print(filter(message))
         print(sql.is_locked(chat.id, lockable))
         print(can_delete(chat, bot.id))
+        print(lockable)
+        print(LOCK_TYPES.items())
+        print("")
         if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
