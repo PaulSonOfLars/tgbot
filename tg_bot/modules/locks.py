@@ -318,7 +318,6 @@ def build_lock_message(chat_id):
                    "\n - previews = `{}`" \
                    "\n - all = `{}`".format(restr.messages, restr.media, restr.other, restr.preview,
                                             all([restr.messages, restr.media, restr.other, restr.preview]))
-    print(res)
     return res
 
 
