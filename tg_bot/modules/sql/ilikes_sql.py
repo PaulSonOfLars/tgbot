@@ -109,7 +109,6 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
     with INSERTION_LOCK:
         new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
         ilikes_id = SESSION.query(iLikes_Clicks).get(str(new_ilikes_id))
-        state = 1
         if not ilikes_id:
             if ( str(key) == "thanks_key1"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
@@ -129,10 +128,9 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 found = 1
                 if ( old_found  == 1 ):
                     found = 0
-                    del_found_count()
+                    del_found_count(new_ilikes_id)
                 else:
-                	add_found_count()
-                ilikes_id.ilikes_click_id = new_ilikes_id
+                	add_found_count(new_ilikes_id)
                 ilikes_id.found = found
                 ilikes_id.thanks = old_thanks
                 ilikes_id.notfound = old_notfound
@@ -143,10 +141,9 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 thanks = 1
                 if old_thanks == 1:
                     thanks = 0
-                    del_thanks_count()
+                    del_thanks_count(new_ilikes_id)
                 else:
-                	add_thanks_count()
-                ilikes_id.ilikes_click_id = new_ilikes_id
+                	add_thanks_count(new_ilikes_id)
                 ilikes_id.found = old_found
                 ilikes_id.thanks = thanks
                 ilikes_id.notfound = old_notfound
@@ -157,10 +154,9 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 notfound = 1
                 if old_notfound == 1:
                     notfound = 0
-                    del_notfound_count()
+                    del_notfound_count(new_ilikes_id)
                 else:
-                	add_notfound_count()
-                ilikes_id.ilikes_click_id = new_ilikes_id
+                	add_notfound_count(new_ilikes_id)
                 ilikes_id.found = old_found
                 ilikes_id.thanks = old_thanks
                 ilikes_id.notfound = notfound
