@@ -78,6 +78,7 @@ def rest_handler(bot: Bot, update: Update):
 def settings_button(bot: Bot, update: Update):
     query = update.callback_query
     user = update.effective_user
+    print("button pressed")
 
 def build_menu(buttons,
                n_cols,
@@ -110,9 +111,9 @@ def get_settings(bot: Bot, update: Update):
     args = msg.text.split(None, 1)
 
     button_list = [
-        InlineKeyboardButton(tfound, callback_data="key1"),
-        InlineKeyboardButton(tthanks, callback_data="key2"),
-        InlineKeyboardButton(tnotfound, callback_data="key3")
+        InlineKeyboardButton(tfound, callback_data="thanks_key1"),
+        InlineKeyboardButton(tthanks, callback_data="thanks_key2"),
+        InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
@@ -133,6 +134,6 @@ __mod_name__ = "Location Likes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
 
 settings_handler = CommandHandler("likeit", get_settings)
-settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"stngs_")
+settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
 dispatcher.add_handler(settings_handler)
 dispatcher.add_handler(settings_callback_handler)
