@@ -197,9 +197,10 @@ def del_lockables(bot: Bot, update: Update):
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
+    if Filters.location(msg):
+        print("location found")
+
     for restriction, filter in RESTRICTION_TYPES.items():
-        if Filters.location(msg):
-            pass
         if filter(msg):
             try:
                 pass
@@ -210,47 +211,6 @@ def rest_handler(bot: Bot, update: Update):
                     LOGGER.exception("ERROR in restrictions")
             break
 
-
-def build_lock_message(chat_id):
-    locks = sql.get_locks(chat_id)
-    restr = sql.get_restr(chat_id)
-    if not (locks or restr):
-        res = "There are no current locks in this chat."
-    else:
-        res = "These are the locks in this chat:"
-        if locks:
-            res += "\n - sticker = `{}`" \
-                   "\n - audio = `{}`" \
-                   "\n - voice = `{}`" \
-                   "\n - document = `{}`" \
-                   "\n - video = `{}`" \
-                   "\n - videonote = `{}`" \
-                   "\n - contact = `{}`" \
-                   "\n - photo = `{}`" \
-                   "\n - gif = `{}`" \
-                   "\n - url = `{}`" \
-                   "\n - bots = `{}`" \
-                   "\n - forward = `{}`" \
-                   "\n - game = `{}`" \
-                   "\n - location = `{}`".format(locks.sticker, locks.audio, locks.voice, locks.document,
-                                                 locks.video, locks.videonote, locks.contact, locks.photo, locks.gif, locks.url,
-                                                 locks.bots, locks.forward, locks.game, locks.location)
-        if restr:
-            res += "\n - messages = `{}`" \
-                   "\n - media = `{}`" \
-                   "\n - other = `{}`" \
-                   "\n - previews = `{}`" \
-                   "\n - all = `{}`".format(restr.messages, restr.media, restr.other, restr.preview,
-                                            all([restr.messages, restr.media, restr.other, restr.preview]))
-    return res
-
-
-def __migrate__(old_chat_id, new_chat_id):
-    sql.migrate_chat(old_chat_id, new_chat_id)
-
-
-def __chat_settings__(chat_id, user_id):
-    return build_lock_message(chat_id)
 
 
 __help__ = """
