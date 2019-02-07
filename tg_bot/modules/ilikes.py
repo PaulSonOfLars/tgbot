@@ -68,12 +68,12 @@ def get_keyboard(chat_id, message_id):
     return reply_markup
 
 @run_async
-def rest_handler(bot: Bot, update: Update):
+def rest_handler(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     if Filters.location(msg):
         if ( sql.ilikes_enabled(chat.id) == True ):
-            get_like_buttons(bot, update)
+            send_like_buttons(bot, update, args)
 
 
 @run_async
@@ -126,43 +126,51 @@ def get_like_buttons(bot: Bot, update: Update, args: List[str]):
 
     user_id = extract_user(update.effective_message, args)
     if user_id:
-        slapped_user = bot.get_chat(user_id)
-        user1 = curr_user
-        if slapped_user.username:
-            user2 = "@" + escape_markdown(slapped_user.username)
-        else:
-            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-                                                   slapped_user.id)
-        img_found = "✅"
-        img_thanks = "😍"
-        img_notfound = "🚫"
-
-        found = "0"
-        thanks = "0"
-        notfound = "0"
-
-        tfound = img_found + "  " + found
-        tthanks = img_thanks + "  " + thanks
-        tnotfound = img_notfound + "  " + notfound
-
-        chat = update.effective_chat  # type: Optional[Chat]
-        user = update.effective_user  # type: Optional[User]
-        msg = update.effective_message  # type: Optional[Message]
+        send_like_buttons(bot, update, args)
 
 
-        button_list = [
-            InlineKeyboardButton(tfound, callback_data="thanks_key1"),
-            InlineKeyboardButton(tthanks, callback_data="thanks_key2"),
-            InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
-        ]
-        reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-        text = "*Danke für deinen Community-Beitrag!*"
+@run_async
+def send_like_buttons(bot: Bot, update: Update, args: List[str]):
+    slapped_user = bot.get_chat(user_id)
+    user1 = curr_user
+    if slapped_user.username:
+        user2 = "@" + escape_markdown(slapped_user.username)
+    else:
+        user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
+                                               slapped_user.id)
+    img_found = "✅"
+    img_thanks = "😍"
+    img_notfound = "🚫"
 
-        sent_message = send(bot, update, text, reply_markup)
-        sent_id = sent_message.message_id
-        chat_id = chat.id
-        sql.add_iLike(chat_id, sent_id)
+    found = "0"
+    thanks = "0"
+    notfound = "0"
+
+    tfound = img_found + "  " + found
+    tthanks = img_thanks + "  " + thanks
+    tnotfound = img_notfound + "  " + notfound
+
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+    msg = update.effective_message  # type: Optional[Message]
+
+
+    button_list = [
+        InlineKeyboardButton(tfound, callback_data="thanks_key1"),
+        InlineKeyboardButton(tthanks, callback_data="thanks_key2"),
+        InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
+    ]
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
+
+    text = "*Danke für deinen Community-Beitrag!*"
+
+    sent_message = send(bot, update, text, reply_markup)
+    sent_id = sent_message.message_id
+    chat_id = chat.id
+    sql.add_iLike(chat_id, sent_id)
+
+
 
 
 __help__ = """
@@ -171,7 +179,7 @@ This module sends Buttons if a Location has been sent to a chat.
 """
 
 __mod_name__ = "Location Likes"
-dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
+dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), pass_args=True, 2)
 
 
 settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
