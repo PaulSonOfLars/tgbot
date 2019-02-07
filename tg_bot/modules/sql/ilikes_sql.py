@@ -91,6 +91,11 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
             old_thanks = ilikes_id.thanks
             old_notfound = ilikes_id.notfound
 
+            print(old_found)
+            print(old_thanks)
+            print(old_notfound)
+
+
             if ( str(key) == "thanks_key1"):
                 found = 1
                 if old_found == 1:
