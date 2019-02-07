@@ -102,6 +102,13 @@ def build_menu(buttons,
 
 
 @run_async
+@user_admin
+def toggle_ilikes(bot: Bot, update: Update):
+    chat_id = update.effective_chat.id
+    sql.toggle_ilikes(chat_id)
+
+
+@run_async
 def get_like_buttons(bot: Bot, update: Update):
     img_found = "✅"
     img_thanks = "😍"
@@ -142,9 +149,17 @@ This module sends Buttons if a Location has been sent to a chat.
 
 __mod_name__ = "Location Likes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
-settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
-dispatcher.add_handler(settings_callback_handler)
 
+
+settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
+
+toggle_handler = CommandHandler("toggle_ilikes", toggle_ilikes,
+                           filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 settings_handler = CommandHandler("ilike", get_like_buttons)
+
+
+
+dispatcher.add_handler(toggle_handler)
 dispatcher.add_handler(settings_handler)
+dispatcher.add_handler(settings_callback_handler)
 

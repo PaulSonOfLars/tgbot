@@ -149,6 +149,21 @@ def ilikes_enabled(chat_id):
         else:
             return ilikes_data.enabled
 
+
+def toggle_ilikes(chat_id):
+    with INSERTION_LOCK:
+        ilikes_data = SESSION.query(iLikes_Settings).get(str(chat_id))
+        if not ilikes_data:
+            ilike_setting = iLikes_Settings(chat_id, True)
+            SESSION.add(ilike_setting)
+            SESSION.commit()
+        else:
+            if ( ilikes_data.enabled == True ):
+                disable_ilikes(chat_id)
+            else:
+                enable_ilikes(chat_id)
+
+
 def add_iLike_Click(chat_id, msg_id, user_id, key):
     with INSERTION_LOCK:
         new_ilikes_main_id = str(chat_id)+str(msg_id)
