@@ -355,7 +355,7 @@ stickers, etc.
 Locking bots will stop non-admins from adding bots to the chat.
 
 Once a message has been deleted a notification will be shown and the last sent \
-notification will be deleted.
+notification will be deleted if possible.
 """
 
 __mod_name__ = "Media Type Locks"
