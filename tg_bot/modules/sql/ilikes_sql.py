@@ -71,6 +71,40 @@ def add_iLike(chat_id, msg_id):
             return False
 
 
+
+def add_found_count(ilikes_id):
+    with INSERTION_LOCK:
+        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data.found = ilikes_data.found + 1
+        SESSION.commit()
+
+def del_found_count(ilikes_id):
+        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data.found = ilikes_data.found - 1
+        SESSION.commit()
+
+
+def add_thanks_count(ilikes_id):
+        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data.thanks = ilikes_data.thanks + 1
+        SESSION.commit()
+def del_thanks_count(ilikes_id):
+        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data.thanks = ilikes_data.thanks - 1
+        SESSION.commit()
+
+
+
+def add_notfound_count():
+        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data.notfound = ilikes_data.notfound + 1
+        SESSION.commit()
+def del_notfound_count():
+        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data.notfound = ilikes_data.notfound - 1
+        SESSION.commit()
+
+
 def add_iLike_Click(chat_id, msg_id, user_id, key):
     with INSERTION_LOCK:
         new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
@@ -91,16 +125,13 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
             old_thanks = ilikes_id.thanks
             old_notfound = ilikes_id.notfound
 
-            print(old_found)
-            print(old_thanks)
-            print(old_notfound)
-            print(key)
-
-
             if ( str(key) == "thanks_key1" ):
                 found = 1
                 if ( old_found  == 1 ):
                     found = 0
+                    del_found_count()
+                else:
+                	add_found_count()
                 ilikes_id.ilikes_click_id = new_ilikes_id
                 ilikes_id.found = found
                 ilikes_id.thanks = old_thanks
@@ -112,6 +143,9 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 thanks = 1
                 if old_thanks == 1:
                     thanks = 0
+                    del_thanks_count()
+                else:
+                	add_thanks_count()
                 ilikes_id.ilikes_click_id = new_ilikes_id
                 ilikes_id.found = old_found
                 ilikes_id.thanks = thanks
@@ -123,6 +157,9 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 notfound = 1
                 if old_notfound == 1:
                     notfound = 0
+                    del_notfound_count()
+                else:
+                	add_notfound_count()
                 ilikes_id.ilikes_click_id = new_ilikes_id
                 ilikes_id.found = old_found
                 ilikes_id.thanks = old_thanks
