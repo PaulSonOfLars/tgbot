@@ -26,6 +26,19 @@ class iLikes(BASE):
         return "<iLikes for %s>" % self.chat_id
 
 
+class iLikesSettings(BASE):
+    __tablename__ = "ilikes_settings"
+    chat_id = Column(String(100), primary_key=True)
+    enabled = Column(Boolean, nullable=False)
+
+    def __init__(self, chat_id):
+        self.chat_id = str(chat_id)
+        self.enabled = True
+
+    def __repr__(self):
+        return "<iLike Settings for %s>" % self.chat_id
+
+
 
 class iLikes_Clicks(BASE):
     __tablename__ = "ilikes_clicks"
@@ -48,6 +61,7 @@ class iLikes_Clicks(BASE):
 
 iLikes.__table__.create(checkfirst=True)
 iLikes_Clicks.__table__.create(checkfirst=True)
+iLikes_Settings.__table__.create(checkfirst=True)
 
 
 
