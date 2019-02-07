@@ -90,108 +90,6 @@ def send_lock_msg(bot: Bot, update: Update):
         print(e)
         pass
 
-
-
-# NOT ASYNC
-def restr_members(bot, chat_id, members, messages=False, media=False, other=False, previews=False):
-    for mem in members:
-        if mem.user in SUDO_USERS:
-            pass
-        try:
-            bot.restrict_chat_member(chat_id, mem.user,
-                                     can_send_messages=messages,
-                                     can_send_media_messages=media,
-                                     can_send_other_messages=other,
-                                     can_add_web_page_previews=previews)
-        except TelegramError:
-            pass
-
-
-# NOT ASYNC
-def unrestr_members(bot, chat_id, members, messages=True, media=True, other=True, previews=True):
-    for mem in members:
-        try:
-            bot.restrict_chat_member(chat_id, mem.user,
-                                     can_send_messages=messages,
-                                     can_send_media_messages=media,
-                                     can_send_other_messages=other,
-                                     can_add_web_page_previews=previews)
-        except TelegramError:
-            pass
-
-
-@user_admin
-@bot_can_delete
-@loggable
-def lock(bot: Bot, update: Update, args: List[str]) -> str:
-    chat = update.effective_chat  # type: Optional[Chat]
-    user = update.effective_user  # type: Optional[User]
-    message = update.effective_message  # type: Optional[Message]
-    if can_delete(chat, bot.id):
-        if len(args) >= 1:
-            if args[0] in LOCK_TYPES:
-                sql.update_lock(chat.id, args[0], locked=True)
-                message.reply_text("Locked {} messages for all non-admins!".format(args[0]))
-
-                return "<b>{}:</b>" \
-                       "\n#LOCK" \
-                       "\n<b>Admin:</b> {}" \
-                       "\nLocked <code>{}</code>.".format(html.escape(chat.title),
-                                                          mention_html(user.id, user.first_name), args[0])
-
-            elif args[0] in RESTRICTION_TYPES:
-                sql.update_restriction(chat.id, args[0], locked=True)
-                if args[0] == "previews":
-                    members = users_sql.get_chat_members(str(chat.id))
-                    restr_members(bot, chat.id, members, messages=True, media=True, other=True)
-
-                message.reply_text("Locked {} for all non-admins!".format(args[0]))
-                return "<b>{}:</b>" \
-                       "\n#LOCK" \
-                       "\n<b>Admin:</b> {}" \
-                       "\nLocked <code>{}</code>.".format(html.escape(chat.title),
-                                                          mention_html(user.id, user.first_name), args[0])
-
-            else:
-                message.reply_text("What are you trying to lock...? Try /locktypes for the list of lockables")
-
-    else:
-        message.reply_text("I'm not an administrator, or haven't got delete rights.")
-
-    return ""
-
-
-@run_async
-@user_not_admin
-def del_lockables(bot: Bot, update: Update):
-    chat = update.effective_chat  # type: Optional[Chat]
-    message = update.effective_message  # type: Optional[Message]
-    for lockable, filter in LOCK_TYPES.items():
-        if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
-            if lockable == "bots":
-                new_members = update.effective_message.new_chat_members
-                for new_mem in new_members:
-                    if new_mem.is_bot:
-                        if not is_bot_admin(chat, bot.id):
-                            message.reply_text("I see a bot, and I've been told to stop them joining... "
-                                               "but I'm not admin!")
-                            return
-
-                        chat.kick_member(new_mem.id)
-                        message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
-            else:
-                try:
-                    send_lock_msg(bot, update)
-                    message.delete()
-                except BadRequest as excp:
-                    if excp.message == "Message to delete not found":
-                        pass
-                    else:
-                        LOGGER.exception("ERROR in lockables")
-
-            break
-
-
 @run_async
 @user_not_admin
 def rest_handler(bot: Bot, update: Update):
@@ -219,9 +117,5 @@ This module sends Buttons if a Location has been sent to a chat.
 """
 
 __mod_name__ = "Location Likes"
-
-LOCK_HANDLER = CommandHandler("locki", lock, pass_args=True, filters=Filters.group)
-
-dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, del_lockables), PERM_GROUP)
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), REST_GROUP)
