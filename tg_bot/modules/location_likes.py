@@ -78,10 +78,16 @@ def rest_handler(bot: Bot, update: Update):
 def settings_button(bot: Bot, update: Update):
     query = update.callback_query
     user = update.effective_user
+    user_id = update.effective_user.id
+    chat_id = update.effective_chat.id
     print("button pressed")
     print(query.data)
     print("")
     print(query)
+    print("")
+    print(user_id)
+    print("")
+    print(chat_id)
 
             # ensure no spinny white circle
     bot.answer_callback_query(query.id)
