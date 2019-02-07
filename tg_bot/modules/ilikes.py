@@ -10,7 +10,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, CallbackQueryH
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown, mention_html
 
-import tg_bot.modules.sql.locks_sql as sql
+import tg_bot.modules.sql.ilikes_sql as sql
 from tg_bot import dispatcher, SUDO_USERS, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, user_not_admin, user_admin, \
@@ -30,41 +30,6 @@ def send(bot: Bot, update: Update, message, keyboard):
         print(e)
 
     return msg
-
-
-
-def send_lock_msg(bot: Bot, update: Update):
-    user_id = update.effective_user.id
-    if user_id:
-        locked_user = bot.get_chat(user_id)
-        if locked_user.username:
-            user2 = "@" + escape_markdown(locked_user.username)
-        else:
-            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-                                                   slapped_user.id)
-        text = "Hey "+user2+",\n_Deine Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
-    else:
-        text = "_Die letzte Nachricht hat Medien enthalten die in diesem Chat untersagt sind!_\n*Daher wurde sie gelöscht!*"
-
-    keyb = []
-    keyboard = InlineKeyboardMarkup(keyb)
-    sentid = send(bot, update, text, keyboard)  # type: Optional[Message]
-
-    chat = update.effective_chat  # type: Optional[Chat]
-
-    try:
-        chat_id = chat.id
-        prev_msg = sql.get_lock_msgid(chat_id)
-
-        if prev_msg:
-            try:
-                bot.delete_message(chat_id, prev_msg)
-            except BadRequest as excp:
-                pass
-        retval = sql.set_lock_msgid(chat_id, sentid.message_id)
-    except Exception as e:
-        print(e)
-        pass
 
 
 @run_async
@@ -135,7 +100,8 @@ def get_like_buttons(bot: Bot, update: Update):
 
     text = "*Danke für deinen Beitrag!*"
 
-    sentid = send(bot, update, text, reply_markup)
+    sent_message = send(bot, update, text, reply_markup)
+    sent_id = sent_message.message_id
 
     print(sentid)
 
