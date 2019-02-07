@@ -25,7 +25,6 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 def send(bot: Bot, update: Update, message, keyboard):
     try:
         chat_id = update.effective_chat.id
-        #msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
         msg = bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
         print(e)
@@ -136,9 +135,9 @@ def get_like_buttons(bot: Bot, update: Update):
 
     text = "*Danke für deinen Beitrag!*"
 
-    send(bot, update, text, reply_markup)
+    sentid = send(bot, update, text, reply_markup)
 
-
+    print(sentid)
 
 
 __help__ = """
