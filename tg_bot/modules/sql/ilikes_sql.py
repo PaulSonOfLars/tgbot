@@ -74,33 +74,33 @@ def add_iLike(chat_id, msg_id):
 
 def add_found_count(ilikes_id):
     with INSERTION_LOCK:
-        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.found = ilikes_data.found + 1
         SESSION.commit()
 
 def del_found_count(ilikes_id):
-        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.found = ilikes_data.found - 1
         SESSION.commit()
 
 
 def add_thanks_count(ilikes_id):
-        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.thanks = ilikes_data.thanks + 1
         SESSION.commit()
 def del_thanks_count(ilikes_id):
-        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.thanks = ilikes_data.thanks - 1
         SESSION.commit()
 
 
 
 def add_notfound_count():
-        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.notfound = ilikes_data.notfound + 1
         SESSION.commit()
 def del_notfound_count():
-        ilikes_data = SESSION.query(iLikes_Clicks).get(str(ilikes_id))
+        ilikes_data = SESSION.query(iLikes).get(str(ilikes_id))
         ilikes_data.notfound = ilikes_data.notfound - 1
         SESSION.commit()
 
