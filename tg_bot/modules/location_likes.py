@@ -24,7 +24,9 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 # do not async
 def send(update, message, keyboard):
     try:
-        msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+        chat_id = update.effective_chat.id
+        #msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
+        bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
     except Exception as e:
         print(e)
 
@@ -133,8 +135,8 @@ def get_like_buttons(bot: Bot, update: Update):
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
     text = "Danke für deinen Beitrag!"
-    msg.reply_text(text,
-                   reply_markup=reply_markup)
+
+    send(update, text, reply_markup)
 
 
 
