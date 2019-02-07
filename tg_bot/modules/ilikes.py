@@ -179,7 +179,7 @@ This module sends Buttons if a Location has been sent to a chat.
 """
 
 __mod_name__ = "Location Likes"
-dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), pass_args=True, 2)
+dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), pass_args=True)
 
 
 settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
