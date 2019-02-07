@@ -19,21 +19,6 @@ from tg_bot.modules.sql import users_sql
 from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
-class CustomCommandHandler(tg.CommandHandler):
-    def __init__(self, command, callback, **kwargs):
-        super().__init__(command, callback, **kwargs)
-
-    def check_update(self, update):
-        return super().check_update(update) and not (
-                sql.is_restr_locked(update.effective_chat.id, 'messages') and not is_user_admin(update.effective_chat,
-                                                                                                update.effective_user.id))
-
-
-tg.CommandHandler = CustomCommandHandler
-
-
-
-
 
 # do not async
 def send(update, message, keyboard):
