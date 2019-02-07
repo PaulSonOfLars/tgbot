@@ -92,15 +92,27 @@ def build_menu(buttons,
 
 @run_async
 def get_settings(bot: Bot, update: Update):
+    img_found = "✅"
+    img_thanks = "😍"
+    img_notfound = "🚫"
+
+    found = "0"
+    thanks = "0"
+    notfound = "0"
+
+    tfound = img_found + " " + found
+    tthanks = img_thanks + " " + thanks
+    tnotfound = img_notfound + " " + notfound
+
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
     args = msg.text.split(None, 1)
 
     button_list = [
-        InlineKeyboardButton("col1", callback_data="key1"),
-        InlineKeyboardButton("col2", callback_data="key2"),
-        InlineKeyboardButton("col3", callback_data="key3")
+        InlineKeyboardButton(tfound, callback_data="key1"),
+        InlineKeyboardButton(tthanks, callback_data="key2"),
+        InlineKeyboardButton(tnotfound, callback_data="key3")
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
