@@ -22,7 +22,7 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 
 
 # do not async
-def send(update, message, keyboard):
+def send(bot: Bot, update: Update, message, keyboard):
     try:
         chat_id = update.effective_chat.id
         #msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard)
