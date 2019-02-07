@@ -106,14 +106,7 @@ def get_like_buttons(bot: Bot, update: Update):
 
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
-
     chat_id = chat.id
-
-
-    print(sent_id)
-    print(chat_id)
-
-
     sql.add_iLike(chat_id, sent_id)
 
 
