@@ -74,7 +74,7 @@ def settings_button(bot: Bot, update: Update):
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
     message_id = update.effective_message.message_id
-    message_text = update.effective_message.text
+    message_text = "*" + update.effective_message.text + "*"
     key = query.data
 
     sql.add_iLike_Click(chat_id, message_id, user_id, key)
