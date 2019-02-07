@@ -90,6 +90,39 @@ def send_lock_msg(bot: Bot, update: Update):
         print(e)
         pass
 
+
+
+@run_async
+@user_not_admin
+def del_lockables(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message  # type: Optional[Message]
+    for lockable, filter in LOCK_TYPES.items():
+        if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
+            if lockable == "bots":
+                new_members = update.effective_message.new_chat_members
+                for new_mem in new_members:
+                    if new_mem.is_bot:
+                        if not is_bot_admin(chat, bot.id):
+                            message.reply_text("I see a bot, and I've been told to stop them joining... "
+                                               "but I'm not admin!")
+                            return
+
+                        chat.kick_member(new_mem.id)
+                        message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
+            else:
+                try:
+                    send_lock_msg(bot, update)
+                    message.delete()
+                except BadRequest as excp:
+                    if excp.message == "Message to delete not found":
+                        pass
+                    else:
+                        LOGGER.exception("ERROR in lockables")
+
+            break
+
+
 @run_async
 @user_not_admin
 def rest_handler(bot: Bot, update: Update):
