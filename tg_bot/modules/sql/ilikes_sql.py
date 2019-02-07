@@ -113,7 +113,7 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 if old_thanks == 1:
                     thanks = 0
                 ilikes_id.ilikes_click_id = new_ilikes_id
-                ilikes_id.found = fold_ound
+                ilikes_id.found = old_found
                 ilikes_id.thanks = thanks
                 ilikes_id.notfound = old_notfound
 
