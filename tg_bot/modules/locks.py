@@ -155,7 +155,6 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
     if can_delete(chat, bot.id):
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
-                print(args[0])
                 sql.update_lock(chat.id, args[0], locked=True)
                 message.reply_text("Locked {} messages for all non-admins!".format(args[0]))
 
@@ -246,6 +245,9 @@ def del_lockables(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
     for lockable, filter in LOCK_TYPES.items():
+        print(filter(message))
+        print(sql.is_locked(chat.id, lockable))
+        print(can_delete(chat, bot.id))
         if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
