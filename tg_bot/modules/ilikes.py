@@ -42,6 +42,30 @@ def UpdateStats(bot: Bot, update: Update, message, keyboard):
     return msg
 
 
+def get_keyboard(chat_id, message_id):
+    img_found = "✅"
+    img_thanks = "😍"
+    img_notfound = "🚫"
+
+
+
+    data = sql.get_iLikes(chat_id, message_id)
+    (found, thanks, notfound) = data
+    
+    tfound = img_found + " " + found
+    tthanks = img_thanks + " " + thanks
+    tnotfound = img_notfound + " " + notfound
+
+
+
+    button_list = [
+        InlineKeyboardButton(tfound, callback_data="thanks_key1"),
+        InlineKeyboardButton(tthanks, callback_data="thanks_key2"),
+        InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
+    ]
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
+    return reply_markup
+
 @run_async
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
@@ -57,6 +81,7 @@ def settings_button(bot: Bot, update: Update):
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
     message_id = update.effective_message.message_id
+    message_text = update.effective_message.text
     key = query.data
     print("button pressed")
     print(query.data)
@@ -69,15 +94,18 @@ def settings_button(bot: Bot, update: Update):
     print("")
     print(message_id)
 
-    print(update.effective_message.text)
-
-#    bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=random_song(), reply_markup=keyboard)
-
-
     sql.add_iLike_Click(chat_id, message_id, user_id, key)
+
+
+    keyboard = get_keyboard(chat_id, message_id)
+    bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard)
 
             # ensure no spinny white circle
     bot.answer_callback_query(query.id)
+
+
+
+
 
 def build_menu(buttons,
                n_cols,
@@ -89,6 +117,8 @@ def build_menu(buttons,
     if footer_buttons:
         menu.append(footer_buttons)
     return menu
+
+
 
 @run_async
 def get_like_buttons(bot: Bot, update: Update):
