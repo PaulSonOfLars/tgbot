@@ -146,7 +146,7 @@ def thank_button(bot: Bot, update: Update):
             if ( data != False ):
                 (up, notused, down, creator, ilikestype) = data
 
-            message_text = "*" + update.effective_message.text + "*"
+            message_text = update.effective_message.text
 
             keyboard = get_keyboard(chat_id, message_id, up, down)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)            
@@ -250,7 +250,6 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     else:
         if ( args != [] ):
             text = " ".join(args)
-            text = "*" + text + "*"
             try:
                 reply_msg_id = msg.reply_to_message.from_user.id
             except Exception as e:
