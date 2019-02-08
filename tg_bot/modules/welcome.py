@@ -17,6 +17,8 @@ from tg_bot.modules.helper_funcs.string_handling import markdown_parser, \
     escape_invalid_curly_brackets
 from tg_bot.modules.log_channel import loggable
 
+from tg_bot.modules.helper_funcs.chat_status import can_delete
+
 VALID_WELCOME_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'count', 'chatname', 'mention']
 
 ENUM_FUNC_MAP = {
@@ -216,15 +218,16 @@ def left_member(bot: Bot, update: Update):
             send(update, res, keyboard, sql.DEFAULT_GOODBYE)
             
     if (DEL_SERVICE_MESSAGES == True):
-        try:
-            bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
-        except BadRequest as excp:
-            if excp.message == "Message to delete not found":
-                pass
-            else:
+        if can_delete(chat, bot.id):
+            try:
+                bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("ERROR in left member")
+            except Exception as e:
                 LOGGER.exception("ERROR in left member")
-        except Exception as e:
-            LOGGER.exception("ERROR in left member")
 
 
 
