@@ -447,4 +447,3 @@ dispatcher.add_handler(toggle_handler)
 dispatcher.add_handler(settings_handler)
 dispatcher.add_handler(settings_callback_handler)
 
-#dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, delete_expired, 0))

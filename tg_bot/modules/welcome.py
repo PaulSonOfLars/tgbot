@@ -8,6 +8,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
+import tg_bot.modules.sql.ilikes_sql as sqllikes
 from tg_bot import dispatcher, OWNER_ID, LOGGER, DEL_SERVICE_MESSAGES
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
@@ -77,6 +78,7 @@ def send(update, message, keyboard, backup_message):
 
 @run_async
 def status_messages(bot: Bot, update: Update):
+    delete_expired(bot, update)
     try:
         bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
     except BadRequest as excp:
@@ -84,6 +86,7 @@ def status_messages(bot: Bot, update: Update):
 
 @run_async
 def new_member(bot: Bot, update: Update):
+    delete_expired(bot, update)
     chat = update.effective_chat  # type: Optional[Chat]
 
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
@@ -154,6 +157,7 @@ def new_member(bot: Bot, update: Update):
         
 @run_async
 def left_member(bot: Bot, update: Update):
+    delete_expired(bot, update)
     chat = update.effective_chat  # type: Optional[Chat]
     should_goodbye, cust_goodbye, goodbye_type = sql.get_gdbye_pref(chat.id)
     if should_goodbye:
@@ -442,6 +446,17 @@ WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in mu
 @user_admin
 def welcome_help(bot: Bot, update: Update):
     update.effective_message.reply_text(WELC_HELP_TXT, parse_mode=ParseMode.MARKDOWN)
+
+
+
+@run_async
+@user_admin
+def delete_expired(bot: Bot, update: Update):
+    try:
+        sqllikes.delete_expired()
+    except Exception as e:
+        pass
+
 
 
 # TODO: get welcome data from group butler snap
