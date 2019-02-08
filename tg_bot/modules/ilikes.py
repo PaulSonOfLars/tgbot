@@ -108,7 +108,6 @@ def thank_button(bot: Bot, update: Update):
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
     user_id = update.effective_user.id
-    print(update.effective_chat)
     message_id = update.effective_message.message_id
     key = query.data
     data = sql.get_iLikes(chat_id, message_id)
@@ -254,6 +253,12 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
 def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     msg = update.effective_message  # type: Optional[Message]
 
+
+    chatlink = ""
+    chat_username = update.effective_chat.username
+    if chat_username:
+        chatlink = "https://t.me/" + str(chat_username)  + "/" + str(reply_msg_id)
+
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
@@ -290,7 +295,7 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-    text = "*Die Community dankt *"+str(user2)+"* für diesen Beitrag!*"
+    text = "*Die Community dankt *"+str(user2)+"* für diesen Beitrag!*\n"+chatlink
 
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
