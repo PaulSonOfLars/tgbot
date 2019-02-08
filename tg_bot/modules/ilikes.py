@@ -103,7 +103,6 @@ def settings_button(bot: Bot, update: Update):
     message_text = "*Die Community dankt*"+str(user2)+"*!*"
 
 
-
     keyboard = get_keyboard(chat_id, message_id, found, thanks, notfound)
     bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
@@ -186,6 +185,7 @@ def send_like_buttons(bot: Bot, update: Update):
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
     chat_id = chat.id
+    user_id = user.id
     sql.add_iLike(chat_id, sent_id, user_id)
 
 
