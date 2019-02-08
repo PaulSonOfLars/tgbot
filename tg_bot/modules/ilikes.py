@@ -256,13 +256,21 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
 
 @run_async
 def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
-#    print(update.effective_message.id)
 
     chatlink = ""
     chat_username = update.effective_chat.username
+    reply_message = update.effective_message.reply_to_message
+
+
+    if reply_message:
+        msg_id = message_id
+    else:
+        msg_id = msg.message_id
     if chat_username:
-        chatlink = "https://t.me/" + str(chat_username)  + "/" + str(update.effective_message.reply_to_message.message_id)
+        chatlink = "https://t.me/" + str(chat_username)  + "/" + msg_id 
 
     img_found = "✅"
     img_thanks = "😍"
@@ -276,9 +284,6 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     tthanks = img_thanks + "   " + thanks
     tnotfound = img_notfound + "   " + notfound
 
-    chat = update.effective_chat  # type: Optional[Chat]
-    user = update.effective_user  # type: Optional[User]
-    msg = update.effective_message  # type: Optional[Message]
 
     user2 = ""
     user_id = update.effective_user.id
