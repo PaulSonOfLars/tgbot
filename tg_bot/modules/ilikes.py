@@ -200,7 +200,6 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 pass
 
             user_id = extract_user(msg, args)
-            msg_id = msg.message_id
             if user_id:
                 send_like_location_buttons(bot, update, reply_msg_id)
             try:
@@ -219,7 +218,6 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 pass
 
             user_id = extract_user(msg, args)
-            msg_id = msg.message_id
             if user_id:
                 send_like_general_buttons(bot, update, reply_msg_id)
             try:
@@ -231,10 +229,8 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                     LOGGER.exception("ERROR in ilikes")
     else:
         if ( args != [] ):
-            text = " ".join(args)
             message_text = str(update.effective_message.text_markdown)
             message_text = message_text[7:]
-            print(message_text)
 
             try:
                 reply_msg_id = msg.reply_to_message.from_user.id
@@ -242,8 +238,7 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 reply_msg_id = None
                 pass
 
-            msg_id = msg.message_id
-            send_like_question_buttons(bot, update, text)
+            send_like_question_buttons(bot, update, message_text)
             try:
                 msg.delete()
             except BadRequest as excp:
