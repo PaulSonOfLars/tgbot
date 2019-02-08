@@ -133,7 +133,7 @@ def thank_button(bot: Bot, update: Update):
                     user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
                                                            sent_user.id)
 
-            message_text = "*" + update.effective_message.text + "*"
+            message_text = "*Die Community dankt*"+str(user2)+"*!*"
 
 
             keyboard = get_keyboard_locations(chat_id, message_id, found, thanks, notfound)
@@ -146,9 +146,7 @@ def thank_button(bot: Bot, update: Update):
             if ( data != False ):
                 (up, notused, down, creator, ilikestype) = data
 
-
-            message_text = "*Die Community dankt*"+str(user2)+"*!*"
-
+            message_text = "*" + update.effective_message.text + "*"
 
             keyboard = get_keyboard(chat_id, message_id, up, down)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)            
