@@ -40,7 +40,7 @@ def send_reply(update, message, keyboard):
     return msg
 
 
-def get_keyboard(chat_id, message_id, found, thanks, notfound):
+def get_keyboard_locations(chat_id, message_id, found, thanks, notfound):
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
@@ -63,6 +63,28 @@ def get_keyboard(chat_id, message_id, found, thanks, notfound):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
     return reply_markup
+
+
+def get_keyboard(chat_id, message_id, up, down):
+    img_up = "👍🏻"
+    img_down = "👎🏻"
+    
+    if up >= 100:
+        up = "99+"
+    if down >= 100:
+        down = "99+"
+
+    tup = img_up + "   " + str(up)
+    tdown = img_down + "   " + str(down)
+
+    button_list = [
+        InlineKeyboardButton(tup, callback_data="thanks_key1"),
+        InlineKeyboardButton(tdown, callback_data="thanks_key3")
+    ]
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
+    return reply_markup
+
+
 
 @run_async
 def location_handler(bot: Bot, update: Update):
@@ -90,29 +112,52 @@ def thank_button(bot: Bot, update: Update, args: List[str]) -> str:
     key = query.data
 
 
-    reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
-    bot.answer_callback_query(query.id, text=reply)
+    msg = update.effective_message  # type: Optional[Message]
+    reply_to_msg = msg.reply_to_message
+    if Filters.location(reply_to_msg):
+        reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
+        bot.answer_callback_query(query.id, text=reply)
 
 
-    data = sql.get_iLikes(chat_id, message_id)
-    if ( data != False ):
-        (found, thanks, notfound, creator) = data
+        data = sql.get_iLikes(chat_id, message_id)
+        if ( data != False ):
+            (found, thanks, notfound, creator) = data
 
-        user2 = ""
-        if creator:
-            sent_user = bot.get_chat(creator)
-            if sent_user.username:
-                user2 = " @" + escape_markdown(sent_user.username)
-            else:
-                user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
-                                                       sent_user.id)
+            user2 = ""
+            if creator:
+                sent_user = bot.get_chat(creator)
+                if sent_user.username:
+                    user2 = " @" + escape_markdown(sent_user.username)
+                else:
+                    user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                           sent_user.id)
 
-        message_text = "*Die Community dankt*"+str(user2)+"*!*"
+            message_text = "*Die Community dankt*"+str(user2)+"*!*"
 
 
-        keyboard = get_keyboard(chat_id, message_id, found, thanks, notfound)
-        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+            keyboard = get_keyboard_locations(chat_id, message_id, found, thanks, notfound)
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+    else:
+        reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
+        bot.answer_callback_query(query.id, text=reply)
+        data = sql.get_iLikes(chat_id, message_id)
+        if ( data != False ):
+            (up, notused, down, creator) = data
 
+            user2 = ""
+            if creator:
+                sent_user = bot.get_chat(creator)
+                if sent_user.username:
+                    user2 = " @" + escape_markdown(sent_user.username)
+                else:
+                    user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                           sent_user.id)
+
+            message_text = "*Die Community dankt*"+str(user2)+"*!*"
+
+
+            keyboard = get_keyboard(chat_id, message_id, up, down)
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
 
 
@@ -146,8 +191,6 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
     if Filters.location(reply_to_msg):
-
-
         # get user who sent message
         try:
             reply_msg_id = msg.reply_to_message.from_user.id
@@ -155,13 +198,29 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
             reply_msg_id = None
             pass
 
-
-
-
         user_id = extract_user(msg, args)
         msg_id = msg.message_id
         if user_id:
             send_like_location_buttons(bot, update, reply_msg_id)
+        try:
+            msg.delete()
+        except BadRequest as excp:
+            if excp.message == "Message to delete not found":
+                pass
+            else:
+                LOGGER.exception("ERROR in ilikes")
+    else:
+        # get user who sent message
+        try:
+            reply_msg_id = msg.reply_to_message.from_user.id
+        except Exception as e:
+            reply_msg_id = None
+            pass
+
+        user_id = extract_user(msg, args)
+        msg_id = msg.message_id
+        if user_id:
+            send_like_general_buttons(bot, update, reply_msg_id)
         try:
             msg.delete()
         except BadRequest as excp:
@@ -210,6 +269,51 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
         InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
+
+    text = "*Die Community dankt*"+str(user2)+"*!*"
+
+    sent_message = send(bot, update, text, reply_markup)
+    sent_id = sent_message.message_id
+    chat_id = chat.id
+    sql.add_iLike(chat_id, sent_id, user_id)
+
+
+
+@run_async
+def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
+    msg = update.effective_message  # type: Optional[Message]
+
+    img_up = "👍🏻"
+    img_down = "👎🏻"
+
+    up = "0"
+    down = "0"
+
+    tup = img_up + "   " + up
+    tdown = img_down + "   " + down
+
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+    msg = update.effective_message  # type: Optional[Message]
+
+    user2 = ""
+    user_id = update.effective_user.id
+    if reply_msg_id:
+        user_id = msg.reply_to_message.from_user.id
+
+    if user_id:
+        sent_user = bot.get_chat(user_id)
+        if sent_user.username:
+            user2 = " @" + escape_markdown(sent_user.username)
+        else:
+            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                   sent_user.id)
+
+    button_list = [
+        InlineKeyboardButton(tup, callback_data="thanks_key1"),
+        InlineKeyboardButton(tdown, callback_data="thanks_key3")
+    ]
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
 
     text = "*Die Community dankt*"+str(user2)+"*!*"
 
