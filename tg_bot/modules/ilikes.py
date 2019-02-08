@@ -142,9 +142,9 @@ def toggle_ilikes(bot: Bot, update: Update):
 def get_like_buttons(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(update.effective_message, args)
     msg = update.effective_message
-    msg_id = msg.id
+#    msg_id = msg.id
 
-    print(msg_id)
+ #   print(msg_id)
     print(msg)
     if user_id:
         send_like_buttons(bot, update)
