@@ -181,6 +181,7 @@ def build_menu(buttons,
 def toggle_ilikes(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     retval = sql.toggle_ilikes(chat_id)
+    print("here3")
     if ( retval == True ):
         msg = "Automatische iLikes wurde für Standorte aktiviert"
     else:
