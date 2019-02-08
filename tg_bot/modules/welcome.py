@@ -218,8 +218,15 @@ def left_member(bot: Bot, update: Update):
     if (DEL_SERVICE_MESSAGES == True):
         try:
             bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+        except BadRequest as excp:
+            if excp.message == "Message to delete not found":
+                pass
+            else:
+                LOGGER.exception("ERROR in left member")
         except Exception as e:
-            pass
+            LOGGER.exception("ERROR in left member")
+
+
 
 @run_async
 @user_admin

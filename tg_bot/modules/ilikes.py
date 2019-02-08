@@ -193,7 +193,13 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
         msgtext = "Automatische iLikes wurden für Standorte aktiviert"
     else:
         msgtext = "Automatische iLikes wurden für Standorte wieder de-aktiviert"
-    msg.delete()
+    try:
+        msg.delete()
+    except BadRequest as excp:
+        if excp.message == "Message to delete not found":
+            pass
+        else:
+            LOGGER.exception("ERROR in toggle ilikes")
 #    send_reply(update, msgtext, [])
     send(bot, update, msgtext, [])
 
@@ -269,7 +275,13 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 else:
                     LOGGER.exception("ERROR in ilikes")
         else: 
-            msg.delete()
+            try:
+                msg.delete()
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("ERROR in send like buttons")
 
 @run_async
 def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
