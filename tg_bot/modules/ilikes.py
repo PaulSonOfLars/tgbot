@@ -185,8 +185,8 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
 
     delete_expired(bot, update)
 
-
-    chat_id = update.effective_chat.id
+    chat = update.effective_chat
+    chat_id = chat.id
     msg = update.effective_message
     retval = sql.toggle_ilikes(chat_id)
     if ( retval == True ):
@@ -194,7 +194,9 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
     else:
         msgtext = "Automatische iLikes wurden für Standorte wieder de-aktiviert"
     try:
-        msg.delete()
+
+        if can_delete(chat, bot.id):
+            msg.delete()
     except BadRequest as excp:
         if excp.message == "Message to delete not found":
             pass
