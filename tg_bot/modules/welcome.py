@@ -77,7 +77,17 @@ def send(update, message, keyboard, backup_message):
     return msg
 
 @run_async
+def delete_expired(bot: Bot, update: Update):
+    try:
+        sqllike.delete_expired()
+    except Exception as e:
+        pass
+
+
+
+@run_async
 def status_messages(bot: Bot, update: Update):
+    delete_expired(bot, update)
     try:
         bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
     except BadRequest as excp:
@@ -85,6 +95,7 @@ def status_messages(bot: Bot, update: Update):
 
 @run_async
 def new_member(bot: Bot, update: Update):
+    delete_expired(bot, update)
     chat = update.effective_chat  # type: Optional[Chat]
 
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
@@ -155,6 +166,7 @@ def new_member(bot: Bot, update: Update):
         
 @run_async
 def left_member(bot: Bot, update: Update):
+    delete_expired(bot, update)
     chat = update.effective_chat  # type: Optional[Chat]
     should_goodbye, cust_goodbye, goodbye_type = sql.get_gdbye_pref(chat.id)
     if should_goodbye:

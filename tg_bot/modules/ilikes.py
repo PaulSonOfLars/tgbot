@@ -447,5 +447,3 @@ settings_handler = CommandHandler("ilike", send_like_buttons,
 dispatcher.add_handler(toggle_handler)
 dispatcher.add_handler(settings_handler)
 dispatcher.add_handler(settings_callback_handler)
-
-dispatcher.add_handler(MessageHandler(Filters.all, delete_expired))
