@@ -148,7 +148,7 @@ def get_like_buttons(bot: Bot, update: Update, args: List[str]):
     print(msg)
     if user_id:
         send_like_buttons(bot, update)
-
+    msg.delete()
 
 
 @run_async
