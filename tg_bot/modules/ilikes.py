@@ -338,7 +338,7 @@ __mod_name__ = "iLikes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, location_handler), 2)
 
 
-settings_callback_handler = CallbackQueryHandler(thank_button, pattern=r"thanks_")
+settings_callback_handler = CallbackQueryHandler(thank_button, pattern=r"thanks_", pass_args=True)
 
 toggle_handler = CommandHandler("iLikes", toggle_ilikes,
                            filters=CustomFilters.sudo_filter | CustomFilters.support_filter, pass_args=True)
