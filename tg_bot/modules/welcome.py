@@ -79,7 +79,7 @@ def send(update, message, keyboard, backup_message):
 @run_async
 def delete_expired(bot: Bot, update: Update):
     try:
-        sqllike.delete_expired()
+        sqllikes.delete_expired()
     except Exception as e:
         pass
 
