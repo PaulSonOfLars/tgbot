@@ -185,7 +185,7 @@ def send_like_buttons(bot: Bot, update: Update):
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
     chat_id = chat.id
-    user_id = user.id
+    print(user_id)
     sql.add_iLike(chat_id, sent_id, user_id)
 
 
