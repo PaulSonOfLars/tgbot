@@ -15,7 +15,7 @@ class iLikes(BASE):
     notfound = Column(Integer, nullable=False)
     creator = Column(String(50), nullable=False)
     iliketype = Column(String(50), nullable=False)
-    timestamp = Column(Integer(50), nullable=False)
+    timestamp = Column(Integer, nullable=False)
 
     def __init__(self, ilikes_id, creator, iliketype):
         self.ilikes_id = str(ilikes_id)
