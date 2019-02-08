@@ -89,7 +89,7 @@ def get_keyboard(chat_id, message_id, up, down):
 @run_async
 def location_handler(bot: Bot, update: Update):
 
-    delete_expired()
+    delete_expired(bot, update)
 
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
@@ -107,7 +107,7 @@ def location_handler(bot: Bot, update: Update):
 @run_async
 def thank_button(bot: Bot, update: Update):
 
-    delete_expired()
+    delete_expired(bot, update)
 
     query = update.callback_query
     user = update.effective_user
@@ -183,7 +183,7 @@ def build_menu(buttons,
 @user_admin
 def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
 
-    delete_expired()
+    delete_expired(bot, update)
 
 
     chat_id = update.effective_chat.id
@@ -199,7 +199,7 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
 
 
 
-def delete_expired():
+def delete_expired(bot: Bot, update: Update):
     try:
         sql.delete_expired()
     except Exception as e:
@@ -208,7 +208,7 @@ def delete_expired():
 
 @run_async
 def send_like_buttons(bot: Bot, update: Update, args: List[str]):
-    delete_expired()
+    delete_expired(bot, update)
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
 
