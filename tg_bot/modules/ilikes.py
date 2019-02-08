@@ -99,9 +99,7 @@ def location_handler(bot: Bot, update: Update):
         pass
 
     if Filters.location(msg):
-        print("here")
         if ( sql.ilikes_enabled(chat.id) == True ):
-            print("here2")
             send_like_location_buttons(bot, update, reply_msg_id)
 
 @run_async
@@ -183,7 +181,6 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
     chat_id = update.effective_chat.id
     msg = update.effective_message
     retval = sql.toggle_ilikes(chat_id)
-    print("here3")
     if ( retval == True ):
         msgtext = "Automatische iLikes wurde für Standorte aktiviert"
     else:
