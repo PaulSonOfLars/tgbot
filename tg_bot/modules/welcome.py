@@ -445,17 +445,6 @@ def welcome_help(bot: Bot, update: Update):
     update.effective_message.reply_text(WELC_HELP_TXT, parse_mode=ParseMode.MARKDOWN)
 
 
-
-@run_async
-@user_admin
-def delete_expired(bot: Bot, update: Update):
-    try:
-        sqllikes.delete_expired()
-    except Exception as e:
-        pass
-
-
-
 # TODO: get welcome data from group butler snap
 # def __import_data__(chat_id, data):
 #     welcome = data.get('info', {}).get('rules')
