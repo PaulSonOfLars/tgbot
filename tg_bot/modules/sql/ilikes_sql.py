@@ -183,15 +183,12 @@ def delete_expired():
         hours = 24
         seconds = hours * 60 * 60
         timelimit = seconds
-        timelimit = 20
         cur_time = int(str(time.time()).split(".")[0])
         expired = SESSION.query(iLikes).filter(cur_time - iLikes.timestamp >= timelimit ).all()
-        print(expired)
         for ilike in expired:
             SESSION.delete(ilike)
             ilike_id = str(ilike)
             expired_clicks = SESSION.query(iLikes_Clicks).filter(iLikes_Clicks.ilikes_id == ilike_id ).all()
-            print(expired_clicks)
             for click in expired_clicks:
                 SESSION.delete(click)
         SESSION.commit()
