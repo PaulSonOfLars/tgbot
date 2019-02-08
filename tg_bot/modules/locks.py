@@ -364,9 +364,9 @@ notification will be deleted if possible.
 __mod_name__ = "Media Type Locks"
 
 LOCKTYPES_HANDLER = DisableAbleCommandHandler("locktypes", locktypes)
-LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=Filters.group)
-UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True, filters=Filters.group)
-LOCKED_HANDLER = CommandHandler("locks", list_locks, filters=Filters.group)
+LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=CustomFilters.sudo_filter & Filters.group | CustomFilters.support_filter & Filters.group)
+UNLOCK_HANDLER = CommandHandler("unlock", unlock, pass_args=True, filters=CustomFilters.sudo_filter & Filters.group | CustomFilters.support_filter & Filters.group)
+LOCKED_HANDLER = CommandHandler("locks", list_locks, filters=CustomFilters.sudo_filter & Filters.group | CustomFilters.support_filter & Filters.group)
 
 dispatcher.add_handler(LOCK_HANDLER)
 dispatcher.add_handler(UNLOCK_HANDLER)

@@ -364,13 +364,13 @@ You can enable that via the config via CHANNEL\_GBAN=True
 __mod_name__ = "Bans - Global"
 
 GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True,
-                              filters=Filters.group)
+                              filters=CustomFilters.sudo_filter | CustomFilters.support_filter )
 UNGBAN_HANDLER = CommandHandler("ungban", ungban, pass_args=True,
                                 filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 GBAN_LIST = CommandHandler("gbanlist", gbanlist,
                            filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
 
-GBAN_STATUS = CommandHandler("gbanstat", gbanstat, pass_args=True, filters=Filters.group)
+GBAN_STATUS = CommandHandler("gbanstat", gbanstat, pass_args=True, filters=CustomFilters.sudo_filter & Filters.group | CustomFilters.support_filter & Filters.group)
 
 GBAN_ENFORCER = MessageHandler(Filters.all & Filters.group, enforce_gban)
 
