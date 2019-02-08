@@ -393,10 +393,11 @@ This module sends like Buttons
 __mod_name__ = "iLikes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, location_handler), 2)
 
+settings_callback_handler = CallbackQueryHandler(thank_button, pattern=r"thanks_")
+
 toggle_handler = CommandHandler("iLikes", toggle_ilikes,
                            filters=CustomFilters.sudo_filter | CustomFilters.support_filter, pass_args=True)
 settings_handler = CommandHandler("ilike", send_like_buttons, pass_args=True)
-settings_callback_handler = CallbackQueryHandler(thank_button, pattern=r"thanks_")
 
 dispatcher.add_handler(toggle_handler)
 dispatcher.add_handler(settings_handler)
