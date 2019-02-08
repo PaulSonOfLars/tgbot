@@ -143,12 +143,15 @@ def get_like_buttons(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(update.effective_message, args)
     msg = update.effective_message
     msg_id = msg.message_id
-
-    print(msg_id)
-    print(msg)
     if user_id:
         send_like_buttons(bot, update)
-    msg.delete()
+    try:
+        msg.delete()
+    except BadRequest as excp:
+        if excp.message == "Message to delete not found":
+            pass
+        else:
+            LOGGER.exception("ERROR in ilikes")
 
 
 @run_async

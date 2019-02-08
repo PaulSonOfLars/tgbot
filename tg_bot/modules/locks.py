@@ -104,7 +104,11 @@ def send_lock_msg(bot: Bot, update: Update):
             try:
                 bot.delete_message(chat_id, prev_msg)
             except BadRequest as excp:
-                pass
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("ERROR in sendlockmsg")
+
         retval = sql.set_lock_msgid(chat_id, sentid.message_id)
     except Exception as e:
         print(e)
