@@ -89,8 +89,7 @@ def get_keyboard(chat_id, message_id, up, down):
 @run_async
 def location_handler(bot: Bot, update: Update):
 
-    sql.get_expired()
-
+    delete_expired()
 
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
@@ -107,6 +106,9 @@ def location_handler(bot: Bot, update: Update):
 
 @run_async
 def thank_button(bot: Bot, update: Update):
+
+    delete_expired()
+
     query = update.callback_query
     user = update.effective_user
     user_id = update.effective_user.id
@@ -180,6 +182,10 @@ def build_menu(buttons,
 @run_async
 @user_admin
 def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
+
+    delete_expired()
+
+
     chat_id = update.effective_chat.id
     msg = update.effective_message
     retval = sql.toggle_ilikes(chat_id)
@@ -192,8 +198,17 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
     send(bot, update, msgtext, [])
 
 
+
+def delete_expired():
+    try:
+        sql.delete_expired()
+    except Exception as e:
+        pass
+
+
 @run_async
 def send_like_buttons(bot: Bot, update: Update, args: List[str]):
+    delete_expired()
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
 
@@ -414,6 +429,8 @@ This module sends like Buttons
 /iLikes : Toggle automatic Location Likes
 /ilike  : Sends Like Buttons (via reply)
 /ilike <Your Text> : Will resend your Text with Like Buttons
+
+Survey Data will be deleted from the server after 24 hours!
 """
 
 __mod_name__ = "iLikes"
@@ -430,3 +447,4 @@ dispatcher.add_handler(toggle_handler)
 dispatcher.add_handler(settings_handler)
 dispatcher.add_handler(settings_callback_handler)
 
+dispatcher.add_handler(MessageHandler(Filters.all & Filters.group, delete_expired, 2)
