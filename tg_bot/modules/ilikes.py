@@ -110,6 +110,7 @@ def thank_button(bot: Bot, update: Update):
     user_id = update.effective_user.id
     message_id = update.effective_message.message_id
     key = query.data
+    print("now")
 
 
     data = sql.get_iLikes(chat_id, message_id)
