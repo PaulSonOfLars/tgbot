@@ -12,8 +12,8 @@ DEFAULT_GOODBYE = "Nice knowing ya!"
 class Welcome(BASE):
     __tablename__ = "welcome_pref"
     chat_id = Column(String(14), primary_key=True)
-    should_welcome = Column(Boolean, default=True)
-    should_goodbye = Column(Boolean, default=True)
+    should_welcome = Column(Boolean, default=False)
+    should_goodbye = Column(Boolean, default=False)
 
     custom_welcome = Column(UnicodeText, default=DEFAULT_WELCOME)
     welcome_type = Column(Integer, default=Types.TEXT.value)
@@ -23,7 +23,7 @@ class Welcome(BASE):
 
     clean_welcome = Column(BigInteger)
 
-    def __init__(self, chat_id, should_welcome=True, should_goodbye=True):
+    def __init__(self, chat_id, should_welcome=False, should_goodbye=False):
         self.chat_id = chat_id
         self.should_welcome = should_welcome
         self.should_goodbye = should_goodbye
