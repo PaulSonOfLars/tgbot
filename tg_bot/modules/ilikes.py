@@ -167,7 +167,7 @@ def send_like_buttons(bot: Bot, update: Update):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-    text = "*Die Community Dankt"+str(user2)+"!*"
+    text = "*Die Community dankt*"+str(user2)+"*!*"
 
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
