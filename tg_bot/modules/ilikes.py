@@ -114,6 +114,7 @@ def thank_button(bot: Bot, update: Update):
 
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
+    print(msg)
     if Filters.location(reply_to_msg):
         reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
         bot.answer_callback_query(query.id, text=reply)
