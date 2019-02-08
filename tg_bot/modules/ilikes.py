@@ -147,6 +147,14 @@ def get_like_buttons(bot: Bot, update: Update, args: List[str]):
 
 @run_async
 def send_like_buttons(bot: Bot, update: Update):
+    msg = update.effective_message  # type: Optional[Message]
+
+    # reply to correct message
+    reply_text = msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
+
+    # get user who sent message
+    if msg.from_user.username:
+        print(msg.from_user.username)
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
