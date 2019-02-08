@@ -448,4 +448,4 @@ dispatcher.add_handler(toggle_handler)
 dispatcher.add_handler(settings_handler)
 dispatcher.add_handler(settings_callback_handler)
 
-dispatcher.add_handler(MessageHandler(Filters.text & Filters.group | Filters.status_update & Filters.group, delete_expired), 0)
+dispatcher.add_handler(MessageHandler(Filters.text & Filters.group | Filters.status_update & Filters.group, delete_expired))
