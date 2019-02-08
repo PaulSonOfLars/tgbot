@@ -150,6 +150,13 @@ def send_like_buttons(bot: Bot, update: Update):
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
 
+    user2 = ""
+    sent_user = bot.get_chat(user_id)
+        if sent_user.username:
+            user2 = " @" + escape_markdown(sent_user.username)
+        else:
+            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                   sent_user.id)
 
     button_list = [
         InlineKeyboardButton(tfound, callback_data="thanks_key1"),
@@ -158,7 +165,7 @@ def send_like_buttons(bot: Bot, update: Update):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-    text = "*Die Community Dankt!*"
+    text = "*Die Community Dankt"+str(user2)+"!*"
 
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
