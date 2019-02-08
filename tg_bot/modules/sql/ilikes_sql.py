@@ -187,6 +187,11 @@ def delete_expired():
         print(expired)
         for ilike in expired:
             SESSION.delete(ilike)
+            print(str(ilike))
+#            expired_clicks = SESSION.query(iLikes_Clicks).filter(iLikes_Clicks.ilikes_id =  ).all()
+#            print(expired_clicks)
+#            for click in expired_clicks:
+#                SESSION.delete(click)
 
 def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
     try:
