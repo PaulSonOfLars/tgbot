@@ -137,7 +137,8 @@ def toggle_ilikes(bot: Bot, update: Update):
 @run_async
 def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
-    if Filters.location(msg):
+    reply_to_msg = msg.reply_to_message
+    if Filters.location(reply_to_msg):
         print("location found")
     print("debug")
     print(msg)
