@@ -232,7 +232,6 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     else:
         if ( args != [] ):
             text = " ".join(args)
-            text = "*" + text + "*"
             try:
                 reply_msg_id = msg.reply_to_message.from_user.id
             except Exception as e:
@@ -382,7 +381,8 @@ __help__ = """
 This module sends like Buttons
 
 /iLikes : Toggle automatic Location Likes
-/ilike  : Send some like Buttons
+/ilike  : Sends Like Buttons (via reply)
+/ilike <Your Text> : Will resend your Text with Like Buttons
 """
 
 __mod_name__ = "iLikes"
