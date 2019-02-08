@@ -50,6 +50,7 @@ class iLikes_Clicks(BASE):
     found = Column(Integer, nullable=False)
     thanks = Column(Integer, nullable=False)
     notfound = Column(Integer, nullable=False)
+    ilikes_id = Column(String(100), nullable=False)
 
     def __init__(self, ilikes_click_id, found, thanks, notfound, ilikes_id):
         self.ilikes_click_id = str(ilikes_click_id)
