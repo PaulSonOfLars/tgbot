@@ -193,7 +193,8 @@ def delete_expired():
             print(expired_clicks)
             for click in expired_clicks:
                 SESSION.delete(click)
-                print(click)
+        SESSION.commit()
+
 def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
     try:
         reply = ""
