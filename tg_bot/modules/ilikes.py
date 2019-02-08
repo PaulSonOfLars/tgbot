@@ -111,7 +111,6 @@ def thank_button(bot: Bot, update: Update):
     message_id = update.effective_message.message_id
     key = query.data
     data = sql.get_iLikes(chat_id, message_id)
-    print(data)
     if ( data != False ):
         (found, thanks, notfound, creator, ilikestype) = data
 
@@ -163,7 +162,7 @@ def thank_button(bot: Bot, update: Update):
             keyboard = get_keyboard(chat_id, message_id, up, down)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
     else:
-        bot.answer_callback_query(query.id, text="Like bereits vom Server gelöscht!")
+        bot.answer_callback_query(query.id, text="iLike Daten bereits vom Server gelöscht!")
 
 
 
