@@ -230,13 +230,14 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
             user_id = extract_user(msg, args)
             if user_id:
                 send_like_location_buttons(bot, update, reply_msg_id)
-            try:
-                msg.delete()
-            except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
-                    LOGGER.exception("ERROR in ilikes")
+            if can_delete(chat, bot.id):
+                try:
+                    msg.delete()
+                except BadRequest as excp:
+                    if excp.message == "Message to delete not found":
+                        pass
+                    else:
+                        LOGGER.exception("ERROR in send_like_buttons")
         else:
             # get user who sent message
             try:
@@ -248,13 +249,14 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
             user_id = extract_user(msg, args)
             if user_id:
                 send_like_general_buttons(bot, update, reply_msg_id)
-            try:
-                msg.delete()
-            except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
-                    LOGGER.exception("ERROR in ilikes")
+            if can_delete(chat, bot.id):
+                try:
+                    msg.delete()
+                except BadRequest as excp:
+                    if excp.message == "Message to delete not found":
+                        pass
+                    else:
+                        LOGGER.exception("ERROR in send_like_buttons")
     else:
         if ( args != [] ):
             message_text = str(update.effective_message.text_markdown)
@@ -267,21 +269,23 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 pass
 
             send_like_question_buttons(bot, update, message_text)
-            try:
-                msg.delete()
-            except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
-                    LOGGER.exception("ERROR in ilikes")
+            if can_delete(chat, bot.id):
+                try:
+                    msg.delete()
+                except BadRequest as excp:
+                    if excp.message == "Message to delete not found":
+                        pass
+                    else:
+                        LOGGER.exception("ERROR in send_like_buttons")
         else: 
-            try:
-                msg.delete()
-            except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
-                    LOGGER.exception("ERROR in send like buttons")
+            if can_delete(chat, bot.id):
+                try:
+                    msg.delete()
+                except BadRequest as excp:
+                    if excp.message == "Message to delete not found":
+                        pass
+                    else:
+                        LOGGER.exception("ERROR in send_like_buttons")
 
 @run_async
 def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
