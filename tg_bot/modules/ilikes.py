@@ -182,9 +182,9 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message
     retval = sql.toggle_ilikes(chat_id)
     if ( retval == True ):
-        msgtext = "Automatische iLikes wurde für Standorte aktiviert"
+        msgtext = "Automatische iLikes wurden für Standorte aktiviert"
     else:
-        msgtext = "Automatische iLikes wurde für Standorte wieder de-aktiviert"
+        msgtext = "Automatische iLikes wurden für Standorte wieder de-aktiviert"
     msg.delete()
 #    send_reply(update, msgtext, [])
     send(bot, update, msgtext, [])
