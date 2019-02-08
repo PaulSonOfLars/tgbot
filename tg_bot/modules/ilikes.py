@@ -277,9 +277,9 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     if user_id:
         sent_user = bot.get_chat(user_id)
         if sent_user.username:
-            user2 = " @" + escape_markdown(sent_user.username)
+            user2 = "@" + escape_markdown(sent_user.username)
         else:
-            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+            user2 = "[{}](tg://user?id={})".format(sent_user.first_name,
                                                    sent_user.id)
 
     button_list = [
@@ -289,7 +289,7 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-    text = "*Die Community dankt*"+str(user2)+"*!*"
+    text = "*Die Community dankt *"+str(user2)+"* für diesen Beitrag!*"
 
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
@@ -323,9 +323,9 @@ def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
     if user_id:
         sent_user = bot.get_chat(user_id)
         if sent_user.username:
-            user2 = " @" + escape_markdown(sent_user.username)
+            user2 = "@" + escape_markdown(sent_user.username)
         else:
-            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+            user2 = "[{}](tg://user?id={})".format(sent_user.first_name,
                                                    sent_user.id)
 
     button_list = [
@@ -334,7 +334,7 @@ def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
 
-    text = "*Die Community dankt*"+str(user2)+"*!*"
+    text = "*Die Community dankt *"+str(user2)+"* für diesen Beitrag!*"
 
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
