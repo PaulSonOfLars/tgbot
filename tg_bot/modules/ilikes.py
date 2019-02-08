@@ -191,7 +191,7 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
 
-    print(reply_to_ms)
+    print(reply_to_msg)
     if Filters.location(reply_to_msg):
         # get user who sent message
         try:
