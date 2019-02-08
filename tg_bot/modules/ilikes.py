@@ -270,7 +270,7 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     else:
         msg_id = msg.message_id
     if chat_username:
-        chatlink = "https://t.me/" + str(chat_username)  + "/" + msg_id 
+        chatlink = "https://t.me/" + str(chat_username)  + "/" + str(msg_id) 
 
     img_found = "✅"
     img_thanks = "😍"
