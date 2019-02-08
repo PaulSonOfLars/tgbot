@@ -199,7 +199,6 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
 
 
 
-@run_async
 def delete_expired(bot: Bot, update: Update):
     try:
         sql.delete_expired()
