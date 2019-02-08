@@ -77,7 +77,10 @@ def send(update, message, keyboard, backup_message):
 
 @run_async
 def status_messages(bot: Bot, update: Update):
-    bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+    try:
+        bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+    except BadRequest as excp:
+        pass
 
 @run_async
 def new_member(bot: Bot, update: Update):
@@ -144,8 +147,11 @@ def new_member(bot: Bot, update: Update):
                 sql.set_clean_welcome(chat.id, sent.message_id)
 
     if (DEL_SERVICE_MESSAGES == True):
-        bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
-
+        try:
+            bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+        except BadRequest as excp:
+            pass
+        
 @run_async
 def left_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
@@ -197,7 +203,10 @@ def left_member(bot: Bot, update: Update):
             send(update, res, keyboard, sql.DEFAULT_GOODBYE)
             
     if (DEL_SERVICE_MESSAGES == True):
-        bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+        try:
+            bot.delete_message(update.effective_message.chat.id, update.effective_message.message_id)
+        except BadRequest as excp:
+            pass
 
 @run_async
 @user_admin
