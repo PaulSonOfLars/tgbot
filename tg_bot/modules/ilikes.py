@@ -181,20 +181,21 @@ def build_menu(buttons,
 @user_admin
 def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
     chat_id = update.effective_chat.id
+    msg = update.effective_message
     retval = sql.toggle_ilikes(chat_id)
     print("here3")
     if ( retval == True ):
-        msg = "Automatische iLikes wurde für Standorte aktiviert"
+        msgtext = "Automatische iLikes wurde für Standorte aktiviert"
     else:
-        msg = "Automatische iLikes wurde für Standorte wieder de-aktiviert"
-    send_reply(update, msg, [])
+        msgtext = "Automatische iLikes wurde für Standorte wieder de-aktiviert"
+    send_reply(update, msgtext, [])
+    msg.delete()
 
 
 @run_async
 def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
-    print(msg)
 
     if reply_to_msg:
         if Filters.location(reply_to_msg):
