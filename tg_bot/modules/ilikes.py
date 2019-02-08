@@ -260,7 +260,7 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 pass
 
             msg_id = msg.message_id
-            send_like_question_buttons(bot, update, reply_msg_id, text)
+            send_like_question_buttons(bot, update, text)
             try:
                 msg.delete()
             except BadRequest as excp:
