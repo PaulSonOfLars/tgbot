@@ -83,8 +83,23 @@ def settings_button(bot: Bot, update: Update):
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
     message_id = update.effective_message.message_id
-    message_text = "*" + update.effective_message.text + "*"
     key = query.data
+
+    user2 = ""
+    user_id = update.effective_user.id
+    if user_id:
+        sent_user = bot.get_chat(user_id)
+        if sent_user.username:
+            user2 = " @" + escape_markdown(sent_user.username)
+        else:
+            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                   sent_user.id)
+
+    message_text = "*Die Community dankt*"+str(user2)+"*!*"
+
+
+
+
 
     reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
     
