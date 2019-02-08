@@ -152,7 +152,7 @@ def send_like_buttons(bot: Bot, update: Update):
 
     # get user who sent message
     if msg.reply_to_message.from_user.username:
-        print(msg.from_user.username)
+        print(msg.reply_to_message.from_user.username)
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
