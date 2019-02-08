@@ -81,7 +81,7 @@ def add_iLike(chat_id, msg_id, user_id, iliketype):
         new_ilikes_id = str(chat_id)+str(msg_id)
         ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
         if not ilikes_id:
-            ilikes_id = iLikes(new_ilikes_id, user_id, str(iliketype)
+            ilikes_id = iLikes(new_ilikes_id, user_id, str(iliketype))
             SESSION.add(ilikes_id)
             SESSION.commit()
             return True
