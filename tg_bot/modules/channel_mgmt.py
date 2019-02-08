@@ -209,10 +209,10 @@ __help__ = """This module does let you add or remove channels and groups manuall
 __mod_name__ = "Groups & Channels"
 
 CHATSS_HANDLER = CommandHandler("listchats", chats, filters=CustomFilters.sudo_filter)
-ADDCHANNEL_HANDLER = CommandHandler("addchannel", add_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-LISTCHANNELS_HANDLER = CommandHandler("listchannels", list_channels, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-DELCHANNEL_HANDLER = CommandHandler("delchannel", del_channel, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-DELCHAT_HANDLER = CommandHandler("delchat", del_chat, filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
+ADDCHANNEL_HANDLER = CommandHandler("addchannel", add_channel, filters=Filters.user(OWNER_ID))
+LISTCHANNELS_HANDLER = CommandHandler("listchannels", list_channels, filters=CustomFilters.sudo_filter)
+DELCHANNEL_HANDLER = CommandHandler("delchannel", del_channel, filters=Filters.user(OWNER_ID))
+DELCHAT_HANDLER = CommandHandler("delchat", del_chat, filters=Filters.user(OWNER_ID))
 
 dispatcher.add_handler(CHATSS_HANDLER)
 dispatcher.add_handler(ADDCHANNEL_HANDLER)
