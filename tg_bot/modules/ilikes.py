@@ -55,9 +55,9 @@ def get_keyboard(chat_id, message_id):
     if notfound >= 100:
         notfound = "99+"
 
-    tfound = img_found + "   " + found
-    tthanks = img_thanks + "   " + thanks
-    tnotfound = img_notfound + "   " + notfound
+    tfound = img_found + "   " + str(found)
+    tthanks = img_thanks + "   " + str(thanks)
+    tnotfound = img_notfound + "   " + str(notfound)
 
     button_list = [
         InlineKeyboardButton(tfound, callback_data="thanks_key1"),
