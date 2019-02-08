@@ -86,9 +86,6 @@ def settings_button(bot: Bot, update: Update):
     message_text = "*" + update.effective_message.text + "*"
     key = query.data
 
-
-    
-
     reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
     
     bot.answer_callback_query(query.id, text=reply)
