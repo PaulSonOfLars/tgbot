@@ -178,7 +178,7 @@ def build_menu(buttons,
 
 @run_async
 @user_admin
-def toggle_ilikes(bot: Bot, update: Update):
+def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
     chat_id = update.effective_chat.id
     retval = sql.toggle_ilikes(chat_id)
     print("here3")
