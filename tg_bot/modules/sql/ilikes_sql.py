@@ -23,7 +23,7 @@ class iLikes(BASE):
         self.thanks = 0
         self.notfound = 0
         self.creator = creator
-        self.type = iliketype
+        self.type = str(iliketype)
         self.timestamp = str(time.time())
 
     def __repr__(self):
