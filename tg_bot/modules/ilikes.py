@@ -68,9 +68,16 @@ def get_keyboard(chat_id, message_id, found, thanks, notfound):
 def location_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
+    reply_to_msg = msg.reply_to_message
+    try:
+        reply_msg_id = msg.reply_to_message.from_user.id
+    except Exception as e:
+        reply_msg_id = None
+        pass
+
     if Filters.location(msg):
         if ( sql.ilikes_enabled(chat.id) == True ):
-            send_like_location_buttons(bot, update)
+            send_like_location_buttons(bot, update, reply_msg_id)
 
 @run_async
 def thank_button(bot: Bot, update: Update, args: List[str]) -> str:
@@ -139,34 +146,34 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
     if Filters.location(reply_to_msg):
-        print("location found")
-    print("debug")
-    print(msg)
 
-    user_id = extract_user(msg, args)
-    msg_id = msg.message_id
-    if user_id:
-        send_like_location_buttons(bot, update)
-    try:
-        msg.delete()
-    except BadRequest as excp:
-        if excp.message == "Message to delete not found":
+
+        # get user who sent message
+        try:
+            reply_msg_id = msg.reply_to_message.from_user.id
+        except Exception as e:
+            reply_msg_id = None
             pass
-        else:
-            LOGGER.exception("ERROR in ilikes")
+
+
+
+
+        user_id = extract_user(msg, args)
+        msg_id = msg.message_id
+        if user_id:
+            send_like_location_buttons(bot, update, reply_msg_id)
+        try:
+            msg.delete()
+        except BadRequest as excp:
+            if excp.message == "Message to delete not found":
+                pass
+            else:
+                LOGGER.exception("ERROR in ilikes")
 
 
 @run_async
-def send_like_location_buttons(bot: Bot, update: Update):
+def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     msg = update.effective_message  # type: Optional[Message]
-
-    # get user who sent message
-    try:
-        reply_msg_id = msg.reply_to_message.from_user.id
-    except Exception as e:
-        reply_msg_id = None
-        pass
-
 
     img_found = "✅"
     img_thanks = "😍"
