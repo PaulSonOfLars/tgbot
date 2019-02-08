@@ -133,11 +133,25 @@ def thank_button(bot: Bot, update: Update):
                     user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
                                                            sent_user.id)
 
-            message_text = "*Die Community dankt*"+str(user2)+"*!*"
+            message_text = "*" + update.effective_message.text + "*"
 
 
             keyboard = get_keyboard_locations(chat_id, message_id, found, thanks, notfound)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+        elif ( str(ilikestype) == "question"):
+            reply = sql.add_iLike_Click(chat_id, message_id, user_id, key, ilikestype)
+            bot.answer_callback_query(query.id, text=reply)
+
+            data = sql.get_iLikes(chat_id, message_id)
+            if ( data != False ):
+                (up, notused, down, creator, ilikestype) = data
+
+
+            message_text = "*Die Community dankt*"+str(user2)+"*!*"
+
+
+            keyboard = get_keyboard(chat_id, message_id, up, down)
+            bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)            
         else:
             reply = sql.add_iLike_Click(chat_id, message_id, user_id, key, ilikestype)
             bot.answer_callback_query(query.id, text=reply)
@@ -197,7 +211,6 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     reply_to_msg = msg.reply_to_message
 
     if reply_to_msg:
-        print(reply_to_msg)
         if Filters.location(reply_to_msg):
             # get user who sent message
             try:
@@ -237,6 +250,24 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 else:
                     LOGGER.exception("ERROR in ilikes")
     else:
+        if ( args != [] ):
+            try:
+                reply_msg_id = msg.reply_to_message.from_user.id
+            except Exception as e:
+                reply_msg_id = None
+                pass
+
+            user_id = extract_user(msg, args)
+            msg_id = msg.message_id
+            if user_id:
+                send_like_question_buttons(bot, update, reply_msg_id)
+            try:
+                msg.delete()
+            except BadRequest as excp:
+                if excp.message == "Message to delete not found":
+                    pass
+                else:
+                    LOGGER.exception("ERROR in ilikes")   
         print(args)
         msg.delete()
 
@@ -331,6 +362,37 @@ def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
     sent_id = sent_message.message_id
     chat_id = chat.id
     sql.add_iLike(chat_id, sent_id, user_id, "general")
+
+
+
+
+@run_async
+def send_like_question_buttons(bot: Bot, update: Update, text: "No input"):
+    msg = update.effective_message  # type: Optional[Message]
+
+    img_up = "👍🏻"
+    img_down = "👎🏻"
+
+    up = "0"
+    down = "0"
+
+    tup = img_up + "   " + up
+    tdown = img_down + "   " + down
+
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+    msg = update.effective_message  # type: Optional[Message]
+
+    button_list = [
+        InlineKeyboardButton(tup, callback_data="thanks_key1"),
+        InlineKeyboardButton(tdown, callback_data="thanks_key3")
+    ]
+    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
+
+    sent_message = send(bot, update, text, reply_markup)
+    sent_id = sent_message.message_id
+    chat_id = chat.id
+    sql.add_iLike(chat_id, sent_id, user_id, "question")
 
 
 
