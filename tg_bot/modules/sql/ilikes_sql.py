@@ -177,10 +177,15 @@ def toggle_ilikes(chat_id):
 
 def get_expired():
     with INSERTION_LOCK:
+        hours = 12
+        seconds = hours * 60 * 60
+        timelimit = seconds
         timelimit = 300 # /60 = 5 Minutes
         cur_time = int(str(time.time()).split(".")[0])
         expired = SESSION.query(iLikes).filter(cur_time - iLikes.timestamp >= timelimit ).all()
         print(expired)
+        for ilike in expired:
+            SESSION.delete(ilike)
 
 def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
     try:
