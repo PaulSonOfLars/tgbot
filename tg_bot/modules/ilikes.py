@@ -237,6 +237,7 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 else:
                     LOGGER.exception("ERROR in ilikes")
     else:
+        print(args)
         msg.delete()
 
 @run_async
