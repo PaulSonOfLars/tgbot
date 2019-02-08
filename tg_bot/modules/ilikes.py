@@ -261,17 +261,18 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
 
-    chatlink = ""
+    chatlink = "*Beitrag!*"
     chat_username = update.effective_chat.username
     reply_message = update.effective_message.reply_to_message
-
 
     if reply_message:
         msg_id = reply_message.message_id
     else:
         msg_id = msg.message_id
+        
     if chat_username:
-        chatlink = "https://t.me/" + str(chat_username)  + "/" + str(msg_id) 
+        chatlink = "[Beitrag](https://t.me/" + str(chat_username)  + "/" + str(msg_id) + ")*!*"
+
 
     img_found = "✅"
     img_thanks = "😍"
@@ -306,8 +307,8 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-    text = "*Die Community dankt *"+str(user2)+"* für diesen* [Beitrag](" + chatlink + ") *!*"
-    
+    text = "*Die Community dankt *"+str(user2)+"* für diesen* " + chatlink
+
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
     chat_id = chat.id
@@ -318,6 +319,19 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
 @run_async
 def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
     msg = update.effective_message  # type: Optional[Message]
+
+    chatlink = "*Beitrag!*"
+    chat_username = update.effective_chat.username
+    reply_message = update.effective_message.reply_to_message
+
+
+    if reply_message:
+        msg_id = reply_message.message_id
+    else:
+        msg_id = msg.message_id
+        
+    if chat_username:
+        chatlink = "[Beitrag](https://t.me/" + str(chat_username)  + "/" + str(msg_id) + ")*!*"
 
     img_up = "👍🏻"
     img_down = "👎🏻"
@@ -351,7 +365,7 @@ def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
     ]
     reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=2))
 
-    text = "*Die Community dankt *"+str(user2)+"* für diesen Beitrag!*"
+    text = "*Die Community dankt *"+str(user2)+"* für diesen* " + chatlink
 
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
