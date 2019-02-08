@@ -51,11 +51,12 @@ class iLikes_Clicks(BASE):
     thanks = Column(Integer, nullable=False)
     notfound = Column(Integer, nullable=False)
 
-    def __init__(self, ilikes_click_id, found, thanks, notfound):
+    def __init__(self, ilikes_click_id, found, thanks, notfound, ilikes_id):
         self.ilikes_click_id = str(ilikes_click_id)
         self.found = str(found)
         self.thanks = str(thanks)
         self.notfound = str(notfound)
+        self.ilikes_id = str(ilikes_id)
 
     def __repr__(self):
         return "<iLikes Clicks for %s>" % self.ilikes_click_id
@@ -210,15 +211,15 @@ def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
             ilikes_id = SESSION.query(iLikes_Clicks).get(str(new_ilikes_id))
             if not ilikes_id:
                 if ( str(key) == "thanks_key1"):
-                    ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
+                    ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0, new_ilikes_main_id)
                     add_found_count(new_ilikes_main_id)
                     reply = tfound
                 if ( str(key) == "thanks_key2"):
-                    ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
+                    ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0, new_ilikes_main_id)
                     add_thanks_count(new_ilikes_main_id)
                     reply = tthanks
                 if ( str(key) == "thanks_key3"):
-                    ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
+                    ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1, new_ilikes_main_id)
                     add_notfound_count(new_ilikes_main_id)
                     reply = tnotfound
                 SESSION.add(ilikes_id)

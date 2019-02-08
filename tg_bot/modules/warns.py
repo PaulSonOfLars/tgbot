@@ -19,7 +19,7 @@ from tg_bot.modules.helper_funcs.misc import split_message
 from tg_bot.modules.helper_funcs.string_handling import split_quotes
 from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import warns_sql as sql
-import tg_bot.modules.sql.ilikes_sql as sqllike
+import tg_bot.modules.sql.ilikes_sql as sqllikes
 
 WARN_HANDLER_GROUP = 9
 CURRENT_WARNING_FILTER_STRING = "<b>Konfigurierten Warn Filter für diesen Chat:</b>\n"
@@ -290,7 +290,7 @@ def list_warn_filters(bot: Bot, update: Update):
 @run_async
 def delete_expired(bot: Bot, update: Update):
     try:
-        sqllike.delete_expired()
+        sqllikes.delete_expired()
     except Exception as e:
         pass
 
