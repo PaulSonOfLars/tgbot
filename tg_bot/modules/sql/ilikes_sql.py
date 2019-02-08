@@ -272,6 +272,6 @@ def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
 
                 return reply
     except Exception as e:
-        return "Etwas ist schief gelaufen!"
+        return "Like bereits vom Server gelöscht!"
 
 
