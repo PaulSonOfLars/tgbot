@@ -23,7 +23,7 @@ class iLikes(BASE):
         self.thanks = 0
         self.notfound = 0
         self.creator = creator
-        self.type = str(iliketype)
+        self.iliketype = str(iliketype)
         self.timestamp = str(time.time())
 
     def __repr__(self):
@@ -77,12 +77,11 @@ INSERTION_LOCK = threading.RLock()
 
 
 def add_iLike(chat_id, msg_id, user_id, iliketype):
-    print(iliketype)
     with INSERTION_LOCK:
         new_ilikes_id = str(chat_id)+str(msg_id)
         ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
         if not ilikes_id:
-            ilikes_id = iLikes(new_ilikes_id, user_id, iliketype)
+            ilikes_id = iLikes(new_ilikes_id, user_id, str(iliketype)
             SESSION.add(ilikes_id)
             SESSION.commit()
             return True
