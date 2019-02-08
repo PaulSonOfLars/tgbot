@@ -98,9 +98,10 @@ def get_iLikes(chat_id, msg_id):
             thanks = ilikes_id.thanks
             notfound = ilikes_id.notfound
             user_id = ilikes_id.creator
-            iliketype = ilikes_id.type
+            iliketype = ilikes_id.iliketype
             return(found, thanks, notfound, user_id, iliketype)
     except Exception as e:
+        print(e)
         return False
 
 def add_found_count(ilikes_id):
