@@ -91,6 +91,7 @@ def location_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     reply_to_msg = msg.reply_to_message
+    print(reply_to_msg)
     try:
         reply_msg_id = msg.reply_to_message.from_user.id
     except Exception as e:
