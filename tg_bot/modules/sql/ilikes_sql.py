@@ -15,7 +15,7 @@ class iLikes(BASE):
     notfound = Column(Integer, nullable=False)
     creator = Column(String(50), nullable=False)
     iliketype = Column(String(50), nullable=False)
-    timestamp = Column(Timestamp(50), nullable=False)
+    timestamp = Column(Integer(50), nullable=False)
 
     def __init__(self, ilikes_id, creator, iliketype):
         self.ilikes_id = str(ilikes_id)
@@ -24,7 +24,7 @@ class iLikes(BASE):
         self.notfound = 0
         self.creator = creator
         self.iliketype = str(iliketype)
-        self.timestamp = time.time()
+        self.timestamp = int(str(time.time()).split(".")[0])
 
     def __repr__(self):
         return "<iLikes for %s>" % self.chat_id
