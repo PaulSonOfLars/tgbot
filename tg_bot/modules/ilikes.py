@@ -232,7 +232,8 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     else:
         if ( args != [] ):
             text = " ".join(args)
-            message_text = update.effective_message.text_markdown
+            message_text = str(update.effective_message.text_markdown)
+            message_text = message_text[7:]
             print(message_text)
 
             try:
