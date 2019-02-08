@@ -171,90 +171,92 @@ def toggle_ilikes(chat_id):
 
 
 def add_iLike_Click(chat_id, msg_id, user_id, key):
-    reply = ""
-    tfound = "Fang bestätigt!"
-    tfoundx = "Bestätigung zurück genommen!"
-    tthanks = "Dein Dank wurde empfangen!"
-    tthanksx = "Dank zurück genommen!"
-    tnotfound = "Despawn bestätigt!"
-    tnotfoundx = "Despawn zurück genommen!"
-    with INSERTION_LOCK:
-        new_ilikes_main_id = str(chat_id)+str(msg_id)
-        new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
-        ilikes_id = SESSION.query(iLikes_Clicks).get(str(new_ilikes_id))
-        if not ilikes_id:
-            if ( str(key) == "thanks_key1"):
-                ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
-                add_found_count(new_ilikes_main_id)
-                reply = tfound
-            if ( str(key) == "thanks_key2"):
-                ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
-                add_thanks_count(new_ilikes_main_id)
-                reply = tthanks
-            if ( str(key) == "thanks_key3"):
-                ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
-                add_notfound_count(new_ilikes_main_id)
-                reply = tnotfound
-            SESSION.add(ilikes_id)
-            SESSION.commit()
-            return reply
-        else:
-
-            new_ilikes_id = new_ilikes_main_id
-            old_found = ilikes_id.found
-            old_thanks = ilikes_id.thanks
-            old_notfound = ilikes_id.notfound
-
-            if ( str(key) == "thanks_key1" ):
-                found = 1
-                if ( old_found  == 1 ):
-                    found = 0
-                    del_found_count(new_ilikes_id)
-
-                    reply = tfoundx
-                else:
-                    add_found_count(new_ilikes_id)
-                    if ( old_notfound  == 1 ):
-                        notfound = 0
-                        del_notfound_count(new_ilikes_id)
-                        ilikes_id.notfound = notfound
-
+    try:
+        reply = ""
+        tfound = "Fang bestätigt!"
+        tfoundx = "Bestätigung zurück genommen!"
+        tthanks = "Dein Dank wurde empfangen!"
+        tthanksx = "Dank zurück genommen!"
+        tnotfound = "Despawn bestätigt!"
+        tnotfoundx = "Despawn zurück genommen!"
+        with INSERTION_LOCK:
+            new_ilikes_main_id = str(chat_id)+str(msg_id)
+            new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
+            ilikes_id = SESSION.query(iLikes_Clicks).get(str(new_ilikes_id))
+            if not ilikes_id:
+                if ( str(key) == "thanks_key1"):
+                    ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
+                    add_found_count(new_ilikes_main_id)
                     reply = tfound
-
-                ilikes_id.found = found
-                SESSION.commit()
-
-            elif ( str(key) == "thanks_key2" ):
-                thanks = 1
-                if old_thanks == 1:
-                    thanks = 0
-                    del_thanks_count(new_ilikes_id)
-                    reply = tthanksx
-                else:
-                    add_thanks_count(new_ilikes_id)
+                if ( str(key) == "thanks_key2"):
+                    ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
+                    add_thanks_count(new_ilikes_main_id)
                     reply = tthanks
-                ilikes_id.thanks = thanks
+                if ( str(key) == "thanks_key3"):
+                    ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
+                    add_notfound_count(new_ilikes_main_id)
+                    reply = tnotfound
+                SESSION.add(ilikes_id)
                 SESSION.commit()
+                return reply
+            else:
 
-            elif ( str(key) == "thanks_key3" ):
-                notfound = 1
-                if old_notfound == 1:
-                    notfound = 0
-                    del_notfound_count(new_ilikes_id)
-                    reply = tnotfoundx
-                else:
-                    add_notfound_count(new_ilikes_id)
+                new_ilikes_id = new_ilikes_main_id
+                old_found = ilikes_id.found
+                old_thanks = ilikes_id.thanks
+                old_notfound = ilikes_id.notfound
+
+                if ( str(key) == "thanks_key1" ):
+                    found = 1
                     if ( old_found  == 1 ):
                         found = 0
                         del_found_count(new_ilikes_id)
-                        ilikes_id.found = found
 
-                    reply = tnotfound
-                ilikes_id.notfound = notfound
+                        reply = tfoundx
+                    else:
+                        add_found_count(new_ilikes_id)
+                        if ( old_notfound  == 1 ):
+                            notfound = 0
+                            del_notfound_count(new_ilikes_id)
+                            ilikes_id.notfound = notfound
 
-                SESSION.commit()
+                        reply = tfound
 
-            return reply
+                    ilikes_id.found = found
+                    SESSION.commit()
 
+                elif ( str(key) == "thanks_key2" ):
+                    thanks = 1
+                    if old_thanks == 1:
+                        thanks = 0
+                        del_thanks_count(new_ilikes_id)
+                        reply = tthanksx
+                    else:
+                        add_thanks_count(new_ilikes_id)
+                        reply = tthanks
+                    ilikes_id.thanks = thanks
+                    SESSION.commit()
+
+                elif ( str(key) == "thanks_key3" ):
+                    notfound = 1
+                    if old_notfound == 1:
+                        notfound = 0
+                        del_notfound_count(new_ilikes_id)
+                        reply = tnotfoundx
+                    else:
+                        add_notfound_count(new_ilikes_id)
+                        if ( old_found  == 1 ):
+                            found = 0
+                            del_found_count(new_ilikes_id)
+                            ilikes_id.found = found
+
+                        reply = tnotfound
+                    ilikes_id.notfound = notfound
+
+                    SESSION.commit()
+
+                return reply
+    except Exception as e:
+        return "Etwas ist schief gelaufen!"
 
 
