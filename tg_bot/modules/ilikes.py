@@ -251,7 +251,6 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                     LOGGER.exception("ERROR in ilikes")
     else:
         if ( args != [] ):
-
             text = " ".join(args)
             text = "*" + text + "*"
             try:
@@ -270,9 +269,9 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 if excp.message == "Message to delete not found":
                     pass
                 else:
-                    LOGGER.exception("ERROR in ilikes")   
-        print(args)
-        msg.delete()
+                    LOGGER.exception("ERROR in ilikes")
+        else: 
+            msg.delete()
 
 @run_async
 def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
