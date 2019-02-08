@@ -91,7 +91,6 @@ def location_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     reply_to_msg = msg.reply_to_message
-    print(reply_to_msg)
     try:
         reply_msg_id = msg.reply_to_message.from_user.id
     except Exception as e:
@@ -139,7 +138,6 @@ def thank_button(bot: Bot, update: Update):
                 (up, notused, down, creator, ilikestype) = data
 
             message_text = update.effective_message.text_markdown
-            print(message_text)
 
             keyboard = get_keyboard(chat_id, message_id, up, down)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True, disable_notification=True)            
