@@ -70,7 +70,7 @@ def rest_handler(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     if Filters.location(msg):
         if ( sql.ilikes_enabled(chat.id) == True ):
-            send_like_buttons(bot, update)
+            send_like_location_buttons(bot, update)
 
 
 @run_async
@@ -139,12 +139,12 @@ def toggle_ilikes(bot: Bot, update: Update):
 
 
 @run_async
-def get_like_buttons(bot: Bot, update: Update, args: List[str]):
+def get_like_location_buttons(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(update.effective_message, args)
     msg = update.effective_message
     msg_id = msg.message_id
     if user_id:
-        send_like_buttons(bot, update)
+        send_like_location_buttons(bot, update)
     try:
         msg.delete()
     except BadRequest as excp:
@@ -155,7 +155,7 @@ def get_like_buttons(bot: Bot, update: Update, args: List[str]):
 
 
 @run_async
-def send_like_buttons(bot: Bot, update: Update):
+def send_like_location_buttons(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
 
     # get user who sent message
@@ -225,7 +225,7 @@ settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"than
 
 toggle_handler = CommandHandler("toggle_ilikes", toggle_ilikes,
                            filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-settings_handler = CommandHandler("ilike", get_like_buttons, pass_args=True)
+settings_handler = CommandHandler("ilike", get_like_location_buttons, pass_args=True)
 
 
 
