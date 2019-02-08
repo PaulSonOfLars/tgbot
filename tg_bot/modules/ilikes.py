@@ -149,52 +149,50 @@ def get_like_buttons(bot: Bot, update: Update, args: List[str]):
 def send_like_buttons(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
 
-
     # get user who sent message
     if msg.reply_to_message.from_user.id:
-        print(msg.reply_to_message.from_user.id)
+        user_id = msg.reply_to_message.from_user.id
 
 
-    img_found = "✅"
-    img_thanks = "😍"
-    img_notfound = "🚫"
+        img_found = "✅"
+        img_thanks = "😍"
+        img_notfound = "🚫"
 
-    found = "0"
-    thanks = "0"
-    notfound = "0"
+        found = "0"
+        thanks = "0"
+        notfound = "0"
 
-    tfound = img_found + "   " + found
-    tthanks = img_thanks + "   " + thanks
-    tnotfound = img_notfound + "   " + notfound
+        tfound = img_found + "   " + found
+        tthanks = img_thanks + "   " + thanks
+        tnotfound = img_notfound + "   " + notfound
 
-    chat = update.effective_chat  # type: Optional[Chat]
-    user = update.effective_user  # type: Optional[User]
-    msg = update.effective_message  # type: Optional[Message]
+        chat = update.effective_chat  # type: Optional[Chat]
+        user = update.effective_user  # type: Optional[User]
+        msg = update.effective_message  # type: Optional[Message]
 
-    user2 = ""
-    user_id = update.effective_user.id
-    if user_id:
-        sent_user = bot.get_chat(user_id)
-        if sent_user.username:
-            user2 = " @" + escape_markdown(sent_user.username)
-        else:
-            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
-                                                   sent_user.id)
+        user2 = ""
+        user_id = update.effective_user.id
+        if user_id:
+            sent_user = bot.get_chat(user_id)
+            if sent_user.username:
+                user2 = " @" + escape_markdown(sent_user.username)
+            else:
+                user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                       sent_user.id)
 
-    button_list = [
-        InlineKeyboardButton(tfound, callback_data="thanks_key1"),
-        InlineKeyboardButton(tthanks, callback_data="thanks_key2"),
-        InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
-    ]
-    reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
+        button_list = [
+            InlineKeyboardButton(tfound, callback_data="thanks_key1"),
+            InlineKeyboardButton(tthanks, callback_data="thanks_key2"),
+            InlineKeyboardButton(tnotfound, callback_data="thanks_key3")
+        ]
+        reply_markup = InlineKeyboardMarkup(build_menu(button_list, n_cols=3))
 
-    text = "*Die Community dankt*"+str(user2)+"*!*"
+        text = "*Die Community dankt*"+str(user2)+"*!*"
 
-    sent_message = send(bot, update, text, reply_markup)
-    sent_id = sent_message.message_id
-    chat_id = chat.id
-    print(user_id)
-    sql.add_iLike(chat_id, sent_id, user_id)
+        sent_message = send(bot, update, text, reply_markup)
+        sent_id = sent_message.message_id
+        chat_id = chat.id
+        sql.add_iLike(chat_id, sent_id, user_id)
 
 
 
