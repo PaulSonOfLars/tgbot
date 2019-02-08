@@ -112,18 +112,15 @@ def thank_button(bot: Bot, update: Update):
     key = query.data
 
 
-    msg = update.effective_message  # type: Optional[Message]
-    reply_to_msg = msg.reply_to_message
-    print(msg)
-    if Filters.location(reply_to_msg):
-        reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
-        bot.answer_callback_query(query.id, text=reply)
+    data = sql.get_iLikes(chat_id, message_id)
+    if ( data != False ):
+        (found, thanks, notfound, creator, ilikestype) = data
 
-
-        data = sql.get_iLikes(chat_id, message_id)
-        if ( data != False ):
-            (found, thanks, notfound, creator) = data
-
+        msg = update.effective_message  # type: Optional[Message]
+        reply_to_msg = msg.reply_to_message
+        if Filters.location(reply_to_msg):
+            reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
+            bot.answer_callback_query(query.id, text=reply)
             user2 = ""
             if creator:
                 sent_user = bot.get_chat(creator)
@@ -138,13 +135,9 @@ def thank_button(bot: Bot, update: Update):
 
             keyboard = get_keyboard_locations(chat_id, message_id, found, thanks, notfound)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
-    else:
-        reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
-        bot.answer_callback_query(query.id, text=reply)
-        data = sql.get_iLikes(chat_id, message_id)
-        if ( data != False ):
-            (up, notused, down, creator) = data
-
+        else:
+            reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
+            bot.answer_callback_query(query.id, text=reply)
             user2 = ""
             if creator:
                 sent_user = bot.get_chat(creator)
@@ -278,7 +271,7 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
     chat_id = chat.id
-    sql.add_iLike(chat_id, sent_id, user_id)
+    sql.add_iLike(chat_id, sent_id, user_id, "location")
 
 
 
@@ -323,7 +316,7 @@ def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
     chat_id = chat.id
-    sql.add_iLike(chat_id, sent_id, user_id)
+    sql.add_iLike(chat_id, sent_id, user_id, "general")
 
 
 
