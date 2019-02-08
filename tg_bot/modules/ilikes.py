@@ -141,6 +141,7 @@ def thank_button(bot: Bot, update: Update):
                 (up, notused, down, creator, ilikestype) = data
 
             message_text = update.effective_message.text_markdown
+            print(message_text)
 
             keyboard = get_keyboard(chat_id, message_id, up, down)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)            
