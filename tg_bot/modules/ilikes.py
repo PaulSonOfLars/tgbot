@@ -65,16 +65,15 @@ def get_keyboard(chat_id, message_id, found, thanks, notfound):
     return reply_markup
 
 @run_async
-def rest_handler(bot: Bot, update: Update):
+def location_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     if Filters.location(msg):
         if ( sql.ilikes_enabled(chat.id) == True ):
             send_like_location_buttons(bot, update)
 
-
 @run_async
-def settings_button(bot: Bot, update: Update):
+def thank_button(bot: Bot, update: Update, args: List[str]) -> str:
     query = update.callback_query
     user = update.effective_user
     user_id = update.effective_user.id
@@ -110,9 +109,6 @@ def settings_button(bot: Bot, update: Update):
 
 
 
-
-
-
 def build_menu(buttons,
                n_cols,
                header_buttons=None,
@@ -132,16 +128,20 @@ def toggle_ilikes(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     retval = sql.toggle_ilikes(chat_id)
     if ( retval == True ):
-        msg = "iLikes wurde für Standorte aktiviert"
+        msg = "Automatische iLikes wurde für Standorte aktiviert"
     else:
-        msg = "iLikes wurde für Standorte wieder de-aktiviert"
+        msg = "Automatische iLikes wurde für Standorte wieder de-aktiviert"
     send_reply(update, msg, [])
 
 
 @run_async
-def get_like_location_buttons(bot: Bot, update: Update, args: List[str]):
-    user_id = extract_user(update.effective_message, args)
-    msg = update.effective_message
+def send_like_buttons(bot: Bot, update: Update, args: List[str]):
+    msg = update.effective_message  # type: Optional[Message]
+    if Filters.location(msg):
+        print("location found")
+
+
+    user_id = extract_user(msg, args)
     msg_id = msg.message_id
     if user_id:
         send_like_location_buttons(bot, update)
@@ -213,19 +213,21 @@ def send_like_location_buttons(bot: Bot, update: Update):
 
 
 __help__ = """
-This module sends Buttons if a Location has been sent to a chat.
+This module sends like Buttons
 
+/iLikes : Toggle automatic Location Likes
+/ilike  : Send some like Buttons
 """
 
-__mod_name__ = "Location Likes"
-dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, rest_handler), 2)
+__mod_name__ = "iLikes"
+dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, location_handler), 2)
 
 
-settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"thanks_")
+settings_callback_handler = CallbackQueryHandler(thank_button, pattern=r"thanks_")
 
-toggle_handler = CommandHandler("toggle_ilikes", toggle_ilikes,
-                           filters=CustomFilters.sudo_filter | CustomFilters.support_filter)
-settings_handler = CommandHandler("ilike", get_like_location_buttons, pass_args=True)
+toggle_handler = CommandHandler("iLikes", toggle_ilikes,
+                           filters=CustomFilters.sudo_filter | CustomFilters.support_filter, pass_args=True)
+settings_handler = CommandHandler("ilike", send_like_buttons, pass_args=True)
 
 
 
