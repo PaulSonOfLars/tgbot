@@ -88,15 +88,17 @@ def add_iLike(chat_id, msg_id, user_id):
 
 
 def get_iLikes(chat_id, msg_id):
-    with INSERTION_LOCK:
-        new_ilikes_id = str(chat_id)+str(msg_id)
-        ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
-        found = ilikes_id.found
-        thanks = ilikes_id.thanks
-        notfound = ilikes_id.notfound
-        user_id = ilikes_id.creator
-        return(found, thanks, notfound, user_id)
-
+    try:
+        with INSERTION_LOCK:
+            new_ilikes_id = str(chat_id)+str(msg_id)
+            ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
+            found = ilikes_id.found
+            thanks = ilikes_id.thanks
+            notfound = ilikes_id.notfound
+            user_id = ilikes_id.creator
+            return(found, thanks, notfound, user_id)
+    except Exception as e:
+        return False
 
 def add_found_count(ilikes_id):
     with INSERTION_LOCK:

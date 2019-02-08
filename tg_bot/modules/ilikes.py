@@ -89,22 +89,23 @@ def settings_button(bot: Bot, update: Update):
 
 
     data = sql.get_iLikes(chat_id, message_id)
-    (found, thanks, notfound, creator) = data
+    if ( data != False ):
+        (found, thanks, notfound, creator) = data
 
-    user2 = ""
-    if creator:
-        sent_user = bot.get_chat(creator)
-        if sent_user.username:
-            user2 = " @" + escape_markdown(sent_user.username)
-        else:
-            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
-                                                   sent_user.id)
+        user2 = ""
+        if creator:
+            sent_user = bot.get_chat(creator)
+            if sent_user.username:
+                user2 = " @" + escape_markdown(sent_user.username)
+            else:
+                user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                       sent_user.id)
 
-    message_text = "*Die Community dankt*"+str(user2)+"*!*"
+        message_text = "*Die Community dankt*"+str(user2)+"*!*"
 
 
-    keyboard = get_keyboard(chat_id, message_id, found, thanks, notfound)
-    bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+        keyboard = get_keyboard(chat_id, message_id, found, thanks, notfound)
+        bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
 
 
