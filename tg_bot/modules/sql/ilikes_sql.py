@@ -189,7 +189,7 @@ def delete_expired():
         for ilike in expired:
             SESSION.delete(ilike)
             ilike_id = str(ilike)
-            expired_clicks = SESSION.query(iLikes_Clicks).filter(iLikes_Clicks.ilikes_id = ilike_id ).all()
+            expired_clicks = SESSION.query(iLikes_Clicks).filter(iLikes_Clicks.ilikes_id == ilike_id ).all()
             print(expired_clicks)
             for click in expired_clicks:
                 SESSION.delete(click)
