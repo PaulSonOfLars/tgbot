@@ -102,11 +102,9 @@ def settings_button(bot: Bot, update: Update):
 
 
     reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
-    
     bot.answer_callback_query(query.id, text=reply)
-
     keyboard = get_keyboard(chat_id, message_id)
-    bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
+    bot.edit_message_text(chat_id=chat_id, message_id=message_id, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
 
 
