@@ -189,6 +189,7 @@ def toggle_ilikes(bot: Bot, update: Update):
 def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
+    print(msg)
 
     if reply_to_msg:
         if Filters.location(reply_to_msg):
