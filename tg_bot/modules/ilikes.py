@@ -114,6 +114,7 @@ def thank_button(bot: Bot, update: Update):
 
 
     data = sql.get_iLikes(chat_id, message_id)
+    print(data)
     if ( data != False ):
         (found, thanks, notfound, creator, ilikestype) = data
 
