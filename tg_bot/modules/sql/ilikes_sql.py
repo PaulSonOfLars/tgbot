@@ -1,7 +1,7 @@
 # New chat added -> setup permissions
 import threading
 import time
-from sqlalchemy import Column, String, Boolean, Integer
+from sqlalchemy import Column, String, Boolean, Integer, Timestamp
 
 from tg_bot.modules.sql import SESSION, BASE
 
@@ -15,7 +15,7 @@ class iLikes(BASE):
     notfound = Column(Integer, nullable=False)
     creator = Column(String(50), nullable=False)
     iliketype = Column(String(50), nullable=False)
-    timestamp = Column(TIMESTAMP(50), nullable=False)
+    timestamp = Column(Timestamp(50), nullable=False)
 
     def __init__(self, ilikes_id, creator, iliketype):
         self.ilikes_id = str(ilikes_id)
