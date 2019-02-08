@@ -183,7 +183,7 @@ def delete_expired():
         timelimit = 300 # /60 = 5 Minutes
         cur_time = int(str(time.time()).split(".")[0])
         expired = SESSION.query(iLikes).filter(cur_time - iLikes.timestamp >= timelimit ).all()
-        print expired
+        print(expired)
         for ilike in expired:
             SESSION.delete(ilike)
 
