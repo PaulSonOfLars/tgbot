@@ -117,7 +117,7 @@ def thank_button(bot: Bot, update: Update):
         msg = update.effective_message  # type: Optional[Message]
         reply_to_msg = msg.reply_to_message
         if ( str(ilikestype) == "location"):
-            reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
+            reply = sql.add_iLike_Click(chat_id, message_id, user_id, key, ilikestype)
             bot.answer_callback_query(query.id, text=reply)
 
             data = sql.get_iLikes(chat_id, message_id)
@@ -139,14 +139,14 @@ def thank_button(bot: Bot, update: Update):
             keyboard = get_keyboard_locations(chat_id, message_id, found, thanks, notfound)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
         else:
-            reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
+            reply = sql.add_iLike_Click(chat_id, message_id, user_id, key, ilikestype)
             bot.answer_callback_query(query.id, text=reply)
 
             data = sql.get_iLikes(chat_id, message_id)
             if ( data != False ):
-                (found, thanks, notfound, creator, ilikestype) = data
+                (up, notused, down, creator, ilikestype) = data
 
-            
+
             user2 = ""
             if creator:
                 sent_user = bot.get_chat(creator)

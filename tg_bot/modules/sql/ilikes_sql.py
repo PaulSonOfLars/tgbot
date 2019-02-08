@@ -176,15 +176,24 @@ def toggle_ilikes(chat_id):
                 return True
 
 
-def add_iLike_Click(chat_id, msg_id, user_id, key):
+def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
     try:
         reply = ""
-        tfound = "Fang bestätigt!"
-        tfoundx = "Bestätigung zurück genommen!"
-        tthanks = "Dein Dank wurde empfangen!"
-        tthanksx = "Dank zurück genommen!"
-        tnotfound = "Despawn bestätigt!"
-        tnotfoundx = "Despawn zurück genommen!"
+        if ( str(ilikestype) == "location"):
+            tfound = "Fang bestätigt!"
+            tfoundx = "Bestätigung zurück genommen!"
+            tthanks = "Dein Dank wurde empfangen!"
+            tthanksx = "Dank zurück genommen!"
+            tnotfound = "Despawn bestätigt!"
+            tnotfoundx = "Despawn zurück genommen!"
+        else:
+            tfound = "Like!"
+            tfoundx = "Like zurück genommen!"
+            tthanks = " !"
+            tthanksx = " !"
+            tnotfound = "Dislike!!"
+            tnotfoundx = "Dislike zurück genommen!"
+
         with INSERTION_LOCK:
             new_ilikes_main_id = str(chat_id)+str(msg_id)
             new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
