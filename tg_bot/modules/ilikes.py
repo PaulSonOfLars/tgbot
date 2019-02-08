@@ -55,9 +55,9 @@ def get_keyboard(chat_id, message_id):
     if notfound >= 100:
         notfound = "99+"
 
-    tfound = img_found + " " + str(found)
-    tthanks = img_thanks + " " + str(thanks)
-    tnotfound = img_notfound + " " + str(notfound)
+    tfound = img_found + "   " + found
+    tthanks = img_thanks + "   " + thanks
+    tnotfound = img_notfound + "   " + notfound
 
     button_list = [
         InlineKeyboardButton(tfound, callback_data="thanks_key1"),
@@ -142,9 +142,9 @@ def send_like_buttons(bot: Bot, update: Update):
     thanks = "0"
     notfound = "0"
 
-    tfound = img_found + "  " + found
-    tthanks = img_thanks + "  " + thanks
-    tnotfound = img_notfound + "  " + notfound
+    tfound = img_found + "   " + found
+    tthanks = img_thanks + "   " + thanks
+    tnotfound = img_notfound + "   " + notfound
 
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
