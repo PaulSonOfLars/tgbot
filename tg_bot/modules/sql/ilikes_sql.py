@@ -13,13 +13,15 @@ class iLikes(BASE):
     found = Column(Integer, nullable=False)
     thanks = Column(Integer, nullable=False)
     notfound = Column(Integer, nullable=False)
+    creator = Column(String(50), nullable=False)
     timestamp = Column(String(50), nullable=False)
 
-    def __init__(self, ilikes_id):
+    def __init__(self, ilikes_id, creator):
         self.ilikes_id = str(ilikes_id)
         self.found = 0
         self.thanks = 0
         self.notfound = 0
+        self.creator = 0
         self.timestamp = str(time.time())
 
     def __repr__(self):
@@ -72,12 +74,12 @@ INSERTION_LOCK = threading.RLock()
 
 
 
-def add_iLike(chat_id, msg_id):
+def add_iLike(chat_id, msg_id, user_id):
     with INSERTION_LOCK:
         new_ilikes_id = str(chat_id)+str(msg_id)
         ilikes_id = SESSION.query(iLikes).get(str(new_ilikes_id))
         if not ilikes_id:
-            ilikes_id = iLikes(new_ilikes_id)
+            ilikes_id = iLikes(new_ilikes_id, user_id)
             SESSION.add(ilikes_id)
             SESSION.commit()
             return True
@@ -92,7 +94,8 @@ def get_iLikes(chat_id, msg_id):
         found = ilikes_id.found
         thanks = ilikes_id.thanks
         notfound = ilikes_id.notfound
-        return(found, thanks, notfound)
+        user_id = ilikes_id.creator
+        return(found, thanks, notfound, user_id)
 
 
 def add_found_count(ilikes_id):

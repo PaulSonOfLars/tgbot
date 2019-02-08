@@ -99,6 +99,10 @@ def settings_button(bot: Bot, update: Update):
 
 
 
+    print(chat_id)
+
+
+
 
 
     reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
@@ -185,7 +189,7 @@ def send_like_buttons(bot: Bot, update: Update):
     sent_message = send(bot, update, text, reply_markup)
     sent_id = sent_message.message_id
     chat_id = chat.id
-    sql.add_iLike(chat_id, sent_id)
+    sql.add_iLike(chat_id, sent_id, user_id)
 
 
 
