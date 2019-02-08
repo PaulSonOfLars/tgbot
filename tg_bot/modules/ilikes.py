@@ -102,7 +102,7 @@ def location_handler(bot: Bot, update: Update):
             send_like_location_buttons(bot, update, reply_msg_id)
 
 @run_async
-def thank_button(bot: Bot, update: Update, args: List[str]) -> str:
+def thank_button(bot: Bot, update: Update):
     query = update.callback_query
     user = update.effective_user
     user_id = update.effective_user.id
@@ -338,7 +338,7 @@ __mod_name__ = "iLikes"
 dispatcher.add_handler(MessageHandler(Filters.location & Filters.group, location_handler), 2)
 
 
-settings_callback_handler = CallbackQueryHandler(thank_button, pattern=r"thanks_", pass_args=True)
+settings_callback_handler = CallbackQueryHandler(thank_button, pattern=r"thanks_")
 
 toggle_handler = CommandHandler("iLikes", toggle_ilikes,
                            filters=CustomFilters.sudo_filter | CustomFilters.support_filter, pass_args=True)
