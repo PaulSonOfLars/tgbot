@@ -168,6 +168,16 @@ def toggle_ilikes(chat_id):
 
 
 def add_iLike_Click(chat_id, msg_id, user_id, key):
+	reply = ""
+	tfound = "Fang bestätigt!"
+	tfoundx = "Bestätigung zurück genommen!"
+
+	tthanks = "Dein Dank wurde empfangen!"
+	tthanksx = "Dank zurück genommen!"
+
+
+	tnotfound = "Despawn bestätigt!"
+	tnotfoundx = "Despawn zurück genommen!"
     with INSERTION_LOCK:
         new_ilikes_main_id = str(chat_id)+str(msg_id)
         new_ilikes_id = str(chat_id)+str(msg_id)+str(user_id)
@@ -176,15 +186,18 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
             if ( str(key) == "thanks_key1"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 1, 0, 0)
                 add_found_count(new_ilikes_main_id)
+                reply = tfound
             if ( str(key) == "thanks_key2"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 1, 0)
                 add_thanks_count(new_ilikes_main_id)
+                reply = tthanks
             if ( str(key) == "thanks_key3"):
                 ilikes_id = iLikes_Clicks(new_ilikes_id, 0, 0, 1)
                 add_notfound_count(new_ilikes_main_id)
+                reply = tnotfound
             SESSION.add(ilikes_id)
             SESSION.commit()
-            return True
+            return reply
         else:
 
             new_ilikes_id = new_ilikes_main_id
@@ -197,12 +210,16 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 if ( old_found  == 1 ):
                     found = 0
                     del_found_count(new_ilikes_id)
+
+                    reply = tfoundx
                 else:
                     add_found_count(new_ilikes_id)
                     if ( old_notfound  == 1 ):
                         notfound = 0
                         del_notfound_count(new_ilikes_id)
                         ilikes_id.notfound = notfound
+
+                    reply = tfound
 
                 ilikes_id.found = found
                 SESSION.commit()
@@ -212,8 +229,10 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 if old_thanks == 1:
                     thanks = 0
                     del_thanks_count(new_ilikes_id)
+                    reply = tthanks
                 else:
                     add_thanks_count(new_ilikes_id)
+                    reply = tthanksx
                 ilikes_id.thanks = thanks
                 SESSION.commit()
 
@@ -222,6 +241,7 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 if old_notfound == 1:
                     notfound = 0
                     del_notfound_count(new_ilikes_id)
+                    reply = tnotfoundx
                 else:
                     add_notfound_count(new_ilikes_id)
                     if ( old_found  == 1 ):
@@ -229,12 +249,13 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                         del_found_count(new_ilikes_id)
                         ilikes_id.found = found
 
+                    reply = tnotfound
                 ilikes_id.notfound = notfound
 
                 SESSION.commit()
 
 
-            return True
+            return reply
 
 
 
