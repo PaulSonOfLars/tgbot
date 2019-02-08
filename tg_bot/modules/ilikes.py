@@ -88,6 +88,10 @@ def get_keyboard(chat_id, message_id, up, down):
 
 @run_async
 def location_handler(bot: Bot, update: Update):
+
+    sql.get_expired()
+
+
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     reply_to_msg = msg.reply_to_message

@@ -177,9 +177,10 @@ def toggle_ilikes(chat_id):
 
 def get_expired():
     with INSERTION_LOCK:
-        cur_time = time.time()
-        SESSION.query(iLikes).filter(iLikes.chat_id == str(chat_id), iLikes.keyword == keyword).all()
-                                
+        cur_time = int(str(time.time()).split(".")[0])
+        expired = SESSION.query(iLikes).filter(cur_time - iLikes.timestamp >= 10 ).all()
+        for i in expired:
+            print(i)
 
 def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
     try:
