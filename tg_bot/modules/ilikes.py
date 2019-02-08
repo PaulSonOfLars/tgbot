@@ -119,6 +119,11 @@ def thank_button(bot: Bot, update: Update):
         if ( str(ilikestype) == "location"):
             reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
             bot.answer_callback_query(query.id, text=reply)
+
+            data = sql.get_iLikes(chat_id, message_id)
+            if ( data != False ):
+                (found, thanks, notfound, creator, ilikestype) = data
+
             user2 = ""
             if creator:
                 sent_user = bot.get_chat(creator)
@@ -136,6 +141,12 @@ def thank_button(bot: Bot, update: Update):
         else:
             reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
             bot.answer_callback_query(query.id, text=reply)
+
+            data = sql.get_iLikes(chat_id, message_id)
+            if ( data != False ):
+                (found, thanks, notfound, creator, ilikestype) = data
+
+            
             user2 = ""
             if creator:
                 sent_user = bot.get_chat(creator)
