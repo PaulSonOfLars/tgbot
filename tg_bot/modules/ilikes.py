@@ -156,7 +156,7 @@ def thank_button(bot: Bot, update: Update):
             keyboard = get_keyboard(chat_id, message_id, up, down)
             bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True, disable_notification=True)
     else:
-        bot.answer_callback_query(query.id, text="iLike Daten bereits vom Server gelöscht!")
+        bot.answer_callback_query(query.id, text="iLike Umfrage bereits vom Server gelöscht!")
 
 
 
