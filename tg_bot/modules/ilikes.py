@@ -25,7 +25,7 @@ from tg_bot.modules.helper_funcs.filters import CustomFilters
 def send(bot: Bot, update: Update, message, keyboard):
     try:
         chat_id = update.effective_chat.id
-        msg = bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard, disable_notification=True)
+        msg = bot.send_message(chat_id, message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard, disable_notification=True, disable_web_page_preview=True)
     except Exception as e:
         print(e)
     return msg
@@ -34,7 +34,7 @@ def send(bot: Bot, update: Update, message, keyboard):
 
 def send_reply(update, message, keyboard):
     try:
-        msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard, disable_notification=True)
+        msg = update.effective_message.reply_text(message, parse_mode=ParseMode.MARKDOWN, reply_markup=keyboard, disable_notification=True, disable_web_page_preview=True)
     except Exception as e:
         print(e)
     return msg
@@ -329,7 +329,7 @@ def send_like_general_buttons(bot: Bot, update: Update, reply_msg_id: None):
         msg_id = reply_message.message_id
     else:
         msg_id = msg.message_id
-        
+
     if chat_username:
         chatlink = "[Beitrag](https://t.me/" + str(chat_username)  + "/" + str(msg_id) + ")*!*"
 
