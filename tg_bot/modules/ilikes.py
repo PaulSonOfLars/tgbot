@@ -99,7 +99,9 @@ def location_handler(bot: Bot, update: Update):
         pass
 
     if Filters.location(msg):
+        print("here")
         if ( sql.ilikes_enabled(chat.id) == True ):
+            print("here2")
             send_like_location_buttons(bot, update, reply_msg_id)
 
 @run_async
