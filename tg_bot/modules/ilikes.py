@@ -140,6 +140,7 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     if Filters.location(msg):
         print("location found")
     print("debug")
+    print(msg)
 
     user_id = extract_user(msg, args)
     msg_id = msg.message_id
