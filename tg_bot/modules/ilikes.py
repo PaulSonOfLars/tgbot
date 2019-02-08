@@ -153,6 +153,7 @@ def send_like_buttons(bot: Bot, update: Update):
     try:
         reply_msg_id = msg.reply_to_message.from_user.id
     except Exception as e:
+        reply_msg_id = None
         pass
 
 
