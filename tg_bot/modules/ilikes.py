@@ -232,6 +232,9 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     else:
         if ( args != [] ):
             text = " ".join(args)
+            message_text = update.effective_message.text_markdown
+            print(message_text)
+
             try:
                 reply_msg_id = msg.reply_to_message.from_user.id
             except Exception as e:
