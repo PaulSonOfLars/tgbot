@@ -266,7 +266,7 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
 
 
     if reply_message:
-        msg_id = message_id
+        msg_id = reply_message.message_id
     else:
         msg_id = msg.message_id
     if chat_username:
