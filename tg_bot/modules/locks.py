@@ -17,6 +17,7 @@ from tg_bot.modules.helper_funcs.chat_status import can_delete, is_user_admin, u
 from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import users_sql
 from tg_bot.modules.helper_funcs.extraction import extract_user
+from tg_bot.modules.helper_funcs.filters import CustomFilters
 
 LOCK_TYPES = {'sticker': Filters.sticker,
               'audio': Filters.audio,
