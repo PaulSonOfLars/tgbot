@@ -259,6 +259,9 @@ def send_like_buttons(bot: Bot, update: Update, args: List[str]):
                 reply_msg_id = None
                 pass
 
+
+            print(text)
+
             user_id = extract_user(msg, args)
             msg_id = msg.message_id
             if user_id:
