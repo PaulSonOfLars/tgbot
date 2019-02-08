@@ -190,6 +190,8 @@ def toggle_ilikes(bot: Bot, update: Update):
 def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     reply_to_msg = msg.reply_to_message
+
+    print(reply_to_ms)
     if Filters.location(reply_to_msg):
         # get user who sent message
         try:
