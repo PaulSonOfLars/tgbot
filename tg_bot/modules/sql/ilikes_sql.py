@@ -27,7 +27,7 @@ class iLikes(BASE):
         self.timestamp = int(str(time.time()).split(".")[0])
 
     def __repr__(self):
-        return "<iLikes for %s>" % self.ilikes_id
+        return "%s" % self.ilikes_id
 
 
 class iLikes_Settings(BASE):
@@ -40,7 +40,7 @@ class iLikes_Settings(BASE):
         self.enabled = True
 
     def __repr__(self):
-        return "<iLike Settings for %s>" % self.chat_id
+        return "%s" % self.chat_id
 
 
 
@@ -60,7 +60,7 @@ class iLikes_Clicks(BASE):
         self.ilikes_id = str(ilikes_id)
 
     def __repr__(self):
-        return "<iLikes Clicks for %s>" % self.ilikes_click_id
+        return "%s" % self.ilikes_click_id
 
 
 
