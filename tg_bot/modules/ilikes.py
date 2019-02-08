@@ -151,12 +151,14 @@ def send_like_buttons(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
 
     user2 = ""
-    sent_user = bot.get_chat(user_id)
-    if sent_user.username:
-        user2 = " @" + escape_markdown(sent_user.username)
-    else:
-        user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
-                                               sent_user.id)
+    user_id = update.effective_user.id
+    if user_id:
+        sent_user = bot.get_chat(user_id)
+        if sent_user.username:
+            user2 = " @" + escape_markdown(sent_user.username)
+        else:
+            user2 = " [{}](tg://user?id={})".format(sent_user.first_name,
+                                                   sent_user.id)
 
     button_list = [
         InlineKeyboardButton(tfound, callback_data="thanks_key1"),
