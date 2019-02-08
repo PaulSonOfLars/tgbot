@@ -188,8 +188,9 @@ def toggle_ilikes(bot: Bot, update: Update, args: List[str]):
         msgtext = "Automatische iLikes wurde für Standorte aktiviert"
     else:
         msgtext = "Automatische iLikes wurde für Standorte wieder de-aktiviert"
-    send_reply(update, msgtext, [])
     msg.delete()
+#    send_reply(update, msgtext, [])
+    send(bot, update, msgtext, []):
 
 
 @run_async
