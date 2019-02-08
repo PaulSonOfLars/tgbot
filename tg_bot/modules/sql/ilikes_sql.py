@@ -15,7 +15,7 @@ class iLikes(BASE):
     notfound = Column(Integer, nullable=False)
     creator = Column(String(50), nullable=False)
     iliketype = Column(String(50), nullable=False)
-    timestamp = Column(String(50), nullable=False)
+    timestamp = Column(TIMESTAMP(50), nullable=False)
 
     def __init__(self, ilikes_id, creator, iliketype):
         self.ilikes_id = str(ilikes_id)
@@ -24,7 +24,7 @@ class iLikes(BASE):
         self.notfound = 0
         self.creator = creator
         self.iliketype = str(iliketype)
-        self.timestamp = str(time.time())
+        self.timestamp = time.time()
 
     def __repr__(self):
         return "<iLikes for %s>" % self.chat_id
@@ -175,6 +175,11 @@ def toggle_ilikes(chat_id):
                 enable_ilikes(chat_id)
                 return True
 
+def get_expired():
+    with INSERTION_LOCK:
+        cur_time = time.time()
+        SESSION.query(iLikes).filter(iLikes.chat_id == str(chat_id), iLikes.keyword == keyword).all()
+                                
 
 def add_iLike_Click(chat_id, msg_id, user_id, key, ilikestype):
     try:
