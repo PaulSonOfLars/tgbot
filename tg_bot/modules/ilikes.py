@@ -216,6 +216,7 @@ def delete_expired(bot: Bot, update: Update):
 def send_like_buttons(bot: Bot, update: Update, args: List[str]):
     delete_expired(bot, update)
     msg = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat
     reply_to_msg = msg.reply_to_message
 
     if reply_to_msg:
