@@ -262,7 +262,7 @@ def send_like_location_buttons(bot: Bot, update: Update, reply_msg_id: None):
     chatlink = ""
     chat_username = update.effective_chat.username
     if chat_username:
-        chatlink = "https://t.me/" + str(chat_username)  + "/" + str(update.effective_message.message_id)
+        chatlink = "https://t.me/" + str(chat_username)  + "/" + str(update.effective_message.reply_to_message.message_id)
 
     img_found = "✅"
     img_thanks = "😍"
