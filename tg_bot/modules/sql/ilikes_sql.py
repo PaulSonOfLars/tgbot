@@ -226,10 +226,10 @@ def add_iLike_Click(chat_id, msg_id, user_id, key):
                 if old_thanks == 1:
                     thanks = 0
                     del_thanks_count(new_ilikes_id)
-                    reply = tthanks
+                    reply = tthanksx
                 else:
                     add_thanks_count(new_ilikes_id)
-                    reply = tthanksx
+                    reply = tthanks
                 ilikes_id.thanks = thanks
                 SESSION.commit()
 
