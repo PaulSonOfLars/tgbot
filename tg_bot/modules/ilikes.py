@@ -110,17 +110,13 @@ def thank_button(bot: Bot, update: Update):
     user_id = update.effective_user.id
     message_id = update.effective_message.message_id
     key = query.data
-    print("now")
-
-
     data = sql.get_iLikes(chat_id, message_id)
-    print(data)
     if ( data != False ):
         (found, thanks, notfound, creator, ilikestype) = data
 
         msg = update.effective_message  # type: Optional[Message]
         reply_to_msg = msg.reply_to_message
-        if Filters.location(reply_to_msg):
+        if ( str(ilikestype) == "location"):
             reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
             bot.answer_callback_query(query.id, text=reply)
             user2 = ""
