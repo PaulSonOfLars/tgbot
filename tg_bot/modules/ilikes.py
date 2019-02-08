@@ -40,13 +40,10 @@ def send_reply(update, message, keyboard):
     return msg
 
 
-def get_keyboard(chat_id, message_id):
+def get_keyboard(chat_id, message_id, found, thanks, notfound):
     img_found = "✅"
     img_thanks = "😍"
     img_notfound = "🚫"
-
-    data = sql.get_iLikes(chat_id, message_id)
-    (found, thanks, notfound) = data
     
     if found >= 100:
         found = "99+"
@@ -82,13 +79,21 @@ def settings_button(bot: Bot, update: Update):
     user = update.effective_user
     user_id = update.effective_user.id
     chat_id = update.effective_chat.id
+    user_id = update.effective_user.id
     message_id = update.effective_message.message_id
     key = query.data
 
+
+    reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
+    bot.answer_callback_query(query.id, text=reply)
+
+
+    data = sql.get_iLikes(chat_id, message_id)
+    (found, thanks, notfound, creator) = data
+
     user2 = ""
-    user_id = update.effective_user.id
-    if user_id:
-        sent_user = bot.get_chat(user_id)
+    if creator:
+        sent_user = bot.get_chat(creator)
         if sent_user.username:
             user2 = " @" + escape_markdown(sent_user.username)
         else:
@@ -99,15 +104,7 @@ def settings_button(bot: Bot, update: Update):
 
 
 
-    print(chat_id)
-
-
-
-
-
-    reply = sql.add_iLike_Click(chat_id, message_id, user_id, key)
-    bot.answer_callback_query(query.id, text=reply)
-    keyboard = get_keyboard(chat_id, message_id)
+    keyboard = get_keyboard(chat_id, message_id, found, thanks, notfound)
     bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=message_text, reply_markup=keyboard, parse_mode=ParseMode.MARKDOWN)
 
 
