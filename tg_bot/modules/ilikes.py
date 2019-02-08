@@ -150,7 +150,10 @@ def send_like_buttons(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
 
     # get user who sent message
-    reply_msg_id = msg.reply_to_message.from_user.id
+    try:
+        reply_msg_id = msg.reply_to_message.from_user.id
+    except Exception as e:
+        pass
 
 
     img_found = "✅"
