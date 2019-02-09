@@ -127,7 +127,7 @@ __help__ = """
  - /setflood <int/'no'/'off'>: enables or disables flood control
 """
 
-__mod_name__ = "Anti Spam"
+__mod_name__ = "Sicherheit - Spam"
 
 FLOOD_BAN_HANDLER = MessageHandler(Filters.all & ~Filters.status_update & Filters.group, check_flood)
 SET_FLOOD_HANDLER = CommandHandler("setflood", set_flood, pass_args=True, filters=Filters.group)
