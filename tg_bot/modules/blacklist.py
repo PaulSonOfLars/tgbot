@@ -144,7 +144,7 @@ def __stats__():
                                                             sql.num_blacklist_filter_chats())
 
 
-__mod_name__ = "Word Blacklists"
+__mod_name__ = "Wort - Löschung"
 
 __help__ = """
 Blacklists are used to stop certain triggers from being said in a group. Any time the trigger is mentioned, \
