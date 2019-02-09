@@ -34,7 +34,7 @@ Eine Liste meiner Befehle findest du hier /help
 HELP_STRINGS = """
 Ich bin modularisiert aufgebaut, und kann *effektiv* nur von den Admins der Frankfurter Pokémon Go Community\
  verwendet werden, oder von meinem [Besitzer](https://t.me/Finte25).\n\nFür Hilfestellung zu einem speziellen Modul, klicke\
- unten einfach auf das entsprechende Button!
+ unten einfach auf den entsprechenden Knopf!
 
 *Haupt Befehle:*
  - /start   : startet den Bot
