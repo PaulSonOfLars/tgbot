@@ -188,6 +188,7 @@ def help_button(bot: Bot, update: Update):
             text = "Hier ist die Hilfestellung für das *{}* Modul:\n".format(HELPABLE[module].__mod_name__) \
                    + HELPABLE[module].__help__
             query.message.reply_text(text=text,
+                                     disable_web_page_preview=True,
                                      parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(
                                          [[InlineKeyboardButton(text="Zurück", callback_data="help_back")]]))
@@ -195,6 +196,7 @@ def help_button(bot: Bot, update: Update):
         elif prev_match:
             curr_page = int(prev_match.group(1))
             query.message.reply_text(HELP_STRINGS,
+                                     disable_web_page_preview=True,
                                      parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(
                                          paginate_modules(curr_page - 1, HELPABLE, "help")))
@@ -202,12 +204,14 @@ def help_button(bot: Bot, update: Update):
         elif next_match:
             next_page = int(next_match.group(1))
             query.message.reply_text(HELP_STRINGS,
+                                     disable_web_page_preview=True,
                                      parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(
                                          paginate_modules(next_page + 1, HELPABLE, "help")))
 
         elif back_match:
             query.message.reply_text(text=HELP_STRINGS,
+                                     disable_web_page_preview=True,
                                      parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(paginate_modules(0, HELPABLE, "help")))
 
