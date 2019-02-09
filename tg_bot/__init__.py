@@ -4,12 +4,17 @@ import sys
 
 import telegram.ext as tg
 
-pid = os.getpid()
 
-pidpath = '/var/run/Klikdiklak.pid'
-pidfile = open(pidpath,'w')
-pidfile.write(str(pid))
-pidfile.close()
+
+
+
+def write_pid(branch : ""):
+    pid = os.getpid()
+
+    pidpath = '/var/run/Klikdiklak'+str(branch)+'.pid'
+    pidfile = open(pidpath,'w')
+    pidfile.write(str(pid))
+    pidfile.close()
 
 # enable logging
 logging.basicConfig(
@@ -66,6 +71,7 @@ if ENV:
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
     DEL_SERVICE_MESSAGES = bool(os.environ.get('DEL_SERVICE_MESSAGES', False))
+    DEVBRANCH = bool(os.environ.get('DEV', False))
 
 else:
     from tg_bot.config import Development as Config
@@ -109,7 +115,11 @@ else:
     BAN_STICKER = Config.BAN_STICKER
     ALLOW_EXCL = Config.ALLOW_EXCL
     DEL_SERVICE_MESSAGES = Config.DEL_SERVICE_MESSAGES
+    DEVBRANCH = Config.DEV
 
+
+
+write_pid()
 
 SUDO_USERS.add(OWNER_ID)
 

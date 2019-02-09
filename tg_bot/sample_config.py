@@ -38,6 +38,7 @@ class Config(object):
     BAN_STICKER = 'CAADAgADOwADPPEcAXkko5EB3YGYAg'  # banhammer marie sticker
     ALLOW_EXCL = False  # Allow ! commands as well as /
     DEL_SERVICE_MESSAGES = False # Delete all service messages like join and leave group
+    DEV = False # Delete all service messages like join and leave group
 
 class Production(Config):
     LOGGER = False
