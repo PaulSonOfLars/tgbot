@@ -44,7 +44,7 @@ Ich bin modularisiert aufgebaut, und kann *effektiv* nur von den Admins der Fran
    - Via Gruppe: wird dich in einen privaten chat weiterleiten.
 
 {}
-Verfügbare Module:
+*Verfügbare Module:*
 """.format("" if not ALLOW_EXCL else "\nAlle Befehle können mit / oder ! benutzt werden\n")
 
 DONATE_STRING = """Heya, glad to hear you want to donate!

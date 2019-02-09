@@ -291,7 +291,7 @@ __help__ = """
  - /ungban <userhandle> bans a user. (via handle, or reply)
 """
 
-__mod_name__ = "Bans - Local"
+__mod_name__ = "Ban - Lokal"
 
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
 TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, filters=Filters.group)

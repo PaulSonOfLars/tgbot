@@ -220,7 +220,7 @@ doin?
  - /stop <filter keyword>: stop that filter.
 """
 
-__mod_name__ = "Codeword Filters"
+__mod_name__ = "Wort - Reaktion"
 
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter)

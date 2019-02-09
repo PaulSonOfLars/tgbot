@@ -361,7 +361,7 @@ You can enable that via the config via CHANNEL\_GBAN=True
 /gban also works precautionary. So even the person is not a member of the channel he will be bannen and won't be able to join!
 """
 
-__mod_name__ = "Bans - Global"
+__mod_name__ = "Ban - Global"
 
 GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True,
                               filters=CustomFilters.sudo_filter | CustomFilters.support_filter )
