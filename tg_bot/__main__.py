@@ -21,28 +21,31 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 import tg_bot.modules.sql.users_sql as sql
 
 PM_START_TEXT = """
-Hi {}, my name is *{}*!
-I am a private modification of the group management bot Marie! Which can be found @BanhammerMarie\_bot!
-This modification focuses on expanding the gban feature to channels!
+Hallo {}, mein Name ist *{}*!\n
+Ich bin einer der Gruppen Verwaltungs Bot der Frankfurter Pokémon Go Community.
+Alle Details zum Datenschutz findest du [hier](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html)
 
-You can find the list of available commands with /help.
+mit dem Befehl /dsgvo löschst du alle Informationen zu deiner Person aus der Datenbank des Bots!
+_Ausser es besteht ein öffentliches Interesse an diesem Datensatz siehe _ [Datenschutz](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html) 
+
+Eine Liste meiner Befehle findest du hier /help
 """
 
 HELP_STRINGS = """
-Hey there! My name is *{}*.
-I'm a modular group management bot with a few fun extras! Have a look at the following for an idea of some of \
-the things I can help you with.
+Hallo {}, Ich bin modularisiert aufgebaut, und kann *effektiv* nur von den Admins der Frankfurter Pokémon Go Community\
+verwendet werden, oder von meinem [Besitzer](https://t.me/Finte25). Für Hilfestellung zu einem speziellen Modul, klicke\
+unten einfach auf das entsprechende Button!
 
-*Main* commands available:
- - /start: start the bot
- - /help: PM's you this message.
+*Haupt* Befehle:
+ - /start: startet den Bot
+ - /help: sendet diese Nachricht
  - /settings:
-   - in PM: will send you your settings for all supported modules.
-   - in a group: will redirect you to pm, with all that chat's settings.
+   - Via PM: will send you your settings for all supported modules.
+   - Via  Gruppe: will redirect you to pm, with all that chat's settings.
 
 {}
-And the following:
-""".format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n")
+Verfügbare Module:
+""".format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAlle Befehle können mit / oder ! benutzt werden\n")
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
 But there is not donationen needed - I made this for free for the community"""
@@ -142,7 +145,7 @@ def start(bot: Bot, update: Update, args: List[str]):
                 PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
                 parse_mode=ParseMode.MARKDOWN)
     else:
-        update.effective_message.reply_text("Yo, whadup?")
+        update.effective_message.reply_text("Ich bin bereits aktiv?")
 
 
 # for test purposes
@@ -150,23 +153,20 @@ def error_callback(bot, update, error):
     try:
         raise error
     except Unauthorized:
-        print("no nono1")
         print(error)
         # remove update.message.chat_id from conversation list
     except BadRequest:
-        print("no nono2")
-        print("BadRequest caught")
         print(error)
 
         # handle malformed requests - read more below!
     except TimedOut:
-        print("no nono3")
+        pass
         # handle slow connection problems
     except NetworkError:
-        print("no nono4")
+        pass
         # handle other connection problems
     except ChatMigrated as err:
-        print("no nono5")
+        pass
         print(err)
         # the chat_id of a group has changed, use e.new_chat_id instead
     except TelegramError:
@@ -184,12 +184,12 @@ def help_button(bot: Bot, update: Update):
     try:
         if mod_match:
             module = mod_match.group(1)
-            text = "Here is the help for the *{}* module:\n".format(HELPABLE[module].__mod_name__) \
+            text = "Hier ist die Hilfestellung für das *{}* Modul:\n".format(HELPABLE[module].__mod_name__) \
                    + HELPABLE[module].__help__
             query.message.reply_text(text=text,
                                      parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(
-                                         [[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
+                                         [[InlineKeyboardButton(text="Zurück", callback_data="help_back")]]))
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
@@ -232,7 +232,7 @@ def get_help(bot: Bot, update: Update):
     # ONLY send help in PM
     if chat.type != chat.PRIVATE:
 
-        update.effective_message.reply_text("Contact me in PM to get the list of possible commands.",
+        update.effective_message.reply_text("Kontaktiere mich per PM um eine Liste der möglichen Befehle zu erhalten",
                                             reply_markup=InlineKeyboardMarkup(
                                                 [[InlineKeyboardButton(text="Help",
                                                                        url="t.me/{}?start=help".format(
@@ -241,7 +241,7 @@ def get_help(bot: Bot, update: Update):
 
     elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
         module = args[1].lower()
-        text = "Here is the available help for the *{}* module:\n".format(HELPABLE[module].__mod_name__) \
+        text = "Hier ist die Hilfestellung für das *{}* Modul:\n".format(HELPABLE[module].__mod_name__) \
                + HELPABLE[module].__help__
         send_help(chat.id, text, InlineKeyboardMarkup([[InlineKeyboardButton(text="Back", callback_data="help_back")]]))
 
@@ -254,11 +254,11 @@ def send_settings(chat_id, user_id, user=False):
         if USER_SETTINGS:
             settings = "\n\n".join(
                 "*{}*:\n{}".format(mod.__mod_name__, mod.__user_settings__(user_id)) for mod in USER_SETTINGS.values())
-            dispatcher.bot.send_message(user_id, "These are your current settings:" + "\n\n" + settings,
+            dispatcher.bot.send_message(user_id, "Hier sind deine momentanen Einstellungen:" + "\n\n" + settings,
                                         parse_mode=ParseMode.MARKDOWN)
 
         else:
-            dispatcher.bot.send_message(user_id, "Seems like there aren't any user specific settings available :'(",
+            dispatcher.bot.send_message(user_id, "Es scheint als sind keine benutzerspezifischen Einstellungen vorhanden :'(",
                                         parse_mode=ParseMode.MARKDOWN)
 
     else:
@@ -270,10 +270,9 @@ def send_settings(chat_id, user_id, user=False):
                                         reply_markup=InlineKeyboardMarkup(
                                             paginate_modules(0, CHAT_SETTINGS, "stngs", chat=chat_id)))
         else:
-            dispatcher.bot.send_message(user_id, "Seems like there aren't any chat settings available :'(\nSend this "
-                                                 "in a group chat you're admin in to find its current settings!",
+            dispatcher.bot.send_message(user_id, "Es scheint als sind keine Chat Einstellungen vorhanden :'(\nSende das "
+                                                 "in einer Gruppe in der du Admin bist um ihre aktuellen Einstellungen herauszufinden!",
                                         parse_mode=ParseMode.MARKDOWN)
-
 
 @run_async
 def settings_button(bot: Bot, update: Update):
@@ -351,14 +350,14 @@ def get_settings(bot: Bot, update: Update):
     # ONLY send settings in PM
     if chat.type != chat.PRIVATE:
         if is_user_admin(chat, user.id):
-            text = "Click here to get this chat's settings, as well as yours."
+            text = "Klicke hier um deine, sowie die Einstellungen dieses Chats zu erhalten."
             msg.reply_text(text,
                            reply_markup=InlineKeyboardMarkup(
                                [[InlineKeyboardButton(text="Settings",
                                                       url="t.me/{}?start=stngs_{}".format(
                                                           bot.username, chat.id))]]))
         else:
-            text = "Click here to check your settings."
+            text = "Klicke hier um deine Einstellungen zu prüfen"
 
     else:
         send_settings(chat.id, user.id, True)
