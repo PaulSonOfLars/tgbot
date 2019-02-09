@@ -23,10 +23,10 @@ import tg_bot.modules.sql.users_sql as sql
 PM_START_TEXT = """
 Hallo {}, mein Name ist *{}*!\n
 Ich bin einer der Gruppen Verwaltungs Bot der Frankfurter Pokémon Go Community.
-Alle Details zum Datenschutz findest du [hier](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html)
+Alle Details zum Datenschutz von mir findest du [hier](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html)
 
-mit dem Befehl /dsgvo löschst du alle Informationen zu deiner Person aus der Datenbank des Bots!
-_Insofern diese nicht von öffentlichem Interesse sind. Siehe _ [Datenschutz](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html) 
+mit dem Befehl /dsgvo löschst du alle Informationen zu deiner Person aus der Datenbank dieses Bots!
+_Insofern dies nicht entgegen des öffentlichem Interesse wirkt. Siehe _ [Datenschutz](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html) 
 
 Eine Liste meiner Befehle findest du hier /help
 """
