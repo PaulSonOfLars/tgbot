@@ -8,7 +8,7 @@ import telegram.ext as tg
 
 
 
-def write_pid(branch : ""):
+def write_pid(branch):
     pid = os.getpid()
 
     pidpath = '/var/run/Klikdiklak'+str(branch)+'.pid'
@@ -119,7 +119,7 @@ else:
 
 
 
-write_pid()
+write_pid("")
 
 SUDO_USERS.add(OWNER_ID)
 
