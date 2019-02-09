@@ -263,9 +263,10 @@ def del_lockables(bot: Bot, update: Update):
                         chat.kick_member(new_mem.id)
                         message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
             else:
-                try:
-                    send_lock_msg(bot, update)
-                    message.delete()
+                try:                
+                    if can_delete(chat, bot.id):
+                        send_lock_msg(bot, update)
+                        message.delete()
                 except BadRequest as excp:
                     if excp.message == "Message to delete not found":
                         pass
@@ -283,7 +284,8 @@ def rest_handler(bot: Bot, update: Update):
     for restriction, filter in RESTRICTION_TYPES.items():
         if filter(msg) and sql.is_restr_locked(chat.id, restriction) and can_delete(chat, bot.id):
             try:
-                msg.delete()
+                if can_delete(chat, bot.id):
+                    msg.delete()
             except BadRequest as excp:
                 if excp.message == "Message to delete not found":
                     pass
