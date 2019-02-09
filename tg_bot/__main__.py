@@ -26,7 +26,7 @@ Ich bin einer der Gruppen Verwaltungs Bot der Frankfurter Pokémon Go Community.
 Alle Details zum Datenschutz findest du [hier](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html)
 
 mit dem Befehl /dsgvo löschst du alle Informationen zu deiner Person aus der Datenbank des Bots!
-_Ausser es besteht ein öffentliches Interesse an diesem Datensatz siehe _ [Datenschutz](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html) 
+_Insofern diese nicht von öffentlichem Interesse sind. Siehe _ [Datenschutz](https://www.cloud-ffm.eu/klikdiklak/datenschutz.html) 
 
 Eine Liste meiner Befehle findest du hier /help
 """
