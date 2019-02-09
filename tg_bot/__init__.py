@@ -118,8 +118,10 @@ else:
     DEVBRANCH = Config.DEV
 
 
-
-write_pid("")
+if DEVBRANCH:
+    write_pid("_dev")
+else:
+    write_pid("")
 
 SUDO_USERS.add(OWNER_ID)
 
