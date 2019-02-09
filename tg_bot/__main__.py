@@ -36,16 +36,16 @@ Ich bin modularisiert aufgebaut, und kann *effektiv* nur von den Admins der Fran
  verwendet werden, oder von meinem [Besitzer](https://t.me/Finte25).\n\nFür Hilfestellung zu einem speziellen Modul, klicke\
  unten einfach auf das entsprechende Button!
 
-*Haupt* Befehle:
- - /start: startet den Bot
- - /help: sendet diese Nachricht
+*Haupt Befehle:*
+ - /start   : startet den Bot
+ - /help.   : sendet diese Nachricht
  - /settings:
-   - Via PM: will send you your settings for all supported modules.
-   - Via  Gruppe: will redirect you to pm, with all that chat's settings.
+   - Via PM    : sendet dir die Einstellungen für alle Module.
+   - Via Gruppe: wird dich in einen privaten chat weiterleiten.
 
 {}
 Verfügbare Module:
-""".format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAlle Befehle können mit / oder ! benutzt werden\n")
+""".format("" if not ALLOW_EXCL else "\nAlle Befehle können mit / oder ! benutzt werden\n")
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
 But there is not donationen needed - I made this for free for the community"""
