@@ -364,7 +364,7 @@ Once a message has been deleted a notification will be shown and the last sent \
 notification will be deleted if possible.
 """
 
-__mod_name__ = "Media Type Locks"
+__mod_name__ = "Medien - Löschung"
 
 LOCKTYPES_HANDLER = DisableAbleCommandHandler("locktypes", locktypes)
 LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=CustomFilters.sudo_filter & Filters.group | CustomFilters.support_filter & Filters.group)
