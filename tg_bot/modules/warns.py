@@ -335,17 +335,15 @@ def reply_filter(bot: Bot, update: Update) -> str:
                     break
             if ( count == 3 ):                    
                 user = update.effective_user  # type: Optional[User]
-                warn_filter = sql.get_warn_filter(chat.id, keyword)
+                warn_filter = "Arabische Zeichen"
                 return warn(user, chat, warn_filter.reply, message)
 
 
     for keyword in chat_warn_filters:
-        print(keyword)
         pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             user = update.effective_user  # type: Optional[User]
             warn_filter = sql.get_warn_filter(chat.id, keyword)
-            print(warn_filter.reply)
             return warn(user, chat, warn_filter.reply, message)
     return ""
 
