@@ -130,6 +130,8 @@ def del_blacklist(bot: Bot, update: Update):
         return
 
     chat_filters = sql.get_chat_blacklist(chat.id)
+
+    threshold = 7
     for trigger in chat_filters:
         if ( trigger == "only_roman" ):
             count = 0
@@ -138,9 +140,9 @@ def del_blacklist(bot: Bot, update: Update):
                     retval = only_roman_chars(i)
                     if not retval:
                         count += 1
-                    if count >= 3:
+                    if count >= threshold:
                         break
-                if ( count == 3 ):                    
+                if ( count == threshold ):                    
                     try:
                         message.delete()
                     except BadRequest as excp:
@@ -149,6 +151,16 @@ def del_blacklist(bot: Bot, update: Update):
                         else:
                             LOGGER.exception("Error while deleting blacklist message.")
                     break
+                else:
+                    if ((count != 0) and ( (len(to_match) / 2) <= int(count))):
+                        try:
+                            message.delete()
+                        except BadRequest as excp:
+                            if excp.message == "Message to delete not found":
+                                pass
+                            else:
+                                LOGGER.exception("Error while deleting blacklist message.")
+                        break
         else:
             pattern = r"( |^|[^\w])" + re.escape(trigger) + r"( |$|[^\w])"
             if re.search(pattern, to_match, flags=re.IGNORECASE):

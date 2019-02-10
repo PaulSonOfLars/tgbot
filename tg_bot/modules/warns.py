@@ -321,7 +321,7 @@ def reply_filter(bot: Bot, update: Update) -> str:
     if not to_match:
         return ""
 
-    threshold = 6
+    threshold = 7
     for keyword in chat_warn_filters:
         if ( keyword == "only_roman" ):
             count = 0
