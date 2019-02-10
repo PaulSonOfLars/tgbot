@@ -337,7 +337,7 @@ def reply_filter(bot: Bot, update: Update) -> str:
                     reason = "Nicht romanische Zeichen"
                     return warn(user, chat, reason, message)
                 else:
-                    if ((count != 0) and (len(to_match) == int(count))):
+                    if ((count != 0) and ( (len(to_match) / 2) <= int(count))):
                         user = update.effective_user  # type: Optional[User]
                         reason = "Nicht romanische Zeichen"
                         return warn(user, chat, reason, message)
