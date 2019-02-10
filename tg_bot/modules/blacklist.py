@@ -131,7 +131,6 @@ def del_blacklist(bot: Bot, update: Update):
 
     chat_filters = sql.get_chat_blacklist(chat.id)
     for trigger in chat_filters:
-        print(trigger)
         if ( trigger == "only_roman" ):
             count = 0
             if not only_roman_chars(to_match):
