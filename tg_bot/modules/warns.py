@@ -326,7 +326,7 @@ def reply_filter(bot: Bot, update: Update) -> str:
             count = 0
             if not only_roman_chars(to_match):
                 for i in to_match:
-                    print "i"
+                    print(i)
                     retval = only_roman_chars(i)
                     if retval:
                         count += 1
