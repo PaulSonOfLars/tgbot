@@ -335,8 +335,8 @@ def reply_filter(bot: Bot, update: Update) -> str:
                     break
             if ( count == 3 ):                    
                 user = update.effective_user  # type: Optional[User]
-                warn_filter = "Arabische Zeichen"
-                return warn(user, chat, warn_filter.reply, message)
+                reason = "Arabische Zeichen"
+                return warn(user, chat, reason, message)
 
 
     for keyword in chat_warn_filters:
