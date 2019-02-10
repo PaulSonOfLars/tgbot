@@ -136,7 +136,7 @@ def del_blacklist(bot: Bot, update: Update):
             if not only_roman_chars(to_match):
                 for i in to_match:
                     retval = only_roman_chars(i)
-                    if retval:
+                    if not retval:
                         count += 1
                     if count >= 3:
                         break
