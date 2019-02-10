@@ -20,9 +20,18 @@ from tg_bot.modules.helper_funcs.string_handling import split_quotes
 from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import warns_sql as sql
 import tg_bot.modules.sql.ilikes_sql as sqllikes
+import unicodedata as ud
 
 WARN_HANDLER_GROUP = 9
 CURRENT_WARNING_FILTER_STRING = "<b>Konfigurierten Warn Filter für diesen Chat:</b>\n"
+
+latin_letters = {}
+check_arabic = True
+
+def only_roman_chars(unistr):
+    return all(is_latin(uchr)
+           for uchr in unistr
+           if uchr.isalpha()) # isalpha suggested by John Machin
 
 
 # Not async
@@ -303,12 +312,23 @@ def reply_filter(bot: Bot, update: Update) -> str:
     delete_expired(bot, update)
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
-    print(message)
 
     chat_warn_filters = sql.get_chat_warn_triggers(chat.id)
     to_match = extract_text(message)
     if not to_match:
         return ""
+
+    # arabic check
+    if check_arabic:
+        count = 0
+        if not only_roman_chars(text):
+            for i in text:
+                retval = only_roman_chars(i)
+                if retval:
+                    count += 1
+            print("arabic chars found:")
+            print(count)
+
 
     for keyword in chat_warn_filters:
         pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
