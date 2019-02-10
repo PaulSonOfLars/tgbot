@@ -331,13 +331,17 @@ def reply_filter(bot: Bot, update: Update) -> str:
                 retval = only_roman_chars(i)
                 if retval:
                     count += 1
-                if count >= 5:
+                if count >= 3:
                     break
-            print("arabic chars found:")
-            print(count)
+            if ( count == 3 ):                    
+                user = update.effective_user  # type: Optional[User]
+                warn_filter = sql.get_warn_filter(chat.id, keyword)
+                return warn(user, chat, warn_filter.reply, message)
 
 
     for keyword in chat_warn_filters:
+        print(keyword)
+        print(warn_filter.reply)
         pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             user = update.effective_user  # type: Optional[User]
