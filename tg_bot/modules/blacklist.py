@@ -149,17 +149,17 @@ def del_blacklist(bot: Bot, update: Update):
                         else:
                             LOGGER.exception("Error while deleting blacklist message.")
                     break
-
-        pattern = r"( |^|[^\w])" + re.escape(trigger) + r"( |$|[^\w])"
-        if re.search(pattern, to_match, flags=re.IGNORECASE):
-            try:
-                message.delete()
-            except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
-                    LOGGER.exception("Error while deleting blacklist message.")
-            break
+        else:
+            pattern = r"( |^|[^\w])" + re.escape(trigger) + r"( |$|[^\w])"
+            if re.search(pattern, to_match, flags=re.IGNORECASE):
+                try:
+                    message.delete()
+                except BadRequest as excp:
+                    if excp.message == "Message to delete not found":
+                        pass
+                    else:
+                        LOGGER.exception("Error while deleting blacklist message.")
+                break
 
 
 def __migrate__(old_chat_id, new_chat_id):

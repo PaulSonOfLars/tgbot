@@ -335,12 +335,12 @@ def reply_filter(bot: Bot, update: Update) -> str:
                     user = update.effective_user  # type: Optional[User]
                     reason = "Nicht romanische Zeichen"
                     return warn(user, chat, reason, message)
-
-        pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
-        if re.search(pattern, to_match, flags=re.IGNORECASE):
-            user = update.effective_user  # type: Optional[User]
-            warn_filter = sql.get_warn_filter(chat.id, keyword)
-            return warn(user, chat, warn_filter.reply, message)
+        else:
+            pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
+            if re.search(pattern, to_match, flags=re.IGNORECASE):
+                user = update.effective_user  # type: Optional[User]
+                warn_filter = sql.get_warn_filter(chat.id, keyword)
+                return warn(user, chat, warn_filter.reply, message)
     return ""
 
 
