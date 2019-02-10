@@ -321,8 +321,8 @@ def reply_filter(bot: Bot, update: Update) -> str:
     # arabic check
     if check_arabic:
         count = 0
-        if not only_roman_chars(text):
-            for i in text:
+        if not only_roman_chars(to_match):
+            for i in to_match:
                 retval = only_roman_chars(i)
                 if retval:
                     count += 1
