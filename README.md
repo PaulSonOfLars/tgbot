@@ -1,4 +1,4 @@
-# Klikdiklak Bot Dev Branch
+# Klikdiklak Bot
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
 This is a private modification of the group management bot Marie! Which can be found [here](https://t.me/BanhammerMarie_bot)! 

@@ -446,6 +446,10 @@ be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is
  - /nowarn <keyword>: stop a warning filter
  - /warnlimit <num>: set the warning limit
  - /strongwarn <on/yes/off/no>: If set to on, exceeding the warn limit will result in a ban. Else, will just kick.
+
+*Trick:*
+ To block non roman characters you can add the keyword 'only_roman' to the blacklist and to the warnlist
+
 """
 
 __mod_name__ = "Wort - Verwarn."
