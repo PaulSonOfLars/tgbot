@@ -22,7 +22,7 @@ latin_letters = {}
 def only_roman_chars(unistr):
     return all(is_latin(uchr)
            for uchr in unistr
-           if uchr.isalpha()) # isalpha suggested by John Machin
+           if uchr.isalpha())
 
 
 def is_latin(uchr):
