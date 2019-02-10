@@ -331,6 +331,8 @@ def reply_filter(bot: Bot, update: Update) -> str:
                 retval = only_roman_chars(i)
                 if retval:
                     count += 1
+                if count >= 5:
+                    break
             print("arabic chars found:")
             print(count)
 
