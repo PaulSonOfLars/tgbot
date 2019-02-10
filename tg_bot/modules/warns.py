@@ -300,10 +300,10 @@ def delete_expired(bot: Bot, update: Update):
 @run_async
 @loggable
 def reply_filter(bot: Bot, update: Update) -> str:
-    print("hi")
     delete_expired(bot, update)
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
+    print(message)
 
     chat_warn_filters = sql.get_chat_warn_triggers(chat.id)
     to_match = extract_text(message)
