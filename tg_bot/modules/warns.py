@@ -339,7 +339,7 @@ def reply_filter(bot: Bot, update: Update) -> str:
                     print(len(text))
                     print(count)
                 else:
-                    print(len(text))
+                    print(len(to_match))
                     print(count)
         else:
             pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
