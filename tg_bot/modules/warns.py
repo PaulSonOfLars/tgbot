@@ -26,8 +26,6 @@ WARN_HANDLER_GROUP = 9
 CURRENT_WARNING_FILTER_STRING = "<b>Konfigurierten Warn Filter für diesen Chat:</b>\n"
 
 latin_letters = {}
-check_arabic = True
-
 def only_roman_chars(unistr):
     return all(is_latin(uchr)
            for uchr in unistr
@@ -323,23 +321,21 @@ def reply_filter(bot: Bot, update: Update) -> str:
     if not to_match:
         return ""
 
-    # arabic check
-    if check_arabic:
-        count = 0
-        if not only_roman_chars(to_match):
-            for i in to_match:
-                retval = only_roman_chars(i)
-                if retval:
-                    count += 1
-                if count >= 3:
-                    break
-            if ( count == 3 ):                    
-                user = update.effective_user  # type: Optional[User]
-                reason = "Arabische Zeichen"
-                return warn(user, chat, reason, message)
-
-
     for keyword in chat_warn_filters:
+        if ( keyword == "only_roman" ):
+            count = 0
+            if not only_roman_chars(to_match):
+                for i in to_match:
+                    retval = only_roman_chars(i)
+                    if retval:
+                        count += 1
+                    if count >= 3:
+                        break
+                if ( count == 3 ):                    
+                    user = update.effective_user  # type: Optional[User]
+                    reason = "Nicht romanische Zeichen"
+                    return warn(user, chat, reason, message)
+
         pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
         if re.search(pattern, to_match, flags=re.IGNORECASE):
             user = update.effective_user  # type: Optional[User]
