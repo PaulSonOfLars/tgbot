@@ -327,7 +327,6 @@ def reply_filter(bot: Bot, update: Update) -> str:
             if not only_roman_chars(to_match):
                 for i in to_match:
                     retval = only_roman_chars(i)
-                    print(retval)
                     if not retval:
                         count += 1
                     if count >= 3:
@@ -336,12 +335,7 @@ def reply_filter(bot: Bot, update: Update) -> str:
                     user = update.effective_user  # type: Optional[User]
                     reason = "Nicht romanische Zeichen"
                     return warn(user, chat, reason, message)
-                elif ( count >= 1):
-                    print(len(text))
-                    print(count)
-                else:
-                    print(len(to_match))
-                    print(count)
+
         else:
             pattern = r"( |^|[^\w])" + re.escape(keyword) + r"( |$|[^\w])"
             if re.search(pattern, to_match, flags=re.IGNORECASE):
