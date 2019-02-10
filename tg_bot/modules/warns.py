@@ -34,6 +34,11 @@ def only_roman_chars(unistr):
            if uchr.isalpha()) # isalpha suggested by John Machin
 
 
+def is_latin(uchr):
+    try: return latin_letters[uchr]
+    except KeyError:
+         return latin_letters.setdefault(uchr, 'LATIN' in ud.name(uchr))
+
 # Not async
 def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = None) -> str:
     if is_user_admin(chat, user.id):
