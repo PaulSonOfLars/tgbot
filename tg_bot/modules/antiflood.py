@@ -127,7 +127,7 @@ __help__ = """
  - /setflood <int/'no'/'off'>: enables or disables flood control
 
 *Trick:*
-To block non roman characters you can add the keyword 'only_roman' to the blacklist and to the warnlist
+To block non roman characters you can add the keyword `only_roman` to the blacklist and to the warnlist
 
 """
 

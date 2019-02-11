@@ -206,7 +206,7 @@ multiple triggers at once.
  - /rmblacklist <triggers>: Same as above.
 
 *Trick:*
-To block non roman characters you can add the keyword 'only_roman' to the blacklist and to the warnlist
+To block non roman characters you can add the keyword `only_roman` to the blacklist and to the warnlist
 
 """
 
