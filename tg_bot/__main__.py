@@ -418,7 +418,7 @@ def migrate_chats(bot: Bot, update: Update):
 def is_chat_allowed(bot, update):
     if BLACKLIST_CHATS:
         chat_id = update.effective_message.chat_id
-        if chat_id not in BLACKLIST_CHATS:
+        if chat_id in BLACKLIST_CHATS:
             bot.send_message(chat_id=update.message.chat_id,
                              text='Unallowed chat! Leaving...')
             try:
