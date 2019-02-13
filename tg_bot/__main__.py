@@ -11,7 +11,7 @@ from telegram.ext.dispatcher import run_async, DispatcherHandlerStop, Dispatcher
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK, CERT_PATH, PORT, URL, LOGGER, \
-    ALLOW_EXCL
+    ALLOW_EXCL, BLACKLIST_CHATS, WHITELIST_CHATS
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in the config file!
 from tg_bot.modules import ALL_MODULES
@@ -415,6 +415,32 @@ def migrate_chats(bot: Bot, update: Update):
     raise DispatcherHandlerStop
 
 
+def is_chat_allowed(bot, update):
+    if BLACKLIST_CHATS:
+        chat_id = update.effective_message.chat_id
+        if chat_id not in BLACKLIST_CHATS:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text='Unallowed chat! Leaving...')
+            try:
+                bot.leave_chat(chat_id)
+
+            finally:
+                raise DispatcherHandlerStop
+            return
+
+    if WHITELIST_CHATS:
+        chat_id = update.effective_message.chat_id
+        if chat_id not in WHITELIST_CHATS:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text='Unallowed chat! Leaving...')
+            try:
+                bot.leave_chat(chat_id)
+
+            finally:
+                raise DispatcherHandlerStop
+            return
+
+
 def main():
     test_handler = CommandHandler("test", test)
     start_handler = CommandHandler("start", start, pass_args=True)
@@ -427,6 +453,7 @@ def main():
 
     donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
+    blacklist_whitelist_handler = MessageHandler(Filters.group, is_chat_allowed)
 
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
@@ -435,6 +462,7 @@ def main():
     dispatcher.add_handler(help_callback_handler)
     dispatcher.add_handler(settings_callback_handler)
     dispatcher.add_handler(migrate_handler)
+    dispatcher.add_handler(blacklist_whitelist_handler)
     dispatcher.add_handler(donate_handler)
 
     # dispatcher.add_error_handler(error_callback)
