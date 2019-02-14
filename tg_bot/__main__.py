@@ -27,6 +27,8 @@ python-telegram-bot library, and am fully opensource - you can find what makes m
 You can find the list of available commands with /help.
 
 If you're enjoying using me, and/or would like to help me survive in the wild, hit /donate to help fund/upgrade my VPS!
+
+_Want to add me to your group?_ [Click here!](t.me/maver_ckbot?startgroup=true)
 """
 
 HELP_STRINGS = """
@@ -148,7 +150,7 @@ def start(bot: Bot, update: Update, args: List[str]):
                 PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
                 parse_mode=ParseMode.MARKDOWN)
     else:
-        update.effective_message.reply_text("Yo, whadup?")
+        update.effective_message.reply_text("Hey there, PM me if you have any questions on how to use me!")
 
 
 # for test purposes
