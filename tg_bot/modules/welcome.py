@@ -90,9 +90,9 @@ def new_member(bot: Bot, update: Update):
                 update.effective_message.reply_text("Master is in the houseeee, let's get this party started!")
                 continue
 
-            # Don't welcome yourself
+            # Make bot greet admins
             elif new_mem.id == bot.id:
-                continue
+                update.effective_message.reply_text("Hey there, I'm {}! Thank you for adding me to your group and be sure to check /help in PM for more commands and tricks! {}".format(bot.first_name))
 
             else:
                 # If welcome message is media, send with appropriate function
