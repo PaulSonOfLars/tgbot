@@ -42,7 +42,7 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if is_user_ban_protected(chat, user_id, member):
-        message.reply_text("I really wish I could ban admins...")
+        message.reply_text("Why would I ban an admin? That sounds like a pretty dumb idea.")
         return ""
 
     if user_id == bot.id:
@@ -190,7 +190,7 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if is_user_ban_protected(chat, user_id):
-        message.reply_text("I really wish I could kick admins...")
+        message.reply_text("I'm not gonna kick an admin... Though I reckon it'd be pretty funny.")
         return ""
 
     if user_id == bot.id:
