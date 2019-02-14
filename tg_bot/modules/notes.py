@@ -142,7 +142,7 @@ def save(bot: Bot, update: Update):
     sql.add_note_to_db(chat_id, note_name, text, data_type, buttons=buttons, file=content)
 
     msg.reply_text(
-        "Yas! Added {note_name}.\nGet it with /get {note_name}, or #{note_name}".format(note_name=note_name))
+        "Yas! Added `{note_name}`.\nGet it with `/get {note_name}`, or `#{note_name}`".format(note_name=note_name))
 
     if msg.reply_to_message and msg.reply_to_message.from_user.is_bot:
         if text:
@@ -176,15 +176,15 @@ def list_notes(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     note_list = sql.get_all_chat_notes(chat_id)
 
-    msg = "*Notes in chat:*\n"
+    msg = "You can get notes by using `/get notename`, or `#notename`.\n *List of notes in chat:*\n"
     for note in note_list:
-        note_name = escape_markdown(" - {}\n".format(note.name))
+        note_name = (" • `{}`\n".format(note.name))
         if len(msg) + len(note_name) > MAX_MESSAGE_LENGTH:
             update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
             msg = ""
         msg += note_name
 
-    if msg == "*Notes in chat:*\n":
+    if msg == "*List of notes in chat:*\n":
         update.effective_message.reply_text("No notes in this chat!")
 
     elif len(msg) != 0:
