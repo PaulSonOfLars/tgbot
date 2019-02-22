@@ -56,12 +56,39 @@ def gmute(bot: Bot, update: Update, args: List[str]):
             return
 
         old_reason = sql.update_gmute_reason(user_id, user_chat.username or user_chat.first_name, reason)
+        user_id, new_reason = extract_user_and_text(message, args)
         if old_reason:
+            muter = update.effective_user  # type: Optional[User]
+            send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
+                     "<b>Emendation of Global Mute</b>" \
+                     "\n#GMUTE" \
+                     "\n<b>Status:</b> <code>Amended</code>" \
+                     "\n<b>Sudo Admin:</b> {}" \
+                     "\n<b>User:</b> {}" \
+                     "\n<b>ID:</b> <code>{}</code>" \
+                     "\n<b>Previous Reason:</b> {}" \
+                     "\n<b>Amended Reason:</b> {}".format(mention_html(muter.id, muter.first_name),
+                                              mention_html(user_chat.id, user_chat.first_name), 
+                                                           user_chat.id, old_reason, new_reason), 
+                    html=True)
+
             message.reply_text("This user is already gmuted, for the following reason:\n"
                                "<code>{}</code>\n"
                                "I've gone and updated it with your new reason!".format(html.escape(old_reason)),
                                parse_mode=ParseMode.HTML)
         else:
+            muter = update.effective_user  # type: Optional[User]
+            send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
+                     "<b>Emendation of Global Mute</b>" \
+                     "\n#GMUTE" \
+                     "\n<b>Status:</b> <code>New reason</code>" \
+                     "\n<b>Sudo Admin:</b> {}" \
+                     "\n<b>User:</b> {}" \
+                     "\n<b>ID:</b> <code>{}</code>" \
+                     "\n<b>New Reason:</b> {}".format(mention_html(muter.id, muter.first_name),
+                                              mention_html(user_chat.id, user_chat.first_name), 
+                                                           user_chat.id, new_reason), 
+                    html=True)
             message.reply_text("This user is already gmuted, but had no reason set; I've gone and updated it!")
 
         return
