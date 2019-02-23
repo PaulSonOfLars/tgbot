@@ -146,7 +146,6 @@ def save(bot: Bot, update: Update):
     sql.add_note_to_db(chat_id, note_name, text, data_type, buttons=buttons, file=content)
 
     msg.reply_text(
-        "Yas! Added `{note_name}`.\nGet it with `/get {note_name}`, or `#{note_name}`".format(note_name=note_name))
         "Yas! Saved `{note_name}` for *{chat_name}*.\nGet it with `/get {note_name}`, or `#{note_name}`".format(note_name=note_name, chat_name=chat_name), parse_mode=ParseMode.MARKDOWN)
 
     if msg.reply_to_message and msg.reply_to_message.from_user.is_bot:
@@ -175,10 +174,8 @@ def clear(bot: Bot, update: Update, args: List[str]):
         notename = args[0]
 
         if sql.rm_note(chat_id, notename):
-            update.effective_message.reply_text("Successfully removed note.")
             update.effective_message.reply_text("Note for '`{note_name}`' has been deleted!".format(note_name=note_name), parse_mode=ParseMode.MARKDOWN)
         else:
-            update.effective_message.reply_text("That's not a note in my database!")
             update.effective_message.reply_text("Unfortunately, There is no such notes saved on {chat_name}!".format(chat_name=chat_name))
 
 
@@ -188,8 +185,6 @@ def list_notes(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     note_list = sql.get_all_chat_notes(chat_id)
-
-    msg = "You can get notes by using `/get notename`, or `#notename`.\n *List of notes in chat:*\n"
     chat_name = chat.title or chat.first or chat.username
     msg = "*List of notes in {}:*\n"
     des = "You can get notes by using `/get notename`, or `#notename`.\n"
@@ -200,12 +195,10 @@ def list_notes(bot: Bot, update: Update):
             msg = ""
         msg += note_name
 
-    if msg == "*List of notes in chat:*\n":
     if msg == "*List of notes in {}:*\n":
         update.effective_message.reply_text("No notes in this chat!")
 
     elif len(msg) != 0:
-        update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
         update.effective_message.reply_text(msg.format(chat_name) + des, parse_mode=ParseMode.MARKDOWN)
 
 
@@ -245,6 +238,10 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
+Save data for future users with notes!
+
+Notes are great to save random tidbits of information; a phone number, a nice gif, a funny picture - anything!
+
  - /get <notename>: get the note with this notename
  - #<notename>: same as /get
  - /notes or /saved: list all saved notes in this chat
@@ -258,6 +255,17 @@ A button can be added to a note by using standard markdown link syntax - the lin
 `buttonurl:` section, as such: `[somelink](buttonurl:example.com)`. Check /markdownhelp for more info.
  - /save <notename>: save the replied message as a note with name notename
  - /clear <notename>: clear note with this name
+ 
+ An example of how to save a note would be via:
+`/save data This is some data!`
+
+Now, anyone using "/get notedata", or "#notedata" will be replied to with "This is some data!".
+
+If you want to save an image, gif, or sticker, or any other data, do the following:
+`/save notename` while replying to a sticker or whatever data you'd like. Now, the note at "#notename" contains a sticker which will be sent as a reply.
+
+Tip: to retrieve a note without the formatting, use /get <notename> noformat
+This will retrieve the note and send it without formatting it; getting you the raw markdown, allowing you to make easy edits.
 """
 
 __mod_name__ = "Notes"
