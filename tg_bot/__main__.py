@@ -28,7 +28,7 @@ You can find the list of available commands with /help.
 
 If you're enjoying using me, and/or would like to help me survive in the wild, hit /donate to help fund/upgrade my VPS!
 
-_Want to add me to your group?_ [Click here!](t.me/maver_ckbot?startgroup=true)
+_Want to add me to your group?_ [Click here!](t.me/{}?startgroup=true) \
 """
 
 HELP_STRINGS = """
@@ -47,7 +47,7 @@ the things I can help you with.
 
 {}
 And the following:
-""".format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAll commands can either be used with / . or !.\n")
+""".format(dispatcher.bot.first_name, dispatcher.bot.username,"" if not ALLOW_EXCL else "\nAll commands can either be used with / . or !.\n")
 
 DONATE_STRING = """Heya, glad to hear you want to donate!
 It took lots of work for [my creator](t.me/SonOfLars) to get me to where I am now, and every donation helps \
@@ -147,7 +147,7 @@ def start(bot: Bot, update: Update, args: List[str]):
         else:
             first_name = update.effective_user.first_name
             update.effective_message.reply_text(
-                PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
+                PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID, bot.username),
                 parse_mode=ParseMode.MARKDOWN)
     else:
         update.effective_message.reply_text("Hey there, PM me if you have any questions on how to use me!")
