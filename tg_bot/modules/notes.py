@@ -131,18 +131,23 @@ def hash_get(bot: Bot, update: Update):
 @user_admin
 def save(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
+    chat = update.effective_chat
     msg = update.effective_message  # type: Optional[Message]
-
+    chat_name = chat.title or chat.first or chat.username
     note_name, text, data_type, content, buttons = get_note_type(msg)
 
     if data_type is None:
         msg.reply_text("Dude, there's no note")
         return
+    
+    if len(text.strip()) == 0:
+        text = note_name
 
     sql.add_note_to_db(chat_id, note_name, text, data_type, buttons=buttons, file=content)
 
     msg.reply_text(
         "Yas! Added `{note_name}`.\nGet it with `/get {note_name}`, or `#{note_name}`".format(note_name=note_name))
+        "Yas! Saved `{note_name}` for *{chat_name}*.\nGet it with `/get {note_name}`, or `#{note_name}`".format(note_name=note_name, chat_name=chat_name), parse_mode=ParseMode.MARKDOWN)
 
     if msg.reply_to_message and msg.reply_to_message.from_user.is_bot:
         if text:
@@ -162,21 +167,32 @@ def save(bot: Bot, update: Update):
 @user_admin
 def clear(bot: Bot, update: Update, args: List[str]):
     chat_id = update.effective_chat.id
+    msg = update.effective_message
+    chat = update.effective_chat
+    chat_name = chat.title or chat.first or chat.username
+    note_name, text, data_type, content, buttons = get_note_type(msg)
     if len(args) >= 1:
         notename = args[0]
 
         if sql.rm_note(chat_id, notename):
             update.effective_message.reply_text("Successfully removed note.")
+            update.effective_message.reply_text("Note for '`{note_name}`' has been deleted!".format(note_name=note_name), parse_mode=ParseMode.MARKDOWN)
         else:
             update.effective_message.reply_text("That's not a note in my database!")
+            update.effective_message.reply_text("Unfortunately, There is no such notes saved on {chat_name}!".format(chat_name=chat_name))
 
 
 @run_async
 def list_notes(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
     note_list = sql.get_all_chat_notes(chat_id)
 
     msg = "You can get notes by using `/get notename`, or `#notename`.\n *List of notes in chat:*\n"
+    chat_name = chat.title or chat.first or chat.username
+    msg = "*List of notes in {}:*\n"
+    des = "You can get notes by using `/get notename`, or `#notename`.\n"
     for note in note_list:
         note_name = (" • `{}`\n".format(note.name))
         if len(msg) + len(note_name) > MAX_MESSAGE_LENGTH:
@@ -185,10 +201,12 @@ def list_notes(bot: Bot, update: Update):
         msg += note_name
 
     if msg == "*List of notes in chat:*\n":
+    if msg == "*List of notes in {}:*\n":
         update.effective_message.reply_text("No notes in this chat!")
 
     elif len(msg) != 0:
         update.effective_message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
+        update.effective_message.reply_text(msg.format(chat_name) + des, parse_mode=ParseMode.MARKDOWN)
 
 
 def __import_data__(chat_id, data):
