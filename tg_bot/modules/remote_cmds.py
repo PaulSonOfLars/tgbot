@@ -1,12 +1,12 @@
 import html
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot, User
+from telegram import Message, Chat, Update, Bot, User, ParseMode, InlineKeyboardMarkup
 from telegram.error import BadRequest
 from telegram.ext import run_async, CommandHandler, Filters
 from telegram.utils.helpers import mention_html
 
-from tg_bot import dispatcher
+from tg_bot import dispatcher, BAN_STICKER
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
     is_user_admin, is_user_in_chat, is_bot_admin
 from tg_bot.modules.helper_funcs.extraction import extract_user_and_text
@@ -87,13 +87,14 @@ RUNMUTE_ERRORS = {
 @bot_admin
 def rban(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message
-
+    #chat_name = chat.title or chat.first or chat.username
+    chat = update.effective_chat  # type: Optional[Chat]
     if not args:
         message.reply_text("You don't seem to be referring to a chat/user.")
         return
 
-    user_id, chat_id = extract_user_and_text(message, args)
-
+    user_id, chat_id = extract_user_and_text(message, args
+    )
     if not user_id:
         message.reply_text("You don't seem to be referring to a user.")
         return
@@ -137,7 +138,13 @@ def rban(bot: Bot, update: Update, args: List[str]):
 
     try:
         chat.kick_member(user_id)
-        message.reply_text("Banned from chat!")
+        rbanning = "Hunting again in the wild!\n{} has been remotely banned from {}! \n".format(mention_html(member.user.id, 
+                                                                        member.user.first_name),
+                                                                               (chat.title or chat.first or 
+                                                                                chat.username))
+        bot.send_sticker(update.effective_chat.id, BAN_STICKER)
+        keyboard = []
+        message.reply_text(rbanning, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
@@ -204,7 +211,12 @@ def runban(bot: Bot, update: Update, args: List[str]):
 
     try:
         chat.unban_member(user_id)
-        message.reply_text("Yep, this user can join that chat!")
+        runbanning = "I am allowing {} to join {}!".format(mention_html(member.user.id, 
+                                                                        member.user.first_name),
+                                                                               (chat.title or chat.first or 
+                                                                                chat.username))
+        keyboard = []
+        message.reply_text(runbanning, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
@@ -271,7 +283,13 @@ def rkick(bot: Bot, update: Update, args: List[str]):
 
     try:
         chat.unban_member(user_id)
-        message.reply_text("Kicked from chat!")
+        rkicking = "Hunting again in the wild!\n{} has been remotely kicked from {}! \n".format(mention_html(member.user.id, 
+                                                                                               member.user.first_name),
+                                                                                         (chat.title or chat.first or 
+                                                                                         chat.username))
+        bot.send_sticker(update.effective_chat.id, BAN_STICKER)
+        keyboard = []
+        message.reply_text(rkicking, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
@@ -338,7 +356,12 @@ def rmute(bot: Bot, update: Update, args: List[str]):
 
     try:
         bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
-        message.reply_text("Muted from the chat!")
+        rmuting = "It is so quiet...\n{} has been remotely muted from {}! \n".format(mention_html(member.user.id, 
+                                                                        member.user.first_name),
+                                                                               (chat.title or chat.first or 
+                                                                                chat.username))
+        keyboard = []
+        message.reply_text(rmuting, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
@@ -411,7 +434,12 @@ def runmute(bot: Bot, update: Update, args: List[str]):
                                      can_send_media_messages=True,
                                      can_send_other_messages=True,
                                      can_add_web_page_previews=True)
-        message.reply_text("Yep, this user can talk in that chat!")
+        runmuting = "Well, I will let {} speak on {}!".format(mention_html(member.user.id, 
+                                                                        member.user.first_name),
+                                                                               (chat.title or chat.first or 
+                                                                                chat.username))
+        keyboard = []
+        message.reply_text(runmuting, reply_markup=keyboard, parse_mode=ParseMode.HTML)
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
