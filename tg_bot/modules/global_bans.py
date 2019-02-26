@@ -2,7 +2,7 @@ import html
 from io import BytesIO
 from typing import Optional, List
 
-from telegram import Message, Update, Bot, User, Chat, ParseMode
+from telegram import Message, Update, Bot, User, Chat, ParseMode, InlineKeyboardMarkup
 from telegram.error import BadRequest, TelegramError
 from telegram.ext import run_async, CommandHandler, MessageHandler, Filters
 from telegram.utils.helpers import mention_html
@@ -46,7 +46,7 @@ UNGBAN_ERRORS = {
 @run_async
 def gban(bot: Bot, update: Update, args: List[str]):
     message = update.effective_message  # type: Optional[Message]
-
+    user = update.effective_user  # type: Optional[User]
     user_id, reason = extract_user_and_text(message, args)
 
     if not user_id:
@@ -93,7 +93,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
                      "\n<b>ID:</b> <code>{}</code>" \
                      "\n<b>Previous Reason:</b> {}" \
                      "\n<b>Amended Reason:</b> {}".format(mention_html(banner.id, banner.first_name),
-                                              mention_html(user_chat.id, user_chat.first_name), 
+                                              mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                            user_chat.id, old_reason, new_reason), 
                     html=True)
                 
@@ -111,15 +111,17 @@ def gban(bot: Bot, update: Update, args: List[str]):
                      "\n<b>User:</b> {}" \
                      "\n<b>ID:</b> <code>{}</code>" \
                      "\n<b>New Reason:</b> {}".format(mention_html(banner.id, banner.first_name),
-                                              mention_html(user_chat.id, user_chat.first_name), 
+                                              mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                            user_chat.id, new_reason), 
                     html=True)
             message.reply_text("This user is already gbanned, but had no reason set; I've gone and updated it!")
 
         return
 
-    message.reply_text("⚡️ *Snaps the Banhammer* ⚡️")
-
+    starting = "Initiating global ban for {}...".format(mention_html(user_chat.id, user_chat.first_name or "Deleted Account"))
+    keyboard = []
+    message.reply_text(starting, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+    
     banner = update.effective_user  # type: Optional[User]
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
                  "<b>Global Ban</b>" \
@@ -129,7 +131,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
                  "\n<b>User:</b> {}" \
                  "\n<b>ID:</b> <code>{}</code>" \
                  "\n<b>Reason:</b> {}".format(mention_html(banner.id, banner.first_name),
-                                              mention_html(user_chat.id, user_chat.first_name), 
+                                              mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                            user_chat.id, reason or "No reason given"), 
                 html=True)
 
@@ -157,7 +159,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
             pass
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, 
-                  "{} has been successfully gbanned!".format(mention_html(user_chat.id, user_chat.first_name)),
+                  "{} has been successfully gbanned!".format(mention_html(user_chat.id, user_chat.first_name or "Deleted Account")),
                 html=True)
     message.reply_text("Person has been gbanned.")
 
@@ -182,7 +184,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
 
     banner = update.effective_user  # type: Optional[User]
 
-    message.reply_text("I pardon {}, globally with a second chance.".format(user_chat.first_name))
+    message.reply_text("I pardon {}, globally with a second chance.".format(user_chat.first_name or "Deleted Account"))
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
                  "<b>Regression of Global Ban</b>" \
@@ -191,7 +193,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
                  "\n<b>Sudo Admin:</b> {}" \
                  "\n<b>User:</b> {}" \
                  "\n<b>ID:</b> <code>{}</code>".format(mention_html(banner.id, banner.first_name),
-                                                       mention_html(user_chat.id, user_chat.first_name), 
+                                                       mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                                     user_chat.id),
                  html=True)
 
@@ -222,7 +224,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, 
                   "{} has been pardoned from gban!".format(mention_html(user_chat.id, 
-                                                                         user_chat.first_name)),
+                                                                         user_chat.first_name or "Deleted Account")),
                   html=True)
 
     message.reply_text("This person has been un-gbanned and pardon is granted!")

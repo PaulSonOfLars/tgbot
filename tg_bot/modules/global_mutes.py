@@ -68,7 +68,7 @@ def gmute(bot: Bot, update: Update, args: List[str]):
                      "\n<b>ID:</b> <code>{}</code>" \
                      "\n<b>Previous Reason:</b> {}" \
                      "\n<b>Amended Reason:</b> {}".format(mention_html(muter.id, muter.first_name),
-                                              mention_html(user_chat.id, user_chat.first_name), 
+                                              mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                            user_chat.id, old_reason, new_reason), 
                     html=True)
 
@@ -86,14 +86,16 @@ def gmute(bot: Bot, update: Update, args: List[str]):
                      "\n<b>User:</b> {}" \
                      "\n<b>ID:</b> <code>{}</code>" \
                      "\n<b>New Reason:</b> {}".format(mention_html(muter.id, muter.first_name),
-                                              mention_html(user_chat.id, user_chat.first_name), 
+                                              mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                            user_chat.id, new_reason), 
                     html=True)
             message.reply_text("This user is already gmuted, but had no reason set; I've gone and updated it!")
 
         return
 
-    message.reply_text("*Duct taping the person* 🙊")
+    starting = "Initiating global mute for {}...".format(mention_html(user_chat.id, user_chat.first_name or "Deleted Account"))
+    keyboard = []
+    message.reply_text(starting, reply_markup=keyboard, parse_mode=ParseMode.HTML)
 
     muter = update.effective_user  # type: Optional[User]
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
@@ -104,7 +106,7 @@ def gmute(bot: Bot, update: Update, args: List[str]):
                  "\n<b>User:</b> {}" \
                  "\n<b>ID:</b> <code>{}</code>" \
                  "\n<b>Reason:</b> {}".format(mention_html(muter.id, muter.first_name),
-                                              mention_html(user_chat.id, user_chat.first_name), 
+                                              mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                            user_chat.id, reason or "No reason given"), 
                  html=True)
 
@@ -152,7 +154,7 @@ def gmute(bot: Bot, update: Update, args: List[str]):
             pass
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, 
-                  "{} has been successfully gmuted!".format(mention_html(user_chat.id, user_chat.first_name)),
+                  "{} has been successfully gmuted!".format(mention_html(user_chat.id, user_chat.first_name or "Deleted Account")),
                 html=True)
                   
     message.reply_text("Person has been gmuted.")
@@ -178,7 +180,7 @@ def ungmute(bot: Bot, update: Update, args: List[str]):
 
     muter = update.effective_user  # type: Optional[User]
 
-    message.reply_text("I'll let {} speak again, globally.".format(user_chat.first_name))
+    message.reply_text("I'll let {} speak again, globally.".format(user_chat.first_name or "Deleted Account"))
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS,
                  "<b>Regression of Global Mute</b>" \
@@ -187,7 +189,7 @@ def ungmute(bot: Bot, update: Update, args: List[str]):
                  "\n<b>Sudo Admin:</b> {}" \
                  "\n<b>User:</b> {}" \
                  "\n<b>ID:</b> <code>{}</code>".format(mention_html(muter.id, muter.first_name),
-                                                       mention_html(user_chat.id, user_chat.first_name), 
+                                                       mention_html(user_chat.id, user_chat.first_name or "Deleted Account"), 
                                                                     user_chat.id),
                  html=True)
 
@@ -236,7 +238,7 @@ def ungmute(bot: Bot, update: Update, args: List[str]):
 
     send_to_list(bot, SUDO_USERS + SUPPORT_USERS, 
                   "{} has been pardoned from gmute!".format(mention_html(user_chat.id, 
-                                                                         user_chat.first_name)),
+                                                                         user_chat.first_name or "Deleted Account")),
                   html=True)
 
     message.reply_text("Person has been un-gmuted.")
