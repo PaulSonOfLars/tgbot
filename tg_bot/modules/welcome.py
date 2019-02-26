@@ -79,7 +79,8 @@ def send(update, message, keyboard, backup_message):
 @run_async
 def new_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
-
+    user = update.effective_user  # type: Optional[User]
+    chat_name = chat.title or chat.first or chat.username # type: Optional:[chat name]
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     if should_welc:
         sent = None
@@ -92,7 +93,8 @@ def new_member(bot: Bot, update: Update):
 
             # Make bot greet admins
             elif new_mem.id == bot.id:
-                update.effective_message.reply_text("Hey there, I'm {}! Thank you for adding me to your group and be sure to check /help in PM for more commands and tricks!".format(bot.first_name))
+                update.effective_message.reply_text("Hey {}, I'm {}! Thank you for adding me to {}" 
+                " and be sure to check /help in PM for more commands and tricks!".format(user.first_name, bot.first_name, chat_name))
 
             else:
                 # If welcome message is media, send with appropriate function
