@@ -62,14 +62,45 @@ class GoodbyeButtons(BASE):
         self.url = url
         self.same_line = same_line
 
+class WelcomeMute(BASE):
+    __tablename__ = "welcome_mutes"
+    chat_id = Column(String(14), primary_key=True)
+    welcomemutes = Column(UnicodeText, default=False)
+
+    def __init__(self, chat_id, welcomemutes):
+        self.chat_id = str(chat_id) # ensure string
+        self.welcomemutes = welcomemutes
+
+
 
 Welcome.__table__.create(checkfirst=True)
 WelcomeButtons.__table__.create(checkfirst=True)
 GoodbyeButtons.__table__.create(checkfirst=True)
+WelcomeMute.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
 WELC_BTN_LOCK = threading.RLock()
 LEAVE_BTN_LOCK = threading.RLock()
+WM_LOCK = threading.RLock()
+
+def welcome_mutes(chat_id):
+    try:
+        welcomemutes = SESSION.query(WelcomeMute).get(str(chat_id))
+        if welcomemutes:
+            return welcomemutes.welcomemutes
+        return False
+    finally:
+        SESSION.close()
+
+
+def set_welcome_mutes(chat_id, welcomemutes):
+    with WM_LOCK:
+        prev = SESSION.query(WelcomeMute).get((str(chat_id)))
+        if prev:
+            SESSION.delete(prev)
+        welcome_m = WelcomeMute(str(chat_id), welcomemutes)
+        SESSION.add(welcome_m)
+        SESSION.commit()
 
 
 def get_welc_pref(chat_id):
