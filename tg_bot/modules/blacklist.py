@@ -15,14 +15,14 @@ from tg_bot.modules.helper_funcs.misc import split_message
 
 BLACKLIST_GROUP = 11
 
-BASE_BLACKLIST_STRING = "Current <b>blacklisted</b> words:\n"
+BASE_BLACKLIST_STRING = "The following blacklist filters are currently active in {}:\n"
 
 
 @run_async
 def blacklist(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
-
+    chat_name = chat.title or chat.first or chat.username
     all_blacklisted = sql.get_chat_blacklist(chat.id)
 
     filter_list = BASE_BLACKLIST_STRING
@@ -32,14 +32,14 @@ def blacklist(bot: Bot, update: Update, args: List[str]):
             filter_list += "<code>{}</code>\n".format(html.escape(trigger))
     else:
         for trigger in all_blacklisted:
-            filter_list += " - <code>{}</code>\n".format(html.escape(trigger))
+            filter_list += " • <code>{}</code>\n".format(html.escape(trigger))
 
     split_text = split_message(filter_list)
     for text in split_text:
         if text == BASE_BLACKLIST_STRING:
             msg.reply_text("There are no blacklisted messages here!")
             return
-        msg.reply_text(text, parse_mode=ParseMode.HTML)
+        msg.reply_text(text.format(chat_name), parse_mode=ParseMode.HTML)
 
 
 @run_async
