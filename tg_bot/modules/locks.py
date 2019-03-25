@@ -290,6 +290,12 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
+Do stickers annoy you? or want to avoid people sharing links? or pictures? \
+You're in the right place!
+
+The locks module allows you to lock away some common items in the \
+telegram world; the bot will automatically delete them!
+
  - /locktypes: a list of possible locktypes
 
 *Admin only:*

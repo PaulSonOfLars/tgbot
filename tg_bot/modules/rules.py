@@ -94,6 +94,8 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
+Every chat works with different rules; this module will help make those rules clearer!
+
  - /rules: get the rules for this chat.
 
 *Admin only:*

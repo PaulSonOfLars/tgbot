@@ -149,6 +149,12 @@ if is_module_loaded(FILENAME):
     __mod_name__ = "Command disabling"
 
     __help__ = """
+Not everyone wants every feature that the bot offers. Some commands are best \
+left unused; to avoid spam and abuse.
+
+This allows you to disable some commonly used commands, so noone can use them. \
+It'll also allow you to autodelete them, stopping people from bluetexting.
+
  - /cmds: check the current status of disabled commands
 
 *Admin only:*

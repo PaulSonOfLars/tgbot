@@ -73,10 +73,10 @@ def __gdpr__(user_id):
 
 
 __help__ = """
+When marked as AFK, any mentions will be replied to with a message to say you're not available!
+
  - /afk <reason>: mark yourself as AFK.
  - brb <reason>: same as the afk command - but not a command.
-
-When marked as AFK, any mentions will be replied to with a message to say you're not available!
 """
 
 __mod_name__ = "AFK"

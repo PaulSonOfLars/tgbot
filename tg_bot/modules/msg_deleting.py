@@ -86,6 +86,9 @@ def del_message(bot: Bot, update: Update) -> str:
 
 
 __help__ = """
+Deleting messages made easy with this command. Bot purges \
+messages all together or individually.
+
 *Admin only:*
  - /del: deletes the message you replied to
  - /purge: deletes all messages between this and the replied to message.
