@@ -358,6 +358,10 @@ def temp_nomedia(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 __help__ = """
+Some people need to be publicly muted; spammers, annoyances, or just trolls.
+
+This module allows you to do that easily, by exposing some common actions, so everyone will see!
+
 *Admin only:*
  - /mute <userhandle>: silences a user. Can also be used as a reply, muting the replied to user.
  - /tmute <userhandle> x(m/h/d): mutes a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
@@ -365,6 +369,12 @@ __help__ = """
  - /restrict <userhandle>: restricts a user from sending stickers, gif, embed links or media. Can also be used as a reply, restrict the replied to user.
  - /trestrict <userhandle> x(m/h/d): restricts a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
  - /unrestrict <userhandle>: unrestricts a user from sending stickers, gif, embed links or media. Can also be used as a reply, restrict the replied to user.
+ 
+An example of temporarily mute someone:
+`/tmute @username 2h`; this mutes a user for 2 hours.
+
+An example of temporarily restricting someone:
+`/trestrict @username 2h`; this restricts a user's ability to send media for 2 hours.
 """
 
 

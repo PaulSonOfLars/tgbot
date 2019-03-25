@@ -30,17 +30,25 @@ def lyrics(bot: Bot, update: Update, args: List[str]):
             lyrics = "\n".join(PyLyrics.getLyrics(
                 song[0], song[1]).split("\n")[:20])
         except ValueError as e:
-            return update.effective_message.reply_text("Song %s not found :(" % song[1], failed=True)
+            return update.effective_message.reply_text("Song %s not found!" % song[1], failed=True)
         else:
             lyricstext = LYRICSINFO % (song[0].replace(
                 " ", "_"), song[1].replace(" ", "_"))
             return update.effective_message.reply_text(lyrics + lyricstext, parse_mode="MARKDOWN")
     else:
-        return update.effective_message.reply_text("Invalid syntax- try Artist - Title!", failed=True)
+        return update.effective_message.reply_text("Invalid args- try Artist - Title!", failed=True)
 
 
 __help__ = """
+Do you simply want to find the lyrics of your favourite songs? This command grabs you chunk of \
+paragraphs for lyrics.
+
  - /lyrics <keyword> Find your favourite songs' lyrics
+
+An example of using lyrics:
+`/lyrics Ariana Grande - God is a woman`; this sends you the lyrics.
+
+`/lyrics Artist - Song title`.
 """
 
 __mod_name__ = "Lyrics"

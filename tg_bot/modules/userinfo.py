@@ -118,10 +118,23 @@ def __gdpr__(user_id):
 
 
 __help__ = """
+Writing something about yourself is cool, whether to make people know about yourself or \
+promoting your profile.
+
+All bios are displayed on /info command.
+
  - /setbio <text>: while replying, will save another user's bio
  - /bio: will get your or another user's bio. This cannot be set by yourself.
  - /setme <text>: will set your info
  - /me: will get your or another user's info
+ 
+An example of setting a bio for yourself:
+`/setme I work for Telegram`; Bio is set to yourself.
+
+An example of writing someone else' bio:
+Reply to user's message: `/setbio He is such cool person`.
+
+*Notice:* Do not use /setbio against yourself! 
 """
 
 __mod_name__ = "Bios and Abouts"

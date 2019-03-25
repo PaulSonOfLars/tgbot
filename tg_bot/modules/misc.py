@@ -393,6 +393,8 @@ def stats(bot: Bot, update: Update):
 
 # /ip is for private use
 __help__ = """
+An "odds and ends" module for small, simple commands which don't really fit anywhere
+
  - /id: get the current group id. If used by replying to a message, gets that user's id.
  - /runs: reply a random string from an array of replies.
  - /slap: slap a user, or get slapped if not a reply.

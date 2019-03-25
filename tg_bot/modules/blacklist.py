@@ -160,6 +160,8 @@ lines will allow you to add multiple triggers.
  - /unblacklist <triggers>: Remove triggers from the blacklist. Same newline logic applies here, so you can remove \
 multiple triggers at once.
  - /rmblacklist <triggers>: Same as above.
+ 
+Tip: To copy list of saved blacklist simply use `/blacklist copy`, the bot will send non-bulleted list of blacklist.
 """
 
 BLACKLIST_HANDLER = DisableAbleCommandHandler("blacklist", blacklist, filters=Filters.group, pass_args=True,

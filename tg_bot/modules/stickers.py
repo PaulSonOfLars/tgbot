@@ -33,6 +33,9 @@ def getsticker(bot: Bot, update: Update):
 
 # /ip is for private use
 __help__ = """
+Kanging or fetching ID of stickers are made easy! With this stickers command you simply can grab \
+raw png file or fetch ID of sticker.
+
  - /stickerid: reply to a sticker to me to tell you its file ID.
  - /getsticker: reply to a sticker to me to upload its raw PNG file.
 """

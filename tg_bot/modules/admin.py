@@ -220,15 +220,23 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
+Lazy to promote or demote someone for admins? Want to see basic information about chat? \
+All stuff about chatroom such as admin lists, pinning or grabbing an invite link can be \
+done easily using the bot.
+
  - /adminlist: list of admins and members in the chat
  - /staff: same as /adminlist
 
 *Admin only:*
- - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifs to users.
+ - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifies to users.
  - /unpin: unpins the currently pinned message
  - /invitelink: gets invitelink
+ - /link: same as /invitelink
  - /promote: promotes the user replied to
  - /demote: demotes the user replied to
+
+An example of promoting someone to admins:
+`/promote @username`; this promotes a user to admins.
 """
 
 __mod_name__ = "Admin"

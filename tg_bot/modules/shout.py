@@ -19,6 +19,10 @@ def shout(bot: Bot, update: Update, args):
     return update.effective_message.reply_text(msg, parse_mode="MARKDOWN")
     
 __help__ = """
+ A little piece of fun wording! Give a loud shout out in the chatroom.
+ 
+ i.e /shout HELP, bot replies with huge coded HELP letters within the square. 
+ 
  - /shout <keyword>: write anything you want to give loud shout.
     ```
     t e s t

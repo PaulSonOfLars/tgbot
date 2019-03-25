@@ -143,15 +143,21 @@ if is_module_loaded(FILENAME):
 
 
     __help__ = """
+Recent actions are nice, but they don't help you log every action taken by the bot. This is why you need log channels!
+
+Log channels can help you keep track of exactly what the other admins are doing. \
+Bans, Mutes, warns, notes - everything can be moderated.
+
 *Admin only:*
 - /logchannel: get log channel info
 - /setlog: set the log channel.
 - /unsetlog: unset the log channel.
 
 Setting the log channel is done by:
-- adding the bot to the desired channel (as an admin!)
-- sending /setlog in the channel
-- forwarding the /setlog to the group
+- Add the bot to your channel, as an admin. This is done via the "add administrators" tab.
+- Send /setlog to your channel.
+- Forward the /setlog command to the group you wish to be logged.
+- Congratulations! All is set!
 """
 
     __mod_name__ = "Log Channels"
