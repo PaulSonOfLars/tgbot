@@ -22,7 +22,7 @@ Hi {}, my name is {}! If you have any questions on how to use me, read /help for
 
 I'm a group manager bot maintained by [this wonderful person](tg://user?id={}). I'm built in python3, using the \
 python-telegram-bot library, and am fully opensource - you can find what makes me tick \
-[here](github.com/1maverick1/tgbot)! Here is a link to the [original sources](github.com/PaulSonOfLars/tgbot).
+[here](github.com/1maverick1/tgbot).
 
 You can find the list of available commands with /help.
 
