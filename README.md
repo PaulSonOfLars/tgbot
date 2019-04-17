@@ -1,19 +1,31 @@
 # tgbot
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
-Originally a simple group management bot with multiple admin features, it has evolved, becoming extremely modular and 
-simple to use.
+Originally a simple group management bot with multiple admin features, it has evolved into becoming a basis for modular
+bots aiming to provide simple plugin expansion via a simple drag and drop.
 
 Can be found on telegram as [Marie](https://t.me/BanhammerMarie_bot).
 
-Marie and I are moderating a [support group](https://t.me/MarieSupport), where you can ask for help setting up your
-bot, discover/request new features, report bugs, and stay in the loop whenever a new update is available. Of course
-I'll also help when a database schema changes, and some table column needs to be modified/added. Note to maintainers that all schema changes will be found in the commit messages, and its their responsibility to read any new commits.
+For questions regarding creating your own bot, please head to [this chat](https://t.me/MarieOT) where you'll find a
+group of volunteers to help. We'll also help when a database schema changes, and some table column needs to be
+modified/added (this info can also be found in the commit messages)
+
 
 Join the [news channel](https://t.me/MarieNews) if you just want to stay in the loop about new features or
 announcements.
 
-Alternatively, [find me on telegram](https://t.me/SonOfLars)! (Keep all support questions in the support chat, where more people can help you.)
+Marie and I can also be found moderating the [marie support group](https://t.me/MarieSupport) aimed at providing help
+setting up Marie in your chats (*not* for bot clones).
+Feel free to join to report bugs, and stay in the loop on the status of the bot development.
+
+Note to maintainers that all schema changes will be found in the commit messages, and its their responsibility to read any new commits.
+
+
+## IMPORTANT NOTICE:
+
+This project is no longer under active maintenance. Occasional bug fixes may be released, but no new features are scheduled to be added.
+Users of [Marie](https://t.me/BanhammerMarie_bot) are encouraged to migrate to [Rose](https://t.me/MissRose_bot), which
+is the improved version of this project, written in goloang, with scalability in mind.
 
 ## Starting the bot.
 
