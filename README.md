@@ -21,3 +21,5 @@ Given this is a Marie Fork, its optimal that you follow the setup procedure as s
 ## Credits
 The bot is based of on the original work done by [PaulSonOfLars](https://github.com/PaulSonOfLars)
 It was just revamped to suit an Anime centric community. All original credits go to him. Without his work, this fork would not have been possible!
+
+Thonkbot for the stickers module
