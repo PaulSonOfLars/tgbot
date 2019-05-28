@@ -63,7 +63,7 @@ def add_blacklist(bot: Bot, update: Update):
                 "Added <code>{}</code> triggers to the blacklist.".format(len(to_blacklist)), parse_mode=ParseMode.HTML)
 
     else:
-        msg.reply_text("Tell me which words you would like to add to the blacklist.")
+        msg.reply_text("Tell me which words you would like to remove from the blacklist.")
 
 
 @run_async
@@ -168,7 +168,6 @@ ADD_BLACKLIST_HANDLER = CommandHandler("addblacklist", add_blacklist, filters=Fi
 UNBLACKLIST_HANDLER = CommandHandler(["unblacklist", "rmblacklist"], unblacklist, filters=Filters.group)
 BLACKLIST_DEL_HANDLER = MessageHandler(
     (Filters.text | Filters.command | Filters.sticker | Filters.photo) & Filters.group, del_blacklist, edited_updates=True)
-
 dispatcher.add_handler(BLACKLIST_HANDLER)
 dispatcher.add_handler(ADD_BLACKLIST_HANDLER)
 dispatcher.add_handler(UNBLACKLIST_HANDLER)

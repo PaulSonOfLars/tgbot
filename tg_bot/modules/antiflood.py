@@ -35,8 +35,7 @@ def check_flood(bot: Bot, update: Update) -> str:
 
     try:
         chat.kick_member(user.id)
-        msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
-                       "disappointment. Get out.")
+        msg.reply_text("*Normal Punches the user because of spamming* ")
 
         return "<b>{}:</b>" \
                "\n#BANNED" \
@@ -105,7 +104,7 @@ def flood(bot: Bot, update: Update):
         update.effective_message.reply_text("I'm not currently enforcing flood control!")
     else:
         update.effective_message.reply_text(
-            "I'm currently banning users if they send more than {} consecutive messages.".format(limit))
+            "I'm currently punching users if they send more than {} consecutive messages.".format(limit))
 
 
 def __migrate__(old_chat_id, new_chat_id):

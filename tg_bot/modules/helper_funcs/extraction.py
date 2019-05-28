@@ -49,7 +49,7 @@ def extract_user_and_text(message: Message, args: List[str]) -> (Optional[int], 
         user = args[0]
         user_id = get_user_id(user)
         if not user_id:
-            message.reply_text("I don't have that user in my db. You'll be able to interact with them if "
+            message.reply_text("No idea who this user is. You'll be able to interact with them if "
                                "you reply to that person's message instead, or forward one of that user's messages.")
             return None, None
 

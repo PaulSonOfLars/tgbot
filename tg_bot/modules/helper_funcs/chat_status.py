@@ -102,7 +102,7 @@ def bot_admin(func):
         if is_bot_admin(update.effective_chat, bot.id):
             return func(bot, update, *args, **kwargs)
         else:
-            update.effective_message.reply_text("I'm not admin!")
+            update.effective_message.reply_text("I'm not admin! - REEEEEE")
 
     return is_admin
 
@@ -121,7 +121,7 @@ def user_admin(func):
             update.effective_message.delete()
 
         else:
-            update.effective_message.reply_text("Who dis non-admin telling me what to do?")
+            update.effective_message.reply_text("Who dis non-admin telling me what to do? You want a punch?")
 
     return is_admin
 

@@ -96,7 +96,7 @@ def chats(bot: Bot, update: Update):
     with BytesIO(str.encode(chatfile)) as output:
         output.name = "chatlist.txt"
         update.effective_message.reply_document(document=output, filename="chatlist.txt",
-                                                caption="Here is the list of chats in my database.")
+                                                caption="Here is the list of chats in my Hit List.")
 
 
 def __user_info__(user_id):
@@ -108,10 +108,6 @@ def __user_info__(user_id):
 
 def __stats__():
     return "{} users, across {} chats".format(sql.num_users(), sql.num_chats())
-
-
-def __gdpr__(user_id):
-    sql.del_user(user_id)
 
 
 def __migrate__(old_chat_id, new_chat_id):

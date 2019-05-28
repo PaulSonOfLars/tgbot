@@ -1,4 +1,5 @@
 import html
+import random
 from typing import Optional, List
 
 from telegram import Message, Chat, Update, Bot, User
@@ -8,7 +9,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
-from tg_bot import dispatcher, OWNER_ID, LOGGER
+from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
 from tg_bot.modules.helper_funcs.msg_types import get_welcome_type
@@ -29,6 +30,70 @@ ENUM_FUNC_MAP = {
     sql.Types.VIDEO.value: dispatcher.bot.send_video
 }
 
+WelcomeList = [
+    "{first} is Here!",
+    "Ready player {first}",
+    "Genos. {first} is here.",
+    "A wild {first} appeared.",
+    "{first} came in like a Lion!",
+    "{first} has joined your party.",
+    "{first} just joined. Can I get a heal?",
+    "{first} just joined the chat - asdgfhak!",
+    "{first} just joined. Everyone, look busy!",
+    "Welcome, {first}. Stay awhile and listen.",
+    "Welcome, {first}. We were expecting you ( ͡° ͜ʖ ͡°)",
+    "Welcome, {first}. We hope you brought pizza.",
+    "Welcome {first}. Leave your weapons by the door.",
+    "Swoooosh. {first} just landed.",
+    "Brace yourselves. {first} just joined the chat.",
+    "{first} just joined. Hide your bananas.",
+    "{first} just arrived. Seems OP - please nerf.",
+    "{first} just slid into the chat.",
+    "A {first} has spawned in the chat.",
+    "Big {first} showed up!",
+    "Where’s {first}? In the chat!",
+    "{first} hopped into the chat. Kangaroo!!",
+    "{first} just showed up. Hold my beer.",
+    "Challenger approaching - {first} has appeared!",
+    "It's a bird! It's a plane! Nevermind, it's just {first}.",
+    "It's {first}! Praise the sun! \o/",
+    "Never gonna give {first} up. Never gonna let {first} down.",
+    "Ha! {first} has joined! You activated my trap card!",
+    "Cheers, love! {first}'s here!",
+    "Hey! Listen! {first} has joined!",
+    "We've been expecting you {first}",
+    "It's dangerous to go alone, take {first}!",
+    "{first} has joined the chat! It's super effective!",
+    "Cheers, love! {first} is here!",
+    "{first} is here, as the prophecy foretold.",
+    "{first} has arrived. Party's over.",
+    "{first} is here to kick butt and chew bubblegum. And {first} is all out of gum.",
+    "Hello. Is it {first} you're looking for?",
+    "{first} has joined. Stay a while and listen!",
+    "Roses are red, violets are blue, {first} joined this chat with you"
+]
+
+GoodbyeList = [
+    "{first} will be missed.",
+    "{first} just went offline.",
+    "{first} has left the lobby.",
+    "{first} has left the clan.",
+    "{first} has left the game.",
+    "{first} has fled the area.",
+    "{first} is out of the running.",
+    "Nice knowing ya, {first}!",
+    "It was a fun time {first}.",
+    "We hope to you again soon, {first}.",
+    "I donut want to say goodbye, {first}.",
+    "Goodbye {first}! Guess who's gonna miss you :')",
+    "Goodbye {first}! It's gonna be lonely without ya.",
+    "Please don't leave me alone in this place, {first}!",
+    "Good luck finding better shitposters than us, {first}!",
+    "You know we're gonna miss you {first}. Right? Right? Right?",
+    "Congratulations, {first}! You're officially free of this mess.",
+    "{first}. You were an opponent worth fighting.",
+    "You're leaving, {first}? Yare Yare Daze.",
+]
 
 # do not async
 def send(update, message, keyboard, backup_message):
@@ -87,7 +152,17 @@ def new_member(bot: Bot, update: Update):
         for new_mem in new_members:
             # Give the owner a special welcome
             if new_mem.id == OWNER_ID:
-                update.effective_message.reply_text("Master is in the houseeee, let's get this party started!")
+                update.effective_message.reply_text("Oh, You're here Genos. Lets get this moving.")
+                continue
+
+            # Welcome Sudos 
+            elif new_mem.id in SUDO_USERS:
+                update.effective_message.reply_text("Huh! Someone with a Disaster Level just joined!")
+                continue
+				#Generalised the diaster notices so that ppl check a user manually and engage with bot functions.
+            # Welcome Support
+            elif new_mem.id in SUPPORT_USERS:
+                update.effective_message.reply_text("Huh! Someone with a Disaster Level just joined!")
                 continue
 
             # Don't welcome yourself
@@ -122,13 +197,12 @@ def new_member(bot: Bot, update: Update):
                     buttons = sql.get_welc_buttons(chat.id)
                     keyb = build_keyboard(buttons)
                 else:
-                    res = sql.DEFAULT_WELCOME.format(first=first_name)
+                    res = random.choice(WelcomeList).format(first=first_name)
                     keyb = []
 
                 keyboard = InlineKeyboardMarkup(keyb)
 
-                sent = send(update, res, keyboard,
-                            sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
+                sent = send(update, res, keyboard, sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
 
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:
@@ -154,7 +228,7 @@ def left_member(bot: Bot, update: Update):
 
             # Give the owner a special goodbye
             if left_mem.id == OWNER_ID:
-                update.effective_message.reply_text("RIP Master")
+                update.effective_message.reply_text("Oi! Genos! He left..")
                 return
 
             # if media goodbye, use appropriate function for it
@@ -231,7 +305,7 @@ def welcome(bot: Bot, update: Update, args: List[str]):
 
         elif args[0].lower() in ("off", "no"):
             sql.set_welc_preference(str(chat.id), False)
-            update.effective_message.reply_text("I'm sulking, not saying hello anymore.")
+            update.effective_message.reply_text("I'm sulking, Will Punch you if you are persistent.")
 
         else:
             # idek what you're writing, say yes or no
@@ -277,7 +351,7 @@ def goodbye(bot: Bot, update: Update, args: List[str]):
 
         elif args[0].lower() in ("off", "no"):
             sql.set_gdbye_preference(str(chat.id), False)
-            update.effective_message.reply_text("They leave, they're dead to me.")
+            update.effective_message.reply_text("If they leave, I can't punch them .")
 
         else:
             # idek what you're writing, say yes or no

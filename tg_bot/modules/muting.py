@@ -29,14 +29,14 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     if user_id == bot.id:
-        message.reply_text("I'm not muting myself!")
+        message.reply_text("I'm not muting myself! lol")
         return ""
 
     member = chat.get_member(int(user_id))
 
     if member:
         if is_user_admin(chat, user_id, member=member):
-            message.reply_text("Afraid I can't stop an admin from talking!")
+            message.reply_text("Afraid I can't stop an admin from talking! - Unless i punch them that is !")
 
         elif member.can_send_messages is None or member.can_send_messages:
             bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
@@ -51,7 +51,7 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
         else:
             message.reply_text("This user is already muted!")
     else:
-        message.reply_text("This user isn't in the chat!")
+        message.reply_text("This user isn't even here!")
 
     return ""
 
@@ -72,29 +72,23 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
 
     member = chat.get_member(int(user_id))
 
-    if member:
-        if is_user_admin(chat, user_id, member=member):
-            message.reply_text("This is an admin, what do you expect me to do?")
-            return ""
-
-        elif member.status != 'kicked' and member.status != 'left':
-            if member.can_send_messages and member.can_send_media_messages \
-                    and member.can_send_other_messages and member.can_add_web_page_previews:
-                message.reply_text("This user already has the right to speak.")
-                return ""
-            else:
-                bot.restrict_chat_member(chat.id, int(user_id),
-                                         can_send_messages=True,
-                                         can_send_media_messages=True,
-                                         can_send_other_messages=True,
-                                         can_add_web_page_previews=True)
-                message.reply_text("Unmuted!")
-                return "<b>{}:</b>" \
-                       "\n#UNMUTE" \
-                       "\n<b>Admin:</b> {}" \
-                       "\n<b>User:</b> {}".format(html.escape(chat.title),
-                                                  mention_html(user.id, user.first_name),
-                                                  mention_html(member.user.id, member.user.first_name))
+    if member.status != 'kicked' and member.status != 'left':
+        if member.can_send_messages and member.can_send_media_messages \
+                and member.can_send_other_messages and member.can_add_web_page_previews:
+            message.reply_text("This user already has the right to speak.")
+        else:
+            bot.restrict_chat_member(chat.id, int(user_id),
+                                     can_send_messages=True,
+                                     can_send_media_messages=True,
+                                     can_send_other_messages=True,
+                                     can_add_web_page_previews=True)
+            message.reply_text("Unmuted!")
+            return "<b>{}:</b>" \
+                   "\n#UNMUTE" \
+                   "\n<b>Admin:</b> {}" \
+                   "\n<b>User:</b> {}".format(html.escape(chat.title),
+                                              mention_html(user.id, user.first_name),
+                                              mention_html(member.user.id, member.user.first_name))
     else:
         message.reply_text("This user isn't even in the chat, unmuting them won't make them talk more than they "
                            "already do!")
@@ -128,11 +122,11 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if is_user_admin(chat, user_id, member):
-        message.reply_text("I really wish I could mute admins...")
+        message.reply_text("I really wish I could mute admins...Perhaps a Punch?")
         return ""
 
     if user_id == bot.id:
-        message.reply_text("I'm not gonna MUTE myself, are you crazy?")
+        message.reply_text("I'm not gonna MUTE myself, How high are you?")
         return ""
 
     if not reason:

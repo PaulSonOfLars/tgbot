@@ -28,40 +28,38 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
     user_id, reason = extract_user_and_text(message, args)
 
     if not user_id:
-        message.reply_text("You don't seem to be referring to a user.")
+        message.reply_text("I doubt thats a user.")
         return ""
 
     try:
         member = chat.get_member(user_id)
     except BadRequest as excp:
         if excp.message == "User not found":
-            message.reply_text("I can't seem to find this user")
+            message.reply_text("Cant seem to find this person")
             return ""
         else:
             raise
 
     if is_user_ban_protected(chat, user_id, member):
-        message.reply_text("I really wish I could ban admins...")
+        message.reply_text("Why?")
         return ""
 
     if user_id == bot.id:
-        message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        message.reply_text("Oh yeah, ban myself, noob!")
         return ""
 
     log = "<b>{}:</b>" \
           "\n#BANNED" \
           "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
-                                                       mention_html(user.id, user.first_name),
-                                                       mention_html(member.user.id, member.user.first_name),
-                                                       member.user.id)
+          "\n<b>User:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
+                                     mention_html(member.user.id, member.user.first_name))
     if reason:
         log += "\n<b>Reason:</b> {}".format(reason)
 
     try:
         chat.kick_member(user_id)
-        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-        message.reply_text("Banned!")
+        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+        message.reply_text("Done!")
         return log
 
     except BadRequest as excp:
@@ -73,7 +71,7 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
             LOGGER.warning(update)
             LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id,
                              excp.message)
-            message.reply_text("Well damn, I can't ban that user.")
+            message.reply_text("Uhm...that didn't work...")
 
     return ""
 
@@ -91,7 +89,7 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
     user_id, reason = extract_user_and_text(message, args)
 
     if not user_id:
-        message.reply_text("You don't seem to be referring to a user.")
+        message.reply_text("I doubt thats a user.")
         return ""
 
     try:
@@ -131,18 +129,15 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
     log = "<b>{}:</b>" \
           "\n#TEMP BANNED" \
           "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {} (<code>{}</code>)" \
-          "\n<b>Time:</b> {}".format(html.escape(chat.title),
-                                     mention_html(user.id, user.first_name),
-                                     mention_html(member.user.id, member.user.first_name),
-                                     member.user.id,
-                                     time_val)
+          "\n<b>User:</b> {}" \
+          "\n<b>Time:</b> {}".format(html.escape(chat.title), mention_html(user.id, user.first_name),
+                                     mention_html(member.user.id, member.user.first_name), time_val)
     if reason:
         log += "\n<b>Reason:</b> {}".format(reason)
 
     try:
         chat.kick_member(user_id, until_date=bantime)
-        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         message.reply_text("Banned! User will be banned for {}.".format(time_val))
         return log
 
@@ -165,7 +160,7 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
 @can_restrict
 @user_admin
 @loggable
-def kick(bot: Bot, update: Update, args: List[str]) -> str:
+def punch(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
@@ -185,7 +180,7 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if is_user_ban_protected(chat, user_id):
-        message.reply_text("I really wish I could kick admins...")
+        message.reply_text("I really wish I could punch admins...")
         return ""
 
     if user_id == bot.id:
@@ -194,22 +189,21 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
 
     res = chat.unban_member(user_id)  # unban on current user = kick
     if res:
-        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-        message.reply_text("Kicked!")
+        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+        message.reply_text("One Punched!")
         log = "<b>{}:</b>" \
               "\n#KICKED" \
               "\n<b>Admin:</b> {}" \
-              "\n<b>User:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
-                                                           mention_html(user.id, user.first_name),
-                                                           mention_html(member.user.id, member.user.first_name),
-                                                           member.user.id)
+              "\n<b>User:</b> {}".format(html.escape(chat.title),
+                                         mention_html(user.id, user.first_name),
+                                         mention_html(member.user.id, member.user.first_name))
         if reason:
             log += "\n<b>Reason:</b> {}".format(reason)
 
         return log
 
     else:
-        message.reply_text("Well damn, I can't kick that user.")
+        message.reply_text("Well damn, I can't punch that user.")
 
     return ""
 
@@ -217,7 +211,7 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
 @run_async
 @bot_admin
 @can_restrict
-def kickme(bot: Bot, update: Update):
+def punchme(bot: Bot, update: Update):
     user_id = update.effective_message.from_user.id
     if is_user_admin(update.effective_chat, user_id):
         update.effective_message.reply_text("I wish I could... but you're an admin.")
@@ -259,7 +253,7 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     if is_user_in_chat(chat, user_id):
-        message.reply_text("Why are you trying to unban someone that's already in the chat?")
+        message.reply_text("Isn't this person already here??")
         return ""
 
     chat.unban_member(user_id)
@@ -268,10 +262,9 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
     log = "<b>{}:</b>" \
           "\n#UNBANNED" \
           "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
-                                                       mention_html(user.id, user.first_name),
-                                                       mention_html(member.user.id, member.user.first_name),
-                                                       member.user.id)
+          "\n<b>User:</b> {}".format(html.escape(chat.title),
+                                     mention_html(user.id, user.first_name),
+                                     mention_html(member.user.id, member.user.first_name))
     if reason:
         log += "\n<b>Reason:</b> {}".format(reason)
 
@@ -279,25 +272,25 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
 
 
 __help__ = """
- - /kickme: kicks the user who issued the command
+ - /punchme: punchs the user who issued the command
 
 *Admin only:*
  - /ban <userhandle>: bans a user. (via handle, or reply)
  - /tban <userhandle> x(m/h/d): bans a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
  - /unban <userhandle>: unbans a user. (via handle, or reply)
- - /kick <userhandle>: kicks a user, (via handle, or reply)
+ - /punch <userhandle>: Punches a user out of the group, (via handle, or reply)
 """
 
 __mod_name__ = "Bans"
 
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
 TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, filters=Filters.group)
-KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.group)
+PUNCH_HANDLER = CommandHandler("punch", punch, pass_args=True, filters=Filters.group)
 UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=Filters.group)
-KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=Filters.group)
+PUNCHME_HANDLER = DisableAbleCommandHandler("punchme", punchme, filters=Filters.group)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(TEMPBAN_HANDLER)
-dispatcher.add_handler(KICK_HANDLER)
+dispatcher.add_handler(PUNCH_HANDLER)
 dispatcher.add_handler(UNBAN_HANDLER)
-dispatcher.add_handler(KICKME_HANDLER)
+dispatcher.add_handler(PUNCHME_HANDLER)
