@@ -41,11 +41,11 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if is_user_ban_protected(chat, user_id, member):
-        message.reply_text("I really wish I could ban admins...")
+        message.reply_text("I really wish I could ban this chutiya admins...")
         return ""
 
     if user_id == bot.id:
-        message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        message.reply_text("I'm not gonna BAN myself, are you chutiya?")
         return ""
 
     log = "<b>{}:</b>" \
@@ -108,7 +108,7 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     if user_id == bot.id:
-        message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        message.reply_text("I'm not gonna BAN myself, are you chutiya?")
         return ""
 
     if not reason:
@@ -143,13 +143,13 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
     try:
         chat.kick_member(user_id, until_date=bantime)
         bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-        message.reply_text("Banned! User will be banned for {}.".format(time_val))
+        message.reply_text("Banned another chutiya! User will be banned for {}.".format(time_val))
         return log
 
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
-            message.reply_text("Banned! User will be banned for {}.".format(time_val), quote=False)
+            message.reply_text("Banned ! another chutiya User will be banned for {}.".format(time_val), quote=False)
             return log
         else:
             LOGGER.warning(update)
@@ -263,7 +263,7 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     chat.unban_member(user_id)
-    message.reply_text("Yep, this user can join!")
+    message.reply_text("Yep, this chutiya can join!")
 
     log = "<b>{}:</b>" \
           "\n#UNBANNED" \
