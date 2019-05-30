@@ -51,7 +51,7 @@ And the following:
 """.format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n")
 
 DONATE_STRING = """Hey😎
-! nice to heae that you wanna donate my master, he really need donation to upgrade my server 
+! nice to hear that you wanna donate my master, he really need donation to upgrade my server 
 please Message him and donate t.me/refundisillegal
 
 IMPORTED = {}
@@ -200,7 +200,7 @@ def help_button(bot: Bot, update: Update):
 
         elif prev_match:
             curr_page = int(prev_match.group(1))
-            query.message.reply_text(HELP_STRINGS,
+            query.message.reply_text(,
                                      parse_mode=ParseMode.MARKDOWN,
                                      reply_markup=InlineKeyboardMarkup(
                                          paginate_modules(curr_page - 1, HELPABLE, "help")))
