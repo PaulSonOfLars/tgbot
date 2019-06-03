@@ -24,7 +24,7 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
 
-    user_id = extract_user(message, args)
+    user_id, reason = extract_user_and_text(message, args)
     if not user_id:
         message.reply_text("You'll need to either give me a username to mute, or reply to someone to be muted.")
         return ""
@@ -40,17 +40,22 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
             message.reply_text("Afraid I can't stop an admin from talking!")
 
         elif member.can_send_messages is None or member.can_send_messages:
-            bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
-            keyboard = []
-            reply = "{} is muted!".format(mention_html(member.user.id, member.user.first_name))
-            message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
-            return "<b>{}:</b>" \
+            log = "<b>{}:</b>" \
                    "\n#MUTE" \
                    "\n<b>• Admin:</b> {}" \
                    "\n<b>• User:</b> {}" \
                    "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title),
                                               mention_html(user.id, user.first_name),
                                               mention_html(member.user.id, member.user.first_name), user_id)
+            reply = "Shh!\n{} is muted!".format(mention_html(member.user.id, member.user.first_name))
+            if reason:
+                log += "\n<b>• Reason:</b> {}".format(reason)
+                reply += "\n<b>Reason:</b> <i>{}</i>".format(reason)
+            bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+            keyboard = []
+            message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
+            
+            return log
 
         else:
             message.reply_text("This user is already muted!")
