@@ -71,12 +71,23 @@ class WelcomeMute(BASE):
         self.chat_id = str(chat_id) # ensure string
         self.welcomemutes = welcomemutes
 
+class WelcomeMuteUsers(BASE):
+    __tablename__ = "human_checks"
+    user_id = Column(Integer, primary_key=True)
+    chat_id = Column(String(14), primary_key=True)
+    human_check = Column(Boolean)
+
+    def __init__(self, user_id, chat_id, human_check):
+        self.user_id = (user_id) # ensure string
+        self.chat_id = str(chat_id)
+        self.human_check = human_check
 
 
 Welcome.__table__.create(checkfirst=True)
 WelcomeButtons.__table__.create(checkfirst=True)
 GoodbyeButtons.__table__.create(checkfirst=True)
 WelcomeMute.__table__.create(checkfirst=True)
+WelcomeMuteUsers.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
 WELC_BTN_LOCK = threading.RLock()
@@ -101,6 +112,30 @@ def set_welcome_mutes(chat_id, welcomemutes):
         welcome_m = WelcomeMute(str(chat_id), welcomemutes)
         SESSION.add(welcome_m)
         SESSION.commit()
+
+def set_human_checks(user_id, chat_id):
+    with INSERTION_LOCK:
+        human_check = SESSION.query(WelcomeMuteUsers).get((user_id, str(chat_id)))
+        if not human_check:
+            human_check = WelcomeMuteUsers(user_id, str(chat_id), True)
+
+        else:
+            human_check.human_check = True
+
+        SESSION.add(human_check)
+        SESSION.commit()
+
+        return human_check
+
+def get_human_checks(user_id, chat_id):
+    try:
+        human_check = SESSION.query(WelcomeMuteUsers).get((user_id, str(chat_id)))
+        if not human_check:
+            return None
+        human_check = human_check.human_check
+        return human_check
+    finally:
+        SESSION.close()
 
 
 def get_welc_pref(chat_id):
@@ -141,6 +176,15 @@ def get_clean_pref(chat_id):
 
     if welc:
         return welc.clean_welcome
+
+    return False
+    
+def get_welc_mutes_pref(chat_id):
+    welcomemutes = SESSION.query(WelcomeMute).get(str(chat_id))
+    SESSION.close()
+
+    if welcomemutes:
+        return welcomemutes.welcomemutes
 
     return False
 

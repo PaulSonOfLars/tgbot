@@ -519,8 +519,9 @@ def user_button(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     query = update.callback_query  # type: Optional[CallbackQuery]
-    match = re.match(r"userverify_\((.+?)\)", query.data)
+    match = re.match(r"user_join_\((.+?)\)", query.data)
     message = update.effective_message  # type: Optional[Message]
+    db_checks = sql.set_human_checks(user.id, chat.id)
     join_user =  int(match.group(1))
     
     if join_user == user.id:
@@ -530,10 +531,10 @@ def user_button(bot: Bot, update: Update):
                                                    can_send_other_messages=True, 
                                                    can_add_web_page_previews=True)
         bot.deleteMessage(chat.id, message.message_id)
+        db_checks
     else:
-        query.answer(text="Sorry, I can't unmute you!")
-
-
+        query.answer(text="You're not allowed to do this!")
+    
 WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in multiple ways. If you want the messages" \
                 " to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
                 " - `{{first}}`: this represents the user's *first* name\n" \
@@ -620,7 +621,7 @@ CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, fi
 WELCOMEMUTE_HANDLER = CommandHandler("welcomemute", welcomemute, pass_args=True, filters=Filters.group)
 DEL_JOINED = CommandHandler(["rmjoin", "cleanservice"], del_joined, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
-BUTTON_VERIFY_HANDLER = CallbackQueryHandler(user_button, pattern=r"userverify_")
+BUTTON_VERIFY_HANDLER = CallbackQueryHandler(user_button, pattern=r"user_join_")
 
 dispatcher.add_handler(NEW_MEM_HANDLER)
 dispatcher.add_handler(LEFT_MEM_HANDLER)
