@@ -20,6 +20,7 @@ def check_flood(bot: Bot, update: Update) -> str:
     user = update.effective_user  # type: Optional[User]
     chat = update.effective_chat  # type: Optional[Chat]
     msg = update.effective_message  # type: Optional[Message]
+    limit = sql.get_flood_limit(chat.id)
 
     if not user:  # ignore channels
         return ""
@@ -47,11 +48,22 @@ def check_flood(bot: Bot, update: Update) -> str:
         keyboard = []
         msg.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
         msg.delete()
-        return "<b>{}:</b>" \
-               "\n#FLOOD_CTL" \
-               "\n<b>• User:</b> {}" \
-               "\nFlooded the group.".format(html.escape(chat.title),
-                                             mention_html(user.id, user.first_name))
+        
+        log = "<b>{}:</b>" \
+              "\n#FLOOD_CONTROL" \
+              "\n<b>• User:</b> {}" \
+              "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title), mention_html(user.id, user.first_name), user.id)
+        
+        if soft_flood:
+           log +="\n<b>• Action:</b> kicked"
+        
+        else:
+           log +="\n<b>• Action:</b> banned"
+        
+        log +="\n<b>• Reason:</b> Exceeded flood limit of {} consecutive messages.".format(limit)
+                                                                               
+        
+        return log
 
     except BadRequest:
         msg.reply_text("I can't kick people here, give me permissions first! Until then, I'll disable anti-flood.")
