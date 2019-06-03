@@ -21,14 +21,10 @@ PM_START_TEXT = """
 Hi {}, my name is {}! If you have any questions on how to use me, read /help for more details.
 
 I'm a group manager bot maintained by [this wonderful person](tg://user?id={}). I'm built in python3, using the \
-python-telegram-bot library, and am fully opensource - you can find what makes me tick \
-[here](github.com/1maverick1/tgbot).
+python-telegram-bot library.
 
 You can find the list of available commands with /help.
 
-If you're enjoying using me, and/or would like to help me survive in the wild, hit /donate to help fund/upgrade my VPS!
-
-_Want to add me to your group?_ [Click here!](t.me/{}?startgroup=true) \
 """
 
 HELP_STRINGS = """
@@ -147,8 +143,9 @@ def start(bot: Bot, update: Update, args: List[str]):
         else:
             first_name = update.effective_user.first_name
             update.effective_message.reply_text(
-                PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID, bot.username),
-                parse_mode=ParseMode.MARKDOWN)
+                PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
+                parse_mode=ParseMode.MARKDOWN, reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="Add me to group",
+                                                                       url="t.me/{}?startgroup=true".format(bot.username))]]))
     else:
         update.effective_message.reply_text("Hey there, PM me if you have any questions on how to use me!")
 
