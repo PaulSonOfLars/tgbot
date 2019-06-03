@@ -48,7 +48,7 @@ def import_data(bot: Bot, update):
                 mod.__import_data__(str(chat.id), data)
         except Exception:
             msg.reply_text("An exception occured while restoring your data. The process may not be complete. If "
-                           "you're having issues with this, message @MarieSupport with your backup file so the "
+                           "you're having issues with this, message @stillmav with your backup file so the "
                            "issue can be debugged. My owners would be happy to help, and every bug "
                            "reported makes me better! Thanks! :)")
             LOGGER.exception("Import for chatid %s with name %s failed.", str(chat.id), str(chat.title))
