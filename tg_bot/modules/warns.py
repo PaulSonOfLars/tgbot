@@ -26,8 +26,8 @@ CURRENT_WARNING_FILTER_STRING = "<b>Current warning filters in this chat:</b>\n"
 
 # Not async
 def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = None) -> str:
-    if is_user_admin(chat, user.id):
-        message.reply_text("Damn admins, can't even be warned!")
+    if is_user_admin(chat, user.id): #ignore for admins
+       # message.reply_text("Damn admins, can't even be warned!")
         return ""
 
     if warner:
@@ -53,19 +53,27 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
         message.bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
         keyboard = []
         log_reason = "<b>{}:</b>" \
-                     "\n#WARN_BAN" \
+                     "\n#WARN_ACTION" \
                      "\n<b>• Admin:</b> {}" \
                      "\n<b>• User:</b> {}" \
-                     "\n<b>• ID:</b> <code>{}</code>" \
-                     "\n<b>• Reason:</b> {}"\
-                     "\n<b>• Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
-                                                                    warner_tag,
-                                                                    mention_html(user.id, user.first_name), user.id, 
-                                                                    reason, num_warns, limit)
+                     "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title),
+                                                            warner_tag,
+                                                            mention_html(user.id, user.first_name), user.id)
+                     
+        if soft_warn:
+           log_reason += "\n<b>• Action:</b> kicked"
+        
+        else:
+            log_reason += "\n<b>• Action:</b> banned"
+        
+        log_reason += "\n<b>• Counts:</b> <code>{}/{}</code>".format(num_warns, limit)
+        
+        if reason:
+            log_reason += "\n<b>• Reason:</b> {}".format(reason)
 
     else:
         keyboard = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("Remove warn", callback_data="rm_warn({})".format(user.id))]])
+            [[InlineKeyboardButton("Remove warn (admin only)", callback_data="rm_warn({})".format(user.id))]])
 
         reply = "{} has {}/{} warnings... watch out!".format(mention_html(user.id, user.first_name), num_warns,
                                                              limit)
@@ -77,11 +85,12 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
                      "\n<b>• Admin:</b> {}" \
                      "\n<b>• User:</b> {}" \
                      "\n<b>• ID:</b> <code>{}</code>" \
-                     "\n<b>• Reason:</b> {}"\
                      "\n<b>• Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
                                                                     warner_tag,
                                                                     mention_html(user.id, user.first_name), user.id, 
-                                                                    reason, num_warns, limit)
+                                                                    num_warns, limit)
+        if reason:
+                log_reason += "\n<b>• Reason:</b> {}".format(reason)
 
     try:
         message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
@@ -95,7 +104,6 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
 
 
 @run_async
-@user_admin_no_reply
 @bot_admin
 @loggable
 def button(bot: Bot, update: Update) -> str:
@@ -106,6 +114,11 @@ def button(bot: Bot, update: Update) -> str:
         user_id = match.group(1)
         chat = update.effective_chat  # type: Optional[Chat]
         res = sql.remove_warn(user_id, chat.id)
+        
+        if not is_user_admin(chat, int(user.id)):
+            query.answer(text="You need to be an admin to do this.")
+            return ""
+        
         if res:
             update.effective_message.edit_text(
                 "Warn removed by {}.".format(mention_html(user.id, user.first_name)),
