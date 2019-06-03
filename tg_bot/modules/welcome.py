@@ -585,8 +585,16 @@ def __migrate__(old_chat_id, new_chat_id):
 def __chat_settings__(chat_id, user_id):
     welcome_pref, _, _ = sql.get_welc_pref(chat_id)
     goodbye_pref, _, _ = sql.get_gdbye_pref(chat_id)
+    clean_welc_pref = sql.get_clean_pref(chat_id)
+    welc_mutes_pref = sql.get_welc_mutes_pref(chat_id)
+    clean_service_pref = sql.get_del_pref(chat_id)
     return "This chat has it's welcome preference set to `{}`.\n" \
-           "It's goodbye preference is `{}`.".format(welcome_pref, goodbye_pref)
+           "It's goodbye preference is `{}`. \n\n" \
+           "*Service preferences:*\n" \
+           "\nClean welcome: `{}`" \
+           "\nWelcome mutes: `{}`" \
+           "\nClean service: `{}`".format(welcome_pref, goodbye_pref, clean_welc_pref, 
+                                          welc_mutes_pref, clean_service_pref)
 
 
 __help__ = """
@@ -603,11 +611,28 @@ __help__ = """
  - /resetgoodbye: reset to the default goodbye message.
  - /cleanwelcome <on/off>: On new member, try to delete the previous welcome message to avoid spamming the chat.
  - /cleanservice <on/off>: when someone joins, try to delete the *user* joined the group message.
- - /welcomemute <off/soft/strong>: all users that join, get muted; a button gets added to the welcome message for them to unmute themselves. This proves they aren't a bot! soft - restricts users ability to post media for 24 hours. strong - mutes on join until they prove they're not bots.
+ - /welcomemute <off/soft/strong>: all users that join, get muted; a button gets added to the welcome message for them to unmute themselves. \
+This proves they aren't a bot! soft - restricts users ability to post media for 24 hours. strong - mutes on join until they prove they're not bots.
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
+ 
+Buttons in welcome messages are made easy, everyone hates URLs visible. With button links you can make your chats look more \
+tidy and simplified.
+
+An example of using buttons:
+You can create a button using `[button text](buttonurl://example.com)`.
+
+If you wish to add more than 1 buttons simply do the following:
+`[Button 1](buttonurl://example.com)`
+`[Button 2](buttonurl://github.com:same)`
+`[Button 3](buttonurl://google.com)`
+
+The `:same` end of the link merges 2 buttons on same line as 1 button, resulting in 3rd button to be separated \
+from same line.
+
+Tip: Buttons must be placed at the end of welcome messages. 
 """.format(WELC_HELP_TXT)
 
-__mod_name__ = "Welcomes/Goodbyes"
+__mod_name__ = "Greetings"
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)
