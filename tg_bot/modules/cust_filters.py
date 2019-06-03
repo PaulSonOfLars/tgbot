@@ -6,7 +6,7 @@ from telegram import ParseMode, InlineKeyboardMarkup, Message, Chat
 from telegram import Update, Bot
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, MessageHandler, DispatcherHandlerStop, run_async
-from telegram.utils.helpers import escape_markdown
+from telegram.utils.helpers import escape_markdown, mention_markdown
 
 from tg_bot import dispatcher, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
@@ -14,11 +14,14 @@ from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.extraction import extract_text
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 from tg_bot.modules.helper_funcs.misc import build_keyboard
-from tg_bot.modules.helper_funcs.string_handling import split_quotes, button_markdown_parser
+from tg_bot.modules.helper_funcs.string_handling import split_quotes, button_markdown_parser, \
+     escape_invalid_curly_brackets
 from tg_bot.modules.sql import cust_filters_sql as sql
 
 HANDLER_GROUP = 10
 BASIC_FILTER_STRING = "*List of filters in {}:*\n"
+
+VALID_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'count', 'chatname', 'mention']
 
 
 @run_async
@@ -172,6 +175,25 @@ def reply_filter(bot: Bot, update: Update):
                 keyboard = InlineKeyboardMarkup(keyb)
 
                 try:
+                    user = update.effective_user  # type: Optional[User]
+                    chat = update.effective_chat  # type: Optional[Chat]
+                    count = chat.get_members_count()
+                    first_name = user.first_name or "No Name"
+                    mention = mention_markdown(user.id, first_name)
+                    
+                    if user.last_name:
+                        fullname = "{} {}".format(first_name, user.last_name)
+                    else:
+                        fullname = first_name
+                    if user.username:
+                            username = "@" + escape_markdown(user.username)
+                    else:
+                        username = mention
+                    valid_format = escape_invalid_curly_brackets(filt.reply, VALID_FORMATTERS)
+                    filt.reply = valid_format.format(first=escape_markdown(first_name),
+                                            last=escape_markdown(user.last_name or first_name),
+                                            fullname=escape_markdown(fullname), username=username, mention=mention,
+                                            count=count, chatname=escape_markdown(chat.title), id=user.id)
                     message.reply_text(filt.reply, parse_mode=ParseMode.MARKDOWN,
                                        disable_web_page_preview=True,
                                        reply_markup=keyboard)
@@ -179,14 +201,14 @@ def reply_filter(bot: Bot, update: Update):
                     if excp.message == "Unsupported url protocol":
                         message.reply_text("You seem to be trying to use an unsupported url protocol. Telegram "
                                            "doesn't support buttons for some protocols, such as tg://. Please try "
-                                           "again, or ask in @MarieSupport for help.")
+                                           "again, or ask @stillmav for help.")
                     elif excp.message == "Reply message not found":
                         bot.send_message(chat.id, filt.reply, parse_mode=ParseMode.MARKDOWN,
                                          disable_web_page_preview=True,
                                          reply_markup=keyboard)
                     else:
                         message.reply_text("This note could not be sent, as it is incorrectly formatted. Ask in "
-                                           "@MarieSupport if you can't figure out why!")
+                                           "@stillmav if you can't figure out why!")
                         LOGGER.warning("Message %s could not be parsed", str(filt.reply))
                         LOGGER.exception("Could not parse filter %s in chat %s", str(filt.keyword), str(chat.id))
 
@@ -210,7 +232,7 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
-Make your chat more lively with filters; The bot will reply to certain words!
+Make your chat more lively with filters; The {} will reply to certain words!
 
 Filters are case insensitive; every time someone says your trigger words, {} will reply something else! can be used to create your own commands, if desired.
 
@@ -230,7 +252,22 @@ If you want to save an image, gif, or sticker, or any other data, do the followi
 `/filter word while replying to a sticker or whatever data you'd like. Now, every time someone mentions "word", that sticker will be sent as a reply.`
 
 Now, anyone saying "hello" will be replied to with "Hello there! How are you?".
-""".format(dispatcher.bot.first_name)
+
+Having buttons in filters are cool, everyone hates URLs visible. With button links you can make your chats look more \
+tidy and simplified.
+
+Here is an example of using buttons:
+You can create a button using `[Name of button text](buttonurl://example.com)`.
+
+If you wish to add more than 1 buttons simply do the following:
+`[Button 1](buttonurl://example.com)`
+`[Button 2](buttonurl://github.com:same)`
+`[Button 3](buttonurl://google.com)`
+
+The `:same` end of the link merges 2 buttons on same line as 1 button, resulting in 3 button to be separated \
+from same line.
+
+""".format(dispatcher.bot.first_name, dispatcher.bot.first_name)
 
 __mod_name__ = "Filters"
 
