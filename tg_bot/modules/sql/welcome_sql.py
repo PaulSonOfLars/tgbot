@@ -6,7 +6,7 @@ from tg_bot.modules.helper_funcs.msg_types import Types
 from tg_bot.modules.sql import SESSION, BASE
 
 DEFAULT_WELCOME = "Hey {first}, how are you?"
-DEFAULT_GOODBYE = "Nice knowing ya!"
+DEFAULT_GOODBYE = "Goodbye, until we meet again."
 
 
 class Welcome(BASE):
@@ -200,6 +200,17 @@ def set_del_joined(chat_id, del_joined):
         SESSION.add(curr)
         SESSION.commit()
 
+def set_rtl_del(chat_id, rtl_del):
+    with INSERTION_LOCK:
+        curr = SESSION.query(Welcome).get(str(chat_id))
+        if not curr:
+            curr = Welcome(str(chat_id))
+
+        curr.rtl_del = int(rtl_del)
+
+        SESSION.add(curr)
+        SESSION.commit()
+
 
 def get_del_pref(chat_id):
     welc = SESSION.query(Welcome).get(str(chat_id))
@@ -207,6 +218,15 @@ def get_del_pref(chat_id):
 
     if welc:
         return welc.del_joined
+
+    return False
+
+def get_rtl_pref(chat_id):
+    welc = SESSION.query(Welcome).get(str(chat_id))
+    SESSION.close()
+
+    if welc:
+        return welc.rtl_del
 
     return False
 
