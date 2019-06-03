@@ -85,6 +85,8 @@ def new_member(bot: Bot, update: Update):
     chat_name = chat.title or chat.first or chat.username # type: Optional:[chat name]
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     welc_mutes = sql.welcome_mutes(chat.id)
+    user_id = user.id
+    human_checks = sql.get_human_checks(user_id, chat.id)
     if should_welc:
         sent = None
         new_members = update.effective_message.new_chat_members
@@ -135,11 +137,10 @@ def new_member(bot: Bot, update: Update):
                 sent = send(update, res, keyboard,
                             sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
             
-                
-                #Sudo user exception from mutes:
-                if is_user_ban_protected(chat, new_mem.id, chat.get_member(new_mem.id)):
+    
+                    #User exception from mutes:
+                if is_user_ban_protected(chat, new_mem.id, chat.get_member(new_mem.id)) or human_checks:
                     continue
-
                 #Join welcome: soft mute
                 if welc_mutes == "soft":
                     bot.restrict_chat_member(chat.id, new_mem.id, 
@@ -148,19 +149,18 @@ def new_member(bot: Bot, update: Update):
                                              can_send_other_messages=False, 
                                              can_add_web_page_previews=False, 
                                              until_date=(int(time.time() + 24 * 60 * 60)))
-
                 #Join welcome: strong mute
                 if welc_mutes == "strong":
-                    msg.reply_text("Click the button below to prove you're human",
+                    new_join_mem = "[{}](tg://user?id={})".format(new_mem.first_name, user.id)
+                    msg.reply_text("{},\nClick the button below to prove you're human".format(new_join_mem),
                          reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="Yes, I'm a human", 
-                         callback_data="userverify_({})".format(new_mem.id))]]))
+                         callback_data="user_join_({})".format(new_mem.id))]]), parse_mode=ParseMode.MARKDOWN)
                     bot.restrict_chat_member(chat.id, new_mem.id, 
                                              can_send_messages=False, 
                                              can_send_media_messages=False, 
                                              can_send_other_messages=False, 
                                              can_add_web_page_previews=False)
             delete_join(bot, update)
-
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:
             try:
@@ -266,7 +266,6 @@ def welcome(bot: Bot, update: Update, args: List[str]):
         else:
             # idek what you're writing, say yes or no
             update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
-
 
 @run_async
 @user_admin
