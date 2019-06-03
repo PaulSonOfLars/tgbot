@@ -364,8 +364,24 @@ def temp_nomedia(bot: Bot, update: Update, args: List[str]) -> str:
 
 __help__ = """
 Some people need to be publicly muted; spammers, annoyances, or just trolls.
+@run_async
+@bot_admin
+@user_admin
+@loggable
+def smute(bot: Bot, update: Update, args: List[str]) -> str:
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+    message = update.effective_message  # type: Optional[Message]
+    
+    update.effective_message.delete()
+    user_id, reason = extract_user_and_text(message, args)
+    if not user_id:
+        return ""
 
 This module allows you to do that easily, by exposing some common actions, so everyone will see!
+    if user_id == bot.id:
+        message.reply_text("Really?! You're not supposed silent mute me!")
+        return ""
 
 *Admin only:*
  - /mute <userhandle>: silences a user. Can also be used as a reply, muting the replied to user.
@@ -379,6 +395,26 @@ This module allows you to do that easily, by exposing some common actions, so ev
  
 An example of temporarily mute someone:
 `/tmute @username 2h`; this mutes a user for 2 hours.
+    member = chat.get_member(int(user_id))
+
+    if member:
+        if is_user_admin(chat, user_id, member=member):
+           return ""
+
+        elif member.can_send_messages is None or member.can_send_messages:
+            bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+            log = "<b>{}:</b>" \
+                   "\n#SILENT_MUTE" \
+                   "\n<b>• Admin:</b> {}" \
+                   "\n<b>• User:</b> {}" \
+                   "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title),
+                                              mention_html(user.id, user.first_name),
+                                              mention_html(member.user.id, member.user.first_name), user_id)
+            if reason:
+               log += "\n<b>• Reason:</b> {}".format(reason)
+            return log
+
+    return ""
 
 An example of temporarily restricting someone:
 `/trestrict @username 2h`; this restricts a user's ability to send media for 2 hours.
@@ -388,6 +424,7 @@ An example of temporarily restricting someone:
 __mod_name__ = "Muting & Restricting"
 
 MUTE_HANDLER = CommandHandler("mute", mute, pass_args=True, filters=Filters.group)
+SMUTE_HANDLER = CommandHandler("smute", smute, pass_args=True, filters=Filters.group)
 UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True, filters=Filters.group)
 TEMPMUTE_HANDLER = CommandHandler(["tmute", "tempmute"], temp_mute, pass_args=True, filters=Filters.group)
 TEMP_NOMEDIA_HANDLER = CommandHandler(["trestrict", "temprestrict"], temp_nomedia, pass_args=True, filters=Filters.group)
@@ -395,6 +432,7 @@ NOMEDIA_HANDLER = CommandHandler(["restrict", "nomedia"], nomedia, pass_args=Tru
 MEDIA_HANDLER = CommandHandler("unrestrict", media, pass_args=True, filters=Filters.group)
 
 dispatcher.add_handler(MUTE_HANDLER)
+dispatcher.add_handler(SMUTE_HANDLER)
 dispatcher.add_handler(UNMUTE_HANDLER)
 dispatcher.add_handler(TEMPMUTE_HANDLER)
 dispatcher.add_handler(TEMP_NOMEDIA_HANDLER)
