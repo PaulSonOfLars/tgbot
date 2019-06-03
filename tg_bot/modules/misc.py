@@ -13,7 +13,7 @@ from telegram.utils.helpers import escape_markdown, mention_html
 from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, SUPER_ADMINS, WHITELIST_USERS, BAN_STICKER
 from tg_bot.__main__ import GDPR
 from tg_bot.__main__ import STATS, USER_INFO
-from tg_bot.modules.disable import DisableAbleCommandHandler
+from tg_bot.modules.disable import DisableAbleCommandHandler, DisableAbleRegexHandler
 from tg_bot.modules.helper_funcs.extraction import extract_user
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 
@@ -26,6 +26,8 @@ RUN_STRINGS = (
     "Look out for the wall!",
     "Don't leave me alone with them!!",
     "You run, you die.",
+    "Energy drinks makes you run faster!",
+    "Stop walking and start to run",
     "Jokes on you, I'm everywhere",
     "You're gonna regret that...",
     "You could also try /kickme, I hear that's fun.",
@@ -42,6 +44,8 @@ RUN_STRINGS = (
     "That's definitely the droid we're looking for.",
     "May the odds be ever in your favour.",
     "Famous last words.",
+    "If you disappear, don't call for help...",
+    "Run for your life!",
     "And they disappeared forever, never to be seen again.",
     "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this person",
     "Yeah yeah, just tap /kickme already.",
@@ -56,12 +60,18 @@ RUN_STRINGS = (
     "You're a wiza- Oh. Wait. You're not Harry, keep moving.",
     "NO RUNNING IN THE HALLWAYS!",
     "Hasta la vista, baby.",
+    "Run carelessly you might get tripped.",
+    "You have done a wonderful job, Keep it up...",
+    "I see an evil spirits here, Let's expel them!\n\n"
+    "Exorcizamus te, omnis immunde spiritus, omni satanica potestas, omnis incursio infernalis adversarii," 
+    " omnis legio, omnis congregatio et secta diabolica, in nomini et virtute Domini nostri Jesu Christi, eradicare "
+    "et effugare a Dei Ecclesia, ab animabus ad imaginem Dei conditis ac pretioso divini Agni sanguini redemptis.",
     "Who let the dogs out?",
     "It's funny, because no one cares.",
+    "That's cool, just hit on seppuku /banme already.",
     "Ah, what a waste. I liked that one.",
     "Frankly, my dear, I don't give a damn.",
-    "My Trident is ready for ban-hammer time!",
-    "My milkshake brings all the boys to yard... So run faster!",
+    "My flowers brings all the girls to yard... So run faster!",
     "You can't HANDLE the truth!",
     "A long time ago, in a galaxy far far away... Someone would've cared about that. Not anymore though.",
     "Hey, look at them! They're running from the inevitable banhammer... Cute.",
@@ -80,9 +90,16 @@ SLAP_TEMPLATES = (
     "{user1} starts slapping {user2} silly with a {item}.",
     "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
     "{user1} grabs up a {item} and {hits} {user2} with it.",
+    "{user1} brutally beats up {user2} with {item}.",
     "{user1} ties {user2} to a chair and {throws} a {item} at them.",
-    "{user1} gave a friendly push to help {user2} learn to swim in a wild ocean."
+    "{user1} {hits} {user2} with a glue filled hands.",
+    "{user1} slams the metal door at {user2}.",
+    "{user1} thundersmacks {user2} with lightning bolt.",
+    "{user1} gave a friendly push to help {user2} learn to swim in a wild ocean.",
+    "{user1} {throws} {user2} into shark infested water.",
 )
+)
+
 
 ITEMS = (
     "cast iron skillet",
@@ -90,27 +107,58 @@ ITEMS = (
     "baseball bat",
     "cricket bat",
     "wooden cane",
+    "spatula",
     "nail",
+    "pillow",
     "printer",
     "shovel",
     "CRT monitor",
+    "spoon forks",
+    "bag of dog food",
     "physics textbook",
     "toaster",
+    "water balloon",
+    "paper plane",
+    "marble ball",
+    "dirty diaper",
+    "phone",
+    "old radio",
+    "gym ball",
+    "shoe box",
+    "detergent",
+    "dart",
+    "arrow",
+    "toy insect",
+    "bowling ball",
+    "glass of water",
+    "bucket of horse shit",
+    "toolbox",
     "portrait of Richard Stallman",
     "television",
     "five ton truck",
     "roll of duct tape",
+    "bottle of ketchup",
+    "bottle of mayonnaise",
+    "bottle of mustard",
+    "tire",
+    "pencil",
+    "wooden board",
     "book",
     "laptop",
     "old television",
     "sack of rocks",
-    "trident",
+    "shopping cart",
+    "keyboard",
+    "lamp",
+    "spiked mace",
     "rainbow trout",
+    "rubber slipper",
     "rubber chicken",
     "spiked bat",
     "fire extinguisher",
     "heavy rock",
     "chunk of dirt",
+    "rotten apple pie",
     "beehive",
     "piece of rotten meat",
     "bear",
@@ -343,7 +391,7 @@ def gdpr(bot: Bot, update: Update):
         mod.__gdpr__(update.effective_user.id)
 
     update.effective_message.reply_text("Your personal data has been deleted.\n\nNote that this will not unban "
-                                        "you from any chats, as that is telegram data, not Marie data. "
+                                        "you from any chats, as that is telegram data, not bot's data. "
                                         "Flooding, warns, and gbans are also preserved, as of "
                                         "[this](https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/individual-rights/right-to-erasure/), "
                                         "which clearly states that the right to erasure does not apply "
