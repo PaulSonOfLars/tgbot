@@ -4,14 +4,16 @@ from typing import Optional, List
 from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode
 from telegram.error import BadRequest
-from telegram.ext import CommandHandler, Filters
+from telegram.ext import CommandHandler, Filters, RegexHandler
 from telegram.ext.dispatcher import run_async
 from telegram.utils.helpers import escape_markdown, mention_html
 
 from tg_bot import dispatcher
+import tg_bot.modules.sql.setlink_sql as sql
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, can_promote, user_admin, can_pin
 from tg_bot.modules.helper_funcs.extraction import extract_user
+from tg_bot.modules.helper_funcs.string_handling import markdown_parser
 from tg_bot.modules.log_channel import loggable
 
 
@@ -168,23 +170,67 @@ def unpin(bot: Bot, update: Update) -> str:
            "\n<b>• Admin:</b> {}".format(html.escape(chat.title),
                                        mention_html(user.id, user.first_name))
 
-
 @run_async
 @bot_admin
 @user_admin
 def invite(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message #type: Optional[Messages]
+    
     if chat.username:
-        update.effective_message.reply_text(chat.username)
+        update.effective_message.reply_text("@{}".format(chat.username))
     elif chat.type == chat.SUPERGROUP or chat.type == chat.CHANNEL:
         bot_member = chat.get_member(bot.id)
         if bot_member.can_invite_users:
             invitelink = bot.exportChatInviteLink(chat.id)
-            update.effective_message.reply_text(invitelink)
+            linktext = "Successfully generated new link for *{}:*".format(chat.title)
+            link = "`{}`".format(invitelink)
+            message.reply_text(linktext, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+            message.reply_text(link, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
         else:
-            update.effective_message.reply_text("I don't have access to the invite link, try changing my permissions!")
+            message.reply_text("I don't have access to the invite link, try changing my permissions!")
     else:
-        update.effective_message.reply_text("I can only give you invite links for supergroups and channels, sorry!")
+        message.reply_text("I can only give you invite links for supergroups and channels, sorry!")
+
+@run_async
+def link_public(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    message = update.effective_message #type: Optional[Messages]
+    chat_id = update.effective_chat.id
+    invitelink = sql.get_link(chat_id)
+    
+    if chat.type == chat.SUPERGROUP or chat.type == chat.CHANNEL:
+        if invitelink:
+            message.reply_text("Link of *{}*:\n`{}`".format(chat.title, invitelink), parse_mode=ParseMode.MARKDOWN)
+        else:
+            message.reply_text("The admins of *{}* haven't set link."
+                               " \nLink can be set by following: `/setlink` and get link of chat "
+                               "using /invitelink, paste the link after `/setlink` append.".format(chat.title), parse_mode=ParseMode.MARKDOWN)
+    else:
+        message.reply_text("I can only can save links for supergroups and channels, sorry!")
+
+@run_async
+@user_admin
+def set_link(bot: Bot, update: Update):
+    chat_id = update.effective_chat.id
+    msg = update.effective_message  # type: Optional[Message]
+    chat = update.effective_chat  # type: Optional[Chat]
+    raw_text = msg.text
+    args = raw_text.split(None, 1)  # use python's maxsplit to separate cmd and args
+    
+    if len(args) == 2:
+        links_text = args[1]
+
+        sql.set_link(chat_id, links_text)
+        msg.reply_text("The link has been set for {}!\nRetrieve link by #link".format((chat.title)))
+
+
+@run_async
+@user_admin
+def clear_link(bot: Bot, update: Update):
+    chat_id = update.effective_chat.id
+    sql.set_link(chat_id, "")
+    update.effective_message.reply_text("Successfully cleared link!")
 
 
 @run_async
@@ -213,6 +259,8 @@ def adminlist(bot: Bot, update: Update):
 
     msg.reply_text(text + members, parse_mode=ParseMode.MARKDOWN)
 
+def __stats__():
+    return "{} chats have links set.".format(sql.num_chats())
 
 def __chat_settings__(chat_id, user_id):
     return "You are *admin*: `{}`".format(
@@ -226,14 +274,20 @@ done easily using the bot.
 
  - /adminlist: list of admins and members in the chat
  - /staff: same as /adminlist
+ - /link: get the group link for this chat.
+ - #link: same as /link
 
 *Admin only:*
  - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifies to users.
- - /unpin: unpins the currently pinned message
- - /invitelink: gets invitelink
- - /link: same as /invitelink
+ - /unpin: unpins the currently pinned message.
+ - /invitelink: generates new invite link.
+ - /setlink <your group link here>: set the group link for this chat.
+ - /clearlink: clear the group link for this chat.
  - /promote: promotes the user replied to
  - /demote: demotes the user replied to
+ 
+ An example of set a link:
+`/setlink https://t.me/joinchat/HwiIk1RADK5gRMr9FBdOrwtae`
 
 An example of promoting someone to admins:
 `/promote @username`; this promotes a user to admins.
@@ -243,17 +297,22 @@ __mod_name__ = "Admin"
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True, filters=Filters.group)
 UNPIN_HANDLER = CommandHandler("unpin", unpin, filters=Filters.group)
-
-INVITE_HANDLER = CommandHandler(["invitelink", "link"], invite, filters=Filters.group)
-
+LINK_HANDLER = DisableAbleCommandHandler("link", link_public)
+SET_LINK_HANDLER = CommandHandler("setlink", set_link, filters=Filters.group)
+RESET_LINK_HANDLER = CommandHandler("clearlink", clear_link, filters=Filters.group)
+HASH_LINK_HANDLER = RegexHandler("#link", link_public)
+INVITE_HANDLER = CommandHandler("invitelink", invite, filters=Filters.group)
 PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True, filters=Filters.group)
 DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True, filters=Filters.group)
-
 ADMINLIST_HANDLER = DisableAbleCommandHandler(["adminlist", "staff"], adminlist, filters=Filters.group)
 
 dispatcher.add_handler(PIN_HANDLER)
 dispatcher.add_handler(UNPIN_HANDLER)
 dispatcher.add_handler(INVITE_HANDLER)
+dispatcher.add_handler(LINK_HANDLER)
+dispatcher.add_handler(SET_LINK_HANDLER)
+dispatcher.add_handler(RESET_LINK_HANDLER)
+dispatcher.add_handler(HASH_LINK_HANDLER)
 dispatcher.add_handler(PROMOTE_HANDLER)
 dispatcher.add_handler(DEMOTE_HANDLER)
 dispatcher.add_handler(ADMINLIST_HANDLER)
