@@ -199,11 +199,6 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
 
     res = chat.unban_member(user_id)  # unban on current user = kick
     if res:
-        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-        keyboard = []
-        reply = "{} has been kicked!".format(mention_html(member.user.id, member.user.first_name))
-        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
-
         log = "<b>{}:</b>" \
               "\n#KICKED" \
               "\n<b>• Admin:</b> {}" \
@@ -211,8 +206,14 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
               "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title),
                                                       mention_html(user.id, user.first_name),
                                                       mention_html(member.user.id, member.user.first_name), user_id)
+        keyboard = []
+        reply = "{} has been kicked!".format(mention_html(member.user.id, member.user.first_name))
         if reason:
             log += "\n<b>• Reason:</b> {}".format(reason)
+            reply += "\n<b>Reason:</b> <i>{}</i>".format(reason)
+            
+        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer hercules sticker
+        message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
 
         return log
 
@@ -296,7 +297,9 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     chat.unban_member(user_id)
-    message.reply_text("Yep, this user can join!")
+    keyboard = []
+    reply = "Yep, {} can join again!".format(mention_html(member.user.id, member.user.first_name))
+    message.reply_text(reply, reply_markup=keyboard, parse_mode=ParseMode.HTML)
 
     log = "<b>{}:</b>" \
           "\n#UNBANNED" \
@@ -342,7 +345,7 @@ def sban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     log = "<b>{}:</b>" \
-          "\n#SILENT BAN" \
+          "\n#SILENT_BAN" \
           "\n<b>• Admin:</b> {}" \
           "\n<b>• User:</b> {}" \
           "\n<b>• ID:</b> <code>{}</code>".format(html.escape(chat.title), mention_html(user.id, user.first_name), 
@@ -363,7 +366,7 @@ def sban(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 __help__ = """
-Some people need to be publicly banned; spammers, annoyances, or just trolls.
+Some people need to be publicly banned, mute or kicked; spammers, annoyances, or just trolls.
 
 This module allows you to do that easily, by exposing some common actions, so everyone will see!
 
@@ -372,23 +375,46 @@ This module allows you to do that easily, by exposing some common actions, so ev
  - /banme: bans the user who issued the command.
 
 *Admin only:*
+   *-Bans-*
  - /ban <userhandle>: bans a user. (via handle, or reply)
- - /sban <userhandle>: silently bans a user. (via handle, or reply)
+ - /sban <userhandle>: bans a user, quietly, deletes your message (via handle, or reply)
  - /tban <userhandle> x(m/h/d): bans a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
  - /unban <userhandle>: unbans a user. (via handle, or reply)
  - /kick <userhandle>: kicks a user, (via handle, or reply)
+   
+   *-Mutes-*
+ - /mute <userhandle>: silences a user. Can also be used as a reply, muting the replied to user.
+ - /smute <userhandle>: silences a user, quietly, deletes your message. 
+ - /tmute <userhandle> x(m/h/d): mutes a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
+ - /unmute <userhandle>: unmutes a user. Can also be used as a reply, muting the replied to user.
+    
+    *-Restrict-*
+ - /restrict <userhandle>: restricts a user from sending stickers, gif, embed links or media. \
+ Can also be used as a reply, restrict the replied to user.
+ - /trestrict <userhandle> x(m/h/d): restricts a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
+ - /unrestrict <userhandle>: unrestricts a user from sending stickers, gif, embed links or media. \
+ Can also be used as a reply, restrict the replied to user.
 
 An example of temporarily banning someone:
 `/tban @username 2h`; this bans a user for 2 hours.
 
-As for the silent ban, it shows no bot output results on banning a user. \
+As for the silent ban, it shows no {}'s output results on banning a user. \
 That makes admins of chat quietly ban users without any expose.
 
 An example of banning someone silently:
 `/sban @username or 728762378`; this bans user silently and deletes command.
-"""
 
-__mod_name__ = "Bans"
+An example of temporarily mute someone:
+`/tmute @username 2h`; this mutes a user for 2 hours.
+
+An example of temporarily restricting someone:
+`/trestrict @username 2h`; this restricts a user's ability to send media for 2 hours.
+
+An example of muting someone silently:
+`/smute @username or 728762378`; this mutes user silently and deletes command.
+""".format(dispatcher.bot.first_name)
+
+__mod_name__ = "Banhammer"
 
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
 TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, filters=Filters.group)
