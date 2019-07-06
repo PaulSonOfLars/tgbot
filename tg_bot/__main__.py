@@ -22,11 +22,9 @@ from tg_bot.modules.helper_funcs.chat_status import is_user_admin
 from tg_bot.modules.helper_funcs.misc import paginate_modules
 
 PM_START_TEXT = """
-Ciao {}, io sono {}! Il bot numero 1 di https://t.me/python_ita. Se hai qualche dubbio su come usarmi, leggi l'output del comando /help .
+Ciao {}, io sono {}! Il bot numero 1 di python_ita. Se hai qualche dubbio su come usarmi, leggi l'output del comando /help .
 
 Se vuoi contribuire al bot contatta @itsMatt oppure @christiancavuti :).
-
-You can find the list of available commands with /help.
 
 Se pensi che io sia un buon bot, e/o ti piacerebbe aiutarmi a sopravvivere nella giungla, scrivi /donate per aiutarmi ad aggiornare i miei server!
 """
