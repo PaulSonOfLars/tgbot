@@ -18,116 +18,95 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 from tg_bot.modules.helper_funcs.filters import CustomFilters
 
 RUN_STRINGS = (
-    "Where do you think you're going?",
-    "Huh? what? did they get away?",
-    "ZZzzZZzz... Huh? what? oh, just them again, nevermind.",
-    "Get back here!",
-    "Not so fast...",
-    "Look out for the wall!",
-    "Don't leave me alone with them!!",
-    "You run, you die.",
-    "Jokes on you, I'm everywhere",
-    "You're gonna regret that...",
-    "You could also try /kickme, I hear that's fun.",
-    "Go bother someone else, no-one here cares.",
-    "You can run, but you can't hide.",
-    "Is that all you've got?",
-    "I'm behind you...",
-    "You've got company!",
-    "We can do this the easy way, or the hard way.",
-    "You just don't get it, do you?",
-    "Yeah, you better run!",
-    "Please, remind me how much I care?",
-    "I'd run faster if I were you.",
-    "That's definitely the droid we're looking for.",
-    "May the odds be ever in your favour.",
-    "Famous last words.",
-    "And they disappeared forever, never to be seen again.",
-    "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this person",
-    "Yeah yeah, just tap /kickme already.",
-    "Here, take this ring and head to Mordor while you're at it.",
-    "Legend has it, they're still running...",
-    "Unlike Harry Potter, your parents can't protect you from me.",
-    "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might "
-    "be the next Vader.",
-    "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0.",
-    "Legend has it, they're still running.",
-    "Keep it up, not sure we want you here anyway.",
-    "You're a wiza- Oh. Wait. You're not Harry, keep moving.",
-    "NO RUNNING IN THE HALLWAYS!",
+    "Dove pensi di poter andare?",
+    "Huh? cosa? Se ne sono andati?",
+    "ZZzzZZzz... Huh? Cosa? oh, ancora loro, amen.",
+    "Torna qui!",
+    "Non così velocemente...",
+    "Non lasciarmi da solo con loro!!",
+    "Se corri, muori.",
+    "Scherzi a parte, io sono ovunque",
+    "Ti pentirai di questa cosa...",
+    "Devi assolutamente provare il comando /kickme, ho sentito dire che è divertente.",
+    "Vai da qualche altra parte.. Qui non interessa a nessuno.",
+    "Puoi correre, ma non puoi nasconderti.",
+    "Tutto qui?",
+    "Sono dietro di te..",
+    "Sei in buona compagnia!",
+    "Possiamo usare le maniere buone.. o quelle *cattive*.",
+    "Non ci arrivi, vero?",
+    "Yeah, faresti meglio a correre!",
+    "Scusami, mi potresti ricordare quanto me ne importa?",
+    "Scapperei più velocemente se fossi in te",
+    "Ultime parole famose.",
+    "E così sparì, senza farsi più rivedere.",
+    "Yeah yeah, meglio se fai /kickme a questo punto.",
+    "Diversamente da Harry Potter, i tuoi genitori non possono proteggerti qui.",
+    "sii il prossimo Vader.",
+    "Dopo migliaia di calcoli, l'uso dei cluster di google e microsoft, ho capito che di questo argomento mi interessa meno di 0 (che è davvero poco)",
     "Hasta la vista, baby.",
-    "Who let the dogs out?",
-    "It's funny, because no one cares.",
-    "Ah, what a waste. I liked that one.",
-    "Frankly, my dear, I don't give a damn.",
-    "My milkshake brings all the boys to yard... So run faster!",
-    "You can't HANDLE the truth!",
-    "A long time ago, in a galaxy far far away... Someone would've cared about that. Not anymore though.",
-    "Hey, look at them! They're running from the inevitable banhammer... Cute.",
-    "Han shot first. So will I.",
-    "What are you running after, a white rabbit?",
-    "As The Doctor would say... RUN!",
+    "Non si corre nei corridoi!",
+    "Francamente, mio caro, non me ne frega assolutamente niente.",
+    "Non puoi CAPIRE la verità!",
+    "Hey, guardali! Stanno scappando da un inevitabile banhammer... Carini.",
 )
 
 SLAP_TEMPLATES = (
-    "{user1} {hits} {user2} with a {item}.",
-    "{user1} {hits} {user2} in the face with a {item}.",
-    "{user1} {hits} {user2} around a bit with a {item}.",
-    "{user1} {throws} a {item} at {user2}.",
-    "{user1} grabs a {item} and {throws} it at {user2}'s face.",
-    "{user1} launches a {item} in {user2}'s general direction.",
-    "{user1} starts slapping {user2} silly with a {item}.",
-    "{user1} pins {user2} down and repeatedly {hits} them with a {item}.",
-    "{user1} grabs up a {item} and {hits} {user2} with it.",
-    "{user1} ties {user2} to a chair and {throws} a {item} at them.",
-    "{user1} gave a friendly push to help {user2} learn to swim in lava."
+    "{user1} {hits} {user2} con un {item}.",
+    "{user1} {hits} {user2} in faccia con un {item}.",
+    "{user1} {hits} {user2} un pochino con un {item}.",
+    "{user1} {throws} un {item} a {user2}.",
+    "{user1} grabs un {item} e {throws} questo in faccia a {user2}.",
+    "{user1} ha lanciato un {item} a {user2}.",
+    "{user1} ha cominciato a schiaffeggiare {user2} violentemente con un {item}.",
+    "{user1} ha preso un {item} e {hits} {user2} con questo.",
+    "{user1} ha spintonato in modo gentile {user2} per insegnarli a nuotare nella lava."
 )
 
 ITEMS = (
-    "cast iron skillet",
-    "large trout",
-    "baseball bat",
-    "cricket bat",
-    "wooden cane",
-    "nail",
-    "printer",
-    "shovel",
+    "padella di ferro",
+    "grossa trota",
+    "mazza da baseball",
+    "mazza da cricket",
+    "canna di legno",
+    "chiodo",
+    "stampante",
+    "pala",
     "CRT monitor",
-    "physics textbook",
+    "libro di fisica",
     "toaster",
-    "portrait of Richard Stallman",
-    "television",
-    "five ton truck",
-    "roll of duct tape",
-    "book",
+    "album di Richard Stallman",
+    "televisione",
+    "camion di 5 tons",
+    "rotolo di nastro adesivo",
+    "libro",
     "laptop",
-    "old television",
-    "sack of rocks",
-    "rainbow trout",
-    "rubber chicken",
-    "spiked bat",
-    "fire extinguisher",
-    "heavy rock",
-    "chunk of dirt",
-    "beehive",
-    "piece of rotten meat",
-    "bear",
-    "ton of bricks",
+    "vecchia televisione",
+    "sacco di rocce",
+    "trota arcobaleno",
+    "pipistrello",
+    "estintore",
+    "pezzo di roccia pesante",
+    "pezzo di terra",
+    "alveare",
+    "pezzo di carne andata a male",
+    "birra",
+    "carico di mattoni",
 )
 
 THROW = (
-    "throws",
-    "flings",
-    "chucks",
-    "hurls",
+    "getta",
+    "scaglia",
+    "lancia",
+    "scaraventa",
 )
 
 HIT = (
-    "hits",
-    "whacks",
-    "slaps",
-    "smacks",
-    "bashes",
+    "colpisce",
+    "bastona",
+    "sciaffeggia",
+    "spacca",
+    "colpisce con violenza",
 )
 
 GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
@@ -194,7 +173,7 @@ def get_id(bot: Bot, update: Update, args: List[str]):
             user1 = update.effective_message.reply_to_message.from_user
             user2 = update.effective_message.reply_to_message.forward_from
             update.effective_message.reply_text(
-                "The original sender, {}, has an ID of `{}`.\nThe forwarder, {}, has an ID of `{}`.".format(
+                "Il mittente originale, {}, ha un ID di `{}`.\nIl forwarder, {}, ha un ID di `{}`.".format(
                     escape_markdown(user2.first_name),
                     user2.id,
                     escape_markdown(user1.first_name),
@@ -202,16 +181,16 @@ def get_id(bot: Bot, update: Update, args: List[str]):
                 parse_mode=ParseMode.MARKDOWN)
         else:
             user = bot.get_chat(user_id)
-            update.effective_message.reply_text("{}'s id is `{}`.".format(escape_markdown(user.first_name), user.id),
+            update.effective_message.reply_text("L'id di {} è `{}`.".format(escape_markdown(user.first_name), user.id),
                                                 parse_mode=ParseMode.MARKDOWN)
     else:
         chat = update.effective_chat  # type: Optional[Chat]
         if chat.type == "private":
-            update.effective_message.reply_text("Your id is `{}`.".format(chat.id),
+            update.effective_message.reply_text("Il tuo id è `{}`.".format(chat.id),
                                                 parse_mode=ParseMode.MARKDOWN)
 
         else:
-            update.effective_message.reply_text("This group's id is `{}`.".format(chat.id),
+            update.effective_message.reply_text("L'id di questo gruppo è `{}`.".format(chat.id),
                                                 parse_mode=ParseMode.MARKDOWN)
 
 
@@ -229,13 +208,13 @@ def info(bot: Bot, update: Update, args: List[str]):
     elif not msg.reply_to_message and (not args or (
             len(args) >= 1 and not args[0].startswith("@") and not args[0].isdigit() and not msg.parse_entities(
         [MessageEntity.TEXT_MENTION]))):
-        msg.reply_text("I can't extract a user from this.")
+        msg.reply_text("Non posso ricavare l'utente in questo modo.")
         return
 
     else:
         return
 
-    text = "<b>User info</b>:" \
+    text = "<b>Informazioni utente</b>:" \
            "\nID: <code>{}</code>" \
            "\nFirst Name: {}".format(user.id, html.escape(user.first_name))
 
@@ -248,19 +227,19 @@ def info(bot: Bot, update: Update, args: List[str]):
     text += "\nPermanent user link: {}".format(mention_html(user.id, "link"))
 
     if user.id == OWNER_ID:
-        text += "\n\nThis person is my owner - I would never do anything against them!"
+        text += "\n\nQuesta persona è il mio proprietario - Non gli farei mai nulla!"
     else:
         if user.id in SUDO_USERS:
-            text += "\nThis person is one of my sudo users! " \
-                    "Nearly as powerful as my owner - so watch it."
+            text += "\nQuesto utente è uno dei miei sudo user! " \
+                    "Forte quasi come il mio proprietario - quindi stai attento."
         else:
             if user.id in SUPPORT_USERS:
-                text += "\nThis person is one of my support users! " \
-                        "Not quite a sudo user, but can still gban you off the map."
+                text += "\nQuesta persona è uno dei miei supporter! " \
+                        "Non proprio uno sudo user, ma può ancora gbannarti."
 
             if user.id in WHITELIST_USERS:
-                text += "\nThis person has been whitelisted! " \
-                        "That means I'm not allowed to ban/kick them."
+                text += "\nQuesta persona è stata whitelistata! " \
+                        "Questo significa che non posso bannare/kickkare."
 
     for mod in USER_INFO:
         mod_info = mod.__user_info__(user.id).strip()
@@ -274,7 +253,7 @@ def info(bot: Bot, update: Update, args: List[str]):
 def get_time(bot: Bot, update: Update, args: List[str]):
     location = " ".join(args)
     if location.lower() == bot.first_name.lower():
-        update.effective_message.reply_text("Its always banhammer time for me!")
+        update.effective_message.reply_text("Ohh, è sempre tempo di banhammer per me!")
         bot.send_sticker(update.effective_chat.id, BAN_STICKER)
         return
 
@@ -325,42 +304,42 @@ def echo(bot: Bot, update: Update):
 
 @run_async
 def gdpr(bot: Bot, update: Update):
-    update.effective_message.reply_text("Deleting identifiable data...")
+    update.effective_message.reply_text("Elimino informazioni che possono identificarti...")
     for mod in GDPR:
         mod.__gdpr__(update.effective_user.id)
 
-    update.effective_message.reply_text("Your personal data has been deleted.\n\nNote that this will not unban "
-                                        "you from any chats, as that is telegram data, not Marie data. "
-                                        "Flooding, warns, and gbans are also preserved, as of "
-                                        "[this](https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/individual-rights/right-to-erasure/), "
-                                        "which clearly states that the right to erasure does not apply "
-                                        "\"for the performance of a task carried out in the public interest\", as is "
-                                        "the case for the aforementioned pieces of data.",
+    update.effective_message.reply_text("Le tue informazioni personali sono state eliminate.\n\nNota bene che questo non ti unbannerà "
+                                        "da nessuna chat. "
+                                        "Flooding, warns, e gbans sono anch'essi salvati secondo "
+                                        "[questo](https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/individual-rights/right-to-erasure/), "
+                                        "che afferma chiaramente che il diritto alla cancellazione non si applica "
+                                        "\"per l'esecuzione di un compito svolto nell'interesse pubblico\", come nel "
+                                        "caso per i dati di cui sopra.",
                                         parse_mode=ParseMode.MARKDOWN)
 
 
 MARKDOWN_HELP = """
-Markdown is a very powerful formatting tool supported by telegram. {} has some enhancements, to make sure that \
-saved messages are correctly parsed, and to allow you to create buttons.
+Markdown è uno strumento di formattazione molto potente supportato dal Telegram. {} ha alcuni miglioramenti, per essere sicuro che \
+i messaggi salvati vengono analizzati correttamente e per consentire di creare pulsanti.
 
-- <code>_italic_</code>: wrapping text with '_' will produce italic text
-- <code>*bold*</code>: wrapping text with '*' will produce bold text
-- <code>`code`</code>: wrapping text with '`' will produce monospaced text, also known as 'code'
-- <code>[sometext](someURL)</code>: this will create a link - the message will just show <code>sometext</code>, \
-and tapping on it will open the page at <code>someURL</code>.
-EG: <code>[test](example.com)</code>
+- <code> _italic _ </ code>: il wrapping del testo con '_' produrrà il testo in corsivo
+- <code> * bold * </ code>: il wrapping del testo con '*' produce testo in grassetto
+- <code> `code` </ code>: il wrapping del testo con '`' produrrà un testo monospaced, noto anche come 'code'
+- <code> [sometext](someURL) </ code>: questo creerà un link - il messaggio mostrerà solo <code> sometext </ code>, \
+e toccandolo si aprirà la pagina su <code> someURL </ code>.
+EG: <code> [test](example.com) </ code>
 
-- <code>[buttontext](buttonurl:someURL)</code>: this is a special enhancement to allow users to have telegram \
-buttons in their markdown. <code>buttontext</code> will be what is displayed on the button, and <code>someurl</code> \
-will be the url which is opened.
-EG: <code>[This is a button](buttonurl:example.com)</code>
+- <code> [buttontext](buttonurl: someURL) </ code>: questo è un miglioramento speciale per consentire agli utenti di avere Telegram \
+pulsanti nel loro markdown. <code> buttontext </ code> sarà ciò che viene visualizzato sul pulsante e <code> someurl </ code> \
+sarà l'url che verrà aperto.
+EG: <code> [Questo è un pulsante](buttonurl: example.com) </ code>
 
-If you want multiple buttons on the same line, use :same, as such:
-<code>[one](buttonurl://example.com)
-[two](buttonurl://google.com:same)</code>
-This will create two buttons on a single line, instead of one button per line.
+Se vuoi più pulsanti sulla stessa riga, usa :same, in quanto tale:
+<Code> [uno](buttonurl: //example.com)
+[Due](buttonurl: //google.com: idem) </ code>
+Questo creerà due pulsanti su una singola riga, invece di un pulsante per riga.
 
-Keep in mind that your message <b>MUST</b> contain some text other than just a button!
+Tieni presente che il tuo messaggio <b> DEVE </ b> contenere del testo diverso da un semplice pulsante!
 """.format(dispatcher.bot.first_name)
 
 
@@ -375,18 +354,18 @@ def markdown_help(bot: Bot, update: Update):
 
 @run_async
 def stats(bot: Bot, update: Update):
-    update.effective_message.reply_text("Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS]))
+    update.effective_message.reply_text("Stats attuali:\n" + "\n".join([mod.__stats__() for mod in STATS]))
 
 
 # /ip is for private use
 __help__ = """
- - /id: get the current group id. If used by replying to a message, gets that user's id.
- - /runs: reply a random string from an array of replies.
- - /slap: slap a user, or get slapped if not a reply.
- - /info: get information about a user.
- - /gdpr: deletes your information from the bot's database. Private chats only.
+ - /id: ottieni l'id del gruppo attuale. Se utilizzato rispondendo a un messaggio, ottieni l'id dell'utente.
+ - /runs: rispondi con una stringa casuale da una serie di risposte.
+ - /slap: schiaffeggiare un utente, o essere schiaffeggiato se non una risposta.
+ - /info: ottenere informazioni su un utente.
+ - /gdpr: cancella le tue informazioni dal database del bot. Solo chat private.
 
- - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
+ - /markdownhelp: un rapido riepilogo di come funziona il markdown di Telegram - può essere chiamato solo in chat private.
 """
 
 __mod_name__ = "Misc"
