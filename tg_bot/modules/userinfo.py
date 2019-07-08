@@ -29,9 +29,9 @@ def about_me(bot: Bot, update: Update, args: List[str]):
                                             parse_mode=ParseMode.MARKDOWN)
     elif message.reply_to_message:
         username = message.reply_to_message.from_user.first_name
-        update.effective_message.reply_text(username + " hasn't set an info message about themselves  yet!")
+        update.effective_message.reply_text(username + " non ha ancora impostato un messaggio bio!")
     else:
-        update.effective_message.reply_text("You haven't set an info message about yourself yet!")
+        update.effective_message.reply_text("Non hai ancora impostato una bio!")
 
 
 @run_async
@@ -43,10 +43,10 @@ def set_about_me(bot: Bot, update: Update):
     if len(info) == 2:
         if len(info[1]) < MAX_MESSAGE_LENGTH // 4:
             sql.set_user_me_info(user_id, info[1])
-            message.reply_text("Updated your info!")
+            message.reply_text("Informazioni utente aggiornate!")
         else:
             message.reply_text(
-                "Your info needs to be under {} characters! You have {}.".format(MAX_MESSAGE_LENGTH // 4, len(info[1])))
+                "La tua bio deve avere meno di {} caratteri! Tu hai {}.".format(MAX_MESSAGE_LENGTH // 4, len(info[1])))
 
 
 @run_async
@@ -66,9 +66,9 @@ def about_bio(bot: Bot, update: Update, args: List[str]):
                                             parse_mode=ParseMode.MARKDOWN)
     elif message.reply_to_message:
         username = user.first_name
-        update.effective_message.reply_text("{} hasn't had a message set about themselves yet!".format(username))
+        update.effective_message.reply_text("{} non ha una bio impostata!".format(username))
     else:
-        update.effective_message.reply_text("You haven't had a bio set about yourself yet!")
+        update.effective_message.reply_text("Non hai ancora impostato una bio!")
 
 
 @run_async
@@ -79,10 +79,10 @@ def set_about_bio(bot: Bot, update: Update):
         repl_message = message.reply_to_message
         user_id = repl_message.from_user.id
         if user_id == message.from_user.id:
-            message.reply_text("Ha, you can't set your own bio! You're at the mercy of others here...")
+            message.reply_text("Ah, non puoi impostare la tua biografia! Sei in balia degli altri qui...")
             return
         elif user_id == bot.id and sender.id not in SUDO_USERS:
-            message.reply_text("Erm... yeah, I only trust sudo users to set my bio.")
+            message.reply_text("Ehm ... sì, mi fido solo dei sudo-user per impostare la mia biografia.")
             return
 
         text = message.text
@@ -90,24 +90,24 @@ def set_about_bio(bot: Bot, update: Update):
         if len(bio) == 2:
             if len(bio[1]) < MAX_MESSAGE_LENGTH // 4:
                 sql.set_user_bio(user_id, bio[1])
-                message.reply_text("Updated {}'s bio!".format(repl_message.from_user.first_name))
+                message.reply_text("Ho aggiornato la bio di {}!".format(repl_message.from_user.first_name))
             else:
                 message.reply_text(
-                    "A bio needs to be under {} characters! You tried to set {}.".format(
+                    "La bio deve avere meno di {} caratteri! Tu hai provato ad impostare {}.".format(
                         MAX_MESSAGE_LENGTH // 4, len(bio[1])))
     else:
-        message.reply_text("Reply to someone's message to set their bio!")
+        message.reply_text("Rispondi al messaggio di qualcuno per impostare la sua bio!")
 
 
 def __user_info__(user_id):
     bio = html.escape(sql.get_user_bio(user_id) or "")
     me = html.escape(sql.get_user_me_info(user_id) or "")
     if bio and me:
-        return "<b>About user:</b>\n{me}\n<b>What others say:</b>\n{bio}".format(me=me, bio=bio)
+        return "<b>Sull'utente:</b>\n{me}\n<b>Cosa dicono gli altri:</b>\n{bio}".format(me=me, bio=bio)
     elif bio:
-        return "<b>What others say:</b>\n{bio}\n".format(me=me, bio=bio)
+        return "<b>Cosa dicono gli altri:</b>\n{bio}\n".format(me=me, bio=bio)
     elif me:
-        return "<b>About user:</b>\n{me}""".format(me=me, bio=bio)
+        return "<b>Sull'utente:</b>\n{me}""".format(me=me, bio=bio)
     else:
         return ""
 
@@ -118,10 +118,10 @@ def __gdpr__(user_id):
 
 
 __help__ = """
- - /setbio <text>: while replying, will save another user's bio
- - /bio: will get your or another user's bio. This cannot be set by yourself.
- - /setme <text>: will set your info
- - /me: will get your or another user's info
+  - /setbio <text>: mentre rispondi, salverà la biografia di un altro utente
+  - /bio: otterrà la bio del tuo o di un altro utente. Questo non può essere impostato da solo.
+  - /setme <text>: imposterà le tue informazioni
+  - /me: otterrai le tue info o di un altro utente
 """
 
 __mod_name__ = "Bios and Abouts"
