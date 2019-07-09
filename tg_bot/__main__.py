@@ -24,7 +24,7 @@ from tg_bot.modules.helper_funcs.misc import paginate_modules
 PM_START_TEXT = """
 Ciao {}, io sono {}! Il bot numero 1 di python_ita. Se hai qualche dubbio su come usarmi, leggi l'output del comando /help .
 
-Se vuoi contribuire al bot contatta @itsMatt oppure @christiancavuti :).
+Se vuoi contribuire al bot contatta @itsMett oppure @christiancavuti :).
 
 Se pensi che io sia un buon bot, e/o ti piacerebbe aiutarmi a sopravvivere nella giungla, scrivi /donate per aiutarmi ad aggiornare i miei server!
 """
@@ -143,7 +143,7 @@ def start(bot: Bot, update: Update, args: List[str]):
             first_name = update.effective_user.first_name
             update.effective_message.reply_text(
                 PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
-                parse_mode=ParseMode.MARKDOWN)
+                parse_mode=ParseMode.HTML)
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
