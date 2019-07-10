@@ -216,15 +216,15 @@ def info(bot: Bot, update: Update, args: List[str]):
 
     text = "<b>Informazioni utente</b>:" \
            "\nID: <code>{}</code>" \
-           "\nFirst Name: {}".format(user.id, html.escape(user.first_name))
+           "\nNome: {}".format(user.id, html.escape(user.first_name))
 
     if user.last_name:
-        text += "\nLast Name: {}".format(html.escape(user.last_name))
+        text += "\nCognome: {}".format(html.escape(user.last_name))
 
     if user.username:
         text += "\nUsername: @{}".format(html.escape(user.username))
 
-    text += "\nPermanent user link: {}".format(mention_html(user.id, "link"))
+    text += "\nLink utente permanente: {}".format(mention_html(user.id, "link"))
 
     if user.id == OWNER_ID:
         text += "\n\nQuesta persona è il mio proprietario - Non gli farei mai nulla!"
@@ -327,7 +327,7 @@ i messaggi salvati vengono analizzati correttamente e per consentire di creare p
 - <code> `code` </ code>: il wrapping del testo con '`' produrrà un testo monospaced, noto anche come 'code'
 - <code> [sometext](someURL) </ code>: questo creerà un link - il messaggio mostrerà solo <code> sometext </ code>, \
 e toccandolo si aprirà la pagina su <code> someURL </ code>.
-EG: <code> [test](example.com) </ code>
+EG: <code> [test] (example.com) </ code>
 
 - <code> [buttontext](buttonurl: someURL) </ code>: questo è un miglioramento speciale per consentire agli utenti di avere Telegram \
 pulsanti nel loro markdown. <code> buttontext </ code> sarà ciò che viene visualizzato sul pulsante e <code> someurl </ code> \
@@ -335,8 +335,8 @@ sarà l'url che verrà aperto.
 EG: <code> [Questo è un pulsante](buttonurl: example.com) </ code>
 
 Se vuoi più pulsanti sulla stessa riga, usa :same, in quanto tale:
-<Code> [uno](buttonurl: //example.com)
-[Due](buttonurl: //google.com: idem) </ code>
+<Code> [uno] (buttonurl: //example.com)
+[Due] (buttonurl: //google.com: idem) </ code>
 Questo creerà due pulsanti su una singola riga, invece di un pulsante per riga.
 
 Tieni presente che il tuo messaggio <b> DEVE </ b> contenere del testo diverso da un semplice pulsante!
