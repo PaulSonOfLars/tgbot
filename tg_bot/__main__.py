@@ -50,6 +50,10 @@ DONATE_STRING = """Heya, felice di sentire che vuoi donare!
 Tutti i soldi per le donazioni andranno per una VPS migliore per ospitarmi e/o birra \
 per ora il canale delle donazioni non è attivo."""
 
+COC_STRING = """Hey! Complimenti e benvenuto su Python Italia. \nOra puoi chattare nel gruppo e inviare messaggi :)\nSe hai ancora bisogno di me puoi
+usare il comando /help per più informazioni.\n\n[Torna sul gruppo](https://t.me/python_ita)"""
+
+
 IMPORTED = {}
 MIGRATEABLE = []
 HELPABLE = {}
