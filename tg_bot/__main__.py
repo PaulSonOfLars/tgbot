@@ -284,6 +284,17 @@ def send_settings(chat_id, user_id, user=False):
                                                  "in un gruppo dove sei admin per vedere le impostazioni!)",
                                         parse_mode=ParseMode.MARKDOWN)
 
+def CoCDone(bot: Bot, update: Update):
+    user = update.effective_message.from_user
+    chat = update.effective_chat  # type: Optional[Chat]
+
+    if chat.type == "private":
+        #dispatcher.bot.send_message(user,
+        #    text="Complimenti e benvenuto! Ora sei abilitato alla scrittura sul gruppo!",
+        #    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="Torna sul gruppo", callback_data="buttonurl://t.me/TheElectusBot?start=-1001082749604")]]))
+        update.effective_message.reply_text(COC_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+    else:
+        update.effective_message.reply_text("Non hai letto le CoC? Sei una delusione... \nNon sei abilitato per questo comando.", parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
 @run_async
 def settings_button(bot: Bot, update: Update):
