@@ -439,6 +439,9 @@ def main():
     donate_handler = CommandHandler("donate", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
+    coc_handler = CommandHandler("CoCDone", CoCDone)
+    coc_callback_handler = CallbackQueryHandler(CoCDone, pattern=r"CoCDone_")
+
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
@@ -447,6 +450,8 @@ def main():
     dispatcher.add_handler(settings_callback_handler)
     dispatcher.add_handler(migrate_handler)
     dispatcher.add_handler(donate_handler)
+    dispatcher.add_handler(coc_handler)
+    dispatcher.add_handler(coc_callback_handler)
 
     # dispatcher.add_error_handler(error_callback)
 
