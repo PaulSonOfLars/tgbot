@@ -4,18 +4,19 @@ if not __name__.endswith("sample_config"):
           "values here. Doing that WILL backfire on you.\nBot quitting.", file=sys.stderr)
     quit(1)
 
+#bot / botbot
 
 # Create a new config.py file in same dir and import, then extend this class.
 class Config(object):
     LOGGER = True
 
     # REQUIRED
-    API_KEY = "YOUR KEY HERE"
+    API_KEY = "397798227:AAGnnY3A0l0_8jmKdznylKSjFx-RirGi-yw"
     OWNER_ID = "YOUR ID HERE"  # If you dont know, run the bot and do /id in your private chat with it
-    OWNER_USERNAME = "YOUR USERNAME HERE"
+    OWNER_USERNAME = "itsMett"
 
     # RECOMMENDED
-    SQLALCHEMY_DATABASE_URI = 'sqldbtype://username:pw@hostname:port/db_name'  # needed for any database modules
+    SQLALCHEMY_DATABASE_URI = 'postgres://bot:botbot@localhost:5432/bot'  # needed for any database modules
     MESSAGE_DUMP = None  # needed to make sure 'save from' messages persist
     LOAD = []
     # sed has been disabled after the discovery that certain long-running sed commands maxed out cpu usage
@@ -23,6 +24,7 @@ class Config(object):
     NO_LOAD = ['translation', 'rss', 'sed']
     WEBHOOK = False
     URL = None
+    DEFAULT_CHAT_ID = None
 
     # OPTIONAL
     SUDO_USERS = []  # List of id's (not usernames) for users which have sudo access to the bot.
