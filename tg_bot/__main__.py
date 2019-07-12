@@ -14,12 +14,14 @@ from telegram.ext.dispatcher import run_async, DispatcherHandlerStop, Dispatcher
 from telegram.utils.helpers import escape_markdown
 
 from tg_bot import dispatcher, updater, TOKEN, WEBHOOK, OWNER_ID, DONATION_LINK, CERT_PATH, PORT, URL, LOGGER, \
-    ALLOW_EXCL
+    ALLOW_EXCL, DEFAULT_CHAT_ID
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in the config file!
 from tg_bot.modules import ALL_MODULES
 from tg_bot.modules.helper_funcs.chat_status import is_user_admin
 from tg_bot.modules.helper_funcs.misc import paginate_modules
+
+version = "0.00.1"
 
 PM_START_TEXT = """
 Ciao {}, io sono {}! Il bot numero 1 di python_ita. Se hai qualche dubbio su come usarmi, leggi l'output del comando /help .
@@ -460,6 +462,11 @@ def main():
     dispatcher.add_handler(coc_callback_handler)
 
     # dispatcher.add_error_handler(error_callback)
+
+    # Restarting bot message
+    dispatcher.bot.sendMessage(chat_id=int(DEFAULT_CHAT_ID), 
+        text="Sistema *riavviato*.\nVersione: {}".format(str(version)),
+        parse_mode=ParseMode.MARKDOWN)
 
     # add antiflood processor
     Dispatcher.process_update = process_update
