@@ -51,6 +51,9 @@ def check_flood(bot: Bot, update: Update) -> str:
                "\n#INFO" \
                "\nNon posso kickkare, quindi ho automaticamente disabilitare l'antiflood.".format(chat.title)
 
+def check_msg_lenght_flood():
+    # analysis of the number of characters in a message
+    pass
 
 @run_async
 @user_admin
@@ -91,7 +94,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
                                                                     mention_html(user.id, user.first_name), amount)
 
         else:
-            message.reply_text("Argomento non riconosciuto - usare un numero, 'off', oppure 'no'.")
+            message.reply_text("Argomento non riconosciuto - usare un numero, 'off', oppure 'on'.")
 
     return ""
 
@@ -125,6 +128,7 @@ __help__ = """
 
 *Admin only:*
  - /setflood <int/'no'/'off'>: Abilita o disabilita l'antiflood
+ - /setmsglen <int/'on'/'off'>: Abilita o disabilita l'antiflood sulla lunghezza del messaggio
 """
 
 __mod_name__ = "AntiFlood"
