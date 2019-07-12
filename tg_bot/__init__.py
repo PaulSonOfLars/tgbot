@@ -57,6 +57,7 @@ if ENV:
     WORKERS = int(os.environ.get('WORKERS', 8))
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
+    DEFAULT_CHAT_ID = os.environ.get('DEFAULT_CHAT_ID', None)
 
 else:
     from tg_bot.config import Development as Config
@@ -98,6 +99,7 @@ else:
     WORKERS = Config.WORKERS
     BAN_STICKER = Config.BAN_STICKER
     ALLOW_EXCL = Config.ALLOW_EXCL
+    DEFAULT_CHAT_ID = Config.DEFAULT_CHAT_ID
 
 
 SUDO_USERS.add(OWNER_ID)
