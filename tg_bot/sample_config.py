@@ -11,12 +11,12 @@ class Config(object):
     LOGGER = True
 
     # REQUIRED
-    API_KEY = "397798227:AAGnnY3A0l0_8jmKdznylKSjFx-RirGi-yw"
+    API_KEY = "API_KEY_HERE"
     OWNER_ID = "YOUR ID HERE"  # If you dont know, run the bot and do /id in your private chat with it
-    OWNER_USERNAME = "itsMett"
+    OWNER_USERNAME = "YOUR USERNAME HERE"
 
     # RECOMMENDED
-    SQLALCHEMY_DATABASE_URI = 'postgres://bot:botbot@localhost:5432/bot'  # needed for any database modules
+    SQLALCHEMY_DATABASE_URI = 'sqldbtype://username:pw@hostname:port/db_name'  # needed for any database modules
     MESSAGE_DUMP = None  # needed to make sure 'save from' messages persist
     LOAD = []
     # sed has been disabled after the discovery that certain long-running sed commands maxed out cpu usage
