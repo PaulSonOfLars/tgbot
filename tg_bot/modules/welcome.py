@@ -96,8 +96,6 @@ def new_member(bot: Bot, update: Update):
 
             else:
                 # Muting new users
-                chat = update.effective_chat  # type: Optional[Chat]
-                user = update.effective_user  # type: Optional[User]
                 bot.restrict_chat_member(chat.id, new_mem.id, can_send_messages=False)
 
                 # If welcome message is media, send with appropriate function
