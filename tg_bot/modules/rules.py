@@ -33,10 +33,10 @@ def send_rules(update, chat_id, from_pm=False):
             raise
 
     rules = sql.get_rules(chat_id)
-    text = "Le regole di *{}* sono:\n\n{}".format(escape_markdown(chat.title), rules)
+    text = "Ecco il regolamento di *{}*:\n\n{}".format(escape_markdown(chat.title), rules)
 
     if from_pm and rules:
-        bot.send_message(user.id, text, parse_mode=ParseMode.MARKDOWN)
+        bot.send_message(user.id, text, parse_mode=ParseMode.MARKDOWN, preview=False)
     elif from_pm:
         bot.send_message(user.id, "Gli admin non hanno ancora impostato le regole del gruppo. "
                                   "Questo non significa che siamo nel far-west!")
