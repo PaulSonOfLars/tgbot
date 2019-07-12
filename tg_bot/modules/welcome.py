@@ -98,7 +98,7 @@ def new_member(bot: Bot, update: Update):
                 # Muting new users
                 chat = update.effective_chat  # type: Optional[Chat]
                 user = update.effective_user  # type: Optional[User]
-                bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+                bot.restrict_chat_member(chat.id, new_mem.id, can_send_messages=False)
 
                 # If welcome message is media, send with appropriate function
                 if welc_type != sql.Types.TEXT and welc_type != sql.Types.BUTTON_TEXT:
