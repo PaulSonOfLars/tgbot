@@ -293,6 +293,12 @@ def CoCDone(bot: Bot, update: Update):
         #    text="Complimenti e benvenuto! Ora sei abilitato alla scrittura sul gruppo!",
         #    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="Torna sul gruppo", callback_data="buttonurl://t.me/TheElectusBot?start=-1001082749604")]]))
         update.effective_message.reply_text(COC_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
+        # Deactivating mute
+        bot.restrict_chat_member(chat.id, int(user_id),
+                                         can_send_messages=True,
+                                         can_send_media_messages=True,
+                                         can_send_other_messages=True,
+                                         can_add_web_page_previews=True)
     else:
         update.effective_message.reply_text("Non hai letto le CoC? Sei una delusione... \nNon sei abilitato per questo comando.", parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
