@@ -127,7 +127,7 @@ __help__ = """
  - /flood: Restituisce le attuali impostazioni di flood
 
 *Admin only:*
- - /setflood <int/'no'/'off'>: Abilita o disabilita l'antiflood
+ - /setflood <int/'on'/'off'>: Abilita o disabilita l'antiflood
  - /setmsglen <int/'on'/'off'>: Abilita o disabilita l'antiflood sulla lunghezza del messaggio
 """
 
