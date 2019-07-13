@@ -61,7 +61,7 @@ if ENV:
 
 else:
     from tg_bot.config import Development as Config
-    from _version import __version__
+    from tg_bot._version import __version__
     TOKEN = Config.API_KEY
     try:
         OWNER_ID = int(Config.OWNER_ID)
