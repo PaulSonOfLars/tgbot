@@ -36,7 +36,17 @@ def send_rules(update, chat_id, from_pm=False):
     text = "Ecco il regolamento di *{}*:\n\n{}".format(escape_markdown(chat.title), rules)
 
     if from_pm and rules:
-        bot.send_message(user.id, text, parse_mode=ParseMode.MARKDOWN, preview=False)
+        bot.send_message(user.id, text, 
+            parse_mode=ParseMode.MARKDOWN, 
+            preview=False, 
+            disable_web_page_preview=True, 
+            reply_markup=InlineKeyboardMarkup(
+                                                [[InlineKeyboardButton(text="Leggi il CoC",
+                                                                       url="https://telegra.ph/CoC-di-PythonItalia-07-09"
+                                                                       )
+                                                ]]
+                                                )
+            )
     elif from_pm:
         bot.send_message(user.id, "Gli admin non hanno ancora impostato le regole del gruppo. "
                                   "Questo non significa che siamo nel far-west!")
