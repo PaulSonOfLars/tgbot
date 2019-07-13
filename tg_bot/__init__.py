@@ -61,6 +61,7 @@ if ENV:
 
 else:
     from tg_bot.config import Development as Config
+    from _version import __version__
     TOKEN = Config.API_KEY
     try:
         OWNER_ID = int(Config.OWNER_ID)
@@ -100,6 +101,7 @@ else:
     BAN_STICKER = Config.BAN_STICKER
     ALLOW_EXCL = Config.ALLOW_EXCL
     DEFAULT_CHAT_ID = Config.DEFAULT_CHAT_ID
+    VERSION = __version__
 
 
 SUDO_USERS.add(OWNER_ID)
