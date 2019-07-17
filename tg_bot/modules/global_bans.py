@@ -59,7 +59,7 @@ def gban(bot: Bot, update: Update, args: List[str]):
         return
 
     if int(user_id) in SUPPORT_USERS:
-        message.reply_text("OOOH qualcuno sta cercando di efffettuare un gban ad un support user! *grabs popcorn*")
+        message.reply_text("OOOH qualcuno sta cercando di effettuare un gban ad un support user! *grabs popcorn*")
         return
 
     if user_id == bot.id:
