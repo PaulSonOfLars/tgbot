@@ -462,9 +462,11 @@ def main():
     # dispatcher.add_error_handler(error_callback)
 
     # Restarting bot message
-    dispatcher.bot.sendMessage(chat_id=int(DEFAULT_CHAT_ID), 
-        text="Sistema *riavviato*.\nVersione: {}".format(str(VERSION)),
-        parse_mode=ParseMode.MARKDOWN)
+
+    if DEFAULT_CHAT_ID:
+        dispatcher.bot.sendMessage(chat_id=int(DEFAULT_CHAT_ID),
+            text="Sistema *riavviato*.\nVersione: {}".format(str(VERSION)),
+            parse_mode=ParseMode.MARKDOWN)
 
     # add antiflood processor
     Dispatcher.process_update = process_update
