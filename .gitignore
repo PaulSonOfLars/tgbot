@@ -5,6 +5,7 @@ tg_bot/config.py
 .pydevproject
 .directory
 .vscode
+*.env*
 
 # Created by https://www.gitignore.io/api/python
 # Edit at https://www.gitignore.io/?templates=python
