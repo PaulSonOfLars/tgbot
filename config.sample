@@ -1,0 +1,9 @@
+ENV=boolean
+TOKEN=your-token
+OWNER_ID=your-owner-id
+OWNER_USERNAME=your-owner-username
+DATABASE_URL=postgresql://your-user:your-pwd@db:5432/tgbot
+SUDO_USERS=your-sudo-users-id
+POSTGRES_PASSWORD=your-pg-password
+POSTGRES_DB=tgbot
+POSTGRES_USER=your-pg-user
