@@ -1,0 +1,18 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+future = "*"
+emoji = "*"
+requests = "*"
+python-telegram-bot = ">=11.1.0"
+psycopg2-binary = "*"
+feedparser = "*"
+SQLAlchemy = "*"
+
+[requires]
+python_version = "3.6"

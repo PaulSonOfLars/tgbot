@@ -3,6 +3,7 @@ import os
 import sys
 
 import telegram.ext as tg
+from tg_bot._version import __version__
 
 # enable logging
 logging.basicConfig(
@@ -58,10 +59,10 @@ if ENV:
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
     DEFAULT_CHAT_ID = os.environ.get('DEFAULT_CHAT_ID', None)
+    VERSION = __version__
 
 else:
     from tg_bot.config import Development as Config
-    from tg_bot._version import __version__
     TOKEN = Config.API_KEY
     try:
         OWNER_ID = int(Config.OWNER_ID)

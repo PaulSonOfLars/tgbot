@@ -10,6 +10,9 @@ FORBIDDEN_ENTITY_TYPES = ['url', 'text_link', 'email', 'phone_number']
 @run_async
 @bot_can_delete
 def spam_filter(bot: Bot, update: Update):
+    """
+    Filter messages with spam into message's text
+    """
     msg = update.effective_message.text
     message_entities = update.effective_message.parse_entities()
     message_caption_entities = update.effective_message.parse_caption_entities()
