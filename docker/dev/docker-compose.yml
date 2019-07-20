@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  db:
+    image: postgres:11.4
+    env_file: config.env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  tgbot:
+    restart: on-failure
+    depends_on:
+      - db
+    build:
+      context: ../../
+      dockerfile: ./docker/dev/Dockerfile
+    ports:
+      - "5003:5003"
+    env_file: config.env
+    volumes:
+      - ../../:/tgbot
+    command: pipenv run python -m tg_bot
+
+volumes:
+  db-data:
