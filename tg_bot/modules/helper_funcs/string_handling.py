@@ -254,5 +254,5 @@ def extract_time(message, time_val):
             return ""
         return bantime
     else:
-        message.reply_text("Invalid time type specified. Expected m,h, or d, got: {}".format(time_val[-1]))
+        message.reply_text("Stringa invalida. Mi aspetto questo ordine: m,h oppure d. Ho ricevuto: {}".format(time_val[-1]))
         return ""
