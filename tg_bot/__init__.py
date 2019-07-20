@@ -59,7 +59,7 @@ if ENV:
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
     DEFAULT_CHAT_ID = os.environ.get('DEFAULT_CHAT_ID', None)
-    VERSION = __version__
+    VERSION = os.environ.get('DEFAULT_CHAT_ID', 'Production.version')
 
 else:
     from tg_bot.config import Development as Config
