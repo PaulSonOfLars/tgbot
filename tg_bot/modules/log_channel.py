@@ -1,6 +1,5 @@
 from functools import wraps
 from typing import Optional
-
 from tg_bot.modules.helper_funcs.misc import is_module_loaded
 
 FILENAME = __name__.rsplit(".", 1)[-1]
@@ -8,8 +7,9 @@ FILENAME = __name__.rsplit(".", 1)[-1]
 if is_module_loaded(FILENAME):
     from telegram import Bot, Update, ParseMode, Message, Chat
     from telegram.error import BadRequest, Unauthorized
-    from telegram.ext import CommandHandler, run_async
+    from telegram.ext import CommandHandler, MessageHandler, run_async
     from telegram.utils.helpers import escape_markdown
+    from telegram.ext import Filters
 
     from tg_bot import dispatcher, LOGGER
     from tg_bot.modules.helper_funcs.chat_status import user_admin
@@ -38,6 +38,28 @@ if is_module_loaded(FILENAME):
             return result
 
         return log_action
+
+    @run_async
+    def log_resource(bot: Bot, update: Update):
+        entities = update.effective_message.parse_entities()
+        caption_entities = update.effective_message.parse_caption_entities()
+        chat = update.effective_chat  # type: Optional[Chat]
+        if chat.type == chat.SUPERGROUP:
+            log_chat = sql.get_chat_log_channel(chat.id)
+            if log_chat:
+                for descriptor, entity in entities.items():
+                    result = f'<b>Risorsa inviata da @{update.effective_user.username}:</b>\n'
+                    if descriptor['type'] in ['url', 'text_link']:
+                        result += f'{entity}'
+                        LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
+                        send_log(bot, log_chat, chat.id, result)
+
+                for descriptor, entity in caption_entities.items():
+                    result = '<b>Risorsa inviata da @{update.effective_user.username}:</b>\n'
+                    if descriptor['type'] in ['url', 'text_link']:
+                        result += f'{entity}'
+                        LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
+                        send_log(bot, log_chat, chat.id, result)
 
 
     def send_log(bot: Bot, log_chat_id: str, orig_chat_id: str, result: str):
@@ -160,9 +182,12 @@ Setting the log channel is done by:
     SET_LOG_HANDLER = CommandHandler("setlog", setlog)
     UNSET_LOG_HANDLER = CommandHandler("unsetlog", unsetlog)
 
+    LOG_RESOURCES_HANDLER = MessageHandler(Filters.all & Filters.group, log_resource)
+
     dispatcher.add_handler(LOG_HANDLER)
     dispatcher.add_handler(SET_LOG_HANDLER)
     dispatcher.add_handler(UNSET_LOG_HANDLER)
+    dispatcher.add_handler(LOG_RESOURCES_HANDLER)
 
 else:
     # run anyway if module not loaded

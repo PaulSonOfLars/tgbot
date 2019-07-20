@@ -1,1 +1,1 @@
-NO_LOAD = ['translation','rss', 'sed', 'afk','notes','filters','Locks','Log Channels']
+NO_LOAD = ['translation','rss', 'sed', 'afk','notes','filters']
