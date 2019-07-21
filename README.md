@@ -82,45 +82,45 @@ Nel caso in cui tu voglia deployare il bot su heroku dovrai impostare le ENV. So
 
     ENV: Setting this to ANYTHING will enable env variables
 
-    TOKEN: Your bot token, as a string.
+    TOKEN: Token del bot, come stringa.
 
-    OWNER_ID: An integer of consisting of your owner ID
+    OWNER_ID: Numero intero che identifica il proprietario del bot (id di Telegram)
 
-    OWNER_USERNAME: Your username
+    OWNER_USERNAME: Il tuo username
 
-    DATABASE_URL: Your database URL
+    DATABASE_URL: URI del db
 
-    MESSAGE_DUMP: optional: a chat where your replied saved messages are stored, to stop people deleting their old
+    MESSAGE_DUMP: opzionale: chat in cui sono salvate le risposte del bot dove non possono essere cancellate
 
-    LOAD: Space separated list of modules you would like to load
+    LOAD: Lista separata da spazi di moduli che vuoi abilitare
 
-    NO_LOAD: Space separated list of modules you would like NOT to load
+    NO_LOAD: Lista separata da spazi di moduli che NON vuoi abilitare
 
-    WEBHOOK: Setting this to ANYTHING will enable webhooks when in env mode messages
+    WEBHOOK: Impostarlo a ANYTHING abiliterà i webhooks nei messaggi env
 
-    URL: The URL your webhook should connect to (only needed for webhook mode)
+    URL: URL del webhook (richiesto solo se abilitata la modalità webhook)
 
-    SUDO_USERS: A space separated list of user_ids which should be considered sudo users
+    SUDO_USERS: Lista separata da spazi di ids di amministratori del bot
 
-    SUPPORT_USERS: A space separated list of user_ids which should be considered support users (can gban/ungban, nothing else)
+    SUPPORT_USERS: Lista separata da spazi di ids di utenti-supporter (possono gban/ungban, e basta)
 
-    WHITELIST_USERS: A space separated list of user_ids which should be considered whitelisted - they can't be banned.
+    WHITELIST_USERS: Lista separata da spazi di ids di utenti che non possono essere bannati
 
-    DONATION_LINK: Optional: link where you would like to receive donations.
+    DONATION_LINK: Opzionale: Link per le donazioni
 
-    CERT_PATH: Path to your webhook certificate
+    CERT_PATH: Path del certificato webhooks
 
-    PORT: Port to use for your webhooks
+    PORT: Porta usata per connettersi al tuo servizio webhooks
 
-    DEL_CMDS: Whether to delete commands from users which don't have rights to use that command
+    DEL_CMDS: Se cancellare i comandi dagli utenti che non hanno i diritti per usare quel comando
 
-    STRICT_GBAN: Enforce gbans across new groups as well as old groups. When a gbanned user talks, he will be banned.
+    STRICT_GBAN: Imponi gban su nuovi gruppi e vecchi gruppi. Quando un utente gbanned parla, sarà bannato
 
-    WORKERS: Number of threads to use. 8 is the recommended (and default) amount, but your experience may vary. Note that going crazy with more threads wont necessarily speed up your bot, given the large amount of sql data accesses, and the way python asynchronous calls work.
+    WORKERS: Numero di threads da usare. 8 è raccomandato (e numero di default). Nota che aumentare questo numero non porterà necessariamente dei benefici alla velocità del bot.
 
-    BAN_STICKER: Which sticker to use when banning people.
+    BAN_STICKER: Sticker da usare quando viene bannato un utente.
 
-    ALLOW_EXCL: Whether to allow using exclamation marks ! for commands as well as /.
+    ALLOW_EXCL: Se consentire l'utilizzo di punti esclamativi ! per i comandi e /.
 
 
 
@@ -157,7 +157,7 @@ docker-compose -f docker/dev/docker-compose.yml up -d
 
 * [tgbot](https://github.com/PaulSonOfLars/tgbot) - Bot modulare scritto in Python3
 * [Trevis CI](https://travis-ci.com) - Deploy in production
-* [Docker](https://www.docker.com/) - Used to generate RSS Feeds
+* [Docker](https://www.docker.com/) - Usato per sviluppare il bot in ambiente dev
 
 ## Come contribuire
 
