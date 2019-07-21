@@ -63,17 +63,17 @@ def sed(bot: Bot, update: Update):
         repl, repl_with, flags = sed_result
 
         if not repl:
-            update.effective_message.reply_to_message.reply_text("You're trying to replace... "
-                                                                 "nothing with something?")
+            update.effective_message.reply_to_message.reply_text("Stai cercando di sostituire... "
+                                                                 "il nulla con qualcosa?")
             return
 
         try:
             check = re.match(repl, to_fix, flags=re.IGNORECASE)
 
             if check and check.group(0).lower() == to_fix.lower():
-                update.effective_message.reply_to_message.reply_text("Hey everyone, {} is trying to make "
-                                                                     "me say stuff I don't wanna "
-                                                                     "say!".format(update.effective_user.first_name))
+                update.effective_message.reply_to_message.reply_text("Hey ragazzi, {} sta cercando di farmi "
+                                                                     "dire cose che non voglio "
+                                                                     "dire!".format(update.effective_user.first_name))
                 return
 
             if 'i' in flags and 'g' in flags:
@@ -87,12 +87,12 @@ def sed(bot: Bot, update: Update):
         except sre_constants.error:
             LOGGER.warning(update.effective_message.text)
             LOGGER.exception("SRE constant error")
-            update.effective_message.reply_text("Do you even sed? Apparently not.")
+            update.effective_message.reply_text("Sed invalido.")
             return
 
         # empty string errors -_-
         if len(text) >= telegram.MAX_MESSAGE_LENGTH:
-            update.effective_message.reply_text("The result of the sed command was too long for \
+            update.effective_message.reply_text("Il risultato del comando sed era troppo lungo per \
                                                  telegram!")
         elif text:
             update.effective_message.reply_to_message.reply_text(text)
