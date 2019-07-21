@@ -59,10 +59,10 @@ def broadcast(bot: Bot, update: Update):
                 sleep(0.1)
             except TelegramError:
                 failed += 1
-                LOGGER.warning("Couldn't send broadcast to %s, group name %s", str(chat.chat_id), str(chat.chat_name))
+                LOGGER.warning("Impossibile inviare messaggio broadcast a %s gruppi/o. Nome dei gruppi/o: %s", str(chat.chat_id), str(chat.chat_name))
 
-        update.effective_message.reply_text("Broadcast complete. {} groups failed to receive the message, probably "
-                                            "due to being kicked.".format(failed))
+        update.effective_message.reply_text("Broadcast completato. {} gruppi non hanno ricevuto il messaggio, probabilmente "
+                                            "perchè sono stato kickato.".format(failed))
 
 
 @run_async
@@ -96,14 +96,14 @@ def chats(bot: Bot, update: Update):
     with BytesIO(str.encode(chatfile)) as output:
         output.name = "chatlist.txt"
         update.effective_message.reply_document(document=output, filename="chatlist.txt",
-                                                caption="Here is the list of chats in my database.")
+                                                caption="Lista di chat nel mio db.")
 
 
 def __user_info__(user_id):
     if user_id == dispatcher.bot.id:
-        return """I've seen them in... Wow. Are they stalking me? They're in all the same places I am... oh. It's me."""
+        return """L'ho visto in.. wow. In tutte le chat! Ah.. sono io!."""
     num_chats = sql.get_user_num_chats(user_id)
-    return """I've seen them in <code>{}</code> chats in total.""".format(num_chats)
+    return """L'ho visto in <code>{}</code> chats in totale.""".format(num_chats)
 
 
 def __stats__():
