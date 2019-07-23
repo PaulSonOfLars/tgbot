@@ -51,15 +51,15 @@ if ENV:
 
     DB_URI = os.environ.get('DATABASE_URL')
     DONATION_LINK = os.environ.get('DONATION_LINK')
-    LOAD = os.environ.get("LOAD", "").split()
-    NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
+    LOAD = os.environ.get("LOAD", "").split(",") if "," in os.environ.get("LOAD", "") else os.environ.get("LOAD", "").split()
+    NO_LOAD = os.environ.get("NO_LOAD", "translation").split(",")
     DEL_CMDS = bool(os.environ.get('DEL_CMDS', False))
     STRICT_GBAN = bool(os.environ.get('STRICT_GBAN', False))
     WORKERS = int(os.environ.get('WORKERS', 8))
     BAN_STICKER = os.environ.get('BAN_STICKER', 'CAADAgADOwADPPEcAXkko5EB3YGYAg')
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
     DEFAULT_CHAT_ID = os.environ.get('DEFAULT_CHAT_ID', None)
-    VERSION = os.environ.get('DEFAULT_CHAT_ID', 'Production.version')
+    VERSION = __version__
 
 else:
     from tg_bot.config import Development as Config

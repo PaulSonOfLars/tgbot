@@ -20,7 +20,8 @@ def spam_filter(bot: Bot, update: Update):
     found = False
     for descriptor, entity in message_entities.items():
         LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
-        found = True
+        if descriptor["type"] in FORBIDDEN_ENTITY_TYPES:
+            found = True
 
     if found:
         spam_action(update)
@@ -40,4 +41,4 @@ def white_spam_add(bot: Bot, update: Update):
 
 SPAM_HANDLER = MessageHandler(Filters.all & Filters.group, spam_filter)
 WHITE_SPAM_HANDLER = CommandHandler("whitespam", white_spam_add)
-#dispatcher.add_handler(SPAM_HANDLER)
+dispatcher.add_handler(SPAM_HANDLER)

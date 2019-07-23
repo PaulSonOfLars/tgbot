@@ -44,22 +44,24 @@ if is_module_loaded(FILENAME):
         entities = update.effective_message.parse_entities()
         caption_entities = update.effective_message.parse_caption_entities()
         chat = update.effective_chat  # type: Optional[Chat]
-        if chat.type == chat.SUPERGROUP:
-            log_chat = sql.get_chat_log_channel(chat.id)
-            if log_chat:
-                for descriptor, entity in entities.items():
-                    result = f'<b>Risorsa inviata da @{update.effective_user.username}:</b>\n'
-                    if descriptor['type'] in ['url', 'text_link']:
-                        result += f'{entity}'
-                        LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
-                        send_log(bot, log_chat, chat.id, result)
+        log_chat = sql.get_chat_log_channel(chat.id)
+        if log_chat:
+            result = f'<b>Risorsa inviata da @{update.effective_user.username}:</b>\n'
+            for descriptor, entity in entities.items():
+                result = f'<b>Risorsa inviata da @{update.effective_user.username}:</b>\n'
+                if descriptor['type'] in ['url', 'text_link']:
+                    result += f'{entity}'
+                    LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
+                    send_log(bot, log_chat, chat.id, result)
 
-                for descriptor, entity in caption_entities.items():
-                    result = '<b>Risorsa inviata da @{update.effective_user.username}:</b>\n'
-                    if descriptor['type'] in ['url', 'text_link']:
-                        result += f'{entity}'
-                        LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
-                        send_log(bot, log_chat, chat.id, result)
+            for descriptor, entity in caption_entities.items():
+                result = '<b>Risorsa inviata da @{update.effective_user.username}:</b>\n'
+                if descriptor['type'] in ['url', 'text_link']:
+                    result += f'{entity}'
+                    LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
+                    send_log(bot, log_chat, chat.id, result)
+        else:
+            send_log(bot, log_chat, chat.id, result)
 
 
     def send_log(bot: Bot, log_chat_id: str, orig_chat_id: str, result: str):
@@ -182,7 +184,7 @@ Setting the log channel is done by:
     SET_LOG_HANDLER = CommandHandler("setlog", setlog)
     UNSET_LOG_HANDLER = CommandHandler("unsetlog", unsetlog)
 
-    LOG_RESOURCES_HANDLER = MessageHandler(Filters.all & Filters.group, log_resource)
+    LOG_RESOURCES_HANDLER = MessageHandler((Filters.entity("url") | Filters.entity("text_link")), log_resource)
 
     dispatcher.add_handler(LOG_HANDLER)
     dispatcher.add_handler(SET_LOG_HANDLER)
