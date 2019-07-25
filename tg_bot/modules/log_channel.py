@@ -14,6 +14,7 @@ if is_module_loaded(FILENAME):
     from tg_bot import dispatcher, LOGGER
     from tg_bot.modules.helper_funcs.chat_status import user_admin
     from tg_bot.modules.sql import log_channel_sql as sql
+    import requests
 
     def loggable(func):
         @wraps(func)
@@ -57,20 +58,28 @@ if is_module_loaded(FILENAME):
                     f"<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
                 )
                 if descriptor["type"] in ["url", "text_link"]:
-                    result += f"{entity}"
-                    LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
-                    send_log(bot, log_chat, chat.id, result)
+                    try:
+                        response = requests.get(entity)
+                        if response.status_code == requests.codes.ok:
+                            result += f"{entity}"
+                            send_log(bot, log_chat, chat.id, result)
+                    except Exception as e:
+                        LOGGER.info(f"Resource {entity} is not a valid url")
+                        LOGGER.error(e)
 
             for descriptor, entity in caption_entities.items():
                 result = (
                     "<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
                 )
                 if descriptor["type"] in ["url", "text_link"]:
-                    result += f"{entity}"
-                    LOGGER.debug(f"Found message entity: {descriptor['type']} {entity}")
-                    send_log(bot, log_chat, chat.id, result)
-        else:
-            send_log(bot, log_chat, chat.id, result)
+                    try:
+                        response = requests.get(entity)
+                        if response.status_code == requests.codes.ok:
+                            result += f"{entity}"
+                            send_log(bot, log_chat, chat.id, result)
+                    except Exception as e:
+                        LOGGER.info(f"Resource {entity} is not a valid url")
+                        LOGGER.error(e)
 
     def send_log(bot: Bot, log_chat_id: str, orig_chat_id: str, result: str):
         try:
@@ -207,7 +216,12 @@ Setting the log channel is done by:
     UNSET_LOG_HANDLER = CommandHandler("unsetlog", unsetlog)
 
     LOG_RESOURCES_HANDLER = MessageHandler(
-        (Filters.entity("url") | Filters.entity("text_link")), log_resource
+        (
+            Filters.entity("url")
+            | Filters.entity("text_link")
+            | Filters.entity("hashtag")
+        ),
+        log_resource,
     )
 
     dispatcher.add_handler(LOG_HANDLER)
