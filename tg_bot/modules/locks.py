@@ -107,12 +107,12 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=True)
-                message.reply_text("Locked {} messages for all non-admins!".format(args[0]))
+                message.reply_text("Bloccati i messaggi che contengono {} per tutti i non admin!".format(args[0]))
 
                 return "<b>{}:</b>" \
                        "\n#LOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nLocked <code>{}</code>.".format(html.escape(chat.title),
+                       "\nBloccato <code>{}</code>.".format(html.escape(chat.title),
                                                           mention_html(user.id, user.first_name), args[0])
 
             elif args[0] in RESTRICTION_TYPES:
@@ -121,18 +121,17 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
                     members = users_sql.get_chat_members(str(chat.id))
                     restr_members(bot, chat.id, members, messages=True, media=True, other=True)
 
-                message.reply_text("Locked {} for all non-admins!".format(args[0]))
+                message.reply_text("Bloccati i {} per tutti i non admin!".format(args[0]))
                 return "<b>{}:</b>" \
                        "\n#LOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nLocked <code>{}</code>.".format(html.escape(chat.title),
+                       "\nBloccato <code>{}</code>.".format(html.escape(chat.title),
                                                           mention_html(user.id, user.first_name), args[0])
 
             else:
-                message.reply_text("What are you trying to lock...? Try /locktypes for the list of lockables")
-
+                message.reply_text("Cosa stai cercando ti bloccare...? Usa /locktypes per la lista degli elementi bloccabili.")
     else:
-        message.reply_text("I'm not an administrator, or haven't got delete rights.")
+        message.reply_text("Non sono un amministratore oppure non ho i permessi di cancellazione.")
 
     return ""
 
@@ -148,11 +147,11 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
         if len(args) >= 1:
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=False)
-                message.reply_text("Unlocked {} for everyone!".format(args[0]))
+                message.reply_text("Sbloccati i messaggi che contengono {} per tutti!".format(args[0]))
                 return "<b>{}:</b>" \
                        "\n#UNLOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nUnlocked <code>{}</code>.".format(html.escape(chat.title),
+                       "\nSbloccato <code>{}</code>.".format(html.escape(chat.title),
                                                             mention_html(user.id, user.first_name), args[0])
 
             elif args[0] in RESTRICTION_TYPES:
@@ -179,13 +178,13 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
                 return "<b>{}:</b>" \
                        "\n#UNLOCK" \
                        "\n<b>Admin:</b> {}" \
-                       "\nUnlocked <code>{}</code>.".format(html.escape(chat.title),
+                       "\nSbloccato <code>{}</code>.".format(html.escape(chat.title),
                                                             mention_html(user.id, user.first_name), args[0])
             else:
-                message.reply_text("What are you trying to unlock...? Try /locktypes for the list of lockables")
+                message.reply_text("Cosa stai cercando ti sbloccare...? Usa /locktypes per la lista degli elementi bloccabili.")
 
         else:
-            bot.sendMessage(chat.id, "What are you trying to unlock...?")
+            bot.sendMessage(chat.id, "Cosa stai cercando ti sbloccare...?")
 
     return ""
 
@@ -203,12 +202,12 @@ def del_lockables(bot: Bot, update: Update):
                 for new_mem in new_members:
                     if new_mem.is_bot:
                         if not is_bot_admin(chat, bot.id):
-                            message.reply_text("I see a bot, and I've been told to stop them joining... "
-                                               "but I'm not admin!")
+                            message.reply_text("Vedo un bot, mi è stato detto di non permettergli di unirsi... "
+                                               "ma non sono un admin!")
                             return
 
                         chat.kick_member(new_mem.id)
-                        message.reply_text("Only admins are allowed to add bots to this chat! Get outta here.")
+                        message.reply_text("Solo gli admin sono autorizzati ad aggiungere bot a questo gruppo! Fuori di qui.")
             else:
                 try:
                     message.delete()
@@ -242,9 +241,9 @@ def build_lock_message(chat_id):
     locks = sql.get_locks(chat_id)
     restr = sql.get_restr(chat_id)
     if not (locks or restr):
-        res = "There are no current locks in this chat."
+        res = "Attualmente non ci sono elementi bloccati in questo gruppo."
     else:
-        res = "These are the locks in this chat:"
+        res = "In questo gruppo questi sono gli elementi bloccati:"
         if locks:
             res += "\n - sticker = `{}`" \
                    "\n - audio = `{}`" \
@@ -291,18 +290,18 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /locktypes: a list of possible locktypes
+ - /locktypes: lista degli elementi bloccabili
 
-*Admin only:*
- - /lock <type>: lock items of a certain type (not available in private)
- - /unlock <type>: unlock items of a certain type (not available in private)
- - /locks: the current list of locks in this chat.
+*Solo admin:*
+ - /lock <type>: blocca un elemento di un certo tipo (non diponibile in privato)
+ - /unlock <type>: sblocca un elemento di un certo tipo (non diponibile in privato)
+ - /locks: lista degli attuali elementi bloccati
 
-Locks can be used to restrict a group's users.
+I blocchi possono essere usati per limitare gli utenti di un gruppo.
 eg:
-Locking urls will auto-delete all messages with urls, locking stickers will delete all \
-stickers, etc.
-Locking bots will stop non-admins from adding bots to the chat.
+Bloccare gli url cancellerà automaticamente tutti i messaggi contententi url, \
+bloccare gli stickers farà lo stesso con tutti i messaggi di quel tipo, ecc.
+Bloccare i bot impedirà ai non admin di aggiungere bot al gruppo.
 """
 
 __mod_name__ = "Locks"
