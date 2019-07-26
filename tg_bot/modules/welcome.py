@@ -16,6 +16,8 @@ from tg_bot.modules.helper_funcs.string_handling import markdown_parser, \
     escape_invalid_curly_brackets
 from tg_bot.modules.log_channel import loggable
 
+import requests as req
+
 VALID_WELCOME_FORMATTERS = ['first', 'last', 'fullname', 'username', 'id', 'count', 'chatname', 'mention']
 
 ENUM_FUNC_MAP = {
@@ -75,6 +77,21 @@ def send(update, message, keyboard, backup_message):
 
     return msg
 
+def CasBanned(userid):
+    # Query cas
+    try: # Just in case the CAS api endpoint goes down
+        response = req.get("https://combot.org/api/cas/check?user_id="+char(userid))
+        response = response.json()
+        # if true the user should be banned
+        if response["ok"] == True:
+            return True # The user should be banned
+        else:
+            return False # The user should not be banned
+    except Exception as e:
+        LOGGER.warning(e)
+        return False
+    
+
 
 @run_async
 def new_member(bot: Bot, update: Update):
@@ -85,53 +102,84 @@ def new_member(bot: Bot, update: Update):
         sent = None
         new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
-            # Give the owner a special welcome
-            if new_mem.id == OWNER_ID:
-                update.effective_message.reply_text("È arrivato il capooooo, diamo il via alla festa!")
-                continue
+            # Check if the user is cas-banned
+            if not CasBanned(new_mem.id):
+                # Give the owner a special welcome
+                if new_mem.id == OWNER_ID:
+                    update.effective_message.reply_text("È arrivato il capooooo, diamo il via alla festa!")
+                    continue
 
-            # Don't welcome yourself
-            elif new_mem.id == bot.id:
-                continue
+                # Don't welcome yourself
+                elif new_mem.id == bot.id:
+                    continue
+
+                else:
+                    # Muting new users
+                    bot.restrict_chat_member(chat.id, new_mem.id, can_send_messages=False)
+
+                    # If welcome message is media, send with appropriate function
+                    if welc_type != sql.Types.TEXT and welc_type != sql.Types.BUTTON_TEXT:
+                        ENUM_FUNC_MAP[welc_type](chat.id, cust_welcome)
+                        return
+                    # else, move on
+                    first_name = new_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
+
+                    if cust_welcome:
+                        if new_mem.last_name:
+                            fullname = "{} {}".format(first_name, new_mem.last_name)
+                        else:
+                            fullname = first_name
+                        count = chat.get_members_count()
+                        mention = mention_markdown(new_mem.id, first_name)
+                        if new_mem.username:
+                            username = "@" + escape_markdown(new_mem.username)
+                        else:
+                            username = mention
+
+                        valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
+                        res = valid_format.format(first=escape_markdown(first_name),
+                                                  last=escape_markdown(new_mem.last_name or first_name),
+                                                  fullname=escape_markdown(fullname), username=username, mention=mention,
+                                                  count=count, chatname=escape_markdown(chat.title), id=new_mem.id)
+                        buttons = sql.get_welc_buttons(chat.id)
+                        keyb = build_keyboard(buttons)
+                    else:
+                        res = sql.DEFAULT_WELCOME.format(first=first_name)
+                        keyb = []
+
+                    keyboard = InlineKeyboardMarkup(keyb)
+
+                    sent = send(update, res, keyboard,
+                                sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
 
             else:
-                # Muting new users
-                bot.restrict_chat_member(chat.id, new_mem.id, can_send_messages=False)
+                # BEGINNING THE BAN
+                log = "<b>CAS BAN:</b>" \
+                      "\n#CASBAN" \
+                      "\n<b>User:</b> {}".format(new_mem.id)
 
-                # If welcome message is media, send with appropriate function
-                if welc_type != sql.Types.TEXT and welc_type != sql.Types.BUTTON_TEXT:
-                    ENUM_FUNC_MAP[welc_type](chat.id, cust_welcome)
-                    return
-                # else, move on
-                first_name = new_mem.first_name or "PersonWithNoName"  # edge case of empty name - occurs for some bugs.
+                reason = "Ban via CAS api query"
 
-                if cust_welcome:
-                    if new_mem.last_name:
-                        fullname = "{} {}".format(first_name, new_mem.last_name)
+                if reason:
+                    log += "\n<b>Motivo:</b> {}".format(reason)
+
+                user_id = new_mem.id
+                try:
+                    chat.kick_member(user_id)
+                    bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+                    message.reply_text("BANNATO VIA SISTEMA AUTOMATICO CAS!")
+                    return log
+
+                except BadRequest as excp:
+                    if excp.message == "Reply message not found":
+                        # Do not reply
+                        message.reply_text('BANNATO!', quote=False)
+                        return log
                     else:
-                        fullname = first_name
-                    count = chat.get_members_count()
-                    mention = mention_markdown(new_mem.id, first_name)
-                    if new_mem.username:
-                        username = "@" + escape_markdown(new_mem.username)
-                    else:
-                        username = mention
-
-                    valid_format = escape_invalid_curly_brackets(cust_welcome, VALID_WELCOME_FORMATTERS)
-                    res = valid_format.format(first=escape_markdown(first_name),
-                                              last=escape_markdown(new_mem.last_name or first_name),
-                                              fullname=escape_markdown(fullname), username=username, mention=mention,
-                                              count=count, chatname=escape_markdown(chat.title), id=new_mem.id)
-                    buttons = sql.get_welc_buttons(chat.id)
-                    keyb = build_keyboard(buttons)
-                else:
-                    res = sql.DEFAULT_WELCOME.format(first=first_name)
-                    keyb = []
-
-                keyboard = InlineKeyboardMarkup(keyb)
-
-                sent = send(update, res, keyboard,
-                            sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
+                        LOGGER.warning(update)
+                        LOGGER.exception("ERROR in CAS banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id,
+                                         excp.message)
+                        message.reply_text("Diamine, non riesco a bannare questo utente.")
 
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:
