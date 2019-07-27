@@ -294,7 +294,7 @@ def CoCDone(bot: Bot, update: Update):
         #    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(text="Torna sul gruppo", callback_data="buttonurl://t.me/TheElectusBot?start=-1001082749604")]]))
         update.effective_message.reply_text(COC_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
         # Deactivating mute
-        bot.restrict_chat_member(chat.id, int(user.id),
+        bot.restrict_chat_member(DEFAULT_CHAT_ID, int(user.id),
                                          can_send_messages=True,
                                          can_send_media_messages=True,
                                          can_send_other_messages=True,
