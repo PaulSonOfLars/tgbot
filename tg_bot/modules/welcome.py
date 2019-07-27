@@ -77,7 +77,7 @@ def send(update, message, keyboard, backup_message):
 
     return msg
 
-def CasBanned(userid):
+def cas_banned(userid):
     # Query cas
     try: # Just in case the CAS api endpoint goes down
         response = req.get("https://combot.org/api/cas/check?user_id="+char(userid))
@@ -103,7 +103,7 @@ def new_member(bot: Bot, update: Update):
         new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
             # Check if the user is cas-banned
-            if not CasBanned(new_mem.id):
+            if not cas_banned(new_mem.id):
                 # Give the owner a special welcome
                 if new_mem.id == OWNER_ID:
                     update.effective_message.reply_text("È arrivato il capooooo, diamo il via alla festa!")
@@ -166,7 +166,7 @@ def new_member(bot: Bot, update: Update):
                 user_id = new_mem.id
                 try:
                     chat.kick_member(user_id)
-                    bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
+                    bot.send_sticker(chat.id, BAN_STICKER)  # banhammer electus sticker
                     message.reply_text("BANNATO VIA SISTEMA AUTOMATICO CAS!")
                     return log
 
