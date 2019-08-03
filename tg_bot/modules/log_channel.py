@@ -5,7 +5,7 @@ from tg_bot.modules.helper_funcs.misc import is_module_loaded
 FILENAME = __name__.rsplit(".", 1)[-1]
 
 if is_module_loaded(FILENAME):
-    from telegram import Bot, Update, ParseMode, Message, Chat
+    from telegram import Bot, Update, ParseMode, Message, Chat, MessageEntity
     from telegram.error import BadRequest, Unauthorized
     from telegram.ext import CommandHandler, MessageHandler, run_async
     from telegram.utils.helpers import escape_markdown
@@ -15,6 +15,7 @@ if is_module_loaded(FILENAME):
     from tg_bot.modules.helper_funcs.chat_status import user_admin
     from tg_bot.modules.sql import log_channel_sql as sql
     import requests
+    import tldextract
 
     def loggable(func):
         @wraps(func)
@@ -49,19 +50,37 @@ if is_module_loaded(FILENAME):
     def log_resource(bot: Bot, update: Update):
         entities = update.effective_message.parse_entities()
         caption_entities = update.effective_message.parse_caption_entities()
+        LOGGER.info(entities)
         chat = update.effective_chat  # type: Optional[Chat]
         log_chat = sql.get_chat_log_channel(chat.id)
+
+        url = None
+        tags = []
+
         if log_chat:
-            result = f"<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
+            for descriptor, entity in entities.items():
+                if descriptor["type"] == MessageEntity.HASHTAG:
+                    tags.append(entity)
+            if tags:
+                tags.sort()
+
             for descriptor, entity in entities.items():
                 result = (
                     f"<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
                 )
-                if descriptor["type"] in ["url", "text_link"]:
+                if descriptor["type"] == MessageEntity.URL:
+                    extracted = tldextract.extract(entity)
+                    if f"#{extracted.domain}" not in tags:
+                        tags.append(f"#{extracted.domain}")
+                        tags.sort()
+                if descriptor["type"] in [MessageEntity.URL, MessageEntity.TEXT_LINK]:
                     try:
                         response = requests.get(entity)
                         if response.status_code == requests.codes.ok:
                             result += f"{entity}"
+                            if tags:
+                                tags_string = " ".join(tags)
+                                result += f"\n\nTags:\n{tags_string}"
                             send_log(bot, log_chat, chat.id, result)
                     except Exception as e:
                         LOGGER.info(f"Resource {entity} is not a valid url")
@@ -71,11 +90,19 @@ if is_module_loaded(FILENAME):
                 result = (
                     "<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
                 )
-                if descriptor["type"] in ["url", "text_link"]:
+                if descriptor["type"] == MessageEntity.URL:
+                    extracted = tldextract.extract(entity)
+                    if f"#{extracted.domain}" not in tags:
+                        tags.append(f"#{extracted.domain}")
+                        tags.sort()
+                if descriptor["type"] in [MessageEntity.URL, MessageEntity.TEXT_LINK]:
                     try:
                         response = requests.get(entity)
                         if response.status_code == requests.codes.ok:
                             result += f"{entity}"
+                            if tags:
+                                tags_string = " ".join(tags)
+                                result += f"\n\nTags:\n{tags_string}"
                             send_log(bot, log_chat, chat.id, result)
                     except Exception as e:
                         LOGGER.info(f"Resource {entity} is not a valid url")
