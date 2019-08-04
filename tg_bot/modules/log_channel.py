@@ -68,16 +68,32 @@ if is_module_loaded(FILENAME):
                 result = (
                     f"<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
                 )
+
                 if descriptor["type"] == MessageEntity.URL:
-                    extracted = tldextract.extract(entity)
-                    if f"#{extracted.domain}" not in tags:
-                        tags.append(f"#{extracted.domain}")
-                        tags.sort()
-                if descriptor["type"] in [MessageEntity.URL, MessageEntity.TEXT_LINK]:
                     try:
                         response = requests.get(entity)
                         if response.status_code == requests.codes.ok:
                             result += f"{entity}"
+                            extracted = tldextract.extract(entity)
+                            if f"#{extracted.domain}" not in tags:
+                                tags.append(f"#{extracted.domain}")
+                                tags.sort()
+                            if tags:
+                                tags_string = " ".join(tags)
+                                result += f"\n\nTags:\n{tags_string}"
+                            send_log(bot, log_chat, chat.id, result)
+                    except Exception as e:
+                        LOGGER.info(f"Resource {entity} is not a valid url")
+                        LOGGER.error(e)
+                elif descriptor["type"] == MessageEntity.TEXT_LINK:
+                    try:
+                        response = requests.get(descriptor["url"])
+                        if response.status_code == requests.codes.ok:
+                            result += f'{descriptor["url"]}'
+                            extracted = tldextract.extract(descriptor["url"])
+                            if f"#{extracted.domain}" not in tags:
+                                tags.append(f"#{extracted.domain}")
+                                tags.sort()
                             if tags:
                                 tags_string = " ".join(tags)
                                 result += f"\n\nTags:\n{tags_string}"
@@ -91,15 +107,30 @@ if is_module_loaded(FILENAME):
                     "<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
                 )
                 if descriptor["type"] == MessageEntity.URL:
-                    extracted = tldextract.extract(entity)
-                    if f"#{extracted.domain}" not in tags:
-                        tags.append(f"#{extracted.domain}")
-                        tags.sort()
-                if descriptor["type"] in [MessageEntity.URL, MessageEntity.TEXT_LINK]:
                     try:
                         response = requests.get(entity)
                         if response.status_code == requests.codes.ok:
                             result += f"{entity}"
+                            extracted = tldextract.extract(entity)
+                            if f"#{extracted.domain}" not in tags:
+                                tags.append(f"#{extracted.domain}")
+                                tags.sort()
+                            if tags:
+                                tags_string = " ".join(tags)
+                                result += f"\n\nTags:\n{tags_string}"
+                            send_log(bot, log_chat, chat.id, result)
+                    except Exception as e:
+                        LOGGER.info(f"Resource {entity} is not a valid url")
+                        LOGGER.error(e)
+                elif descriptor["type"] == MessageEntity.TEXT_LINK:
+                    try:
+                        response = requests.get(descriptor["url"])
+                        if response.status_code == requests.codes.ok:
+                            result += f'{descriptor["url"]}'
+                            extracted = tldextract.extract(descriptor["url"])
+                            if f"#{extracted.domain}" not in tags:
+                                tags.append(f"#{extracted.domain}")
+                                tags.sort()
                             if tags:
                                 tags_string = " ".join(tags)
                                 result += f"\n\nTags:\n{tags_string}"
