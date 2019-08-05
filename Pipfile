@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+black = "*"
 
 [packages]
 future = "==0.17.1"
@@ -36,3 +37,6 @@ PyYAML = "==5.1.2"
 
 [requires]
 python_version = "3.6"
+
+[pipenv]
+allow_prereleases = true

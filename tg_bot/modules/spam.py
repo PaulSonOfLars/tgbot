@@ -5,7 +5,8 @@ from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 
 
-FORBIDDEN_ENTITY_TYPES = ['url', 'text_link', 'email', 'phone_number']
+FORBIDDEN_ENTITY_TYPES = ["url", "text_link", "email", "phone_number"]
+
 
 @run_async
 @bot_can_delete
@@ -38,6 +39,7 @@ def white_spam_add(bot: Bot, update: Update):
         pass
     else:
         update.effective_message.reply_text("Cosa vuoi aggiungere in whitelist?")
+
 
 SPAM_HANDLER = MessageHandler(Filters.all & Filters.group, spam_filter)
 WHITE_SPAM_HANDLER = CommandHandler("whitespam", white_spam_add)

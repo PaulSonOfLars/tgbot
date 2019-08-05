@@ -3,5 +3,5 @@ repos:
     rev: stable
     hooks:
     - id: black
-default_language_version: 
+default_language_version:
     python: python3.6

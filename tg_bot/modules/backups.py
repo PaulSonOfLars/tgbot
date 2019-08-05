@@ -22,8 +22,10 @@ def import_data(bot: Bot, update):
         try:
             file_info = bot.get_file(msg.reply_to_message.document.file_id)
         except BadRequest:
-            msg.reply_text("Prova a scaricare e ricaricare il file manualmente. "
-                           "Momentaneamente questa richiesta non può essere completata.")
+            msg.reply_text(
+                "Prova a scaricare e ricaricare il file manualmente. "
+                "Momentaneamente questa richiesta non può essere completata."
+            )
             return
 
         with BytesIO() as file:
@@ -33,24 +35,32 @@ def import_data(bot: Bot, update):
 
         # only import one group
         if len(data) > 1 and str(chat.id) not in data:
-            msg.reply_text("Ci sono più chat nello stesso file ma nessuno ha l'id di questa chat "
-                           "- come posso capire cosa importare qui?")
+            msg.reply_text(
+                "Ci sono più chat nello stesso file ma nessuno ha l'id di questa chat "
+                "- come posso capire cosa importare qui?"
+            )
             return
 
         # Select data source
         if str(chat.id) in data:
-            data = data[str(chat.id)]['hashes']
+            data = data[str(chat.id)]["hashes"]
         else:
-            data = data[list(data.keys())[0]]['hashes']
+            data = data[list(data.keys())[0]]["hashes"]
 
         try:
             for mod in DATA_IMPORT:
                 mod.__import_data__(str(chat.id), data)
         except Exception:
-            msg.reply_text("Un eccezione è avvenuto mentre provavo a ripristinare i messaggi. Il processo potrebbe non essere completo. Se"
-                           "hai problemi con il file ti consiglio di inviarlo al gruppo admin e in modo da debuggarlo. "
-                           "I report su github sono molto apprezzati! Grazie! :)")
-            LOGGER.exception("Import for chatid %s with name %s failed.", str(chat.id), str(chat.title))
+            msg.reply_text(
+                "Un eccezione è avvenuto mentre provavo a ripristinare i messaggi. Il processo potrebbe non essere completo. Se"
+                "hai problemi con il file ti consiglio di inviarlo al gruppo admin e in modo da debuggarlo. "
+                "I report su github sono molto apprezzati! Grazie! :)"
+            )
+            LOGGER.exception(
+                "Import for chatid %s with name %s failed.",
+                str(chat.id),
+                str(chat.title),
+            )
             return
 
         # TODO: some of that link logic

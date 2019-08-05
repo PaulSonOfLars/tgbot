@@ -10,7 +10,14 @@ from telegram import ParseMode
 from telegram.ext import CommandHandler, run_async, Filters
 from telegram.utils.helpers import escape_markdown, mention_html
 
-from tg_bot import dispatcher, OWNER_ID, SUDO_USERS, SUPPORT_USERS, WHITELIST_USERS, BAN_STICKER
+from tg_bot import (
+    dispatcher,
+    OWNER_ID,
+    SUDO_USERS,
+    SUPPORT_USERS,
+    WHITELIST_USERS,
+    BAN_STICKER,
+)
 from tg_bot.__main__ import GDPR
 from tg_bot.__main__ import STATS, USER_INFO
 from tg_bot.modules.disable import DisableAbleCommandHandler
@@ -60,7 +67,7 @@ SLAP_TEMPLATES = (
     "{user1} ha lanciato un {item} a {user2}.",
     "{user1} ha cominciato a schiaffeggiare {user2} violentemente con un {item}.",
     "{user1} ha preso un {item} e {hits} {user2} con questo.",
-    "{user1} ha spintonato in modo gentile {user2} per insegnarli a nuotare nella lava."
+    "{user1} ha spintonato in modo gentile {user2} per insegnarli a nuotare nella lava.",
 )
 
 ITEMS = (
@@ -94,20 +101,9 @@ ITEMS = (
     "carico di mattoni",
 )
 
-THROW = (
-    "getta",
-    "scaglia",
-    "lancia",
-    "scaraventa",
-)
+THROW = ("getta", "scaglia", "lancia", "scaraventa")
 
-HIT = (
-    "colpisce",
-    "bastona",
-    "sciaffeggia",
-    "spacca",
-    "colpisce con violenza",
-)
+HIT = ("colpisce", "bastona", "sciaffeggia", "spacca", "colpisce con violenza")
 
 GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
 GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
@@ -123,13 +119,17 @@ def slap(bot: Bot, update: Update, args: List[str]):
     msg = update.effective_message  # type: Optional[Message]
 
     # reply to correct message
-    reply_text = msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
+    reply_text = (
+        msg.reply_to_message.reply_text if msg.reply_to_message else msg.reply_text
+    )
 
     # get user who sent message
     if msg.from_user.username:
         curr_user = "@" + escape_markdown(msg.from_user.username)
     else:
-        curr_user = "[{}](tg://user?id={})".format(msg.from_user.first_name, msg.from_user.id)
+        curr_user = "[{}](tg://user?id={})".format(
+            msg.from_user.first_name, msg.from_user.id
+        )
 
     user_id = extract_user(update.effective_message, args)
     if user_id:
@@ -138,8 +138,9 @@ def slap(bot: Bot, update: Update, args: List[str]):
         if slapped_user.username:
             user2 = "@" + escape_markdown(slapped_user.username)
         else:
-            user2 = "[{}](tg://user?id={})".format(slapped_user.first_name,
-                                                   slapped_user.id)
+            user2 = "[{}](tg://user?id={})".format(
+                slapped_user.first_name, slapped_user.id
+            )
 
     # if no target found, bot targets the sender
     else:
@@ -169,7 +170,10 @@ def get_bot_ip(bot: Bot, update: Update):
 def get_id(bot: Bot, update: Update, args: List[str]):
     user_id = extract_user(update.effective_message, args)
     if user_id:
-        if update.effective_message.reply_to_message and update.effective_message.reply_to_message.forward_from:
+        if (
+            update.effective_message.reply_to_message
+            and update.effective_message.reply_to_message.forward_from
+        ):
             user1 = update.effective_message.reply_to_message.from_user
             user2 = update.effective_message.reply_to_message.forward_from
             update.effective_message.reply_text(
@@ -177,21 +181,28 @@ def get_id(bot: Bot, update: Update, args: List[str]):
                     escape_markdown(user2.first_name),
                     user2.id,
                     escape_markdown(user1.first_name),
-                    user1.id),
-                parse_mode=ParseMode.MARKDOWN)
+                    user1.id,
+                ),
+                parse_mode=ParseMode.MARKDOWN,
+            )
         else:
             user = bot.get_chat(user_id)
-            update.effective_message.reply_text("L'id di {} è `{}`.".format(escape_markdown(user.first_name), user.id),
-                                                parse_mode=ParseMode.MARKDOWN)
+            update.effective_message.reply_text(
+                "L'id di {} è `{}`.".format(escape_markdown(user.first_name), user.id),
+                parse_mode=ParseMode.MARKDOWN,
+            )
     else:
         chat = update.effective_chat  # type: Optional[Chat]
         if chat.type == "private":
-            update.effective_message.reply_text("Il tuo id è `{}`.".format(chat.id),
-                                                parse_mode=ParseMode.MARKDOWN)
+            update.effective_message.reply_text(
+                "Il tuo id è `{}`.".format(chat.id), parse_mode=ParseMode.MARKDOWN
+            )
 
         else:
-            update.effective_message.reply_text("L'id di questo gruppo è `{}`.".format(chat.id),
-                                                parse_mode=ParseMode.MARKDOWN)
+            update.effective_message.reply_text(
+                "L'id di questo gruppo è `{}`.".format(chat.id),
+                parse_mode=ParseMode.MARKDOWN,
+            )
 
 
 @run_async
@@ -205,18 +216,26 @@ def info(bot: Bot, update: Update, args: List[str]):
     elif not msg.reply_to_message and not args:
         user = msg.from_user
 
-    elif not msg.reply_to_message and (not args or (
-            len(args) >= 1 and not args[0].startswith("@") and not args[0].isdigit() and not msg.parse_entities(
-        [MessageEntity.TEXT_MENTION]))):
+    elif not msg.reply_to_message and (
+        not args
+        or (
+            len(args) >= 1
+            and not args[0].startswith("@")
+            and not args[0].isdigit()
+            and not msg.parse_entities([MessageEntity.TEXT_MENTION])
+        )
+    ):
         msg.reply_text("Non posso ricavare l'utente in questo modo.")
         return
 
     else:
         return
 
-    text = "<b>Informazioni utente</b>:" \
-           "\nID: <code>{}</code>" \
-           "\nNome: {}".format(user.id, html.escape(user.first_name))
+    text = (
+        "<b>Informazioni utente</b>:"
+        "\nID: <code>{}</code>"
+        "\nNome: {}".format(user.id, html.escape(user.first_name))
+    )
 
     if user.last_name:
         text += "\nCognome: {}".format(html.escape(user.last_name))
@@ -230,16 +249,22 @@ def info(bot: Bot, update: Update, args: List[str]):
         text += "\n\nQuesta persona è il mio proprietario - Non gli farei mai nulla!"
     else:
         if user.id in SUDO_USERS:
-            text += "\nQuesto utente è uno dei miei sudo user! " \
-                    "Forte quasi come il mio proprietario - quindi stai attento."
+            text += (
+                "\nQuesto utente è uno dei miei sudo user! "
+                "Forte quasi come il mio proprietario - quindi stai attento."
+            )
         else:
             if user.id in SUPPORT_USERS:
-                text += "\nQuesta persona è uno dei miei supporter! " \
-                        "Non proprio uno sudo user, ma può ancora gbannarti."
+                text += (
+                    "\nQuesta persona è uno dei miei supporter! "
+                    "Non proprio uno sudo user, ma può ancora gbannarti."
+                )
 
             if user.id in WHITELIST_USERS:
-                text += "\nQuesta persona è stata whitelistata! " \
-                        "Questo significa che non posso bannare/kickkare."
+                text += (
+                    "\nQuesta persona è stata whitelistata! "
+                    "Questo significa che non posso bannare/kickkare."
+                )
 
     for mod in USER_INFO:
         mod_info = mod.__user_info__(user.id).strip()
@@ -261,21 +286,21 @@ def get_time(bot: Bot, update: Update, args: List[str]):
 
     if res.status_code == 200:
         loc = json.loads(res.text)
-        if loc.get('status') == 'OK':
-            lat = loc['results'][0]['geometry']['location']['lat']
-            long = loc['results'][0]['geometry']['location']['lng']
+        if loc.get("status") == "OK":
+            lat = loc["results"][0]["geometry"]["location"]["lat"]
+            long = loc["results"][0]["geometry"]["location"]["lng"]
 
             country = None
             city = None
 
-            address_parts = loc['results'][0]['address_components']
+            address_parts = loc["results"][0]["address_components"]
             for part in address_parts:
-                if 'country' in part['types']:
-                    country = part.get('long_name')
-                if 'administrative_area_level_1' in part['types'] and not city:
-                    city = part.get('long_name')
-                if 'locality' in part['types']:
-                    city = part.get('long_name')
+                if "country" in part["types"]:
+                    country = part.get("long_name")
+                if "administrative_area_level_1" in part["types"] and not city:
+                    city = part.get("long_name")
+                if "locality" in part["types"]:
+                    city = part.get("long_name")
 
             if city and country:
                 location = "{}, {}".format(city, country)
@@ -283,11 +308,16 @@ def get_time(bot: Bot, update: Update, args: List[str]):
                 location = country
 
             timenow = int(datetime.utcnow().timestamp())
-            res = requests.get(GMAPS_TIME, params=dict(location="{},{}".format(lat, long), timestamp=timenow))
+            res = requests.get(
+                GMAPS_TIME,
+                params=dict(location="{},{}".format(lat, long), timestamp=timenow),
+            )
             if res.status_code == 200:
-                offset = json.loads(res.text)['dstOffset']
-                timestamp = json.loads(res.text)['rawOffset']
-                time_there = datetime.fromtimestamp(timenow + timestamp + offset).strftime("%H:%M:%S on %A %d %B")
+                offset = json.loads(res.text)["dstOffset"]
+                timestamp = json.loads(res.text)["rawOffset"]
+                time_there = datetime.fromtimestamp(
+                    timenow + timestamp + offset
+                ).strftime("%H:%M:%S on %A %d %B")
                 update.message.reply_text("It's {} in {}".format(time_there, location))
 
 
@@ -304,18 +334,22 @@ def echo(bot: Bot, update: Update):
 
 @run_async
 def gdpr(bot: Bot, update: Update):
-    update.effective_message.reply_text("Elimino informazioni che possono identificarti...")
+    update.effective_message.reply_text(
+        "Elimino informazioni che possono identificarti..."
+    )
     for mod in GDPR:
         mod.__gdpr__(update.effective_user.id)
 
-    update.effective_message.reply_text("Le tue informazioni personali sono state eliminate.\n\nNota bene che questo non ti unbannerà "
-                                        "da nessuna chat. "
-                                        "Flooding, warns, e gbans sono anch'essi salvati secondo "
-                                        "[questo](https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/individual-rights/right-to-erasure/), "
-                                        "che afferma chiaramente che il diritto alla cancellazione non si applica "
-                                        "\"per l'esecuzione di un compito svolto nell'interesse pubblico\", come nel "
-                                        "caso per i dati di cui sopra.",
-                                        parse_mode=ParseMode.MARKDOWN)
+    update.effective_message.reply_text(
+        "Le tue informazioni personali sono state eliminate.\n\nNota bene che questo non ti unbannerà "
+        "da nessuna chat. "
+        "Flooding, warns, e gbans sono anch'essi salvati secondo "
+        "[questo](https://ico.org.uk/for-organisations/guide-to-the-general-data-protection-regulation-gdpr/individual-rights/right-to-erasure/), "
+        "che afferma chiaramente che il diritto alla cancellazione non si applica "
+        "\"per l'esecuzione di un compito svolto nell'interesse pubblico\", come nel "
+        "caso per i dati di cui sopra.",
+        parse_mode=ParseMode.MARKDOWN,
+    )
 
 
 MARKDOWN_HELP = """
@@ -340,21 +374,29 @@ Se vuoi più pulsanti sulla stessa riga, usa :same, in quanto tale:
 Questo creerà due pulsanti su una singola riga, invece di un pulsante per riga.
 
 Tieni presente che il tuo messaggio <b> DEVE </ b> contenere del testo diverso da un semplice pulsante!
-""".format(dispatcher.bot.first_name)
+""".format(
+    dispatcher.bot.first_name
+)
 
 
 @run_async
 def markdown_help(bot: Bot, update: Update):
     update.effective_message.reply_text(MARKDOWN_HELP, parse_mode=ParseMode.HTML)
-    update.effective_message.reply_text("Try forwarding the following message to me, and you'll see!")
-    update.effective_message.reply_text("/save test This is a markdown test. _italics_, *bold*, `code`, "
-                                        "[URL](example.com) [button](buttonurl:github.com) "
-                                        "[button2](buttonurl://google.com:same)")
+    update.effective_message.reply_text(
+        "Try forwarding the following message to me, and you'll see!"
+    )
+    update.effective_message.reply_text(
+        "/save test This is a markdown test. _italics_, *bold*, `code`, "
+        "[URL](example.com) [button](buttonurl:github.com) "
+        "[button2](buttonurl://google.com:same)"
+    )
 
 
 @run_async
 def stats(bot: Bot, update: Update):
-    update.effective_message.reply_text("Stats attuali:\n" + "\n".join([mod.__stats__() for mod in STATS]))
+    update.effective_message.reply_text(
+        "Stats attuali:\n" + "\n".join([mod.__stats__() for mod in STATS])
+    )
 
 
 # /ip is for private use

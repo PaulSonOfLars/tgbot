@@ -28,9 +28,14 @@ def get_note_type(msg: Message):
     buttons = []
     # determine what the contents of the filter are - text, image, sticker, etc
     if len(args) >= 3:
-        offset = len(args[2]) - len(raw_text)  # set correct offset relative to command + notename
-        text, buttons = button_markdown_parser(args[2], entities=msg.parse_entities() or msg.parse_caption_entities(),
-                                               offset=offset)
+        offset = len(args[2]) - len(
+            raw_text
+        )  # set correct offset relative to command + notename
+        text, buttons = button_markdown_parser(
+            args[2],
+            entities=msg.parse_entities() or msg.parse_caption_entities(),
+            offset=offset,
+        )
         if buttons:
             data_type = Types.BUTTON_TEXT
         else:
@@ -40,8 +45,7 @@ def get_note_type(msg: Message):
         entities = msg.reply_to_message.parse_entities()
         msgtext = msg.reply_to_message.text or msg.reply_to_message.caption
         if len(args) >= 2 and msg.reply_to_message.text:  # not caption, text
-            text, buttons = button_markdown_parser(msgtext,
-                                                   entities=entities)
+            text, buttons = button_markdown_parser(msgtext, entities=entities)
             if buttons:
                 data_type = Types.BUTTON_TEXT
             else:
@@ -90,8 +94,12 @@ def get_welcome_type(msg: Message):
     buttons = []
     # determine what the contents of the filter are - text, image, sticker, etc
     if len(args) >= 2:
-        offset = len(args[1]) - len(msg.text)  # set correct offset relative to command + notename
-        text, buttons = button_markdown_parser(args[1], entities=msg.parse_entities(), offset=offset)
+        offset = len(args[1]) - len(
+            msg.text
+        )  # set correct offset relative to command + notename
+        text, buttons = button_markdown_parser(
+            args[1], entities=msg.parse_entities(), offset=offset
+        )
         if buttons:
             data_type = Types.BUTTON_TEXT
         else:
