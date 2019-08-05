@@ -7,7 +7,11 @@ from telegram.ext import Filters, MessageHandler, CommandHandler, run_async
 from telegram.utils.helpers import mention_html
 
 from tg_bot import dispatcher
-from tg_bot.modules.helper_funcs.chat_status import is_user_admin, user_admin, can_restrict
+from tg_bot.modules.helper_funcs.chat_status import (
+    is_user_admin,
+    user_admin,
+    can_restrict,
+)
 from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import antiflood_sql as sql
 
@@ -35,25 +39,38 @@ def check_flood(bot: Bot, update: Update) -> str:
 
     try:
         chat.kick_member(user.id)
-        msg.reply_text("Non ti vergogni? Spammare in questo modo in un gruppo di gente civile? "
-                       "Sei una delusione. Addio.")
+        msg.reply_text(
+            "Non ti vergogni? Spammare in questo modo in un gruppo di gente civile? "
+            "Sei una delusione. Addio."
+        )
 
-        return "<b>{}:</b>" \
-               "\n#BAN" \
-               "\n<b>User:</b> {}" \
-               "\nFlood delo gruppo.".format(html.escape(chat.title),
-                                             mention_html(user.id, user.first_name))
+        return (
+            "<b>{}:</b>"
+            "\n#BAN"
+            "\n<b>User:</b> {}"
+            "\nFlood delo gruppo.".format(
+                html.escape(chat.title), mention_html(user.id, user.first_name)
+            )
+        )
 
     except BadRequest:
-        msg.reply_text("Non posso kickkare persone qui. Dammi i permessi così potrò disabilitare l'antiflood.")
+        msg.reply_text(
+            "Non posso kickkare persone qui. Dammi i permessi così potrò disabilitare l'antiflood."
+        )
         sql.set_flood(chat.id, 0)
-        return "<b>{}:</b>" \
-               "\n#INFO" \
-               "\nNon posso kickkare, quindi ho automaticamente disabilitare l'antiflood.".format(chat.title)
+        return (
+            "<b>{}:</b>"
+            "\n#INFO"
+            "\nNon posso kickkare, quindi ho automaticamente disabilitare l'antiflood.".format(
+                chat.title
+            )
+        )
+
 
 def check_msg_lenght_flood():
     # analysis of the number of characters in a message
     pass
+
 
 @run_async
 @user_admin
@@ -75,26 +92,41 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
             if amount <= 0:
                 sql.set_flood(chat.id, 0)
                 message.reply_text("L'antiflood è stato disabilitato.")
-                return "<b>{}:</b>" \
-                       "\n#SETFLOOD" \
-                       "\n<b>Admin:</b> {}" \
-                       "\nDisabilitazione antiflood.".format(html.escape(chat.title), mention_html(user.id, user.first_name))
+                return (
+                    "<b>{}:</b>"
+                    "\n#SETFLOOD"
+                    "\n<b>Admin:</b> {}"
+                    "\nDisabilitazione antiflood.".format(
+                        html.escape(chat.title), mention_html(user.id, user.first_name)
+                    )
+                )
 
             elif amount < 3:
-                message.reply_text("L'antiflood deve essere impostato a 0 (disabilitato), o un numero maggiore di 3!")
+                message.reply_text(
+                    "L'antiflood deve essere impostato a 0 (disabilitato), o un numero maggiore di 3!"
+                )
                 return ""
 
             else:
                 sql.set_flood(chat.id, amount)
-                message.reply_text("Modulo antiflood aggiornato e impostato a {}".format(amount))
-                return "<b>{}:</b>" \
-                       "\n#SETFLOOD" \
-                       "\n<b>Admin:</b> {}" \
-                       "\nAntiflood impostato a <code>{}</code>.".format(html.escape(chat.title),
-                                                                    mention_html(user.id, user.first_name), amount)
+                message.reply_text(
+                    "Modulo antiflood aggiornato e impostato a {}".format(amount)
+                )
+                return (
+                    "<b>{}:</b>"
+                    "\n#SETFLOOD"
+                    "\n<b>Admin:</b> {}"
+                    "\nAntiflood impostato a <code>{}</code>.".format(
+                        html.escape(chat.title),
+                        mention_html(user.id, user.first_name),
+                        amount,
+                    )
+                )
 
         else:
-            message.reply_text("Argomento non riconosciuto - usare un numero, 'off', oppure 'on'.")
+            message.reply_text(
+                "Argomento non riconosciuto - usare un numero, 'off', oppure 'on'."
+            )
 
     return ""
 
@@ -105,10 +137,15 @@ def flood(bot: Bot, update: Update):
 
     limit = sql.get_flood_limit(chat.id)
     if limit == 0:
-        update.effective_message.reply_text("Sto monitorando la chat alla ricerca di flooding!")
+        update.effective_message.reply_text(
+            "Sto monitorando la chat alla ricerca di flooding!"
+        )
     else:
         update.effective_message.reply_text(
-            "Bannerò gli utenti che invieranno più di {} messaggi consecutivi.".format(limit))
+            "Bannerò gli utenti che invieranno più di {} messaggi consecutivi.".format(
+                limit
+            )
+        )
 
 
 def __migrate__(old_chat_id, new_chat_id):
@@ -133,8 +170,12 @@ __help__ = """
 
 __mod_name__ = "AntiFlood"
 
-FLOOD_BAN_HANDLER = MessageHandler(Filters.all & ~Filters.status_update & Filters.group, check_flood)
-SET_FLOOD_HANDLER = CommandHandler("setflood", set_flood, pass_args=True, filters=Filters.group)
+FLOOD_BAN_HANDLER = MessageHandler(
+    Filters.all & ~Filters.status_update & Filters.group, check_flood
+)
+SET_FLOOD_HANDLER = CommandHandler(
+    "setflood", set_flood, pass_args=True, filters=Filters.group
+)
 FLOOD_HANDLER = CommandHandler("flood", flood, filters=Filters.group)
 
 dispatcher.add_handler(FLOOD_BAN_HANDLER, FLOOD_GROUP)

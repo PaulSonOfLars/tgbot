@@ -25,11 +25,15 @@ def about_me(bot: Bot, update: Update, args: List[str]):
     info = sql.get_user_me_info(user.id)
 
     if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.first_name, escape_markdown(info)),
-                                            parse_mode=ParseMode.MARKDOWN)
+        update.effective_message.reply_text(
+            "*{}*:\n{}".format(user.first_name, escape_markdown(info)),
+            parse_mode=ParseMode.MARKDOWN,
+        )
     elif message.reply_to_message:
         username = message.reply_to_message.from_user.first_name
-        update.effective_message.reply_text(username + " non ha ancora impostato un messaggio bio!")
+        update.effective_message.reply_text(
+            username + " non ha ancora impostato un messaggio bio!"
+        )
     else:
         update.effective_message.reply_text("Non hai ancora impostato una bio!")
 
@@ -39,14 +43,19 @@ def set_about_me(bot: Bot, update: Update):
     message = update.effective_message  # type: Optional[Message]
     user_id = message.from_user.id
     text = message.text
-    info = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
+    info = text.split(
+        None, 1
+    )  # use python's maxsplit to only remove the cmd, hence keeping newlines.
     if len(info) == 2:
         if len(info[1]) < MAX_MESSAGE_LENGTH // 4:
             sql.set_user_me_info(user_id, info[1])
             message.reply_text("Informazioni utente aggiornate!")
         else:
             message.reply_text(
-                "La tua bio deve avere meno di {} caratteri! Tu hai {}.".format(MAX_MESSAGE_LENGTH // 4, len(info[1])))
+                "La tua bio deve avere meno di {} caratteri! Tu hai {}.".format(
+                    MAX_MESSAGE_LENGTH // 4, len(info[1])
+                )
+            )
 
 
 @run_async
@@ -62,11 +71,15 @@ def about_bio(bot: Bot, update: Update, args: List[str]):
     info = sql.get_user_bio(user.id)
 
     if info:
-        update.effective_message.reply_text("*{}*:\n{}".format(user.first_name, escape_markdown(info)),
-                                            parse_mode=ParseMode.MARKDOWN)
+        update.effective_message.reply_text(
+            "*{}*:\n{}".format(user.first_name, escape_markdown(info)),
+            parse_mode=ParseMode.MARKDOWN,
+        )
     elif message.reply_to_message:
         username = user.first_name
-        update.effective_message.reply_text("{} non ha una bio impostata!".format(username))
+        update.effective_message.reply_text(
+            "{} non ha una bio impostata!".format(username)
+        )
     else:
         update.effective_message.reply_text("Non hai ancora impostato una bio!")
 
@@ -79,35 +92,51 @@ def set_about_bio(bot: Bot, update: Update):
         repl_message = message.reply_to_message
         user_id = repl_message.from_user.id
         if user_id == message.from_user.id:
-            message.reply_text("Ah, non puoi impostare la tua biografia! Sei in balia degli altri qui...")
+            message.reply_text(
+                "Ah, non puoi impostare la tua biografia! Sei in balia degli altri qui..."
+            )
             return
         elif user_id == bot.id and sender.id not in SUDO_USERS:
-            message.reply_text("Ehm ... sì, mi fido solo dei sudo-user per impostare la mia biografia.")
+            message.reply_text(
+                "Ehm ... sì, mi fido solo dei sudo-user per impostare la mia biografia."
+            )
             return
 
         text = message.text
-        bio = text.split(None, 1)  # use python's maxsplit to only remove the cmd, hence keeping newlines.
+        bio = text.split(
+            None, 1
+        )  # use python's maxsplit to only remove the cmd, hence keeping newlines.
         if len(bio) == 2:
             if len(bio[1]) < MAX_MESSAGE_LENGTH // 4:
                 sql.set_user_bio(user_id, bio[1])
-                message.reply_text("Ho aggiornato la bio di {}!".format(repl_message.from_user.first_name))
+                message.reply_text(
+                    "Ho aggiornato la bio di {}!".format(
+                        repl_message.from_user.first_name
+                    )
+                )
             else:
                 message.reply_text(
                     "La bio deve avere meno di {} caratteri! Tu hai provato ad impostare {}.".format(
-                        MAX_MESSAGE_LENGTH // 4, len(bio[1])))
+                        MAX_MESSAGE_LENGTH // 4, len(bio[1])
+                    )
+                )
     else:
-        message.reply_text("Rispondi al messaggio di qualcuno per impostare la sua bio!")
+        message.reply_text(
+            "Rispondi al messaggio di qualcuno per impostare la sua bio!"
+        )
 
 
 def __user_info__(user_id):
     bio = html.escape(sql.get_user_bio(user_id) or "")
     me = html.escape(sql.get_user_me_info(user_id) or "")
     if bio and me:
-        return "<b>Sull'utente:</b>\n{me}\n<b>Cosa dicono gli altri:</b>\n{bio}".format(me=me, bio=bio)
+        return "<b>Sull'utente:</b>\n{me}\n<b>Cosa dicono gli altri:</b>\n{bio}".format(
+            me=me, bio=bio
+        )
     elif bio:
         return "<b>Cosa dicono gli altri:</b>\n{bio}\n".format(me=me, bio=bio)
     elif me:
-        return "<b>Sull'utente:</b>\n{me}""".format(me=me, bio=bio)
+        return "<b>Sull'utente:</b>\n{me}" "".format(me=me, bio=bio)
     else:
         return ""
 
