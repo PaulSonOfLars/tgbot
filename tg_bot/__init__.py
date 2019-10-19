@@ -7,7 +7,7 @@ from tg_bot._version import __version__
 
 # enable logging
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 LOGGER = logging.getLogger(__name__)
