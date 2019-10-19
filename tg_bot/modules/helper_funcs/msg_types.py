@@ -99,32 +99,32 @@ def get_welcome_type(msg: Message):
 
     elif msg.reply_to_message and msg.reply_to_message.sticker:
         content = msg.reply_to_message.sticker.file_id
-        text = msg.reply_to_message.text
+        text = msg.reply_to_message.caption
         data_type = Types.STICKER
 
     elif msg.reply_to_message and msg.reply_to_message.document:
         content = msg.reply_to_message.document.file_id
-        text = msg.reply_to_message.text
+        text = msg.reply_to_message.caption
         data_type = Types.DOCUMENT
 
     elif msg.reply_to_message and msg.reply_to_message.photo:
         content = msg.reply_to_message.photo[-1].file_id  # last elem = best quality
-        text = msg.reply_to_message.text
+        text = msg.reply_to_message.caption
         data_type = Types.PHOTO
 
     elif msg.reply_to_message and msg.reply_to_message.audio:
         content = msg.reply_to_message.audio.file_id
-        text = msg.reply_to_message.text
+        text = msg.reply_to_message.caption
         data_type = Types.AUDIO
 
     elif msg.reply_to_message and msg.reply_to_message.voice:
         content = msg.reply_to_message.voice.file_id
-        text = msg.reply_to_message.text
+        text = msg.reply_to_message.caption
         data_type = Types.VOICE
 
     elif msg.reply_to_message and msg.reply_to_message.video:
         content = msg.reply_to_message.video.file_id
-        text = msg.reply_to_message.text
+        text = msg.reply_to_message.caption
         data_type = Types.VIDEO
 
     return text, data_type, content, buttons
