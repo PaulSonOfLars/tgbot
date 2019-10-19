@@ -26,3 +26,4 @@ toml==0.10.0
 urllib3==1.25.3
 virtualenv==16.7.2
 zipp==0.5.2
+tldextract==2.2.2
