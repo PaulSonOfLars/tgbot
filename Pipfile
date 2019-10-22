@@ -36,7 +36,7 @@ importlib_resources = "==1.0.2"
 PyYAML = "==5.1.2"
 
 [requires]
-python_version = "3.6"
+
 
 [pipenv]
 allow_prereleases = true
