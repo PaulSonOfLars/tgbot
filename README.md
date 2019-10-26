@@ -25,7 +25,7 @@ Note to maintainers that all schema changes will be found in the commit messages
 
 This project is no longer under active maintenance. Occasional bug fixes may be released, but no new features are scheduled to be added.
 Users of [Marie](https://t.me/BanhammerMarie_bot) are encouraged to migrate to [Rose](https://t.me/MissRose_bot), which
-is the improved version of this project, written in goloang, with scalability in mind.
+is the improved version of this project, written in golang, with scalability in mind.
 
 ## Starting the bot.
 
