@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -15,9 +15,11 @@ class FloodControl(BASE):
     user_id = Column(Integer)
     count = Column(Integer, default=DEF_COUNT)
     limit = Column(Integer, default=DEF_LIMIT)
+    soft_flood = Column(Boolean, default=False)
 
-    def __init__(self, chat_id):
+    def __init__(self, chat_id, soft_flood=False):
         self.chat_id = str(chat_id)  # ensure string
+        self.soft_flood = soft_flood
 
     def __repr__(self):
         return "<flood control for %s>" % self.chat_id
@@ -44,6 +46,16 @@ def set_flood(chat_id, amount):
         SESSION.add(flood)
         SESSION.commit()
 
+def set_flood_strength(chat_id, soft_flood):
+    with INSERTION_LOCK:
+        flood = SESSION.query(FloodControl).get(str(chat_id))
+        if not flood:
+            flood = FloodControl(chat_id, soft_flood=soft_flood)
+
+        flood.soft_flood = soft_flood
+
+        SESSION.add(flood)
+        SESSION.commit()
 
 def update_flood(chat_id: str, user_id) -> bool:
     if str(chat_id) in CHAT_FLOOD:
@@ -69,6 +81,16 @@ def update_flood(chat_id: str, user_id) -> bool:
 def get_flood_limit(chat_id):
     return CHAT_FLOOD.get(str(chat_id), DEF_OBJ)[2]
 
+def get_flood_strength(chat_id):
+    try:
+        soft_flood = SESSION.query(FloodControl).get(str(chat_id))
+        if soft_flood:
+            return soft_flood.soft_flood
+        else:
+            return 3, False
+
+    finally:
+        SESSION.close()
 
 def migrate_chat(old_chat_id, new_chat_id):
     with INSERTION_LOCK:
