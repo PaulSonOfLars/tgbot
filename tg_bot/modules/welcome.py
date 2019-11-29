@@ -9,7 +9,7 @@ from telegram.utils.helpers import mention_markdown, mention_html, escape_markdo
 
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import dispatcher, OWNER_ID, LOGGER
-from tg_bot.modules.helper_funcs.chat_status import user_admin
+from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
 from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
 from tg_bot.modules.helper_funcs.msg_types import get_welcome_type
 from tg_bot.modules.helper_funcs.string_handling import markdown_parser, \
@@ -77,6 +77,52 @@ def send(update, message, keyboard, backup_message):
 
 
 @run_async
+@user_admin
+@loggable
+def del_joined(bot: Bot, update: Update, args: List[str]) -> str:
+    chat = update.effective_chat  # type: Optional[Chat]
+    user = update.effective_user  # type: Optional[User]
+
+    if not args:
+        del_pref = sql.get_del_pref(chat.id)
+        if del_pref:
+            update.effective_message.reply_text("I should be deleting `user` joined the chat messages now.")
+        else:
+            update.effective_message.reply_text("I'm currently not deleting old joined messages!")
+        return ""
+
+    if args[0].lower() in ("on", "yes"):
+        sql.set_del_joined(str(chat.id), True)
+        update.effective_message.reply_text("I'll try to delete old joined messages!")
+        return "<b>{}:</b>" \
+               "\n#CLEAN_SERVICE_MESSAGE" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas toggled join deletion to <code>ON</code>.".format(html.escape(chat.title),
+                                                                         mention_html(user.id, user.first_name))
+    elif args[0].lower() in ("off", "no"):
+        sql.set_del_joined(str(chat.id), False)
+        update.effective_message.reply_text("I won't delete old joined messages.")
+        return "<b>{}:</b>" \
+               "\n#CLEAN_SERVICE_MESSAGE" \
+               "\n<b>Admin:</b> {}" \
+               "\nHas toggled joined deletion to <code>OFF</code>.".format(html.escape(chat.title),
+                                                                          mention_html(user.id, user.first_name))
+    else:
+        # idek what you're writing, say yes or no
+        update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
+        return ""
+
+
+@run_async
+def delete_join(bot: Bot, update: Update):
+    chat = update.effective_chat  # type: Optional[Chat]
+    join = update.effective_message.new_chat_members
+    if can_delete(chat, bot.id):
+        del_join = sql.get_del_pref(chat.id)
+        if del_join:
+            update.message.delete()
+
+@run_async
 def new_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
 
@@ -108,7 +154,7 @@ def new_member(bot: Bot, update: Update):
                     else:
                         fullname = first_name
                     count = chat.get_members_count()
-                    mention = mention_markdown(new_mem.id, first_name)
+                    mention = mention_markdown(new_mem.id, escape_markdown(first_name))
                     if new_mem.username:
                         username = "@" + escape_markdown(new_mem.username)
                     else:
@@ -129,6 +175,7 @@ def new_member(bot: Bot, update: Update):
 
                 sent = send(update, res, keyboard,
                             sql.DEFAULT_WELCOME.format(first=first_name))  # type: Optional[Message]
+            delete_join(bot, update)
 
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:
@@ -190,6 +237,7 @@ def left_member(bot: Bot, update: Update):
             keyboard = InlineKeyboardMarkup(keyb)
 
             send(update, res, keyboard, sql.DEFAULT_GOODBYE)
+            delete_join(bot, update)
 
 
 @run_async
@@ -464,8 +512,9 @@ __help__ = """
  - /resetwelcome: reset to the default welcome message.
  - /resetgoodbye: reset to the default goodbye message.
  - /cleanwelcome <on/off>: On new member, try to delete the previous welcome message to avoid spamming the chat.
-
+ - /clearjoin <on/off>: when someone joins, try to delete the *user* joined the group message.
  - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
+
 """.format(WELC_HELP_TXT)
 
 __mod_name__ = "Welcomes/Goodbyes"
@@ -479,7 +528,9 @@ SET_GOODBYE = CommandHandler("setgoodbye", set_goodbye, filters=Filters.group)
 RESET_WELCOME = CommandHandler("resetwelcome", reset_welcome, filters=Filters.group)
 RESET_GOODBYE = CommandHandler("resetgoodbye", reset_goodbye, filters=Filters.group)
 CLEAN_WELCOME = CommandHandler("cleanwelcome", clean_welcome, pass_args=True, filters=Filters.group)
+DEL_JOINED = CommandHandler("clearjoin", del_joined, pass_args=True, filters=Filters.group)
 WELCOME_HELP = CommandHandler("welcomehelp", welcome_help)
+
 
 dispatcher.add_handler(NEW_MEM_HANDLER)
 dispatcher.add_handler(LEFT_MEM_HANDLER)
@@ -490,4 +541,5 @@ dispatcher.add_handler(SET_GOODBYE)
 dispatcher.add_handler(RESET_WELCOME)
 dispatcher.add_handler(RESET_GOODBYE)
 dispatcher.add_handler(CLEAN_WELCOME)
+dispatcher.add_handler(DEL_JOINED)
 dispatcher.add_handler(WELCOME_HELP)

@@ -279,9 +279,11 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
 
 
 __help__ = """
- - /kickme: kicks the user who issued the command
+
 Some people need to be publicly banned; spammers, annoyances, or just trolls.
 This module allows you to do that easily, by exposing some common actions, so everyone will see!
+
+ - /kickme: kicks the user who issued the command
 
 *Admin only:*
  - /ban <userhandle>: bans a user. (via handle, or reply)

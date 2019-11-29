@@ -40,7 +40,7 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
 
         elif member.can_send_messages is None or member.can_send_messages:
             bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
-            message.reply_text("Muted!")
+            message.reply_text("👍🏻 muted! 🤐")
             return "<b>{}:</b>" \
                    "\n#MUTE" \
                    "\n<b>Admin:</b> {}" \
@@ -72,29 +72,23 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
 
     member = chat.get_member(int(user_id))
 
-    if member:
-        if is_user_admin(chat, user_id, member=member):
-            message.reply_text("This is an admin, what do you expect me to do?")
-            return ""
-
-        elif member.status != 'kicked' and member.status != 'left':
-            if member.can_send_messages and member.can_send_media_messages \
-                    and member.can_send_other_messages and member.can_add_web_page_previews:
-                message.reply_text("This user already has the right to speak.")
-                return ""
-            else:
-                bot.restrict_chat_member(chat.id, int(user_id),
-                                         can_send_messages=True,
-                                         can_send_media_messages=True,
-                                         can_send_other_messages=True,
-                                         can_add_web_page_previews=True)
-                message.reply_text("Unmuted!")
-                return "<b>{}:</b>" \
-                       "\n#UNMUTE" \
-                       "\n<b>Admin:</b> {}" \
-                       "\n<b>User:</b> {}".format(html.escape(chat.title),
-                                                  mention_html(user.id, user.first_name),
-                                                  mention_html(member.user.id, member.user.first_name))
+    if member.status != 'kicked' and member.status != 'left':
+        if member.can_send_messages and member.can_send_media_messages \
+                and member.can_send_other_messages and member.can_add_web_page_previews:
+            message.reply_text("This user already has the right to speak.")
+        else:
+            bot.restrict_chat_member(chat.id, int(user_id),
+                                     can_send_messages=True,
+                                     can_send_media_messages=True,
+                                     can_send_other_messages=True,
+                                     can_add_web_page_previews=True)
+            message.reply_text("Unmuted!")
+            return "<b>{}:</b>" \
+                   "\n#UNMUTE" \
+                   "\n<b>Admin:</b> {}" \
+                   "\n<b>User:</b> {}".format(html.escape(chat.title),
+                                              mention_html(user.id, user.first_name),
+                                              mention_html(member.user.id, member.user.first_name))
     else:
         message.reply_text("This user isn't even in the chat, unmuting them won't make them talk more than they "
                            "already do!")
@@ -164,7 +158,7 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
     try:
         if member.can_send_messages is None or member.can_send_messages:
             bot.restrict_chat_member(chat.id, user_id, until_date=mutetime, can_send_messages=False)
-            message.reply_text("Muted for {}!".format(time_val))
+            message.reply_text("shut up! 😠 Muted for {}!".format(time_val))
             return log
         else:
             message.reply_text("This user is already muted.")
@@ -172,7 +166,7 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
-            message.reply_text("Muted for {}!".format(time_val), quote=False)
+            message.reply_text("shut up! 😠 Muted for {}!".format(time_val), quote=False)
             return log
         else:
             LOGGER.warning(update)
@@ -196,7 +190,7 @@ An example of temporarily mute someone:
 `/tmute @username 2h`; this mutes a user for 2 hours.
 """
 
-__mod_name__ = "Muting"
+__mod_name__ = "Mute"
 
 MUTE_HANDLER = CommandHandler("mute", mute, pass_args=True, filters=Filters.group)
 UNMUTE_HANDLER = CommandHandler("unmute", unmute, pass_args=True, filters=Filters.group)
