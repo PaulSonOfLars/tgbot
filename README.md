@@ -144,8 +144,8 @@ You should now be able to build your database URI. This will be:
 
 `sqldbtype://username:pw@hostname:port/db_name`
 
-Replace sqldbtype with whichever db youre using (eg postgres, mysql, sqllite, etc)
-repeat for your username, password, hostname (localhost?), port (5432?), and db name.
+Replace username with your username, repeat for your password, hostname (localhost?), port (5432?), and db name.
+Only postgres is supported.
 
 ## Modules
 ### Setting load order.
