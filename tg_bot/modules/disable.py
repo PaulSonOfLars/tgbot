@@ -74,7 +74,7 @@ if is_module_loaded(FILENAME):
                 disable_cmd = disable_cmd[1:]
 
             if disable_cmd in set(DISABLE_CMDS + DISABLE_OTHER):
-                sql.disable_command(chat.id, disable_cmd)
+                sql.disable_command(chat.id, str(disable_cmd).lower())
                 update.effective_message.reply_text("Disabled the use of `{}`".format(disable_cmd),
                                                     parse_mode=ParseMode.MARKDOWN)
             else:
