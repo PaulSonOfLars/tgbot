@@ -57,7 +57,7 @@ def enable_command(chat_id, enable):
 
 
 def is_command_disabled(chat_id, cmd):
-    return cmd in DISABLED.get(str(chat_id), set())
+    return str(cmd).lower() in DISABLED.get(str(chat_id), set())
 
 
 def get_all_disabled(chat_id):
