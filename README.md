@@ -11,7 +11,7 @@ group of volunteers to help. We'll also help when a database schema changes, and
 modified/added (this info can also be found in the commit messages)
 
 
-Join the [news channel](https://t.me/MarieNews) if you just want to stay in the loop about new features or
+Join the [news channel](https://t.me/MarieNlell) if you just want to stay in the loop about new features or
 announcements.
 
 Marie and I can also be found moderating the [marie support group](https://t.me/MarieSupport) aimed at providing help
