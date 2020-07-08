@@ -175,7 +175,7 @@ def unpin(bot: Bot, update: Update) -> str:
 def invite(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     if chat.username:
-        update.effective_message.reply_text(chat.username)
+        update.effective_message.reply_text("http://t.me/{}".format(chat.username))
     elif chat.type == chat.SUPERGROUP or chat.type == chat.CHANNEL:
         bot_member = chat.get_member(bot.id)
         if bot_member.can_invite_users:
