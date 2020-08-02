@@ -175,7 +175,7 @@ def start(bot: Bot, update: Update, args: List[str]):
                 # Deactivating mute
                 bot.restrict_chat_member(
                     DEFAULT_CHAT_ID,
-                    int(user.id),
+                    int(update.effective_message.from_user.id),
                     can_send_messages=True,
                     can_send_media_messages=True,
                     can_send_other_messages=True,
