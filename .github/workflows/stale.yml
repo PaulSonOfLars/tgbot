@@ -1,0 +1,19 @@
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/stale@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: 'Questo issue è inattivo da molto tempo. Per favore, controlla le nuove versioni del bot: se il problema persiste commenta qui per evitare la chiusura del thread.'
+        stale-pr-message: 'Questa pull-request è inattiva da molto tempo. Per favore, controlla le nuove versioni del bot e se pensi che la PR sia ancora valida commenta qui.'
+        stale-issue-label: 'old-issue'
+        stale-pr-label: 'old-pr'
