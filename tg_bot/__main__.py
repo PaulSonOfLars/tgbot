@@ -172,6 +172,15 @@ def start(bot: Bot, update: Update, args: List[str]):
                 update.effective_message.reply_text(
                     COC_STRING, parse_mode=ParseMode.MARKDOWN
                 )
+                # Deactivating mute
+                bot.restrict_chat_member(
+                    DEFAULT_CHAT_ID,
+                    int(user.id),
+                    can_send_messages=True,
+                    can_send_media_messages=True,
+                    can_send_other_messages=True,
+                    can_add_web_page_previews=True,
+                )
 
         else:
             first_name = update.effective_user.first_name
