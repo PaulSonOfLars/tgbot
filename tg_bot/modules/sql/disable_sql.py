@@ -29,7 +29,7 @@ def disable_command(chat_id, disable):
         disabled = SESSION.query(Disable).get((str(chat_id), disable))
 
         if not disabled:
-            DISABLED.setdefault(str(chat_id), set()).add(disable)
+            DISABLED.setdefault(str(chat_id), set()).add(disable.lower())
 
             disabled = Disable(str(chat_id), disable)
             SESSION.add(disabled)
@@ -46,7 +46,7 @@ def enable_command(chat_id, enable):
 
         if disabled:
             if enable in DISABLED.get(str(chat_id)):  # sanity check
-                DISABLED.setdefault(str(chat_id), set()).remove(enable)
+                DISABLED.setdefault(str(chat_id), set()).remove(enable.lower())
 
             SESSION.delete(disabled)
             SESSION.commit()
