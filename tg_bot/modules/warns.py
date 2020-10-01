@@ -48,7 +48,7 @@ CURRENT_WARNING_FILTER_STRING = "<b>Attuali filtri di ammonimento in questa chat
 
 # Not async
 def warn(
-    user: User, chat: Chat, reason: str, message: Message, warner: User = None
+        user: User, chat: Chat, reason: str, message: Message, warner: User = None
 ) -> str:
     if is_user_admin(chat, user.id):
         message.reply_text("Gli amministratori non possono essere ammuniti.")
@@ -202,8 +202,8 @@ def warn_user(bot: Bot, update: Update, args: List[str]) -> str:
 
     if user_id:
         if (
-            message.reply_to_message
-            and message.reply_to_message.from_user.id == user_id
+                message.reply_to_message
+                and message.reply_to_message.from_user.id == user_id
         ):
             return warn(
                 message.reply_to_message.from_user,

@@ -48,7 +48,6 @@ __help__ = """
 
 __mod_name__ = "Translator"
 
-
 TRANSLATE_HANDLER = CommandHandler("t", translate)
 
 dispatcher.add_handler(TRANSLATE_HANDLER)

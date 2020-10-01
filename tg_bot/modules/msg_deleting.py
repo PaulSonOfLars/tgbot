@@ -30,7 +30,7 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
                     delete_to = new_del
 
             for m_id in range(
-                delete_to, message_id - 1, -1
+                    delete_to, message_id - 1, -1
             ):  # Reverse iteration over message ids
                 try:
                     bot.deleteMessage(chat.id, m_id)

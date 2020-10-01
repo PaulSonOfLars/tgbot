@@ -33,9 +33,7 @@ from tg_bot import (
     LOGGER,
     ALLOW_EXCL,
     DEFAULT_CHAT_ID,
-    VERSION,
 )
-
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in the config file!
 from tg_bot.modules import ALL_MODULES
@@ -78,7 +76,6 @@ Attualmente il sistema di donazioni per il bot non è attivo, però il mio codic
 COC_STRING = """Hey! Grazie per la verifica e benvenuto nel gruppo. 
 In caso tu sia ancora mutato, invia questo comando: /CoCDone per essere sbloccato.\nOra puoi chattare nel gruppo e inviare messaggi :)\nSe hai ancora bisogno di me puoi
 usare il comando /help per più informazioni."""
-
 
 IMPORTED = {}
 MIGRATEABLE = []
@@ -348,7 +345,7 @@ def send_settings(chat_id, user_id, user=False):
                 user_id,
                 "Queste sono le tue impostazioni attuali:" + "\n\n" + settings,
                 parse_mode=ParseMode.MARKDOWN,
-                )
+            )
 
         else:
             dispatcher.bot.send_message(

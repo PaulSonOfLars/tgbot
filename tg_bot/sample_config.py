@@ -8,6 +8,7 @@ if not __name__.endswith("sample_config"):
     )
     quit(1)
 
+
 # bot / botbot
 
 # Create a new config.py file in same dir and import, then extend this class.

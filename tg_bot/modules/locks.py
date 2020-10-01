@@ -34,9 +34,9 @@ LOCK_TYPES = {
     "photo": Filters.photo,
     "gif": Filters.animation,
     "url": Filters.entity(MessageEntity.URL)
-    | Filters.caption_entity(MessageEntity.URL)
-    | Filters.entity(MessageEntity.TEXT_LINK)
-    | Filters.caption_entity(MessageEntity.TEXT_LINK),
+           | Filters.caption_entity(MessageEntity.URL)
+           | Filters.entity(MessageEntity.TEXT_LINK)
+           | Filters.caption_entity(MessageEntity.TEXT_LINK),
     "bots": Filters.status_update.new_chat_members,
     "forward": Filters.forwarded,
     "game": Filters.game,
@@ -46,21 +46,21 @@ LOCK_TYPES = {
 GIF = Filters.animation
 OTHER = Filters.game | Filters.sticker | GIF
 MEDIA = (
-    Filters.audio
-    | Filters.document
-    | Filters.video
-    | Filters.video_note
-    | Filters.voice
-    | Filters.photo
+        Filters.audio
+        | Filters.document
+        | Filters.video
+        | Filters.video_note
+        | Filters.voice
+        | Filters.photo
 )
 MESSAGES = (
-    Filters.text
-    | Filters.contact
-    | Filters.location
-    | Filters.venue
-    | Filters.command
-    | MEDIA
-    | OTHER
+        Filters.text
+        | Filters.contact
+        | Filters.location
+        | Filters.venue
+        | Filters.command
+        | MEDIA
+        | OTHER
 )
 PREVIEWS = Filters.entity("url")
 
@@ -82,8 +82,8 @@ class CustomCommandHandler(tg.CommandHandler):
 
     def check_update(self, update):
         return super().check_update(update) and not (
-            sql.is_restr_locked(update.effective_chat.id, "messages")
-            and not is_user_admin(update.effective_chat, update.effective_user.id)
+                sql.is_restr_locked(update.effective_chat.id, "messages")
+                and not is_user_admin(update.effective_chat, update.effective_user.id)
         )
 
 
@@ -92,7 +92,7 @@ tg.CommandHandler = CustomCommandHandler
 
 # NOT ASYNC
 def restr_members(
-    bot, chat_id, members, messages=False, media=False, other=False, previews=False
+        bot, chat_id, members, messages=False, media=False, other=False, previews=False
 ):
     for mem in members:
         if mem.user in SUDO_USERS:
@@ -112,7 +112,7 @@ def restr_members(
 
 # NOT ASYNC
 def unrestr_members(
-    bot, chat_id, members, messages=True, media=True, other=True, previews=True
+        bot, chat_id, members, messages=True, media=True, other=True, previews=True
 ):
     for mem in members:
         try:
@@ -272,9 +272,9 @@ def del_lockables(bot: Bot, update: Update):
 
     for lockable, filter in LOCK_TYPES.items():
         if (
-            filter(message)
-            and sql.is_locked(chat.id, lockable)
-            and can_delete(chat, bot.id)
+                filter(message)
+                and sql.is_locked(chat.id, lockable)
+                and can_delete(chat, bot.id)
         ):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
@@ -310,9 +310,9 @@ def rest_handler(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     for restriction, filter in RESTRICTION_TYPES.items():
         if (
-            filter(msg)
-            and sql.is_restr_locked(chat.id, restriction)
-            and can_delete(chat, bot.id)
+                filter(msg)
+                and sql.is_restr_locked(chat.id, restriction)
+                and can_delete(chat, bot.id)
         ):
             try:
                 msg.delete()

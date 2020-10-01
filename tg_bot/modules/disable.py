@@ -22,6 +22,7 @@ if is_module_loaded(FILENAME):
     DISABLE_OTHER = []
     ADMIN_CMDS = []
 
+
     class DisableAbleCommandHandler(CommandHandler):
         def __init__(self, command, callback, admin_ok=False, **kwargs):
             super().__init__(command, callback, **kwargs)
@@ -41,8 +42,8 @@ if is_module_loaded(FILENAME):
             if super().check_update(update):
                 # Should be safe since check_update passed.
                 command = update.effective_message.text_html.split(None, 1)[0][
-                    1:
-                ].split("@")[0]
+                          1:
+                          ].split("@")[0]
 
                 # disabled, admincmd, user admin
                 if sql.is_command_disabled(chat.id, command):
@@ -53,6 +54,7 @@ if is_module_loaded(FILENAME):
                     return True
 
             return False
+
 
     class DisableAbleRegexHandler(RegexHandler):
         def __init__(self, pattern, callback, friendly="", **kwargs):
@@ -65,6 +67,7 @@ if is_module_loaded(FILENAME):
             return super().check_update(update) and not sql.is_command_disabled(
                 chat.id, self.friendly
             )
+
 
     @run_async
     @user_admin
@@ -89,6 +92,7 @@ if is_module_loaded(FILENAME):
         else:
             update.effective_message.reply_text("Cosa dovrei disabilitare?")
 
+
     @run_async
     @user_admin
     def enable(bot: Bot, update: Update, args: List[str]):
@@ -111,6 +115,7 @@ if is_module_loaded(FILENAME):
         else:
             update.effective_message.reply_text("Cosa dovrei abilitare?")
 
+
     @run_async
     @user_admin
     def list_cmds(bot: Bot, update: Update):
@@ -125,6 +130,7 @@ if is_module_loaded(FILENAME):
         else:
             update.effective_message.reply_text("Tutti i comandi sono abilitati.")
 
+
     # do not async
     def build_curr_disabled(chat_id: Union[str, int]) -> str:
         disabled = sql.get_all_disabled(chat_id)
@@ -136,6 +142,7 @@ if is_module_loaded(FILENAME):
             result += " - `{}`\n".format(escape_markdown(cmd))
         return "I seguenti comando sono attualmente ristretti:\n{}".format(result)
 
+
     @run_async
     def commands(bot: Bot, update: Update):
         chat = update.effective_chat
@@ -143,16 +150,20 @@ if is_module_loaded(FILENAME):
             build_curr_disabled(chat.id), parse_mode=ParseMode.MARKDOWN
         )
 
+
     def __stats__():
         return "{} comandi disabilitati, in {} chats.".format(
             sql.num_disabled(), sql.num_chats()
         )
 
+
     def __migrate__(old_chat_id, new_chat_id):
         sql.migrate_chat(old_chat_id, new_chat_id)
 
+
     def __chat_settings__(chat_id, user_id):
         return build_curr_disabled(chat_id)
+
 
     __mod_name__ = "Command disabling"
 

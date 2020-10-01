@@ -3,6 +3,7 @@ import os
 import sys
 
 import telegram.ext as tg
+
 from tg_bot._version import __version__
 
 # enable logging
@@ -112,7 +113,6 @@ else:
     ALLOW_EXCL = Config.ALLOW_EXCL
     DEFAULT_CHAT_ID = Config.DEFAULT_CHAT_ID
     VERSION = __version__
-
 
 SUDO_USERS.add(OWNER_ID)
 

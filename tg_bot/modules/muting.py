@@ -94,10 +94,10 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
 
         elif member.status != "kicked" and member.status != "left":
             if (
-                member.can_send_messages
-                and member.can_send_media_messages
-                and member.can_send_other_messages
-                and member.can_add_web_page_previews
+                    member.can_send_messages
+                    and member.can_send_media_messages
+                    and member.can_send_other_messages
+                    and member.can_add_web_page_previews
             ):
                 message.reply_text("Questo utente può parlare.")
                 return ""

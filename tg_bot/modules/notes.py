@@ -239,7 +239,7 @@ def __import_data__(chat_id, data):
 
         if match:
             failures.append(notename)
-            notedata = notedata[match.end() :].strip()
+            notedata = notedata[match.end():].strip()
             if notedata:
                 sql.add_note_to_db(chat_id, notename[1:], notedata, sql.Types.TEXT)
         else:
@@ -253,8 +253,8 @@ def __import_data__(chat_id, data):
                 document=output,
                 filename="failed_imports.txt",
                 caption="These files/photos failed to import due to originating "
-                "from another bot. This is a telegram API restriction, and can't "
-                "be avoided. Sorry for the inconvenience!",
+                        "from another bot. This is a telegram API restriction, and can't "
+                        "be avoided. Sorry for the inconvenience!",
             )
 
 
