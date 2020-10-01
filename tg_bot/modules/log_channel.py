@@ -75,38 +75,29 @@ if is_module_loaded(FILENAME):
                 f"<b>Risorsa inviata da @{update.effective_user.username}:</b>\n"
             )
 
+            to_manage = None
             if descriptor["type"] == MessageEntity.URL:
-                try:
-                    response = requests.get(entity)
-                    if response.status_code == requests.codes.ok:
-                        result += f"{entity}"
-                        extracted = tldextract.extract(entity)
-                        if f"#{extracted.domain}" not in tags:
-                            tags.append(f"#{extracted.domain}")
-                            tags.sort()
-                        if tags:
-                            tags_string = " ".join(tags)
-                            result += f"\n\nTags:\n{tags_string}"
-                        send_log(bot, log_chat, chat.id, result)
-                except Exception as e:
-                    LOGGER.info(f"Resource {entity} is not a valid url")
-                    LOGGER.error(e)
+                to_manage = entity
             elif descriptor["type"] == MessageEntity.TEXT_LINK:
-                try:
-                    response = requests.get(descriptor["url"])
-                    if response.status_code == requests.codes.ok:
-                        result += f'{descriptor["url"]}'
-                        extracted = tldextract.extract(descriptor["url"])
-                        if f"#{extracted.domain}" not in tags:
-                            tags.append(f"#{extracted.domain}")
-                            tags.sort()
-                        if tags:
-                            tags_string = " ".join(tags)
-                            result += f"\n\nTags:\n{tags_string}"
-                        send_log(bot, log_chat, chat.id, result)
-                except Exception as e:
-                    LOGGER.info(f"Resource {entity} is not a valid url")
-                    LOGGER.error(e)
+                to_manage = descriptor['url']
+            log_for_entity(bot, chat, to_manage, log_chat, result, tags)
+
+    def log_for_entity(bot, chat, entity, log_chat, result, tags):
+        try:
+            response = requests.get(entity)
+            if response.status_code == requests.codes.ok:
+                result += f'{entity}'
+                extracted = tldextract.extract(entity)
+                if f"#{extracted.domain}" not in tags:
+                    tags.append(f"#{extracted.domain}")
+                    tags.sort()
+                if tags:
+                    tags_string = " ".join(tags)
+                    result += f"\n\nTags:\n{tags_string}"
+                send_log(bot, log_chat, chat.id, result)
+        except Exception as e:
+            LOGGER.info(f"Resource {entity} is not a valid url")
+            LOGGER.error(e)
 
 
     def send_log(bot: Bot, log_chat_id: str, orig_chat_id: str, result: str):
