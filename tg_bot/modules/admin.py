@@ -61,7 +61,7 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
         can_promote_members=bot_member.can_promote_members,
     )
 
-    message.reply_text("Successfully promoted!")
+    message.reply_text("Utente promosso.")
     return (
         "<b>{}:</b>"
         "\n#PROMOZIONE"
