@@ -51,8 +51,8 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
                 if err.message == "Message can't be deleted":
                     bot.send_message(
                         chat.id,
-                        "Non posso cancellare tutti i messaggi. I messaggi potrebbero essere troppo vecchi, oppure "
-                        "non sono amministratore, o questo non è un supergruppo.",
+                        "Non posso cancellare tutti i messaggi. I messaggi potrebbero essere troppo vecchi, potrei "
+                        "non essere amministratore, o questo potrebbe non essere un supergruppo.",
                     )
 
                 elif err.message != "Message to delete not found":

@@ -37,7 +37,7 @@ def blacklist(bot: Bot, update: Update, args: List[str]):
     split_text = split_message(filter_list)
     for text in split_text:
         if text == BASE_BLACKLIST_STRING:
-            msg.reply_text("Non sono presenti triggger nella blacklist!")
+            msg.reply_text("Non sono presenti trigger nella blacklist!")
             return
         msg.reply_text(text, parse_mode=ParseMode.HTML)
 
@@ -114,7 +114,7 @@ def unblacklist(bot: Bot, update: Update):
 
         elif not successful:
             msg.reply_text(
-                "NNessuno di questi trigger esiste, quindi non sono stati rimossi.".format(
+                "Nessuno di questi trigger esiste, quindi non sono stati rimossi.".format(
                     successful, len(to_unblacklist) - successful
                 ),
                 parse_mode=ParseMode.HTML,

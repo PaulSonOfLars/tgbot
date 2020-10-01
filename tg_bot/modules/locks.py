@@ -330,7 +330,7 @@ def build_lock_message(chat_id):
     if not (locks or restr):
         res = "Attualmente non ci sono elementi bloccati in questo gruppo."
     else:
-        res = "In questo gruppo questi sono gli elementi bloccati:"
+        res = "Gli elementi bloccati in questo gruppo sono i seguenti:"
         if locks:
             res += (
                 "\n - sticker = `{}`"

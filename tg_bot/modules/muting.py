@@ -31,7 +31,7 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
     user_id = extract_user(message, args)
     if not user_id:
         message.reply_text(
-            "Dovrai o darmi un nome utente per mutarlo o rispondere a qualcuno che deve essere mutato."
+            "Dovrai darmi un nome utente per mutarlo o rispondere a qualcuno che deve essere mutato."
         )
         return ""
 
@@ -49,7 +49,7 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
 
         elif member.can_send_messages is None or member.can_send_messages:
             bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
-            message.reply_text("Muted!")
+            message.reply_text("Membro silenziato.")
             return (
                 "<b>{}:</b>"
                 "\n#MUTE"
@@ -123,7 +123,7 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
                 )
     else:
         message.reply_text(
-            "Questo utente non è nella chat, unmutarlo non gli permetterà di parlare!!"
+            "Questo utente non è nella chat, unmutarlo non gli permetterà di parlare."
         )
 
     return ""
@@ -163,7 +163,7 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     if not reason:
-        message.reply_text("NOn hai specificato per quanto tempo mutare questo utente!")
+        message.reply_text("Non hai specificato per quanto tempo mutare questo utente!")
         return ""
 
     split_reason = reason.split(None, 1)

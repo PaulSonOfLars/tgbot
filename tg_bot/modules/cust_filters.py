@@ -215,7 +215,7 @@ def reply_filter(bot: Bot, update: Update):
                         message.reply_text(
                             "Sembra che tu stia provando a usare un protocollo url non supportato. "
                             "Telegram non supporta i bottoni con alcuni procolli come per esempio: tg://."
-                            "Per favore riprova oppure chiedi aiuto qui: @MarieSupport."
+                            "Per favore riprova oppure chiedi aiuto qui: https://t.me/python_ita."
                         )
                     elif excp.message == "Reply message not found":
                         bot.send_message(
@@ -228,7 +228,7 @@ def reply_filter(bot: Bot, update: Update):
                     else:
                         message.reply_text(
                             "Questa nota non può essere inviata, è formattata in modo scorretto. "
-                            "Chiedi su @MarieSupport se non riesci a capire perché."
+                            "Chiedi su https://t.me/python_ita se non riesci a capire perché."
                         )
                         LOGGER.warning(
                             "Message %s could not be parsed", str(filt.reply)

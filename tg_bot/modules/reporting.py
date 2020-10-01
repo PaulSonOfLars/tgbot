@@ -53,7 +53,7 @@ def report_setting(bot: Bot, update: Update, args: List[str]):
                 msg.reply_text("Reporting spento. Nessun admin verrà notificato.")
         else:
             msg.reply_text(
-                "This chat's current setting is: `{}`".format(
+                "La chat è attualmente impostata: `{}`".format(
                     sql.chat_should_report(chat.id)
                 ),
                 parse_mode=ParseMode.MARKDOWN,

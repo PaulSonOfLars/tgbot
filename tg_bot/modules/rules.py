@@ -62,7 +62,7 @@ def send_rules(update, chat_id, from_pm=False):
         bot.send_message(
             user.id,
             "Gli admin non hanno ancora impostato le regole del gruppo. "
-            "Questo non significa che siamo nel far-west!",
+            "Per favore attieniti alle regole di rispetto reciproco che vigono in ogni chat online.",
         )
     elif rules:
         update.effective_message.reply_text(
@@ -81,7 +81,7 @@ def send_rules(update, chat_id, from_pm=False):
     else:
         update.effective_message.reply_text(
             "Il gruppo non ha ancora nessuna regola impostata. "
-            "Questo però non significa che si può fare tutto..!"
+            "Per favore attieniti alle regole di rispetto reciproco che vigono in ogni chat online."
         )
 
 

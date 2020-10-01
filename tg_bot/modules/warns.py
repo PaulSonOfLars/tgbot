@@ -51,7 +51,7 @@ def warn(
     user: User, chat: Chat, reason: str, message: Message, warner: User = None
 ) -> str:
     if is_user_admin(chat, user.id):
-        message.reply_text("Maledetti admin, non possono nemmeno essere ammoniti!")
+        message.reply_text("Gli amministratori non possono essere ammuniti.")
         return ""
 
     if warner:
@@ -65,13 +65,13 @@ def warn(
         sql.reset_warns(user.id, chat.id)
         if soft_warn:  # kick
             chat.unban_member(user.id)
-            reply = "{} ammonimenti, {} è stato cacciato!".format(
+            reply = "{} ammonimenti, {} è stato cacciato.".format(
                 limit, mention_html(user.id, user.first_name)
             )
 
         else:  # ban
             chat.kick_member(user.id)
-            reply = "{} ammonimenti, {} è stato bandito!".format(
+            reply = "{} ammonimenti, {} è stato bandito.".format(
                 limit, mention_html(user.id, user.first_name)
             )
 
@@ -109,7 +109,7 @@ def warn(
             ]
         )
 
-        reply = "{} ha {}/{} ammonimenti... attenzione!".format(
+        reply = "{} ha {}/{} ammonimenti... Per favore attieniti al Codice di Condotta e ricordati di rispettare sempre gli altri utenti.".format(
             mention_html(user.id, user.first_name), num_warns, limit
         )
         if reason:
@@ -279,7 +279,7 @@ def warns(bot: Bot, update: Update, args: List[str]):
             )
     else:
         update.effective_message.reply_text(
-            "Questo utente non ha ricevuto alcun ammonimento!"
+            "Questo utente non ha ricevuto alcun ammonimento."
         )
 
 
@@ -347,7 +347,7 @@ def remove_warn_filter(bot: Bot, update: Update):
     for filt in chat_filters:
         if filt == to_remove:
             sql.remove_warn_filter(chat.id, to_remove)
-            msg.reply_text("Si, smetterò di ammonire la gente per questo.")
+            msg.reply_text("Filtro disattivato per questo termine.")
             raise DispatcherHandlerStop
 
     msg.reply_text(
@@ -462,7 +462,7 @@ def set_warn_strength(bot: Bot, update: Update, args: List[str]):
             return (
                 "<b>{}:</b>\n"
                 "<b>Admin:</b> {}\n"
-                "Ha disabilitato gli ammonimenti rigidi. Gli utenti saranno solo cacciati.".format(
+                "Ha disabilitato gli ammonimenti rigidi. Gli utenti saranno solo momentaneamente rimossi.".format(
                     html.escape(chat.title), mention_html(user.id, user.first_name)
                 )
             )
@@ -473,7 +473,7 @@ def set_warn_strength(bot: Bot, update: Update, args: List[str]):
         limit, soft_warn = sql.get_warn_setting(chat.id)
         if soft_warn:
             msg.reply_text(
-                "Gli ammonimenti sono impostati per *cacciare* (kick) gli utenti quando superano il limite.",
+                "Gli ammonimenti sono impostati per *rimuovere* (kick) gli utenti quando superano il limite.",
                 parse_mode=ParseMode.MARKDOWN,
             )
         else:
