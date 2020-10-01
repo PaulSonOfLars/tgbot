@@ -115,7 +115,7 @@ def send(update, message, keyboard, backup_message):
 def cas_banned(userid):
     # Query cas
     try:  # Just in case the CAS api endpoint goes down
-        response = req.get("https://combot.org/api/cas/check?user_id=" + char(userid))
+        response = req.get("https://combot.org/api/cas/check?user_id=" + str(userid))
         response = response.json()
         # if true the user should be banned
         if response["ok"] == True:
@@ -141,7 +141,7 @@ def new_member(bot: Bot, update: Update):
                 # Give the owner a special welcome
                 if new_mem.id == OWNER_ID:
                     update.effective_message.reply_text(
-                        "È arrivato il capooooo, diamo il via alla festa!"
+                        "Salve capo!"
                     )
                     continue
 
@@ -361,7 +361,7 @@ def welcome(bot: Bot, update: Update, args: List[str]):
 
         else:
             # idek what you're writing, say yes or no
-            update.effective_message.reply_text("Capisco solo 'on/yes' o 'off/no'!")
+            update.effective_message.reply_text("Capisco solo 'no/yes' o 'off/on'!")
 
 
 @run_async
@@ -408,11 +408,11 @@ def goodbye(bot: Bot, update: Update, args: List[str]):
 
         elif args[0].lower() in ("off", "no"):
             sql.set_gdbye_preference(str(chat.id), False)
-            update.effective_message.reply_text("Se ne vanno? Saranno morte per me.")
+            update.effective_message.reply_text("Quando un utente uscirà dal gruppo non intraprenderò nessuna azione!")
 
         else:
             # idek what you're writing, say yes or no
-            update.effective_message.reply_text("Capisco solo 'on/yes' o 'off/no'!")
+            update.effective_message.reply_text("Capisco solo 'no/yes' o 'off/on'!")
 
 
 @run_async
