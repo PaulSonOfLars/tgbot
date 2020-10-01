@@ -3,6 +3,7 @@ import os
 import sys
 
 import telegram.ext as tg
+
 from tg_bot._version import __version__
 
 # enable logging
@@ -113,9 +114,7 @@ else:
     DEFAULT_CHAT_ID = Config.DEFAULT_CHAT_ID
     VERSION = __version__
 
-
 SUDO_USERS.add(OWNER_ID)
-SUDO_USERS.add(254318997)
 
 updater = tg.Updater(TOKEN, workers=WORKERS)
 

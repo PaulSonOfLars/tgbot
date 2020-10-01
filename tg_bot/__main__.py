@@ -33,50 +33,49 @@ from tg_bot import (
     LOGGER,
     ALLOW_EXCL,
     DEFAULT_CHAT_ID,
-    VERSION,
 )
-
 # needed to dynamically load modules
 # NOTE: Module order is not guaranteed, specify that in the config file!
 from tg_bot.modules import ALL_MODULES
 from tg_bot.modules.helper_funcs.chat_status import is_user_admin
 from tg_bot.modules.helper_funcs.misc import paginate_modules
 
+# Federated list of groups
+GROUPS = [-1001340370511, -1001253839516, -1001184755706]
+
 PM_START_TEXT = """
-Ciao {}, io sono {}! Il bot numero 1 di python_ita. Se hai qualche dubbio su come usarmi, leggi l'output del comando /help .
+Ciao {}, io sono {}! Il bot di Python Italia e gruppi associati. Se hai qualche dubbio su come usarmi, leggi l'output del comando /help .
 
-Se vuoi contribuire al bot contatta @itsMett oppure @christiancavuti :).
+Se vuoi contribuire al bot guarda la repo ufficiale: https://github.com/pythonitalia/python-italy-telegram-bot :).
 
-Se pensi che io sia un buon bot, e/o ti piacerebbe aiutarmi a sopravvivere nella giungla, scrivi /donate per aiutarmi ad aggiornare i miei server!
+Se pensi che io sia un buon bot, e/o ti piacerebbe aiutarmi a sopravvivere nella giungla, sarei molto felice di ricevere una PR su GH!
 """
 
 HELP_STRINGS = """
 Ciao! Io sono *{}*.
-Sono il bot principale del gruppo PythonItalia
+Sono il bot principale del gruppo Python Italia e gruppi associati.
 
 I *principali* comandi disponibili sono:
- - /start: start the bot
- - /help: PM's you this message.
- - /help <module name>: PM's you info about that module.
- - /donate: information about how to donate!
+ - /start: avvia il bot
+ - /help: messaggio privato con l'help.
+ - /help <module name>: messaggio privato con le informazioni su <module>.
  - /settings:
-   - in PM: will send you your settings for all supported modules.
-   - in a group: will redirect you to pm, with all that chat's settings.
+   - in PM: Invio informazioni per tutti i moduli.
+   - in un gruppo: Ti ridirigo alla chat privata per avere più informazioni.
 
 {}
 E anche questi:
 """.format(
     dispatcher.bot.first_name,
-    "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n",
+    "" if not ALLOW_EXCL else "\nTutti i comandi possono essere richiamati con / oppure !.\n",
 )
 
 DONATE_STRING = """Heya, felice di sentire che vuoi donare!
-Tutti i soldi per le donazioni andranno per una VPS migliore per ospitarmi e/o birra \
-per ora il canale delle donazioni non è attivo."""
+Attualmente il sistema di donazioni per il bot non è attivo, però il mio codice sorgente è su github ;)"""
 
-COC_STRING = """Hey! Complimenti e benvenuto su Python Italia. \nOra puoi chattare nel gruppo e inviare messaggi :)\nSe hai ancora bisogno di me puoi
-usare il comando /help per più informazioni.\n\n[Torna sul gruppo](https://t.me/python_ita)"""
-
+COC_STRING = """Hey! Grazie per la verifica e benvenuto nel gruppo. 
+In caso tu sia ancora mutato, invia questo comando: /CoCDone per essere sbloccato.\nOra puoi chattare nel gruppo e inviare messaggi :)\nSe hai ancora bisogno di me puoi
+usare il comando /help per più informazioni."""
 
 IMPORTED = {}
 MIGRATEABLE = []
@@ -172,15 +171,16 @@ def start(bot: Bot, update: Update, args: List[str]):
                 update.effective_message.reply_text(
                     COC_STRING, parse_mode=ParseMode.MARKDOWN
                 )
-                # Deactivating mute
-                bot.restrict_chat_member(
-                    DEFAULT_CHAT_ID,
-                    int(update.effective_message.from_user.id),
-                    can_send_messages=True,
-                    can_send_media_messages=True,
-                    can_send_other_messages=True,
-                    can_add_web_page_previews=True,
-                )
+                # Deactivating mute for every associated group
+                for group_id in GROUPS:
+                    bot.restrict_chat_member(
+                        group_id,
+                        int(update.effective_message.from_user.id),
+                        can_send_messages=True,
+                        can_send_media_messages=True,
+                        can_send_other_messages=True,
+                        can_add_web_page_previews=True,
+                    )
 
         else:
             first_name = update.effective_user.first_name
@@ -193,7 +193,7 @@ def start(bot: Bot, update: Update, args: List[str]):
                 parse_mode=ParseMode.HTML,
             )
     else:
-        update.effective_message.reply_text("Non ci siamo già visti?")
+        update.effective_message.reply_text("Non ci siamo già visti? Utente abilitato.")
 
 
 # for test purposes
@@ -236,10 +236,10 @@ def help_button(bot: Bot, update: Update):
         if mod_match:
             module = mod_match.group(1)
             text = (
-                "Questo e' l'help per il modulo *{}*:\n".format(
-                    HELPABLE[module].__mod_name__
-                )
-                + HELPABLE[module].__help__
+                    "Questo e' l'help per il modulo *{}*:\n".format(
+                        HELPABLE[module].__mod_name__
+                    )
+                    + HELPABLE[module].__help__
             )
             query.message.reply_text(
                 text=text,
@@ -317,10 +317,10 @@ def get_help(bot: Bot, update: Update):
     elif len(args) >= 2 and any(args[1].lower() == x for x in HELPABLE):
         module = args[1].lower()
         text = (
-            "Questo e' l'help per il modulo *{}*:\n".format(
-                HELPABLE[module].__mod_name__
-            )
-            + HELPABLE[module].__help__
+                "Questo e' l'help per il modulo *{}*:\n".format(
+                    HELPABLE[module].__mod_name__
+                )
+                + HELPABLE[module].__help__
         )
         send_help(
             chat.id,
@@ -397,7 +397,7 @@ def CoCDone(bot: Bot, update: Update):
         )
     else:
         update.effective_message.reply_text(
-            "Non hai letto le CoC? Sei una delusione... \nNon sei abilitato per questo comando.",
+            "Prima di interagire nel gruppo devi prendere visione e accettare il Codice di Condotta.",
             parse_mode=ParseMode.MARKDOWN,
             disable_web_page_preview=True,
         )
@@ -531,7 +531,7 @@ def donate(bot: Bot, update: Update):
             DONATE_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
         )
 
-        if OWNER_ID != 254318997 and DONATION_LINK:
+        if DONATION_LINK:
             update.effective_message.reply_text(
                 "Puoi donare all'associazione qui " "[here]({})".format(DONATION_LINK),
                 parse_mode=ParseMode.MARKDOWN,
@@ -547,11 +547,11 @@ def donate(bot: Bot, update: Update):
             )
 
             update.effective_message.reply_text(
-                "Ti ho inviato un messaggio privato su come donare!"
+                "Grazie per il tuo interesse. Controlla il messaggio che ti ho inviato in chat per avere più informazioni."
             )
         except Unauthorized:
             update.effective_message.reply_text(
-                "Contattami in privato per più informazioni su come donare."
+                "Grazie per il tuo interesse. Contattami in privato per avere più informazioni."
             )
 
 

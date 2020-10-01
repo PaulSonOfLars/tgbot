@@ -1,9 +1,9 @@
-from tg_bot import dispatcher, LOGGER
-from tg_bot.modules.helper_funcs.chat_status import bot_can_delete
 from telegram import Update, Bot
 from telegram.ext import MessageHandler, Filters, CommandHandler
 from telegram.ext.dispatcher import run_async
 
+from tg_bot import dispatcher, LOGGER
+from tg_bot.modules.helper_funcs.chat_status import bot_can_delete
 
 FORBIDDEN_ENTITY_TYPES = ["url", "text_link", "email", "phone_number"]
 

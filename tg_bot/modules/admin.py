@@ -61,7 +61,7 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
         can_promote_members=bot_member.can_promote_members,
     )
 
-    message.reply_text("Successfully promoted!")
+    message.reply_text("Utente promosso.")
     return (
         "<b>{}:</b>"
         "\n#PROMOZIONE"
@@ -153,9 +153,9 @@ def pin(bot: Bot, update: Update, args: List[str]) -> str:
     is_silent = True
     if len(args) >= 1:
         is_silent = not (
-            args[0].lower() == "notify"
-            or args[0].lower() == "loud"
-            or args[0].lower() == "violent"
+                args[0].lower() == "notify"
+                or args[0].lower() == "loud"
+                or args[0].lower() == "violent"
         )
 
     if prev_message and is_group:

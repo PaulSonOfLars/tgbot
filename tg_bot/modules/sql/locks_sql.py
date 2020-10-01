@@ -69,7 +69,6 @@ class Restrictions(BASE):
 Permissions.__table__.create(checkfirst=True)
 Restrictions.__table__.create(checkfirst=True)
 
-
 PERM_LOCK = threading.RLock()
 RESTR_LOCK = threading.RLock()
 
@@ -212,10 +211,10 @@ def is_restr_locked(chat_id, lock_type):
         return curr_restr.preview
     elif lock_type == "all":
         return (
-            curr_restr.messages
-            and curr_restr.media
-            and curr_restr.other
-            and curr_restr.preview
+                curr_restr.messages
+                and curr_restr.media
+                and curr_restr.other
+                and curr_restr.preview
         )
 
 

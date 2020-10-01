@@ -193,7 +193,7 @@ def rss_update(bot, job):
         if len(new_entry_links) < 5:
             # this loop sends every new update to each user from each group based on the DB entries
             for link, title in zip(
-                reversed(new_entry_links), reversed(new_entry_titles)
+                    reversed(new_entry_links), reversed(new_entry_titles)
             ):
                 final_message = "<b>{}</b>\n\n{}".format(
                     html.escape(title), html.escape(link)
@@ -213,7 +213,7 @@ def rss_update(bot, job):
                     )
         else:
             for link, title in zip(
-                reversed(new_entry_links[-5:]), reversed(new_entry_titles[-5:])
+                    reversed(new_entry_links[-5:]), reversed(new_entry_titles[-5:])
             ):
                 final_message = "<b>{}</b>\n\n{}".format(
                     html.escape(title), html.escape(link)

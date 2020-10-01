@@ -47,11 +47,11 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if is_user_ban_protected(chat, user_id, member):
-        message.reply_text("A volte mi piacerebbe tanto poter bannare gli admin...")
+        message.reply_text("Impossibile rimuovere gli altri admin.")
         return ""
 
     if user_id == bot.id:
-        message.reply_text("Di sicuro non mi bannero' da solo.. sei pazzo?")
+        message.reply_text("Di sicuro non mi bannero' da solo.")
         return ""
 
     log = (
@@ -70,14 +70,14 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
 
     try:
         chat.kick_member(user_id)
-        bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-        message.reply_text("BANNATO!")
+        # bot.send_sticker(chat.id, BAN_STICKER)  # banhammer sticker
+        message.reply_text("Utente rimosso.")
         return log
 
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
-            message.reply_text("BANNATO!", quote=False)
+            message.reply_text("Utente rimosso.", quote=False)
             return log
         else:
             LOGGER.warning(update)
@@ -88,7 +88,7 @@ def ban(bot: Bot, update: Update, args: List[str]) -> str:
                 chat.id,
                 excp.message,
             )
-            message.reply_text("Diamine, non riesco a bannare questo utente.")
+            message.reply_text("Impossibile rimuovere questo membro.")
 
     return ""
 
@@ -119,11 +119,11 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
             raise
 
     if is_user_ban_protected(chat, user_id, member):
-        message.reply_text("A volte mi piacerebbe tanto poter bannare gli admin...")
+        message.reply_text("Impossibile rimuovere gli altri admin.")
         return ""
 
     if user_id == bot.id:
-        message.reply_text("Di sicuro non mi bannero' da solo.. sei pazzo?")
+        message.reply_text("Di sicuro non mi bannero' da solo.")
         return ""
 
     if not reason:
@@ -164,14 +164,14 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
     try:
         chat.kick_member(user_id, until_date=bantime)
         bot.send_sticker(chat.id, BAN_STICKER)  # banhammer marie sticker
-        message.reply_text("BANNATO! L'utente verra' bannato per {}.".format(time_val))
+        message.reply_text("L'utente verra' bannato per {}.".format(time_val))
         return log
 
     except BadRequest as excp:
         if excp.message == "Reply message not found":
             # Do not reply
             message.reply_text(
-                "BANNATO! L'utente verra' bannato per {}.".format(time_val), quote=False
+                "L'utente verra' bannato per {}.".format(time_val), quote=False
             )
             return log
         else:
@@ -183,7 +183,7 @@ def temp_ban(bot: Bot, update: Update, args: List[str]) -> str:
                 chat.id,
                 excp.message,
             )
-            message.reply_text("Diamine, non riesco a bannare questo utente.")
+            message.reply_text("Impossibile bannare questo utente.")
 
     return ""
 
@@ -214,7 +214,7 @@ def kick(bot: Bot, update: Update, args: List[str]) -> str:
 
     if is_user_ban_protected(chat, user_id):
         message.reply_text(
-            "Non hai idea di quanto mi piacerebbe poter kickare gli admins..."
+            "Impossibile rimuovere gli admin."
         )
         return ""
 
@@ -299,7 +299,7 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
     chat.unban_member(user_id)
-    message.reply_text("Yep, questo utente può tornare tra noi!")
+    message.reply_text("Questo utente può tornare tra noi!")
 
     log = (
         "<b>{}:</b>"

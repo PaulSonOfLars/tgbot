@@ -35,7 +35,7 @@ def about_me(bot: Bot, update: Update, args: List[str]):
             username + " non ha ancora impostato un messaggio bio!"
         )
     else:
-        update.effective_message.reply_text("Non hai ancora impostato una bio!")
+        update.effective_message.reply_text("Non hai ancora impostato una bio.")
 
 
 @run_async
@@ -93,12 +93,12 @@ def set_about_bio(bot: Bot, update: Update):
         user_id = repl_message.from_user.id
         if user_id == message.from_user.id:
             message.reply_text(
-                "Ah, non puoi impostare la tua biografia! Sei in balia degli altri qui..."
+                "Mi dispiace, non puoi impostare la biiografia qui!"
             )
             return
         elif user_id == bot.id and sender.id not in SUDO_USERS:
             message.reply_text(
-                "Ehm ... sì, mi fido solo dei sudo-user per impostare la mia biografia."
+                "Ehm ... sì, mi fido solo degli amministratori per impostare la mia biografia."
             )
             return
 

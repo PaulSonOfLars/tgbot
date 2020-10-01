@@ -1,6 +1,7 @@
 import html
 from typing import Optional, List
 
+import requests as req
 from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode, InlineKeyboardMarkup
 from telegram.error import BadRequest
@@ -17,8 +18,6 @@ from tg_bot.modules.helper_funcs.string_handling import (
     escape_invalid_curly_brackets,
 )
 from tg_bot.modules.log_channel import loggable
-
-import requests as req
 
 VALID_WELCOME_FORMATTERS = [
     "first",
@@ -53,8 +52,8 @@ def send(update, message, keyboard, backup_message):
         msg = update.effective_message.reply_text(
             markdown_parser(
                 backup_message + "\nNota: Il messaggio corrente è "
-                "invalido a causa di problemi di markdown. Potrebbe essere a causa del "
-                "nome dell'utente."
+                                 "invalido a causa di problemi di markdown. Potrebbe essere a causa del "
+                                 "nome dell'utente."
             ),
             parse_mode=ParseMode.MARKDOWN,
         )
@@ -62,8 +61,8 @@ def send(update, message, keyboard, backup_message):
         msg = update.effective_message.reply_text(
             markdown_parser(
                 backup_message + "\nNote: the current message is "
-                "invalid due to an issue with some misplaced "
-                "curly brackets. Please update"
+                                 "invalid due to an issue with some misplaced "
+                                 "curly brackets. Please update"
             ),
             parse_mode=ParseMode.MARKDOWN,
         )
@@ -73,7 +72,7 @@ def send(update, message, keyboard, backup_message):
                 markdown_parser(
                     backup_message
                     + "\nNota: Il messaggio corrente ha un url non valido "
-                    "in uno dei bottoni. Per favore, aggiornarlo."
+                      "in uno dei bottoni. Per favore, aggiornarlo."
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
@@ -81,8 +80,8 @@ def send(update, message, keyboard, backup_message):
             msg = update.effective_message.reply_text(
                 markdown_parser(
                     backup_message + "\nNota: il messaggio corrente ha bottoni che "
-                    "usano un protocollo per gli url non supportato da "
-                    "Telegram. Per favore, aggiornarlo."
+                                     "usano un protocollo per gli url non supportato da "
+                                     "Telegram. Per favore, aggiornarlo."
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
@@ -91,7 +90,7 @@ def send(update, message, keyboard, backup_message):
                 markdown_parser(
                     backup_message
                     + "\nNota: il messaggio corrente ha degli url difettosi. "
-                    "Per favore, aggiornarlo.."
+                      "Per favore, aggiornarlo.."
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
@@ -103,7 +102,7 @@ def send(update, message, keyboard, backup_message):
                 markdown_parser(
                     backup_message
                     + "\nNota: un errore si è verificato quando ho provato  "
-                    "a inviare il messaggio customizzato. Per favore, risolvere l'errore."
+                      "a inviare il messaggio customizzato. Per favore, risolvere l'errore."
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
@@ -115,7 +114,7 @@ def send(update, message, keyboard, backup_message):
 def cas_banned(userid):
     # Query cas
     try:  # Just in case the CAS api endpoint goes down
-        response = req.get("https://combot.org/api/cas/check?user_id=" + char(userid))
+        response = req.get("https://combot.org/api/cas/check?user_id=" + str(userid))
         response = response.json()
         # if true the user should be banned
         if response["ok"] == True:
@@ -141,7 +140,7 @@ def new_member(bot: Bot, update: Update):
                 # Give the owner a special welcome
                 if new_mem.id == OWNER_ID:
                     update.effective_message.reply_text(
-                        "È arrivato il capooooo, diamo il via alla festa!"
+                        "Salve capo!"
                     )
                     continue
 
@@ -157,14 +156,14 @@ def new_member(bot: Bot, update: Update):
 
                     # If welcome message is media, send with appropriate function
                     if (
-                        welc_type != sql.Types.TEXT
-                        and welc_type != sql.Types.BUTTON_TEXT
+                            welc_type != sql.Types.TEXT
+                            and welc_type != sql.Types.BUTTON_TEXT
                     ):
                         ENUM_FUNC_MAP[welc_type](chat.id, cust_welcome)
                         return
                     # else, move on
                     first_name = (
-                        new_mem.first_name or "PersonWithNoName"
+                            new_mem.first_name or "PersonWithNoName"
                     )  # edge case of empty name - occurs for some bugs.
 
                     if cust_welcome:
@@ -276,7 +275,7 @@ def left_member(bot: Bot, update: Update):
                 return
 
             first_name = (
-                left_mem.first_name or "PersonWithNoName"
+                    left_mem.first_name or "PersonWithNoName"
             )  # edge case of empty name - occurs for some bugs.
             if cust_goodbye:
                 if left_mem.last_name:
@@ -361,7 +360,7 @@ def welcome(bot: Bot, update: Update, args: List[str]):
 
         else:
             # idek what you're writing, say yes or no
-            update.effective_message.reply_text("Capisco solo 'on/yes' o 'off/no'!")
+            update.effective_message.reply_text("Capisco solo 'no/yes' o 'off/on'!")
 
 
 @run_async
@@ -408,11 +407,11 @@ def goodbye(bot: Bot, update: Update, args: List[str]):
 
         elif args[0].lower() in ("off", "no"):
             sql.set_gdbye_preference(str(chat.id), False)
-            update.effective_message.reply_text("Se ne vanno? Saranno morte per me.")
+            update.effective_message.reply_text("Quando un utente uscirà dal gruppo non intraprenderò nessuna azione!")
 
         else:
             # idek what you're writing, say yes or no
-            update.effective_message.reply_text("Capisco solo 'on/yes' o 'off/no'!")
+            update.effective_message.reply_text("Capisco solo 'no/yes' o 'off/on'!")
 
 
 @run_async
