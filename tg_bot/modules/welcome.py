@@ -129,11 +129,15 @@ def cas_banned(userid):
 @run_async
 def new_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
+    new_members = update.effective_message.new_chat_members
+    for new_mem in new_members:
+        if not new_mem.username:
+            chat.kick_member(new_mem.id)
+            break
 
     should_welc, cust_welcome, welc_type = sql.get_welc_pref(chat.id)
     if should_welc:
         sent = None
-        new_members = update.effective_message.new_chat_members
         for new_mem in new_members:
             # Check if the user is cas-banned
             if not cas_banned(new_mem.id):
