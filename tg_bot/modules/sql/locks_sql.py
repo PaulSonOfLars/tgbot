@@ -158,64 +158,66 @@ def update_restriction(chat_id, restr_type, locked):
 
 
 def is_locked(chat_id, lock_type):
-    curr_perm = SESSION.query(Permissions).get(str(chat_id))
-    SESSION.close()
+    with PERM_LOCK:
+        curr_perm = SESSION.query(Permissions).get(str(chat_id))
+        SESSION.close()
 
-    if not curr_perm:
-        return False
+        if not curr_perm:
+            return False
 
-    elif lock_type == "sticker":
-        return curr_perm.sticker
-    elif lock_type == "photo":
-        return curr_perm.photo
-    elif lock_type == "audio":
-        return curr_perm.audio
-    elif lock_type == "voice":
-        return curr_perm.voice
-    elif lock_type == "contact":
-        return curr_perm.contact
-    elif lock_type == "video":
-        return curr_perm.video
-    elif lock_type == "videonote":
-        return curr_perm.videonote
-    elif lock_type == "document":
-        return curr_perm.document
-    elif lock_type == "gif":
-        return curr_perm.gif
-    elif lock_type == "url":
-        return curr_perm.url
-    elif lock_type == "bots":
-        return curr_perm.bots
-    elif lock_type == "forward":
-        return curr_perm.forward
-    elif lock_type == "game":
-        return curr_perm.game
-    elif lock_type == "location":
-        return curr_perm.location
+        elif lock_type == "sticker":
+            return curr_perm.sticker
+        elif lock_type == "photo":
+            return curr_perm.photo
+        elif lock_type == "audio":
+            return curr_perm.audio
+        elif lock_type == "voice":
+            return curr_perm.voice
+        elif lock_type == "contact":
+            return curr_perm.contact
+        elif lock_type == "video":
+            return curr_perm.video
+        elif lock_type == "videonote":
+            return curr_perm.videonote
+        elif lock_type == "document":
+            return curr_perm.document
+        elif lock_type == "gif":
+            return curr_perm.gif
+        elif lock_type == "url":
+            return curr_perm.url
+        elif lock_type == "bots":
+            return curr_perm.bots
+        elif lock_type == "forward":
+            return curr_perm.forward
+        elif lock_type == "game":
+            return curr_perm.game
+        elif lock_type == "location":
+            return curr_perm.location
 
 
 def is_restr_locked(chat_id, lock_type):
-    curr_restr = SESSION.query(Restrictions).get(str(chat_id))
-    SESSION.close()
+    with PERM_LOCK:
+        curr_restr = SESSION.query(Restrictions).get(str(chat_id))
+        SESSION.close()
 
-    if not curr_restr:
-        return False
+        if not curr_restr:
+            return False
 
-    if lock_type == "messages":
-        return curr_restr.messages
-    elif lock_type == "media":
-        return curr_restr.media
-    elif lock_type == "other":
-        return curr_restr.other
-    elif lock_type == "previews":
-        return curr_restr.preview
-    elif lock_type == "all":
-        return (
-                curr_restr.messages
-                and curr_restr.media
-                and curr_restr.other
-                and curr_restr.preview
-        )
+        if lock_type == "messages":
+            return curr_restr.messages
+        elif lock_type == "media":
+            return curr_restr.media
+        elif lock_type == "other":
+            return curr_restr.other
+        elif lock_type == "previews":
+            return curr_restr.preview
+        elif lock_type == "all":
+            return (
+                    curr_restr.messages
+                    and curr_restr.media
+                    and curr_restr.other
+                    and curr_restr.preview
+            )
 
 
 def get_locks(chat_id):
