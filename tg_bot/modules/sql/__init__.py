@@ -6,7 +6,7 @@ from tg_bot import DB_URI
 
 
 def start() -> scoped_session:
-    engine = create_engine(DB_URI, client_encoding="utf8")
+    engine = create_engine(DB_URI, client_encoding="utf8", pool_pre_ping=True)
     BASE.metadata.bind = engine
     BASE.metadata.create_all(engine)
     return scoped_session(sessionmaker(bind=engine, autoflush=False))
