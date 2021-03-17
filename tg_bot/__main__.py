@@ -30,7 +30,8 @@ I also have a news channel, @MarieNews for announcements on new features, downti
 
 You can find the list of available commands with /help.
 
-If you're enjoying using me, and/or would like to help me survive in the wild, hit /donate to help fund/upgrade my VPS!
+If you're enjoying using me, and/or would like to help me surjhgff
+in the wild, hit /donate to help fund/upgrade my VPS!
 """
 
 HELP_STRINGS = """
