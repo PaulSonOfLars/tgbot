@@ -638,7 +638,7 @@ def process_update(self, update):
         return
 
     now = datetime.datetime.utcnow()
-    self.logger.debug(update)
+    LOGGER.info(update)
     cnt = CHATS_CNT.get(update.effective_chat.id, 0)
 
     t = CHATS_TIME.get(update.effective_chat.id, datetime.datetime(1970, 1, 1))

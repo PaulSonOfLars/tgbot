@@ -10,6 +10,7 @@ from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
 import tg_bot.modules.sql.welcome_sql as sql
+from tg_bot import BAN_STICKER
 from tg_bot import dispatcher, OWNER_ID, LOGGER
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.helper_funcs.misc import build_keyboard, revert_buttons
@@ -19,7 +20,6 @@ from tg_bot.modules.helper_funcs.string_handling import (
     escape_invalid_curly_brackets,
 )
 from tg_bot.modules.log_channel import loggable
-from tg_bot import BAN_STICKER
 
 VALID_WELCOME_FORMATTERS = [
     "first",
@@ -96,8 +96,8 @@ def send(update, message, keyboard, backup_message):
                 ),
                 parse_mode=ParseMode.MARKDOWN,
             )
-            LOGGER.warning(message)
-            LOGGER.warning(keyboard)
+            LOGGER.warning(f"Message obj warn: {message}")
+            LOGGER.warning(f"Keyword warn: {keyboard}")
             LOGGER.exception("Impossibile parsarlo! Ci sono degli url non validi.")
         else:
             msg = update.effective_message.reply_text(
