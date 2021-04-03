@@ -685,7 +685,7 @@ def process_update(self, update):
                 self.logger.exception(
                     "An uncaught error was raised while processing the update"
                 )
-    except KeyError:
+    except AttributeError:
         LOGGER.info("We have received an invalid update from telegram, skipping")
 
 
