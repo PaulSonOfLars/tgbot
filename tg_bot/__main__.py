@@ -639,51 +639,54 @@ def process_update(self, update):
 
     now = datetime.datetime.utcnow()
     LOGGER.info(update)
-    cnt = CHATS_CNT.get(update.effective_chat.id, 0)
+    try:
+        cnt = CHATS_CNT.get(update.effective_chat.id, 0)
 
-    t = CHATS_TIME.get(update.effective_chat.id, datetime.datetime(1970, 1, 1))
-    if t and now > t + datetime.timedelta(0, 1):
-        CHATS_TIME[update.effective_chat.id] = now
-        cnt = 0
-    else:
-        cnt += 1
+        t = CHATS_TIME.get(update.effective_chat.id, datetime.datetime(1970, 1, 1))
+        if t and now > t + datetime.timedelta(0, 1):
+            CHATS_TIME[update.effective_chat.id] = now
+            cnt = 0
+        else:
+            cnt += 1
 
-    if cnt > 10:
-        return
+        if cnt > 10:
+            return
 
-    CHATS_CNT[update.effective_chat.id] = cnt
-    for group in self.groups:
-        try:
-            for handler in (x for x in self.handlers[group] if x.check_update(update)):
-                handler.handle_update(update, self)
-                break
-
-        # Stop processing with any other handler.
-        except DispatcherHandlerStop:
-            self.logger.debug("Stopping further handlers due to DispatcherHandlerStop")
-            break
-
-        # Dispatch any error.
-        except TelegramError as te:
-            self.logger.warning(
-                "A TelegramError was raised while processing the Update"
-            )
-
+        CHATS_CNT[update.effective_chat.id] = cnt
+        for group in self.groups:
             try:
-                self.dispatch_error(update, te)
+                for handler in (x for x in self.handlers[group] if x.check_update(update)):
+                    handler.handle_update(update, self)
+                    break
+
+            # Stop processing with any other handler.
             except DispatcherHandlerStop:
-                self.logger.debug("Error handler stopped further handlers")
+                self.logger.debug("Stopping further handlers due to DispatcherHandlerStop")
                 break
-            except Exception:
-                self.logger.exception(
-                    "An uncaught error was raised while handling the error"
+
+            # Dispatch any error.
+            except TelegramError as te:
+                self.logger.warning(
+                    "A TelegramError was raised while processing the Update"
                 )
 
-        # Errors should not stop the thread.
-        except Exception:
-            self.logger.exception(
-                "An uncaught error was raised while processing the update"
-            )
+                try:
+                    self.dispatch_error(update, te)
+                except DispatcherHandlerStop:
+                    self.logger.debug("Error handler stopped further handlers")
+                    break
+                except Exception:
+                    self.logger.exception(
+                        "An uncaught error was raised while handling the error"
+                    )
+
+            # Errors should not stop the thread.
+            except Exception:
+                self.logger.exception(
+                    "An uncaught error was raised while processing the update"
+                )
+    except KeyError:
+        LOGGER.info("We have received an invalid update from telegram, skipping")
 
 
 if __name__ == "__main__":
