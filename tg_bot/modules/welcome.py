@@ -9,6 +9,7 @@ from telegram.error import BadRequest
 from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
+import tg_bot.modules.sql.users_sql as user_sql
 import tg_bot.modules.sql.welcome_sql as sql
 from tg_bot import BAN_STICKER
 from tg_bot import dispatcher, OWNER_ID, LOGGER
@@ -154,6 +155,11 @@ def new_member(bot: Bot, update: Update):
                         continue
 
                     else:
+                        # Adding the new user to the database
+                        user_sql.update_user(new_mem.id,
+                                             new_mem.username,
+                                             chat.id,
+                                             chat.title)
                         # Muting new users
                         bot.restrict_chat_member(
                             chat.id, new_mem.id, can_send_messages=False
