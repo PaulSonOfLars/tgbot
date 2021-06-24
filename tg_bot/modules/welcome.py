@@ -255,7 +255,7 @@ def new_member(bot: Bot, update: Update):
             else:
                 # Kicking the user because of the username
                 user_id = new_mem.id
-                message.reply_text("L'utente non ha uno username, verrà rimosso.")
+                message.reply_text("L'utente non ha uno username, quindi verrà rimosso.")
                 chat.kick_member(user_id, until_date=time.time() + 300)
 
         prev_welc = sql.get_clean_pref(chat.id)
