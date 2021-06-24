@@ -255,9 +255,8 @@ def new_member(bot: Bot, update: Update):
             else:
                 # Kicking the user because of the username
                 user_id = new_mem.id
+                message.reply_text("L'utente non ha uno username, verrà rimosso.")
                 chat.kick_member(user_id, until_date=time.time() + 300)
-                bot.send_sticker(chat.id, BAN_STICKER)  # banhammer electus sticker
-                message.reply_text("L'utente non ha uno username, quindi è stato rimosso.")
 
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:
