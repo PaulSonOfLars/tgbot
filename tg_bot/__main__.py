@@ -387,14 +387,15 @@ def CoCDone(bot: Bot, update: Update):
             COC_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True
         )
         # Deactivating mute
-        bot.restrict_chat_member(
-            DEFAULT_CHAT_ID,
-            int(user.id),
-            can_send_messages=True,
-            can_send_media_messages=True,
-            can_send_other_messages=True,
-            can_add_web_page_previews=True,
-        )
+        for group_id in GROUPS:
+            bot.restrict_chat_member(
+                group_id,
+                int(user.id),
+                can_send_messages=True,
+                can_send_media_messages=True,
+                can_send_other_messages=True,
+                can_add_web_page_previews=True,
+            )
     else:
         update.effective_message.reply_text(
             "Prima di interagire nel gruppo devi prendere visione e accettare il Codice di Condotta.",
