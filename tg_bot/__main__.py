@@ -152,8 +152,23 @@ def start(bot: Bot, update: Update, args: List[str]):
         else:
             first_name = update.effective_user.first_name
             update.effective_message.reply_photo(
-                MARIE_PIC, PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
-                parse_mode=ParseMode.MARKDOWN)
+                MARIE_PIC,
+                caption=PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(context.bot.first_name), OWNER_ID),
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=InlineKeyboardMarkup(                   
+                          [[
+                              InlineKeyboardButton(
+                              text="🎙️Support🎙️",
+                              url=f"https://t.me/MarieSupport"),
+                              InlineKeyboardButton(
+                              text="📢 Updates 📢",
+                              url="https://MarieNews")
+                          [
+                              InlineKeyboardButton(
+                              text="➕ Add {} To Your Group ➕".format(context.bot.first_name),
+                              url="t.me/{}?startgroup=true".format(
+                                  context.bot.username))
+                          ]])) 
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
