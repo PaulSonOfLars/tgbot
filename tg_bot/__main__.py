@@ -167,8 +167,8 @@ def start(bot: Bot, update: Update, args: List[str]):
                               InlineKeyboardButton(
                               text="➕ Add me to Group ➕",
                               url="t.me/{}?startgroup=true".format(
-                                  context.bot.username))
-                          ]]) 
+                                  context.bot.username)
+                          ]] 
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
