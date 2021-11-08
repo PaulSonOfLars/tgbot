@@ -57,6 +57,9 @@ SOURCE_STRING = """Oh you want my source . I am built in python 3 , Using the py
 SOURCEG_STRING = """I'm a group manager bot built in python3, using the python-telegram-bot library, and am fully opensource; \
 you can find what makes me tick [here](github.com/PaulSonOfLars/tgbot)!"""
 
+MARIE_PIC = "https://telegra.ph/file/1b2232194134f2cdcfceb.jpg"
+
+
 IMPORTED = {}
 MIGRATEABLE = []
 HELPABLE = {}
@@ -148,8 +151,8 @@ def start(bot: Bot, update: Update, args: List[str]):
 
         else:
             first_name = update.effective_user.first_name
-            update.effective_message.reply_text(
-                PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
+            update.effective_message.reply_photo(
+                MARIE_PIC, PM_START_TEXT.format(escape_markdown(first_name), escape_markdown(bot.first_name), OWNER_ID),
                 parse_mode=ParseMode.MARKDOWN)
     else:
         update.effective_message.reply_text("Yo, whadup?")
