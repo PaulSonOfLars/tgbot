@@ -1,3 +1,5 @@
+![tgbot](https://telegra.ph/file/0233b58e8dbbffe5887d3.jpg)
+
 # tgbot
 A modular telegram Python bot running on python3 with an sqlalchemy database.
 
@@ -27,12 +29,25 @@ This project is no longer under active maintenance. Occasional bug fixes may be 
 Users of [Marie](https://t.me/BanhammerMarie_bot) are encouraged to migrate to [Rose](https://t.me/MissRose_bot), which
 is the improved version of this project, written in golang, with scalability in mind.
 
-## Starting the bot.
+## Hosting 
+
+<details><summary>Deploy To Heroku</summary>
+<p>
+<br>
+<a href="https://heroku.com/deploy?template=https://github.com/Kunal-Diwan/tgbot">
+  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
+</a>
+</p>
+</details>
+
+<details><summary>Self Hosting</summary>
+<p> 
+
+## Starting the bot
 
 Once you've setup your database and your configuration (see below) is complete, simply run:
 
 `python3 -m tg_bot`
-
 
 ## Setting up the bot (Read this before trying to use!):
 Please make sure to use python3.6, as I cannot guarantee everything will work as expected on older python versions!
@@ -183,3 +198,9 @@ it is necessary to migrate it in the db.
 
 The `__stats__()` function is for retrieving module statistics, eg number of users, number of chats. This is accessed 
 through the `/stats` command, which is only available to the bot owner.
+</p>
+</details>
+
+## Credits
+
+* Well, it's all in the commit history Feel free to open pull requests should any be missing.
