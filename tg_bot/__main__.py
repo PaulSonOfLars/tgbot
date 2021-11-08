@@ -168,7 +168,7 @@ def start(bot: Bot, update: Update, args: List[str]):
                               text="➕ Add me to Group ➕",
                               url="t.me/{}?startgroup=true".format(
                                   context.bot.username))
-                          ]])) 
+                          ]]) 
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
