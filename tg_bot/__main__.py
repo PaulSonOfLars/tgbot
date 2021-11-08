@@ -165,10 +165,10 @@ def start(bot: Bot, update: Update, args: List[str]):
                               url="https://MarieNews")
                           [
                               InlineKeyboardButton(
-                              text="➕ Add {} To Your Group ➕".format(context.bot.first_name),
+                              text="➕ Add Me To Your Group ➕",
                               url="t.me/{}?startgroup=true".format(
-                                  context.bot.username))
-                         ]] 
+                                  context.bot.username)
+                          ]])) 
     else:
         update.effective_message.reply_text("Yo, whadup?")
 
