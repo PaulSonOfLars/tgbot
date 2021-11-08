@@ -25,9 +25,6 @@ I can help manage your groups with useful features, feel free to add me to your 
 
 Follow @MarieNews if you want to keep up with the bot news, bot updates and bot downtime!
 
-I'm a group manager bot built in python3, using the python-telegram-bot library, and am fully opensource; \
-you can find what makes me tick [here](github.com/PaulSonOfLars/tgbot)!
-
 """
 
 HELP_STRINGS = """
@@ -53,6 +50,12 @@ It took a lot of work for my creator to get me to where I am now - so if you hav
 After all, server fees don't pay themselves - so every little helps! All donation money goes straight to funding the VPS, and of course, boosting morale - always nice to see my work is appreciated :) \
 You can donate on paypal [here](https://paypal.me/PaulSonOfLars), or if you want to help support me on a monthly basis, you can set up a recurring donation on [GitHub Sponsors](https://github.com/sponsors/PaulSonOfLars). \
 Thank you for your generosity!"""
+
+SOURCE_STRING = """Oh you want my source . I am built in python 3 , Using the python-telegram-bot library, and am fully open source .
+\nDon't forgot to fork 🍴 and star 🌟 the repo . \n\nCheck my source below 👇"""
+
+SOURCEG_STRING = """I'm a group manager bot built in python3, using the python-telegram-bot library, and am fully opensource; \
+you can find what makes me tick [here](github.com/PaulSonOfLars/tgbot)!"""
 
 IMPORTED = {}
 MIGRATEABLE = []
@@ -379,11 +382,6 @@ def donate(bot: Bot, update: Update):
     if chat.type == "private":
         update.effective_message.reply_text(DONATE_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
 
-        if OWNER_ID != 254318997 and DONATION_LINK:
-            update.effective_message.reply_text("You can also donate to the person currently running me "
-                                                "[here]({})".format(DONATION_LINK),
-                                                parse_mode=ParseMode.MARKDOWN)
-
     else:
         try:
             bot.send_message(user.id, DONATE_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True)
@@ -392,6 +390,38 @@ def donate(bot: Bot, update: Update):
         except Unauthorized:
             update.effective_message.reply_text("Contact me in PM first to get donation information.")
 
+@run_async
+def source(bot: Bot, update: Update):
+    user = update.effective_message.from_user
+    chat = update.effective_chat  # type: Optional[Chat]
+
+    if chat.type == "private":
+        update.effective_message.reply_text(
+            SOURCE_STRING, parse_mode=ParseMode.MARKDOWN, disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(
+                [
+                  [
+                    InlineKeyboardButton(text="↗️ Source ↗️", url="https://github.com/Kunal-Diwan/TgMarie")
+                 ] 
+                ]
+            ),
+        )
+
+    else:
+        try:
+            bot.send_message(
+                user.id,
+                SOURCEG_STRING,
+                parse_mode=ParseMode.MARKDOWN,
+                disable_web_page_preview=True,
+            )
+
+            update.effective_message.reply_text(
+                "I have PM you about my source!"
+            )
+        except Unauthorized:
+            update.effective_message.reply_text(
+                "Contact me in PM first to get source information."
+            )
 
 def migrate_chats(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
@@ -423,6 +453,7 @@ def main():
     settings_callback_handler = CallbackQueryHandler(settings_button, pattern=r"stngs_")
 
     donate_handler = CommandHandler("donate", donate)
+    source_handler = CommandHandler("source", donate)
     migrate_handler = MessageHandler(Filters.status_update.migrate, migrate_chats)
 
     # dispatcher.add_handler(test_handler)
@@ -433,6 +464,7 @@ def main():
     dispatcher.add_handler(settings_callback_handler)
     dispatcher.add_handler(migrate_handler)
     dispatcher.add_handler(donate_handler)
+    dispatcher.add_handler(source_handler)
 
     # dispatcher.add_error_handler(error_callback)
 
