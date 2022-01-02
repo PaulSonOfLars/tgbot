@@ -48,8 +48,8 @@ if ENV:
     PORT = int(os.environ.get('PORT', 5000))
     CERT_PATH = os.environ.get("CERT_PATH")
 
-    DB_URI = os.environ.get('DATABASE_URL')
-    DONATION_LINK = os.environ.get('DONATION_LINK')
+    DB_URI = os.environ.get("DATABASE_URL")
+    DONATION_LINK = os.environ.get("DONATION_LINK")
     LOAD = os.environ.get("LOAD", "").split()
     NO_LOAD = os.environ.get("NO_LOAD", "translation").split()
     DEL_CMDS = bool(os.environ.get('DEL_CMDS', False))
