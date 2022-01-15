@@ -215,7 +215,7 @@ ensure_bot_in_db()
 
 def remove_user(user_id, chat_id, username):
     with INSERTION_LOCK:
-        user = SESSION.query(RemovedUser).get((user_id, chat_id))
+        user = SESSION.query(RemovedUser).get((user_id, str(chat_id)))
         if not user:
             user = RemovedUser(user_id, chat_id, username)
             SESSION.add(user)
