@@ -6,7 +6,7 @@ import requests as req
 from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode, InlineKeyboardMarkup
 from telegram.error import BadRequest
-from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
+from telegram.ext import MessageHandler, Filters, CommandHandler, run_async, JobQueue
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
 import tg_bot.modules.sql.users_sql as user_sql
@@ -255,8 +255,9 @@ def new_member(bot: Bot, update: Update):
             else:
                 # Kicking the user because of the username
                 user_id = new_mem.id
-                message.reply_text("L'utente non ha uno username, quindi verrà rimosso.")
                 chat.kick_member(user_id, until_date=time.time() + 300)
+                user_sql.remove_user(user_id, chat.id)  # Keep track of whom we removed and where
+                bot.delete_message(chat.id, message.message_id)  # Delete " user joined group" message
 
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:

@@ -27,6 +27,19 @@ class Users(BASE):
         return "<User {} ({})>".format(self.username, self.user_id)
 
 
+class RemovedUser(BASE):
+    __tablename__ == "removed_user"
+    user_id = Column(BigInteger, primary_key=True)
+    chat_id = Column(String(14), primary_key=True)
+
+    def __init__(self, user_id, chat_id):
+        self.user_id = user_id
+        self.chat_id = str(chat_id)
+
+    def __repr__(self):
+        return f"<RemovedUser {self.user_id} | {self.chat_id}>"
+
+
 class Chats(BASE):
     __tablename__ = "chats"
     chat_id = Column(String(14), primary_key=True)
@@ -72,6 +85,7 @@ class ChatMembers(BASE):
 Users.__table__.create(checkfirst=True)
 Chats.__table__.create(checkfirst=True)
 ChatMembers.__table__.create(checkfirst=True)
+RemovedUser.__table__.create(checkfirst=True)
 
 INSERTION_LOCK = threading.RLock()
 
@@ -195,6 +209,16 @@ def migrate_chat(old_chat_id, new_chat_id):
 
 
 ensure_bot_in_db()
+
+
+def remove_user(user_id, chat_id):
+    with INSERTION_LOCK:
+        user = SESSION.query(RemovedUser).get((user_id, chat_id))
+        if not user:
+            user = RemovedUser(user_id, chat_id)
+            SESSION.add(user)
+            SESSION.flush()
+        SESSION.commit()
 
 
 def del_user(user_id):
