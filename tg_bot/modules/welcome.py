@@ -6,7 +6,7 @@ import requests as req
 from telegram import Message, Chat, Update, Bot, User
 from telegram import ParseMode, InlineKeyboardMarkup
 from telegram.error import BadRequest
-from telegram.ext import MessageHandler, Filters, CommandHandler, run_async, JobQueue
+from telegram.ext import MessageHandler, Filters, CommandHandler, run_async
 from telegram.utils.helpers import mention_markdown, mention_html, escape_markdown
 
 import tg_bot.modules.sql.users_sql as user_sql
@@ -216,6 +216,7 @@ def new_member(bot: Bot, update: Update):
                             keyboard,
                             sql.DEFAULT_WELCOME.format(first=first_name),
                         )  # type: Optional[Message]
+                        delete_welcome_message(bot, sent.message_id, 50000)
 
                 else:
                     # BEGINNING THE BAN
@@ -268,6 +269,14 @@ def new_member(bot: Bot, update: Update):
 
             if sent:
                 sql.set_clean_welcome(chat.id, sent.message_id)
+
+
+@run_async
+def delete_welcome_message(bot: Bot, update: Update, message_id: Message, timeout: int):
+    # Very very very ugly way to handle a remove message after a timeout
+    time.sleep(timeout)
+    chat = update.effective_chat
+    bot.delete_message(chat.id, message_id)
 
 
 @run_async
