@@ -253,11 +253,11 @@ def new_member(bot: Bot, update: Update):
                                 "Diamine, non riesco a bannare questo utente."
                             )
             else:
-                # Kicking the user because of the username
+                # Kicking the user because of the empty username
                 user_id = new_mem.id
                 chat.kick_member(user_id, until_date=time.time() + 300)
-                user_sql.remove_user(user_id, chat.id)  # Keep track of whom we removed and where
-                bot.delete_message(chat.id, message.message_id)  # Delete " user joined group" message
+                user_sql.remove_user(user_id, chat.id, new_mem.first_name)  # Keep track of whom we removed and where
+                bot.delete_message(chat.id, message.message_id)  # Delete "user joined group" message
 
         prev_welc = sql.get_clean_pref(chat.id)
         if prev_welc:
