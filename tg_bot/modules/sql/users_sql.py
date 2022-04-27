@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, Integer, UnicodeText, String, ForeignKey, UniqueConstraint, func
+from sqlalchemy import Column, Integer, BigInteger, UnicodeText, String, ForeignKey, UniqueConstraint, func
 
 from tg_bot import dispatcher
 from tg_bot.modules.sql import BASE, SESSION
@@ -8,7 +8,7 @@ from tg_bot.modules.sql import BASE, SESSION
 
 class Users(BASE):
     __tablename__ = "users"
-    user_id = Column(Integer, primary_key=True)
+    user_id = Column(BigInteger, primary_key=True)
     username = Column(UnicodeText)
 
     def __init__(self, user_id, username=None):

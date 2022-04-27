@@ -183,3 +183,8 @@ it is necessary to migrate it in the db.
 
 The `__stats__()` function is for retrieving module statistics, eg number of users, number of chats. This is accessed 
 through the `/stats` command, which is only available to the bot owner.
+
+### Docker Compose
+
+For using docker-compose you should change .env file variables according to **_Configuration_** section, remove unused values from docker-compose file `environment` section in `bot` container.
+Then you can run your bot with `docker-compose up` command
