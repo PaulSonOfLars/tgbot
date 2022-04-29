@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  bot:
+    build: ./
+    environment:
+      ENV: "${ENV}"
+      TOKEN: "${TOKEN}"
+      OWNER_ID: "${OWNER_ID}"
+      OWNER_USERNAME: "${OWNER_USERNAME}"
+      DATABASE_URL: "${DATABASE_URL}"
+      #      MESSAGE_DUMP: "${MESSAGE_DUMP}"
+      LOAD: "${LOAD}"
+      NO_LOAD: "${NO_LOAD}"
+      #      WEBHOOK: "${WEBHOOK}"
+      #      URL: "${URL}"
+      SUDO_USERS: "${SUDO_USERS}"
+      SUPPORT_USERS: "${SUPPORT_USERS}"
+      WHITELIST_USERS: "${WHITELIST_USERS}"
+      #      DONATION_LINK: "${DONATION_LINK}"
+      #      CERT_PATH: "${CERT_PATH}"
+      #      PORT: "${PORT}"
+      DEL_CMDS: "${DEL_CMDS}"
+      WORKERS: "${WORKERS}"
+      BAN_STICKER: "${BAN_STICKER}"
+      ALLOW_EXCL: "${ALLOW_EXCL}"
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    image: postgres:14.2-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - /CHANGE_IT/var/lib/postgresql:/var/lib/postgresql
