@@ -3,6 +3,7 @@ version: '3.8'
 services:
   bot:
     build: ./
+    restart: always
     environment:
       ENV: "${ENV}"
       TOKEN: "${TOKEN}"
