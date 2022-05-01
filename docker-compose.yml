@@ -39,4 +39,4 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /CHANGE_IT/var/lib/postgresql:/var/lib/postgresql
+      - /home/var/lib/postgresql:/var/lib/postgresql
