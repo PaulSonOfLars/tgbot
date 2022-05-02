@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, BigInteger, Integer, String
+from sqlalchemy import Column, BigInteger, String
 
 from tg_bot.modules.sql import BASE, SESSION
 
@@ -13,8 +13,8 @@ class FloodControl(BASE):
     __tablename__ = "antiflood"
     chat_id = Column(String(14), primary_key=True)
     user_id = Column(BigInteger)
-    count = Column(Integer, default=DEF_COUNT)
-    limit = Column(Integer, default=DEF_LIMIT)
+    count = Column(BigInteger, default=DEF_COUNT)
+    limit = Column(BigInteger, default=DEF_LIMIT)
 
     def __init__(self, chat_id):
         self.chat_id = str(chat_id)  # ensure string

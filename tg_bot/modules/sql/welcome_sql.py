@@ -1,6 +1,6 @@
 import threading
 
-from sqlalchemy import Column, String, Boolean, UnicodeText, Integer, BigInteger
+from sqlalchemy import Column, String, Boolean, UnicodeText, BigInteger
 
 from tg_bot.modules.helper_funcs.msg_types import Types
 from tg_bot.modules.sql import SESSION, BASE
@@ -16,10 +16,10 @@ class Welcome(BASE):
     should_goodbye = Column(Boolean, default=True)
 
     custom_welcome = Column(UnicodeText, default=DEFAULT_WELCOME)
-    welcome_type = Column(Integer, default=Types.TEXT.value)
+    welcome_type = Column(BigInteger, default=Types.TEXT.value)
 
     custom_leave = Column(UnicodeText, default=DEFAULT_GOODBYE)
-    leave_type = Column(Integer, default=Types.TEXT.value)
+    leave_type = Column(BigInteger, default=Types.TEXT.value)
 
     clean_welcome = Column(BigInteger)
 
@@ -34,7 +34,7 @@ class Welcome(BASE):
 
 class WelcomeButtons(BASE):
     __tablename__ = "welcome_urls"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     chat_id = Column(String(14), primary_key=True)
     name = Column(UnicodeText, nullable=False)
     url = Column(UnicodeText, nullable=False)
@@ -49,7 +49,7 @@ class WelcomeButtons(BASE):
 
 class GoodbyeButtons(BASE):
     __tablename__ = "leave_urls"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
     chat_id = Column(String(14), primary_key=True)
     name = Column(UnicodeText, nullable=False)
     url = Column(UnicodeText, nullable=False)
