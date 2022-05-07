@@ -230,6 +230,9 @@ def help_button(bot: Bot, update: Update):
             pass
         elif excp.message == "Message can't be deleted":
             pass
+        elif "Query is too old" in excp.message:
+            bot.send_message(query.chat_instance, "Menu is expired. Please type '/help' to open new menu")
+            pass
         else:
             LOGGER.exception("Exception in help buttons. %s", str(query.data))
 
