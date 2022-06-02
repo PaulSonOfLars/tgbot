@@ -41,4 +41,3 @@ services:
       - "8443:8443"
     volumes:
       - /home/chatcomm/postgresql:/var/lib/postgresql
-      - /home/chatcomm/cert:/home/certificate
