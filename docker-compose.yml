@@ -39,5 +39,5 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /home/postgresql:/var/lib/postgresql
-      - /home/certificate:/home/certificate
+      - /home/chatcomm/postgresql:/var/lib/postgresql
+      - /home/chatcomm/cert:/home/certificate
