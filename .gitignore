@@ -6,3 +6,5 @@ tg_bot/config.py
 .directory
 .vscode
 .env
+cert.pem
+private.key
