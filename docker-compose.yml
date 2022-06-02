@@ -40,4 +40,4 @@ services:
       - "5432:5432"
     volumes:
       - /home/chatcomm/postgresql:/var/lib/postgresql
-      - /home/chatcomm/cert:/home/certificate
+      - /home/chatcomm/cert:/home/certificate
