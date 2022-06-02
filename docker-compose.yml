@@ -27,6 +27,8 @@ services:
       ALLOW_EXCL: "${ALLOW_EXCL}"
     depends_on:
       - db
+    ports:
+      - "8443:8443"
 
   db:
     container_name: db
@@ -38,6 +40,5 @@ services:
       POSTGRES_DB: "${POSTGRES_DB}"
     ports:
       - "5432:5432"
-      - "8443:8443"
     volumes:
       - /home/chatcomm/postgresql:/var/lib/postgresql
