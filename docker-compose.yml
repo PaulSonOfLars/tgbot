@@ -28,7 +28,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8443:${PORT}"
+      - "${PORT}:${PORT}"
 
   db:
     container_name: db
