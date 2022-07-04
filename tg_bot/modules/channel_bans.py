@@ -24,6 +24,9 @@ def ban_channel(bot: Bot, update: Update, args: List[str]):
 @bot_can_delete
 @loggable
 def global_ban_channel(bot: Bot, update: Update, args: List[str]):
+    if int(update.effective_user.id) not in SUDO_USERS:
+        update.effective_message.reply_text("Only SUDO users can use this command")
+        return
     channel_name = args[0]
     sql.add_channel_global_bans(channel_name)
     update.effective_message.reply_text("Channel " + channel_name + " was added to global ban list")
@@ -45,7 +48,7 @@ def banned_channels(bot: Bot, update: Update):
     res = sql.get_channel_bans(chat.id)
     if res is not None:
         res = list(map(lambda x: x.channel_to_ban, res))
-        update.effective_message.reply_text("Channels banned in this channel: " + ','.join(res))
+        update.effective_message.reply_text("Channels banned in this chat: " + ','.join(res))
     else:
         update.effective_message.reply_text("There are no channels in ban")
 
@@ -55,7 +58,7 @@ def banned_channels(bot: Bot, update: Update):
 @loggable
 def global_ban_channel(bot: Bot, update: Update, args: List[str]):
     if int(update.effective_user.id) not in SUDO_USERS:
-        update.effective_message.reply_text("You are not a sudo user")
+        update.effective_message.reply_text("Only SUDO users can use this command")
         return
     channel_name = args[0]
     sql.add_channel_global_bans(channel_name)
@@ -67,8 +70,7 @@ def global_ban_channel(bot: Bot, update: Update, args: List[str]):
 @loggable
 def global_unban_channel(bot: Bot, update: Update, args: List[str]):
     if int(update.effective_user.id) not in SUDO_USERS:
-        update.effective_message.reply_text(
-            "You are not a sudo user")
+        update.effective_message.reply_text("Only SUDO users can use this command")
         return
     channel_name = args[0]
     sql.delete_channel_global_ban(channel_name)
@@ -79,8 +81,7 @@ def global_unban_channel(bot: Bot, update: Update, args: List[str]):
 @user_admin
 def global_banned_channels(bot: Bot, update: Update):
     if int(update.effective_user.id) not in SUDO_USERS:
-        update.effective_message.reply_text(
-            "You are not a sudo user")
+        update.effective_message.reply_text("Only SUDO users can use this command")
         return
     res = sql.get_channel_global_bans()
     if res is not None:
@@ -110,7 +111,6 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 __help__ = """
-
 *Admin only:*
  - /banchannel channelname: add channel to list of banned channels in this group
  - /unbanchannel channelname: remove channel from list of banned channels in this group
@@ -126,8 +126,7 @@ BAN_CHANNEL_HANDLER = CommandHandler("banchannel", ban_channel, pass_args=True, 
 UNBAN_CHANNEL_HANDLER = CommandHandler("unbanchannel", unban_channel, pass_args=True, filters=Filters.group)
 BANNED_CHANNELS_HANDLER = CommandHandler("bannedchannels", banned_channels, filters=Filters.group)
 GLOBAL_BAN_CHANNEL_HANDLER = CommandHandler("globalbanchannel", ban_channel, pass_args=True, filters=Filters.group)
-GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("globalunbanchannel", unban_channel, pass_args=True,
-                                              filters=Filters.group)
+GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("globalunbanchannel", unban_channel, pass_args=True, filters=Filters.group)
 GLOBAL_BANNED_CHANNELS_HANDLER = CommandHandler("globalbannedchannels", banned_channels, filters=Filters.group)
 
 dispatcher.add_handler(BAN_CHANNEL_HANDLER)
