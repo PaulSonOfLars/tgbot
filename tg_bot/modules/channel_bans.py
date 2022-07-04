@@ -62,7 +62,7 @@ def global_ban_channel(bot: Bot, update: Update, args: List[str]):
         return
     channel_name = args[0]
     sql.add_channel_global_bans(channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was added to global ban list")
+    update.effective_message.reply_text("Channel " + channel_name + " was added to global ban list")
 
 
 @run_async
@@ -74,7 +74,7 @@ def global_unban_channel(bot: Bot, update: Update, args: List[str]):
         return
     channel_name = args[0]
     sql.delete_channel_global_ban(channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was removed from global ban list")
+    update.effective_message.reply_text("Channel " + channel_name + " was removed from global ban list")
 
 
 @run_async
