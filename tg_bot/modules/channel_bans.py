@@ -54,8 +54,9 @@ def banned_channels(bot: Bot, update: Update):
 @bot_can_delete
 @loggable
 def global_ban_channel(bot: Bot, update: Update, args: List[str]):
-    if int(update.effective_user.id) in SUDO_USERS:
+    if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("You are not a sudo user")
+        return
     channel_name = args[0]
     sql.add_channel_global_bans(channel_name)
     update.effective_message.reply_text("Channel " + channel_name + "was added to global ban list")
@@ -65,9 +66,10 @@ def global_ban_channel(bot: Bot, update: Update, args: List[str]):
 @user_admin
 @loggable
 def global_unban_channel(bot: Bot, update: Update, args: List[str]):
-    if int(update.effective_user.id) in SUDO_USERS:
+    if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text(
             "You are not a sudo user")
+        return
     channel_name = args[0]
     sql.delete_channel_global_ban(channel_name)
     update.effective_message.reply_text("Channel " + channel_name + "was removed from global ban list")
@@ -76,9 +78,10 @@ def global_unban_channel(bot: Bot, update: Update, args: List[str]):
 @run_async
 @user_admin
 def global_banned_channels(bot: Bot, update: Update):
-    if int(update.effective_user.id) in SUDO_USERS:
+    if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text(
             "You are not a sudo user")
+        return
     res = sql.get_channel_global_bans()
     if res is not None:
         res = list(map(lambda x: x.channel_to_ban, res))
@@ -95,6 +98,7 @@ def remove_banned_forwardings(bot: Bot, update: Update):
         if is_exists:
             update.effective_message.reply_text("Channel " + forwarder_from_channel_name + " banned in this channel")
             update.effective_message.delete()
+            return
         is_exists_in_global = sql.is_global_channel_ban_exists(forwarder_from_channel_name)
         if is_exists_in_global:
             update.effective_message.reply_text("Channel " + forwarder_from_channel_name + " banned in global ban list")
