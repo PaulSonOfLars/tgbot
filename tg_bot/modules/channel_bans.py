@@ -115,9 +115,9 @@ __help__ = """
  - /banchannel channelname: add channel to list of banned channels in this group
  - /unbanchannel channelname: remove channel from list of banned channels in this group
  - /bannedchannels : show list of all banned channels
- - /globalbanchannel channelname: add channel to global list of banned channels
- - /globalunbanchannel channelname: remove channel from global list of banned channels
- - /globalbannedchannels : show list of all global banned channels
+ - /gbanchannel channelname: add channel to global list of banned channels
+ - /gunbanchannel channelname: remove channel from global list of banned channels
+ - /gbannedchannels : show list of all global banned channels
 """
 
 __mod_name__ = "Channel Bans"
@@ -125,9 +125,9 @@ __mod_name__ = "Channel Bans"
 BAN_CHANNEL_HANDLER = CommandHandler("banchannel", ban_channel, pass_args=True, filters=Filters.group)
 UNBAN_CHANNEL_HANDLER = CommandHandler("unbanchannel", unban_channel, pass_args=True, filters=Filters.group)
 BANNED_CHANNELS_HANDLER = CommandHandler("bannedchannels", banned_channels, filters=Filters.group)
-GLOBAL_BAN_CHANNEL_HANDLER = CommandHandler("globalbanchannel", ban_channel, pass_args=True, filters=Filters.group)
-GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("globalunbanchannel", unban_channel, pass_args=True, filters=Filters.group)
-GLOBAL_BANNED_CHANNELS_HANDLER = CommandHandler("globalbannedchannels", banned_channels, filters=Filters.group)
+GLOBAL_BAN_CHANNEL_HANDLER = CommandHandler("gbanchannel", ban_channel, pass_args=True, filters=Filters.group)
+GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("gunbanchannel", unban_channel, pass_args=True, filters=Filters.group)
+GLOBAL_BANNED_CHANNELS_HANDLER = CommandHandler("gbannedchannels", banned_channels, filters=Filters.group)
 
 dispatcher.add_handler(BAN_CHANNEL_HANDLER)
 dispatcher.add_handler(UNBAN_CHANNEL_HANDLER)
