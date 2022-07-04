@@ -47,8 +47,7 @@ def banned_channels(bot: Bot, update: Update):
 @loggable
 def global_ban_channel(bot: Bot, update: Update, args: List[str]):
     if int(update.effective_user.id) in SUDO_USERS:
-        update.effective_message.reply_text(
-            "You are not a sudo user")
+        update.effective_message.reply_text("You are not a sudo user")
     channel_name = args[0]
     sql.add_channel_global_bans(channel_name)
     update.effective_message.reply_text("Channel " + channel_name + "was added to global ban list")
