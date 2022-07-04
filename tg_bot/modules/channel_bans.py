@@ -35,7 +35,7 @@ def kek(bot: Bot, update: Update):
     forwarder_from_channel_name = update.effective_message.forward_from_chat.username
     is_exists = sql.is_channel_ban_exists(update.effective_chat.id, forwarder_from_channel_name)
     if is_exists:
-        update.effective_message.reply_text("Channel " + forwarder_from_channel_name + "banned")
+        update.effective_message.reply_text("Channel " + forwarder_from_channel_name + " banned")
         update.effective_message.delete()
 
 @run_async
@@ -51,14 +51,12 @@ def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
 __help__ = """
- - /filters: list all active filters in this chat.
+ - /banned_channels: list all banned channels in this chat.
 
 *Admin only:*
- - /filter <keyword> <reply message>: add a filter to this chat. The bot will now reply that message whenever 'keyword'\
-is mentioned. If you reply to a sticker with a keyword, the bot will reply with that sticker. NOTE: all filter \
-keywords are in lowercase. If you want your keyword to be a sentence, use quotes. eg: /filter "hey there" How you \
-doin?
- - /stop <filter keyword>: stop that filter.
+ - /ban_channel <@channel_name>: ban a channel in this chat. The bot will now delete messages forwarded from the channel\
+mentioned.
+ - /unban_channel <@channel_name>: unban a channel in this chat.
 """
 
 __mod_name__ = "Channel Bans"
