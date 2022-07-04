@@ -63,7 +63,7 @@ def is_channel_ban_exists(chat_id, channel_name):
 def delete_channel_ban(chat_id, channel_ban):
     with CHANNEL_BAN_INSERTION_LOCK:
         channel_ban = SESSION.query(ChannelBan).filter(ChannelBan.chat_id == chat_id, 
-                                                       ChannelBan.channel_to_ban == channel_ban)
+                                                       ChannelBan.channel_to_ban == channel_ban).first()
         if channel_ban:
             SESSION.delete(channel_ban)
             SESSION.commit()
@@ -94,7 +94,7 @@ def is_global_channel_ban_exists(channel_name):
 
 def delete_channel_global_ban(channel_global_ban):
     with CHANNEL_GLOBAL_BAN_INSERTION_LOCK:
-        channel_global_ban = SESSION.query(ChannelGlobalBan).filter(ChannelGlobalBan.channel_to_ban == channel_global_ban)
+        channel_global_ban = SESSION.query(ChannelGlobalBan).filter(ChannelGlobalBan.channel_to_ban == channel_global_ban).first()
         if channel_global_ban:
             SESSION.delete(channel_global_ban)
             SESSION.commit()
