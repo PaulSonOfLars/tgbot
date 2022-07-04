@@ -17,7 +17,7 @@ def ban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.add_channel_bans(chat_id, channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was added to ban list")
+    update.effective_message.reply_text("Channel " + channel_name + " was added to ban list")
 
 
 @user_admin
@@ -26,8 +26,7 @@ def ban_channel(bot: Bot, update: Update, args: List[str]):
 def global_ban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     sql.add_channel_global_bans(channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was added to global ban list")
-
+    update.effective_message.reply_text("Channel " + channel_name + " was added to global ban list")
 
 @run_async
 @user_admin
@@ -36,7 +35,7 @@ def unban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.delete_channel_ban(chat_id, channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was removed from ban list")
+    update.effective_message.reply_text("Channel " + channel_name + " was removed from ban list")
 
 
 @run_async
@@ -45,8 +44,7 @@ def unban_channel(bot: Bot, update: Update, args: List[str]):
 def global_unban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     sql.delete_channel_global_ban(channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was removed from global ban list")
-
+    update.effective_message.reply_text("Channel " + channel_name + " was removed from global ban list")
 
 @run_async
 def remove_banned_forwardings(bot: Bot, update: Update):
@@ -57,7 +55,7 @@ def remove_banned_forwardings(bot: Bot, update: Update):
         update.effective_message.delete()
     is_exists_in_global = sql.is_global_channel_ban_exists(forwarder_from_channel_name)
     if is_exists_in_global:
-        update.effective_message.reply_text("Channel " + forwarder_from_channel_name + " banned in global ban list")
+        update.effective_message.reply_text("Channel " + forwarder_from_channel_name + " is banned in global ban list")
         update.effective_message.delete()
 
 
