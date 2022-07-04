@@ -54,8 +54,8 @@ __help__ = """
  - /banned_channels: list all banned channels in this chat.
 
 *Admin only:*
- - /ban_channel <@channel_name>: ban a channel in this chat. The bot will now delete messages forwarded from the channel mentioned.
- - /unban_channel <@channel_name>: unban a channel in this chat.
+ - /ban_channel <channel_name>: ban a channel in this chat. The bot will now delete messages forwarded from the channel mentioned.
+ - /unban_channel <channel_name>: unban a channel in this chat.
 """
 
 __mod_name__ = "Channel Bans"
