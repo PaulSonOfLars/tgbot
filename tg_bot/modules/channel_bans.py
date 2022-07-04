@@ -125,9 +125,9 @@ __mod_name__ = "Channel Bans"
 BAN_CHANNEL_HANDLER = CommandHandler("banchannel", ban_channel, pass_args=True, filters=Filters.group)
 UNBAN_CHANNEL_HANDLER = CommandHandler("unbanchannel", unban_channel, pass_args=True, filters=Filters.group)
 BANNED_CHANNELS_HANDLER = CommandHandler("bannedchannels", banned_channels, filters=Filters.group)
-GLOBAL_BAN_CHANNEL_HANDLER = CommandHandler("gbanchannel", ban_channel, pass_args=True, filters=Filters.group)
-GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("gunbanchannel", unban_channel, pass_args=True, filters=Filters.group)
-GLOBAL_BANNED_CHANNELS_HANDLER = CommandHandler("gbannedchannels", banned_channels, filters=Filters.group)
+GLOBAL_BAN_CHANNEL_HANDLER = CommandHandler("gbanchannel", global_ban_channel, pass_args=True, filters=Filters.group)
+GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("gunbanchannel", global_unban_channel, pass_args=True, filters=Filters.group)
+GLOBAL_BANNED_CHANNELS_HANDLER = CommandHandler("gbannedchannels", global_banned_channels, filters=Filters.group)
 
 dispatcher.add_handler(BAN_CHANNEL_HANDLER)
 dispatcher.add_handler(UNBAN_CHANNEL_HANDLER)
