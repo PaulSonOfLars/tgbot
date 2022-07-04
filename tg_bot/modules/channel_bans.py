@@ -17,7 +17,7 @@ def ban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.add_channel_bans(chat_id, channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was added to banned")
+    update.effective_message.reply_text("Channel " + channel_name + " was added to banned")
 
 
 @run_async
@@ -27,7 +27,7 @@ def unban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.delete_channel_ban(chat_id, channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + "was removed to banned")
+    update.effective_message.reply_text("Channel " + channel_name + " was removed to banned")
 
 
 @run_async
@@ -36,7 +36,7 @@ def remove_banned_forwardings(bot: Bot, update: Update):
     forwarder_from_channel_name = update.effective_message.forward_from_chat.username
     is_exists = sql.is_channel_ban_exists(update.effective_chat.id, forwarder_from_channel_name)
     if is_exists:
-        update.effective_message.reply_text("Channel " + forwarder_from_channel_name + " banned")
+        update.effective_message.reply_text("Channel " + forwarder_from_channel_name + " is banned")
         update.effective_message.delete()
 
 
