@@ -88,7 +88,7 @@ def global_banned_channels(bot: Bot, update: Update):
         res = list(map(lambda x: x.channel_to_ban, res))
         update.effective_message.reply_text("Channels banned globally: " + ','.join(res))
     else:
-        update.effective_message.reply_text("There are no channels in ban")
+        update.effective_message.reply_text("There are no channels in global ban")
 
 
 @run_async
