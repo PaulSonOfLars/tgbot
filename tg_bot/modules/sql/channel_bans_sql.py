@@ -79,7 +79,7 @@ def add_channel_global_bans(channel_to_ban):
 
 
 def get_channel_global_bans():
-    channel_global_bans = SESSION.query(ChannelBan).all()
+    channel_global_bans = SESSION.query(ChannelGlobalBan).all()
     SESSION.close()
     if channel_global_bans:
         return channel_global_bans
@@ -87,14 +87,14 @@ def get_channel_global_bans():
 
 
 def is_global_channel_ban_exists(channel_name):
-    is_exists = SESSION.query(ChannelBan).filter(ChannelBan.channel_to_ban == channel_name).first() is not None
+    is_exists = SESSION.query(ChannelGlobalBan).filter(ChannelGlobalBan.channel_to_ban == channel_name).first() is not None
     SESSION.close()
     return is_exists
 
 
 def delete_channel_global_ban(channel_global_ban):
     with CHANNEL_GLOBAL_BAN_INSERTION_LOCK:
-        channel_global_ban = SESSION.query(ChannelBan).filter(ChannelBan.channel_to_ban == channel_global_ban)
+        channel_global_ban = SESSION.query(ChannelGlobalBan).filter(ChannelGlobalBan.channel_to_ban == channel_global_ban)
         if channel_global_ban:
             SESSION.delete(channel_global_ban)
             SESSION.commit()
