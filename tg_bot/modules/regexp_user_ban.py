@@ -122,6 +122,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
 
 __help__ = """
 *Admin only:*
+Usernames processed without @ symbol at the start E.g example_name instead of @example_name
  - /regexpuserban [regex] - ban new users by regexp
  - /listregexpuserban - list regexp bans
  - /regexpuserunban [regex] - unban new users by regexp. Does not unban users already banned.
