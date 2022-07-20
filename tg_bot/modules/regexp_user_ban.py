@@ -35,8 +35,10 @@ def regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
     chat_id = update.effective_chat.id
 
     regex = args[0]
+    if regex is None:
+        update.effective_message.reply_text("Regexp value is missing")
+        return
     sql.add_regex_bans(chat_id, regex)
-
     update.effective_message.reply_text("Regex " + regex + " was added to ban list")
 
 @user_admin
@@ -54,6 +56,9 @@ def listregexpuserban(bot: Bot, update: Update):
 @loggable
 def regexpuserunban(bot: Bot, update: Update, args: List[str]):
     regex = args[0]
+    if regex is None:
+        update.effective_message.reply_text("Regexp value is missing")
+        return
     chat_id = update.effective_chat.id
     sql.delete_regex_ban(chat_id, regex)
     update.effective_message.reply_text("Regexp " + regex + " was removed from ban list")
@@ -69,8 +74,10 @@ def g_regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
 
     regex = args[0]
+    if regex is None:
+        update.effective_message.reply_text("Regexp value is missing")
+        return
     sql.add_regex_global_bans(regex)
-
     update.effective_message.reply_text("Regex " + regex + " was added to global ban list")
 
 @user_admin
@@ -96,10 +103,12 @@ def g_regexpuserunban(bot: Bot, update: Update, args: List[str]):
         return
 
     regex = args[0]
+    if regex is None:
+        update.effective_message.reply_text("Regexp value is missing")
+        return
     chat_id = update.effective_chat.id
     sql.delete_regex_global_ban(chat_id, regex)
     update.effective_message.reply_text("Regexp " + regex + " was removed from global ban list")
-
 
 @run_async
 def remove_banned_nicknames(bot: Bot, update: Update):
