@@ -62,6 +62,10 @@ def regexpuserunban(bot: Bot, update: Update, args: List[str]):
 @bot_can_delete
 @loggable
 def g_regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
+    if int(update.effective_user.id) not in SUDO_USERS:
+        update.effective_message.reply_text("Only SUDO users can use this command")
+        return
+
     message = update.effective_message  # type: Optional[Message]
 
     regex = args[0]
@@ -72,6 +76,10 @@ def g_regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
 @user_admin
 @loggable
 def g_listregexpuserban(bot: Bot, update: Update):
+    if int(update.effective_user.id) not in SUDO_USERS:
+        update.effective_message.reply_text("Only SUDO users can use this command")
+        return
+
     res = sql.get_regex_global_bans()
     if res is not None:
         res = list(map(lambda x: x.regex_to_ban, res))
@@ -83,6 +91,10 @@ def g_listregexpuserban(bot: Bot, update: Update):
 @user_admin
 @loggable
 def g_regexpuserunban(bot: Bot, update: Update, args: List[str]):
+    if int(update.effective_user.id) not in SUDO_USERS:
+        update.effective_message.reply_text("Only SUDO users can use this command")
+        return
+
     regex = args[0]
     chat_id = update.effective_chat.id
     sql.delete_regex_global_ban(chat_id, regex)
