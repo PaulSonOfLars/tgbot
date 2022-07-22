@@ -17,7 +17,7 @@ def ban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.add_channel_bans(chat_id, channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + " was added to ban list")
+    update.effective_message.reply_text("Channel was added to ban list")
 
 
 @user_admin
@@ -38,7 +38,7 @@ def unban_channel(bot: Bot, update: Update, args: List[str]):
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.delete_channel_ban(chat_id, channel_name)
-    update.effective_message.reply_text("Channel " + channel_name + " was removed from ban list")
+    update.effective_message.reply_text("Channel was removed from ban list")
 
 
 @run_async
