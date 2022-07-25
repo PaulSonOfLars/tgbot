@@ -10,7 +10,7 @@ import tg_bot.modules.sql.userinfo_sql as sql
 from tg_bot import dispatcher, SUDO_USERS
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.extraction import extract_user
-
+from tg_bot.modules.helper_funcs.chat_status import user_admin
 
 @run_async
 def about_me(bot: Bot, update: Update, args: List[str]):
