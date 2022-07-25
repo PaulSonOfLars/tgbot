@@ -69,7 +69,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
         reply = "У {} есть {}/{} предупреждений...".format(mention_html(user.id, user.first_name), num_warns,
                                                              limit)
         if reason:
-            reply += "\nПричина последненго предупреждения:\n{}".format(html.escape(reason))
+            reply += "\nПричина последнего предупреждения:\n{}".format(html.escape(reason))
 
         log_reason = "<b>{}:</b>" \
                      "\n#WARN" \
