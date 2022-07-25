@@ -33,7 +33,7 @@ def about_me(bot: Bot, update: Update, args: List[str]):
     else:
         update.effective_message.reply_text("You haven't set an info message about yourself yet!")
 
-
+@user_admin
 @run_async
 def set_about_me(bot: Bot, update: Update):
     message = update.effective_message  # type: Optional[Message]
@@ -70,7 +70,7 @@ def about_bio(bot: Bot, update: Update, args: List[str]):
     else:
         update.effective_message.reply_text("You haven't had a bio set about yourself yet!")
 
-
+@user_admin
 @run_async
 def set_about_bio(bot: Bot, update: Update):
     message = update.effective_message  # type: Optional[Message]

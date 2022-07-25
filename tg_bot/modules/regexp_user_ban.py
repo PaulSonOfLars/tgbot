@@ -107,7 +107,7 @@ def g_regexpuserunban(bot: Bot, update: Update, args: List[str]):
         update.effective_message.reply_text("Regexp value is missing")
         return
     chat_id = update.effective_chat.id
-    sql.delete_regex_global_ban(chat_id, regex)
+    sql.delete_regex_global_ban(regex)
     update.effective_message.reply_text("Regexp " + regex + " was removed from global ban list")
 
 @run_async
