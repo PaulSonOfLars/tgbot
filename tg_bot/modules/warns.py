@@ -54,17 +54,17 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
         keyboard = []
         log_reason = "<b>{}:</b>" \
                      "\n#WARN_BAN" \
-                     "\n<b>Admin:</b> {}" \
-                     "\n<b>User:</b> {} (<code>{}</code>)" \
-                     "\n<b>Reason:</b> {}"\
-                     "\n<b>Counts:</b> <code>{}/{}</code>".format(html.escape(chat.title),
+                     "\n<b>Админ:</b> {}" \
+                     "\n<b>Пользователь:</b> {} (<code>{}</code>)" \
+                     "\n<b>Причина:</b> {}"\
+                     "\n<b>Кол. предупреждений:</b> <code>{}/{}</code>".format(html.escape(chat.title),
                                                                   warner_tag,
                                                                   mention_html(user.id, user.first_name),
                                                                   user.id, reason, num_warns, limit)
 
     else:
         keyboard = InlineKeyboardMarkup(
-            [[InlineKeyboardButton("Аннулирвать предупреждения", callback_data="rm_warn({})".format(user.id))]])
+            [[InlineKeyboardButton("Аннулировать предупреждения", callback_data="rm_warn({})".format(user.id))]])
 
         reply = "У {} есть {}/{} предупреждений...".format(mention_html(user.id, user.first_name), num_warns,
                                                              limit)
@@ -106,7 +106,7 @@ def button(bot: Bot, update: Update) -> str:
         res = sql.remove_warn(user_id, chat.id)
         if res:
             update.effective_message.edit_text(
-                "Warn removed by {}.".format(mention_html(user.id, user.first_name)),
+                "Предупреждение удалил админ.".format(mention_html(user.id, user.first_name)),
                 parse_mode=ParseMode.HTML)
             user_member = chat.get_member(user_id)
             return "<b>{}:</b>" \
@@ -118,7 +118,7 @@ def button(bot: Bot, update: Update) -> str:
                                                                 user_member.user.id)
         else:
             update.effective_message.edit_text(
-                "У пользователя нет предупреждений.".format(mention_html(user.id, user.first_name)),
+                "У пользователя нет предупреждений.",
                 parse_mode=ParseMode.HTML)
 
     return ""
