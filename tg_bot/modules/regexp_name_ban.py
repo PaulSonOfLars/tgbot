@@ -38,7 +38,7 @@ def regexpnameban(bot: Bot, update: Update, args: List[str]) -> str:
         update.effective_message.reply_text("Regexp value is missing")
         return
     sql.add_regex_bans(chat_id, regex)
-    update.effective_message.reply_text("Regex name " + regex + " was added to ban list")
+    update.effective_message.reply_text("Regex name " + regex + " was added to name ban list")
 
 @user_admin
 @loggable
@@ -46,9 +46,9 @@ def listregexpnameban(bot: Bot, update: Update):
     res = sql.get_regex_bans(update.effective_chat.id)
     if res is not None:
         res = list(map(lambda x: x.regex_to_ban, res))
-        update.effective_message.reply_text("Regexp banned in this chat: " + ','.join(res))
+        update.effective_message.reply_text("Regexp banned in this chat: " + ' || '.join(res))
     elif res is [] or res is None:
-        update.effective_message.reply_text("There are no regexp in ban")
+        update.effective_message.reply_text("There are no regexp in name ban")
 
 @run_async
 @user_admin
@@ -60,7 +60,7 @@ def regexpnameunban(bot: Bot, update: Update, args: List[str]):
         return
     chat_id = update.effective_chat.id
     sql.delete_regex_ban(chat_id, regex)
-    update.effective_message.reply_text("Regexp name " + regex + " was removed from ban list")
+    update.effective_message.reply_text("Regexp name " + regex + " was removed from name ban list")
 
 @user_admin
 @bot_can_delete
@@ -77,7 +77,7 @@ def g_regexpnameban(bot: Bot, update: Update, args: List[str]) -> str:
         update.effective_message.reply_text("Regexp value is missing")
         return
     sql.add_regex_global_bans(regex)
-    update.effective_message.reply_text("Regex " + regex + " was added to global ban list")
+    update.effective_message.reply_text("Regex " + regex + " was added to global name ban list")
 
 @user_admin
 @loggable
@@ -89,7 +89,7 @@ def g_listregexpnameban(bot: Bot, update: Update):
     res = sql.get_regex_global_bans()
     if res is not None:
         res = list(map(lambda x: x.regex_to_ban, res))
-        update.effective_message.reply_text("Regexp banned globally: " + ','.join(res))
+        update.effective_message.reply_text("Regexp banned globally: " + ' || '.join(res))
     elif res is [] or res is None:
         update.effective_message.reply_text("There are no regexp in ban globally")
 
@@ -107,7 +107,7 @@ def g_regexpnameunban(bot: Bot, update: Update, args: List[str]):
         return
     chat_id = update.effective_chat.id
     sql.delete_regex_global_ban(regex)
-    update.effective_message.reply_text("Regexp " + regex + " was removed from global ban list")
+    update.effective_message.reply_text("Regexp " + regex + " was removed from global name ban list")
 
 @run_async
 def remove_banned_nicknames(bot: Bot, update: Update):
@@ -152,7 +152,7 @@ Regexp checks both first name and last name.
  - /g\_regexp\_name\_unban [regex]
 """
 
-__mod_name__ = "Bans Names Regexp"
+__mod_name__ = "Regexp Ban Names"
 
 REGEXPNAMEBAN_HANDLER = CommandHandler("regexp_name_ban", regexpnameban, pass_args=True, filters=Filters.group)
 LISTREGEXPNAMEBAN_HANDLER = CommandHandler("list_regexp_name_ban", listregexpnameban, pass_args=False, filters=Filters.group)
