@@ -153,7 +153,7 @@ Regexp checks both first name and last name.
  - /g\_regexp\_name\_unban [regex]
 """
 
-__mod_name__ = "Regexp Ban Names"
+__mod_name__ = "Regexp name ban"
 
 REGEXPNAMEBAN_HANDLER = CommandHandler("regexp_name_ban", regexpnameban, pass_args=True, filters=Filters.group)
 LISTREGEXPNAMEBAN_HANDLER = CommandHandler("list_regexp_name_ban", listregexpnameban, pass_args=False, filters=Filters.group)
