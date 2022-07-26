@@ -207,14 +207,10 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /adminlist: list of admins in the chat
-
 *Admin only:*
  - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifs to users.
  - /unpin: unpins the currently pinned message
  - /invitelink: gets invitelink
- - /promote: promotes the user replied to
- - /demote: demotes the user replied to
 """
 
 __mod_name__ = "Admin"
@@ -232,6 +228,3 @@ ADMINLIST_HANDLER = DisableAbleCommandHandler("adminlist", adminlist, filters=Fi
 dispatcher.add_handler(PIN_HANDLER)
 dispatcher.add_handler(UNPIN_HANDLER)
 dispatcher.add_handler(INVITE_HANDLER)
-dispatcher.add_handler(PROMOTE_HANDLER)
-dispatcher.add_handler(DEMOTE_HANDLER)
-dispatcher.add_handler(ADMINLIST_HANDLER)
