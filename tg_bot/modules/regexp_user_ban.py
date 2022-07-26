@@ -143,6 +143,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
 
 __help__ = """
 *Admin only:*
+Block new chat members that match one of the regexp patterns added.
 Usernames processed without @ symbol at the start E.g example_name instead of @example_name
  - /regexpuserban [regex] - ban new users by regexp
  - /listregexpuserban - list regexp bans
@@ -152,7 +153,7 @@ Usernames processed without @ symbol at the start E.g example_name instead of @e
  - /g\_regexpuserunban [regex] - unban new users by regexp. Does not unban users already banned.
 """
 
-__mod_name__ = "Bans Regexp"
+__mod_name__ = "Regex user ban"
 
 REGEXPUSERBAN_HANDLER = CommandHandler("regexpuserban", regexpuserban, pass_args=True, filters=Filters.group)
 LISTREGEXPUSERBAN_HANDLER = CommandHandler("listregexpuserban", listregexpuserban, pass_args=False, filters=Filters.group)
