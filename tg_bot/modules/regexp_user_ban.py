@@ -143,7 +143,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
 
 __help__ = """
 *Admin only:*
-Block new chat members that match one of the regexp patterns added.
+Block new chat members which username matches one of the regexp patterns added.
 Usernames processed without @ symbol at the start E.g example_name instead of @example_name
  - /regexpuserban [regex] - ban new users by regexp
  - /listregexpuserban - list regexp bans
