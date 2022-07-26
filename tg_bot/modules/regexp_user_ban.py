@@ -123,7 +123,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
                 is_banned = re.match(regex, name.username)
 
                 if is_banned:
-                    update.effective_message.reply_text("\#бан_банан тебе 🍌")
+                    update.effective_message.reply_text("бан_банан тебе")
                     chat.kick_member(name.id)
                     break
 
