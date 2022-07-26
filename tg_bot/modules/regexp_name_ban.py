@@ -142,6 +142,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
 
 __help__ = """
 *Admin only:*
+Block new chat members which firstname+lastname matches one of the regexp patterns added.
 Regexp checks both first name and last name.
  - /regexp\_name\_ban [regex]
  - /list\_regexp\_name\_ban
