@@ -343,7 +343,7 @@ def set_warn_strength(bot: Bot, update: Update, args: List[str]):
     if args:
         if args[0].lower() in ("on", "yes"):
             sql.set_warn_strength(chat.id, False)
-            msg.reply_text("Сейчас через чур много предупреждений приведут к бану!")
+            msg.reply_text("Сейчас чересчур много предупреждений приведут к бану!")
             return "<b>{}:</b>\n" \
                    "<b>Админ:</b> {}\n" \
                    "Включил строгий режим предупреждений. Нарушители будут забаннены.".format(html.escape(chat.title),
@@ -351,7 +351,7 @@ def set_warn_strength(bot: Bot, update: Update, args: List[str]):
 
         elif args[0].lower() in ("off", "no"):
             sql.set_warn_strength(chat.id, True)
-            msg.reply_text("Сейчас через чур много предупреждений приведут к удалению. Пользователи смогут вернуться в чат.")
+            msg.reply_text("Сейчас чересчур много предупреждений приведут к удалению. Пользователи смогут вернуться в чат.")
             return "<b>{}:</b>\n" \
                    "<b>Админ:</b> {}\n" \
                    "Выключил строгий режим предупреждений. Нарушители будут просто удалены.".format(html.escape(chat.title),
