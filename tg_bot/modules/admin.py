@@ -217,13 +217,12 @@ __mod_name__ = "Admin"
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True, filters=Filters.group)
 UNPIN_HANDLER = CommandHandler("unpin", unpin, filters=Filters.group)
-
 INVITE_HANDLER = CommandHandler("invitelink", invite, filters=Filters.group)
 
-PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True, filters=Filters.group)
-DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True, filters=Filters.group)
+#PROMOTE_HANDLER = CommandHandler("promote", promote, pass_args=True, filters=Filters.group)
+#DEMOTE_HANDLER = CommandHandler("demote", demote, pass_args=True, filters=Filters.group)
 
-ADMINLIST_HANDLER = DisableAbleCommandHandler("adminlist", adminlist, filters=Filters.group)
+#ADMINLIST_HANDLER = DisableAbleCommandHandler("adminlist", adminlist, filters=Filters.group)
 
 dispatcher.add_handler(PIN_HANDLER)
 dispatcher.add_handler(UNPIN_HANDLER)
