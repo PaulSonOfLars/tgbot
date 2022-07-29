@@ -118,9 +118,14 @@ def __migrate__(old_chat_id, new_chat_id):
     sql.migrate_chat(old_chat_id, new_chat_id)
 
 
-__help__ = ""  # no help string
+__help__ = """
+*SUDO администратор:*
+    - /chatlist - присылает список всех чатов текст файлом.
+*Владелец только:*
+    - /broadcast <сообщение> - рассылка сообщения по всем чатам.
+""" 
 
-__mod_name__ = "Users (Пользователи)"
+__mod_name__ = "Пользователи"
 
 BROADCAST_HANDLER = CommandHandler("broadcast", broadcast, filters=Filters.user(OWNER_ID))
 USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
