@@ -51,7 +51,7 @@ __help__ = """
  - /t: ответить на сообщение с автоматической коррекцией грамматики
 """
 
-__mod_name__ = "Translator (Переводы)"
+__mod_name__ = "Переводы"
 
 
 TRANSLATE_HANDLER = CommandHandler('t', translate)
