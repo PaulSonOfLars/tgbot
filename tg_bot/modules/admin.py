@@ -207,13 +207,13 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
-*Admin only:*
- - /pin: silently pins the message replied to - add 'loud' or 'notify' to give notifs to users.
- - /unpin: unpins the currently pinned message
- - /invitelink: gets invitelink
+*Только администратор:*
+ - /pin: тихо закрепляет сообщение, на которое ответили - добавьте 'loud' или 'notify', чтобы уведомлять пользователей
+ - /unpin: открепить закрепленное в данный момент сообщение
+ - /invitelink: получает ссылку приглашения в чат
 """
 
-__mod_name__ = "Admin"
+__mod_name__ = "Админы"
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True, filters=Filters.group)
 UNPIN_HANDLER = CommandHandler("unpin", unpin, filters=Filters.group)

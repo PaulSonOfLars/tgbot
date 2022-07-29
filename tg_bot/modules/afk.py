@@ -73,13 +73,14 @@ def __gdpr__(user_id):
 
 
 __help__ = """
- - /afk <reason>: mark yourself as AFK.
- - brb <reason>: same as the afk command - but not a command.
+ - /afk <причина>: отметить себя как недоступного для коммуникации.
+ - brb <причина>: отменить команду afk.
 
-When marked as AFK, any mentions will be replied to with a message to say you're not available!
+Когда вы помечены как AFK, на любое упоминание будет отправлено сообщение о том, что вы недоступны! \
+Если вы добавите пояснение, то с пояснением - почему.
 """
 
-__mod_name__ = "AFK"
+__mod_name__ = "Недоступность"
 
 AFK_HANDLER = DisableAbleCommandHandler("afk", afk)
 AFK_REGEX_HANDLER = DisableAbleRegexHandler("(?i)brb", afk, friendly="afk")

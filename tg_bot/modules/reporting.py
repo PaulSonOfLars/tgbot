@@ -120,17 +120,17 @@ def __user_settings__(user_id):
         sql.user_should_report(user_id))
 
 
-__mod_name__ = "Reporting"
+__mod_name__ = "Жалобы"
 
 __help__ = """
- - /report <reason>: reply to a message to report it to admins.
- - @admin: reply to a message to report it to admins.
-NOTE: neither of these will get triggered if used by admins
+ - /report <причина>: ответить на сообщение, чтобы пожаловаться администраторам (они получат его копию в PM и канал журнала).
+ - @admin: ответьте на сообщение, чтобы сообщить об этом администраторам.
+ПРИМЕЧАНИЕ. Ни один из них не сработает, если его используют админ или на админа.
 
-*Admin only:*
- - /reports <on/off>: change report setting, or view current status.
-   - If done in pm, toggles your status.
-   - If in chat, toggles that chat's status.
+*Только администратор:*
+ - /reports <on/off>: изменить настройки отчета или просмотреть текущий статус.
+   - Если прислать в л.с. боту, включит или отключит получение вами таких сообщений.
+   - Если в чате, включит или отключит для всего чата.
 """
 
 REPORT_HANDLER = CommandHandler("report", report, filters=Filters.group)

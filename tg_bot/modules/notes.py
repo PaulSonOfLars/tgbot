@@ -138,10 +138,10 @@ def save(bot: Bot, update: Update):
     if data_type is None:
         msg.reply_text("Dude, there's no note")
         return
-    
+
     if len(text.strip()) == 0:
         text = note_name
-        
+
     sql.add_note_to_db(chat_id, note_name, text, data_type, buttons=buttons, file=content)
 
     msg.reply_text(
@@ -230,22 +230,22 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /get <notename>: get the note with this notename
- - #<notename>: same as /get
- - /notes or /saved: list all saved notes in this chat
+ - /get <имя заметки>: получить заметку с этим именем заметки
+ - #<имя заметки>: то же, что и /get
+ - /notes или /saved: список всех сохраненных заметок в этом чате
 
-If you would like to retrieve the contents of a note without any formatting, use `/get <notename> noformat`. This can \
-be useful when updating a current note.
+Если вы хотите получить содержимое заметки без какого-либо форматирования, используйте `/get <имя заметки> noformat`. \
+Это может быть полезно при обновлении текущей заметки.
 
-*Admin only:*
- - /save <notename> <notedata>: saves notedata as a note with name notename
-A button can be added to a note by using standard markdown link syntax - the link should just be prepended with a \
-`buttonurl:` section, as such: `[somelink](buttonurl:example.com)`. Check /markdownhelp for more info.
- - /save <notename>: save the replied message as a note with name notename
- - /clear <notename>: clear note with this name
+*Только администратор:*
+ - /save <имя заметки> <данные заметки>: сохраняет данные заметки как заметку с именем
+Кнопку можно добавить в заметку, используя стандартный синтаксис ссылки форматирования — к ссылке нужно просто добавить \
+раздел `buttonurl:`, как таковой: `[somelink](buttonurl:example.com)`. Проверьте /markdownhelp для получения дополнительной информации.
+ - /save <имя заметки>: сохранить ответное сообщение как заметку с этим именем
+ - /clear <имя заметки>: очистить заметку с этим именем
 """
 
-__mod_name__ = "Notes"
+__mod_name__ = "Заметки"
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 HASH_GET_HANDLER = RegexHandler(r"^#[^\s]+", hash_get)

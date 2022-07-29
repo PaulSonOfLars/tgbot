@@ -210,17 +210,18 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /filters: list all active filters in this chat.
+ Автоответы (фильтры) отвечают на сообщения содежращие ключевые слова.
+ 
+ - /filters: список всех активных фильтров в этом чате.
 
-*Admin only:*
- - /filter <keyword> <reply message>: add a filter to this chat. The bot will now reply that message whenever 'keyword'\
-is mentioned. If you reply to a sticker with a keyword, the bot will reply with that sticker. NOTE: all filter \
-keywords are in lowercase. If you want your keyword to be a sentence, use quotes. eg: /filter "hey there" How you \
-doin?
- - /stop <filter keyword>: stop that filter.
+*Только администратор:*
+ - /filter <ключевое слово> <ответное сообщение>: добавить фильтр в этот чат. Теперь бот будет отвечать на сообщения, \
+в которых упоминается 'ключевое слово'. Если вы ответите данной командой на стикер то 'ответное сообщение' будет этот стикер. ПРИМЕЧАНИЕ: все \
+ключевые слова должны быть написаны строчными буквами. Если вы хотите, чтобы ваше ключевое слово было предложением, используйте кавычки. например: /filter "привет лох" Как дела?
+ - /stop <ключевое слово>: остановить этот фильтр.
 """
 
-__mod_name__ = "Filters"
+__mod_name__ = "Автоответы"
 
 FILTER_HANDLER = CommandHandler("filter", filters)
 STOP_HANDLER = CommandHandler("stop", stop_filter)

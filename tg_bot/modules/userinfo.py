@@ -118,22 +118,21 @@ def __gdpr__(user_id):
 
 
 __help__ = """
- - /bio: will get your or another user's bio. This cannot be set by yourself.
- - /me: will get your or another user's info
+ - /bio: получить заметку вашу или другого пользователя.
 
  *Admin only:*
- - /setbio <text>: while replying, will save another user's bio
+ - /setbio <text>: при ответе на сообщение будет сохранена заметка о пользователе пользователя (ваша заметка о нём)
 """
 
-__mod_name__ = "Bios and Abouts"
+__mod_name__ = "Заметки о юзере"
 
 SET_BIO_HANDLER = DisableAbleCommandHandler("setbio", set_about_bio)
 GET_BIO_HANDLER = DisableAbleCommandHandler("bio", about_bio, pass_args=True)
 
 #SET_ABOUT_HANDLER = DisableAbleCommandHandler("setme", set_about_me)
-GET_ABOUT_HANDLER = DisableAbleCommandHandler("me", about_me, pass_args=True)
+#GET_ABOUT_HANDLER = DisableAbleCommandHandler("me", about_me, pass_args=True)
 
 dispatcher.add_handler(SET_BIO_HANDLER)
 dispatcher.add_handler(GET_BIO_HANDLER)
 #dispatcher.add_handler(SET_ABOUT_HANDLER)
-dispatcher.add_handler(GET_ABOUT_HANDLER)
+#dispatcher.add_handler(GET_ABOUT_HANDLER)

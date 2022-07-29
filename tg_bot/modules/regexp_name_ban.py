@@ -141,19 +141,19 @@ def remove_banned_nicknames(bot: Bot, update: Update):
                 #     break
 
 __help__ = """
-*Admin only:*
-Block new chat members which firstname+lastname matches one of the regexp patterns added.
-Regexp checks both first name and last name.
- - /regexp\_name\_ban [regex]
+*Только администратор:*
+Блокирует новых участников чата, имя или фамилия которых соответствуют одному из добавленных шаблонов регулярных выражений.
+Regexp проверяет как имя, так и фамилию.
+ - /regexp\_name\_ban [регулярное выражение]
  - /list\_regexp\_name\_ban
- - /regexp\_name\_unban [regex]
+ - /regexp\_name\_unban [регулярное выражение]
 
- - /g\_regexp\_name\_ban [regex]
+ - /g\_regexp\_name\_ban [регулярное выражение]
  - /g\_list\_regexp\_name\_ban
- - /g\_regexp\_name\_unban [regex]
+ - /g\_regexp\_name\_unban [регулярное выражение]
 """
 
-__mod_name__ = "Regexp name ban"
+__mod_name__ = "Regexp имя бан"
 
 REGEXPNAMEBAN_HANDLER = CommandHandler("regexp_name_ban", regexpnameban, pass_args=True, filters=Filters.group)
 LISTREGEXPNAMEBAN_HANDLER = CommandHandler("list_regexp_name_ban", listregexpnameban, pass_args=False, filters=Filters.group)

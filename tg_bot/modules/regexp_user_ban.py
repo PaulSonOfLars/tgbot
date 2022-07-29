@@ -21,7 +21,7 @@ from tg_bot.modules.sql import regex_user_bans_sql as sql
 # /listregexpuserban
 # /regexpuserunban [regex]
 # example regex .*\d+
-# 
+#
 
 # /g_regexpuserban [regex]
 # /g_listregexpuserban
@@ -142,18 +142,21 @@ def remove_banned_nicknames(bot: Bot, update: Update):
                 #     break
 
 __help__ = """
-*Admin only:*
-Block new chat members which username matches one of the regexp patterns added.
-Usernames processed without @ symbol at the start E.g example_name instead of @example_name
- - /regexpuserban [regex] - ban new users by regexp
- - /listregexpuserban - list regexp bans
- - /regexpuserunban [regex] - unban new users by regexp. Does not unban users already banned.
- - /g\_regexpuserban [regex] - ban new users globally by regexp
- - /g\_listregexpuserban - list regexp global bans
- - /g\_regexpuserunban [regex] - unban new users by regexp. Does not unban users already banned.
+*Только администратор:*
+Блокирует новых участников чата, ник (имя пользователя) которых соответствует одному из добавленных шаблонов регулярных выражений.
+Имена пользователей обрабатываются без символа @ в начале. Например, имя_пользователя вместо @имя_пользователя
+ - /regexpuserban [регулярное выражение] - бан новых пользователей по регулярному выражению
+ - /listregexpuserban - список банов регулярных выражений
+ - /regexpuserunban [регулярное выражение] - разбанить новых пользователей по регулярному выражению. Не разблокирует уже забаненных пользователей.
+ - /g\_regexpuserban [регулярное выражение] - глобально забанить новых пользователей по регулярному выражению
+ - /g\_listregexpuserban - список глобальных банов регулярных выражений
+ - /g\_regexpuserunban [регулярное выражение] - разбанить новых пользователей по регулярному выражению. Не разблокирует уже забаненных пользователей.
+
+Например: блокировать имена, состящие из минимум трёх и более букв подряд и двух цифр (sdf11, dfsd87): `/regexpuserban ^[a-zA-Z]{3,}[0-9]{2}$` Если в имени \
+две буквы (aa11), три цифры (aaaa111), среди букв есть лишняя цифра(aa1a11), они не будут заблокированы.
 """
 
-__mod_name__ = "Regex user ban"
+__mod_name__ = "Regexp ник бан"
 
 REGEXPUSERBAN_HANDLER = CommandHandler("regexpuserban", regexpuserban, pass_args=True, filters=Filters.group)
 LISTREGEXPUSERBAN_HANDLER = CommandHandler("listregexpuserban", listregexpuserban, pass_args=False, filters=Filters.group)

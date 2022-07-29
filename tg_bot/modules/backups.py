@@ -66,13 +66,13 @@ def export_data(bot: Bot, update: Update):
     msg.reply_text("")
 
 
-__mod_name__ = "Backups"
+__mod_name__ = "Бэкапы"
 
 __help__ = """
-*Admin only:*
- - /import: reply to a group butler backup file to import as much as possible, making the transfer super simple! Note \
-that files/photos can't be imported due to telegram restrictions.
- - /export: !!! This isn't a command yet, but should be coming soon!
+*Только администратор:*
+ - /import: ответь хранителю группы файлом содержащим комвнды для импорта данных. Помни, что файлы и фото нельзя импортировать \
+из-за ограничение Telegram
+ - /export: Не реализовано
 """
 IMPORT_HANDLER = CommandHandler("import", import_data)
 EXPORT_HANDLER = CommandHandler("export", export_data)

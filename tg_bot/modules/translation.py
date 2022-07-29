@@ -48,10 +48,10 @@ def translate(bot: Bot, update: Update):
 
 
 __help__ = """
- - /t: while replying to a message, will reply with a grammar corrected version
+ - /t: ответить на сообщение с автоматической коррекцией грамматики
 """
 
-__mod_name__ = "Translator"
+__mod_name__ = "Переводы"
 
 
 TRANSLATE_HANDLER = CommandHandler('t', translate)

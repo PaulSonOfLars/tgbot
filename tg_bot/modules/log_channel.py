@@ -143,18 +143,19 @@ if is_module_loaded(FILENAME):
 
 
     __help__ = """
-*Admin only:*
-- /logchannel: get log channel info
-- /setlog: set the log channel.
-- /unsetlog: unset the log channel.
+Настройка канала, в котором будут записываться определенные действия бота.
+Настройка выполняется так:
+- добавление бота на нужный канал (как админа!)
+- отправка /setlog в канал
+- пересылка /setlog в группу
 
-Setting the log channel is done by:
-- adding the bot to the desired channel (as an admin!)
-- sending /setlog in the channel
-- forwarding the /setlog to the group
+*Только администратор:*
+- /logchannel: получить информацию о канале журнала
+- /setlog: установить канал журнала.
+- /unsetlog: отключить канал журнала.
 """
 
-    __mod_name__ = "Log Channels"
+    __mod_name__ = "Канал лога"
 
     LOG_HANDLER = CommandHandler("logchannel", logging)
     SET_LOG_HANDLER = CommandHandler("setlog", setlog)

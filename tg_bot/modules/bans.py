@@ -279,16 +279,16 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
 
 
 __help__ = """
- - /kickme: kicks the user who issued the command
+ - /kickme: удаляет из чата пользователя, давшего команду
 
-*Admin only:*
- - /ban <userhandle>: bans a user. (via handle, or reply)
- - /tban <userhandle> x(m/h/d): bans a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
- - /unban <userhandle>: unbans a user. (via handle, or reply)
- - /kick <userhandle>: kicks a user, (via handle, or reply)
+*Только администратор:*
+ - /ban <имя пользователя>: забанить пользователя (удалить из чата и отправить в чёрный список). (через имя пользователя или ответ)
+ - /tban <имя пользователя> x(m/h/d): банит пользователя на x минут/часов/дней. (через имя пользователя или ответ). m = минуты, h = часы, d = дни.
+ - /unban <имя пользователя>: разбанить пользователя. (через имя пользователя или ответ)
+ - /kick <имя пользователя>: удаляет пользователя из чата (через имя пользователя или ответ)
 """
 
-__mod_name__ = "Bans"
+__mod_name__ = "Баны"
 
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
 TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, filters=Filters.group)

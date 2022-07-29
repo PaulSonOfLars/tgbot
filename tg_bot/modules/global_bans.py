@@ -290,15 +290,21 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
-*Admin only:*
- - /gbanstat <on/off/yes/no>: Will disable the effect of global bans on your group, or return your current settings.
+Gbans, также известные как глобальные баны, используются владельцами ботов для блокировки спамеров во всех группах. \
+Это помогает защитить вас и ваши группы, удаляя спам-флудеры как можно быстрее. Их можно отключить для вашей группы \
+командой /gbanstat.
 
-Gbans, also known as global bans, are used by the bot owners to ban spammers across all groups. This helps protect \
-you and your groups by removing spam flooders as quickly as possible. They can be disabled for you group by calling \
-/gbanstat
+ - /gbanlist : перечислить глобально забаненных пользователей.
+
+*Только администратор:*
+ - /gbanstat <on/off/yes/no>: отключит действие глобальных банов на вашу группу или вернет ваши текущие настройки.
+ 
+ *Только SUDO администратор:*
+ - /gban : забанить пользователя глобально.
+ - /ungban : разблокировать пользователя глобально.
 """
 
-__mod_name__ = "Global Bans"
+__mod_name__ = "Глобальные баны"
 
 GBAN_HANDLER = CommandHandler("gban", gban, pass_args=True,
                               filters=CustomFilters.sudo_filter | CustomFilters.support_filter)

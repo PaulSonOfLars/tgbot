@@ -111,16 +111,17 @@ def __migrate__(old_chat_id, new_chat_id):
 
 
 __help__ = """
+Имя канала указывается без @, например - channel_name
 *Admin only:*
- - /banchannel channelname: add channel to list of banned channels in this group
- - /unbanchannel channelname: remove channel from list of banned channels in this group
- - /bannedchannels : show list of all banned channels
- - /gbanchannel channelname: add channel to global list of banned channels
- - /gunbanchannel channelname: remove channel from global list of banned channels
- - /gbannedchannels : show list of all global banned channels
+ - /banchannel <имя канала>: добавить канал в список запрещенных каналов в этой группе
+ - /unbanchannel <имя канала>: удалить канал из списка запрещенных каналов в этой группе
+ - /bannedchannels : показать список всех запрещенных каналов
+ - /gbanchannel <имя канала>: добавить канал в глобальный список запрещенных каналов
+ - /gunbanchannel <имя канала>: удалить канал из глобального списка запрещенных каналов
+ - /gbannedchannels : показать список всех глобальных запрещенных каналов
 """
 
-__mod_name__ = "Channel Bans"
+__mod_name__ = "Блан Каналов"
 
 BAN_CHANNEL_HANDLER = CommandHandler("banchannel", ban_channel, pass_args=True, filters=Filters.group)
 UNBAN_CHANNEL_HANDLER = CommandHandler("unbanchannel", unban_channel, pass_args=True, filters=Filters.group)
