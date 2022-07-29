@@ -121,7 +121,7 @@ __help__ = """
  - /gbannedchannels : показать список всех глобальных запрещенных каналов
 """
 
-__mod_name__ = "Блан Каналов"
+__mod_name__ = "Бан Каналов"
 
 BAN_CHANNEL_HANDLER = CommandHandler("banchannel", ban_channel, pass_args=True, filters=Filters.group)
 UNBAN_CHANNEL_HANDLER = CommandHandler("unbanchannel", unban_channel, pass_args=True, filters=Filters.group)
