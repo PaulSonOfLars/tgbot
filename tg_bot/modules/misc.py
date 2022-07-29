@@ -389,7 +389,7 @@ __help__ = """
  - /markdownhelp: краткий обзор того, как работает форматирование в телеграмме - можно вызывать только в приватных чатах.
 """
 
-__mod_name__ = "Misc (Разное)"
+__mod_name__ = "Разное"
 
 ID_HANDLER = DisableAbleCommandHandler("id", get_id, pass_args=True)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))
