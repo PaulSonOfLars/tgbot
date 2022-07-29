@@ -88,11 +88,11 @@ def del_message(bot: Bot, update: Update) -> str:
 __help__ = """
 *Только администратор:*
  - /del: удаляет сообщение, на которое вы ответили
- - /purge: удаляет все сообщения между этим и ответом на сообщение.
+ - /purge: удаляет все сообщения между сообщением, на которое вы ответили (включая) и сообщением с командой.
  - /purge <целое число X>: удаляет ответное сообщение и X следующих за ним сообщений.
 """
 
-__mod_name__ = "Purges (Очистка)"
+__mod_name__ = "Удаление сообщений"
 
 DELETE_HANDLER = CommandHandler("del", del_message, filters=Filters.group)
 PURGE_HANDLER = CommandHandler("purge", purge, filters=Filters.group, pass_args=True)
