@@ -245,7 +245,7 @@ __help__ = """
  - /clear <имя заметки>: очистить заметку с этим именем
 """
 
-__mod_name__ = "Notes (Заметки)"
+__mod_name__ = "Заметки"
 
 GET_HANDLER = CommandHandler("get", cmd_get, pass_args=True)
 HASH_GET_HANDLER = RegexHandler(r"^#[^\s]+", hash_get)
