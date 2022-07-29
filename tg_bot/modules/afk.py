@@ -80,7 +80,7 @@ __help__ = """
 Если вы добавите пояснение, то с пояснением - почему.
 """
 
-__mod_name__ = "AFK (Пометки о недоступности)"
+__mod_name__ = "Недоступность"
 
 AFK_HANDLER = DisableAbleCommandHandler("afk", afk)
 AFK_REGEX_HANDLER = DisableAbleRegexHandler("(?i)brb", afk, friendly="afk")
