@@ -97,11 +97,11 @@ __help__ = """
  - /rules: получить правила для этого чата.
 
 *Только администратор:*
- - /setrules <здесь ваши правила>: установить правила для этого чата.
+ - /setrules <текст правил>: установить правила для этого чата.
  - /clearrules: очистить правила для этого чата
 """
 
-__mod_name__ = "Rules (Правила)"
+__mod_name__ = "Правила чата"
 
 GET_RULES_HANDLER = CommandHandler("rules", get_rules, filters=Filters.group)
 SET_RULES_HANDLER = CommandHandler("setrules", set_rules, filters=Filters.group)
