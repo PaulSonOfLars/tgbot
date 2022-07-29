@@ -142,7 +142,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
 
 __help__ = """
 *Только администратор:*
-Блокируйте новых участников чата, имя и фамилия которых соответствуют одному из добавленных шаблонов регулярных выражений.
+Блокирует новых участников чата, имя или фамилия которых соответствуют одному из добавленных шаблонов регулярных выражений.
 Regexp проверяет как имя, так и фамилию.
  - /regexp\_name\_ban [регулярное выражение]
  - /list\_regexp\_name\_ban
@@ -153,7 +153,7 @@ Regexp проверяет как имя, так и фамилию.
  - /g\_regexp\_name\_unban [регулярное выражение]
 """
 
-__mod_name__ = "Regexp Name Ban (блокировка имен по регулярному выражению)"
+__mod_name__ = "Regexp имя бан"
 
 REGEXPNAMEBAN_HANDLER = CommandHandler("regexp_name_ban", regexpnameban, pass_args=True, filters=Filters.group)
 LISTREGEXPNAMEBAN_HANDLER = CommandHandler("list_regexp_name_ban", listregexpnameban, pass_args=False, filters=Filters.group)
