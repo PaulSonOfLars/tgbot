@@ -184,10 +184,11 @@ def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
 
 
 __help__ = """
-*Admin only:*
- - /mute <userhandle>: silences a user. Can also be used as a reply, muting the replied to user.
- - /tmute <userhandle> x(m/h/d): mutes a user for x time. (via handle, or reply). m = minutes, h = hours, d = days.
- - /unmute <userhandle>: unmutes a user. Can also be used as a reply, muting the replied to user.
+*Только администратор:*
+ - /mute <дескриптор пользователя>: отключает пользователя (запрещает писать в чате). Также может использоваться в качестве ответа \
+на сообщение пользователя, отключая его.
+ - /tmute <дескриптор пользователя> x(m/h/d): заглушает пользователя на x раз. (через дескриптор или ответ). m = минуты, h = часы, d = дни.
+ - /unmute <дескриптор пользователя>: включает пользователя. Также может использоваться в качестве ответа на сообщение пользователя, отключая его.
 """
 
 __mod_name__ = "Muting"

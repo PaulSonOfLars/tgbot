@@ -380,16 +380,16 @@ def stats(bot: Bot, update: Update):
 
 # /ip is for private use
 __help__ = """
- - /id: get the current group id. If used by replying to a message, gets that user's id.
- - /runs: reply a random string from an array of replies.
- - /slap: slap a user, or get slapped if not a reply.
- - /info: get information about a user.
- - /gdpr: deletes your information from the bot's database. Private chats only.
+ - /id: получить текущий идентификатор группы. Если используется при ответе на сообщение, получает идентификатор этого пользователя
+ - /runs: ответить случайной строкой из массива ответов
+ - /slap: дать пощечину пользователю или получить пощечину (вызывает шутливо-агрессивную фразу в адрес выбранного участника или самого себя)
+ - /info: получить информацию о пользователе
+ - /gdpr: удаляет вашу информацию из базы данных бота. Только приватные чаты.
 
- - /markdownhelp: quick summary of how markdown works in telegram - can only be called in private chats.
+ - /markdownhelp: краткий обзор того, как работает форматирование в телеграмме - можно вызывать только в приватных чатах.
 """
 
-__mod_name__ = "Misc"
+__mod_name__ = "Misc (Разное)"
 
 ID_HANDLER = DisableAbleCommandHandler("id", get_id, pass_args=True)
 IP_HANDLER = CommandHandler("ip", get_bot_ip, filters=Filters.chat(OWNER_ID))

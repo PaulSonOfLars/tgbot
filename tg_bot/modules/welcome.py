@@ -397,29 +397,25 @@ def clean_welcome(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
 
-WELC_HELP_TXT = "Your group's welcome/goodbye messages can be personalised in multiple ways. If you want the messages" \
-                " to be individually generated, like the default welcome message is, you can use *these* variables:\n" \
-                " - `{{first}}`: this represents the user's *first* name\n" \
-                " - `{{last}}`: this represents the user's *last* name. Defaults to *first name* if user has no " \
-                "last name.\n" \
-                " - `{{fullname}}`: this represents the user's *full* name. Defaults to *first name* if user has no " \
-                "last name.\n" \
-                " - `{{username}}`: this represents the user's *username*. Defaults to a *mention* of the user's " \
-                "first name if has no username.\n" \
-                " - `{{mention}}`: this simply *mentions* a user - tagging them with their first name.\n" \
-                " - `{{id}}`: this represents the user's *id*\n" \
-                " - `{{count}}`: this represents the user's *member number*.\n" \
-                " - `{{chatname}}`: this represents the *current chat name*.\n" \
-                "\nEach variable MUST be surrounded by `{{}}` to be replaced.\n" \
-                "Welcome messages also support markdown, so you can make any elements bold/italic/code/links. " \
-                "Buttons are also supported, so you can make your welcomes look awesome with some nice intro " \
-                "buttons.\n" \
-                "To create a button linking to your rules, use this: `[Rules](buttonurl://t.me/{}?start=group_id)`. " \
-                "Simply replace `group_id` with your group's id, which can be obtained via /id, and you're good to " \
-                "go. Note that group ids are usually preceded by a `-` sign; this is required, so please don't " \
-                "remove it.\n" \
-                "If you're feeling fun, you can even set images/gifs/videos/voice messages as the welcome message by " \
-                "replying to the desired media, and calling /setwelcome.".format(dispatcher.bot.username)
+WELC_HELP_TXT = "Приветственные/прощальные сообщения вашей группы можно персонализировать несколькими способами.\n" \
+                "Если вы хотите, чтобы сообщения генерировались индивидуально, как приветственное сообщение по " \
+                "умолчанию, вы можете использовать *эти* переменные:\n" \
+                " - `{{first}}`: представляет *имя* пользователя\n" \
+                " - `{{last}}`: представляет *фамилию* пользователя. По умолчанию используется *имя*, если у пользователя нет фамилии.\n" \
+                " - `{{fullname}}`: это полное имя пользователя. По умолчанию используется *имя*, если у пользователя нет фамилии.\n" \
+                " - `{{username}}`: представляет *имя пользователя*. По умолчанию используется *упоминание* имени пользователя, если у него нет имени пользователя.\n " \
+                " - `{{mention}}`: здесь просто *упоминается* пользователь, помечая его по имени.\n" \
+                " - `{{id}}`: это *идентификатор пользователя*.\n" \
+                " - `{{count}}`: представляет *номер участника* пользователя.\n" \
+                " - `{{chatname}}`: представляет *текущее имя чата*.\n" \
+                "\nКаждая переменная ДОЛЖНА быть окружена `{{}}` для замены.\n" \
+                "Приветственные сообщения также поддерживают форматирование, поэтому вы можете сделать любые элементы полужирным/курсивным/кодом/ссылками. " \
+                "Кнопки также поддерживаются, поэтому вы можете сделать свои приветствия потрясающими с помощью красивых кнопок вступления. \n" \
+                "Чтобы создать кнопку со ссылкой на ваши правила, используйте это: `[Правила](buttonurl://t.me/{}?start=group_id)`. " \
+                "Просто замените `group_id` на идентификатор вашей группы, который можно получить через /id, и все готово. " \
+                "Обратите внимание, что идентификаторам групп обычно предшествует знак `-`; это необходимо, поэтому, пожалуйста, не удаляйте его.\n" \
+                "Если хотите, вы даже можете установить изображения/гифки/видео/голосовые сообщения в качестве приветственного сообщения, " \
+                "ответив на нужный носитель и вызвав команду /setwelcome.".format(dispatcher.bot.username)
 
 
 @run_async
@@ -454,21 +450,21 @@ def __chat_settings__(chat_id, user_id):
 __help__ = """
 {}
 
-*Admin only:*
- - /welcome <on/off>: enable/disable welcome messages.
- - /welcome: shows current welcome settings.
- - /welcome noformat: shows current welcome settings, without the formatting - useful to recycle your welcome messages!
- - /goodbye -> same usage and args as /welcome.
- - /setwelcome <sometext>: set a custom welcome message. If used replying to media, uses that media.
- - /setgoodbye <sometext>: set a custom goodbye message. If used replying to media, uses that media.
- - /resetwelcome: reset to the default welcome message.
- - /resetgoodbye: reset to the default goodbye message.
- - /cleanwelcome <on/off>: On new member, try to delete the previous welcome message to avoid spamming the chat.
+*Только администратор:*
+ - /welcome <on/off>: включить/отключить приветственные сообщения.
+ - /welcome: показывает текущие настройки приветствия.
+ - /welcome noformat: показывает текущие настройки приветствия без форматирования - полезно для повторного использования ваших приветственных сообщений!
+ - /goodbye -> то же использование и аргументы, что и /welcome.
+ - /setwelcome <текст>: установить пользовательское приветственное сообщение. Если используется для ответа на медиа, использует это медиа.
+ - /setgoodbye <текст>: установить собственное прощальное сообщение. Если используется для ответа на медиа, использует это медиа.
+ - /resetwelcome: сбросить приветственное сообщение по умолчанию.
+ - /resetgoodbye: сброс к прощальному сообщению по умолчанию.
+ - /cleanwelcome <on/off>: для нового участника попробуйте удалить предыдущее приветственное сообщение, чтобы не спамить чат.
 
- - /welcomehelp: view more formatting information for custom welcome/goodbye messages.
+ - /welcomehelp: просмотреть дополнительную информацию о форматировании пользовательских приветственных/прощальных сообщений.
 """.format(WELC_HELP_TXT)
 
-__mod_name__ = "Welcomes/Goodbyes"
+__mod_name__ = "Welcomes/Goodbyes (Приветствия/Прощания)"
 
 NEW_MEM_HANDLER = MessageHandler(Filters.status_update.new_chat_members, new_member)
 LEFT_MEM_HANDLER = MessageHandler(Filters.status_update.left_chat_member, left_member)

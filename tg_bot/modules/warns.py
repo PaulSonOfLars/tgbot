@@ -395,20 +395,20 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /warns <userhandle>: get a user's number, and reason, of warnings.
- - /warnlist: list of all current warning filters
+ - /warns <дескриптор пользователя>: получить номер пользователя и причину предупреждений.
+ - /warnlist: список всех текущих фильтров предупреждений
 
-*Admin only:*
- - /warn <userhandle>: warn a user. After 3 warns, the user will be banned from the group. Can also be used as a reply.
- - /resetwarn <userhandle>: reset the warnings for a user. Can also be used as a reply.
- - /addwarn <keyword> <reply message>: set a warning filter on a certain keyword. If you want your keyword to \
-be a sentence, encompass it with quotes, as such: `/addwarn "very angry" This is an angry user`. 
- - /nowarn <keyword>: stop a warning filter
- - /warnlimit <num>: set the warning limit
- - /strongwarn <on/yes/off/no>: If set to on, exceeding the warn limit will result in a ban. Else, will just kick.
+*Только администратор:*
+ - /warn <дескриптор пользователя>: предупредить пользователя. После 3 предупреждений пользователь будет забанен в группе. Также можно использовать в качестве ответа.
+ - /resetwarn <дескриптор пользователя>: сбросить предупреждения для пользователя. Также можно использовать в качестве ответа.
+ - /addwarn <ключевое слово> <ответное сообщение>: установить фильтр предупреждений по определенному ключевому слову. \
+ Если вы хотите, чтобы ваше ключевое слово было предложением, заключите его в кавычки, например: `/addwarn "вали отсюда" грубость`
+ - /nowarn <ключевое слово>: остановить фильтр предупреждений
+ - /warnlimit <число>: установить лимит предупреждений
+ - /strongwarn <on/yes/off/no>: Если установлено значение on, превышение лимита предупреждений приведет к бану. Иначе просто выкинет.
 """
 
-__mod_name__ = "Warnings"
+__mod_name__ = "Warnings (Предупреждения)"
 
 WARN_HANDLER = CommandHandler("warn", warn_user, pass_args=True, filters=Filters.group)
 RESET_WARN_HANDLER = CommandHandler(["resetwarn", "resetwarns"], reset_warns, pass_args=True, filters=Filters.group)

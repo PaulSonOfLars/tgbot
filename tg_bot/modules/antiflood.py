@@ -121,13 +121,13 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /flood: Get the current flood control setting
+ - /flood: показать текущую настройку контроля флуда
 
-*Admin only:*
- - /setflood <int/'no'/'off'>: enables or disables flood control
+*Только администратор:*
+ - /setflood <int/'no'/'off'>: : включает или отключает контроль флуда
 """
 
-__mod_name__ = "AntiFlood"
+__mod_name__ = "AntiFlood (Антифлуд)"
 
 FLOOD_BAN_HANDLER = MessageHandler(Filters.all & ~Filters.status_update & Filters.group, check_flood)
 SET_FLOOD_HANDLER = CommandHandler("setflood", set_flood, pass_args=True, filters=Filters.group)

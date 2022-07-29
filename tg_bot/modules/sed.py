@@ -99,17 +99,17 @@ def sed(bot: Bot, update: Update):
 
 
 __help__ = """
- - s/<text1>/<text2>(/<flag>): Reply to a message with this to perform a sed operation on that message, replacing all \
-occurrences of 'text1' with 'text2'. Flags are optional, and currently include 'i' for ignore case, 'g' for global, \
-or nothing. Delimiters include `/`, `_`, `|`, and `:`. Text grouping is supported. The resulting message cannot be \
-larger than {}.
+ - s/<текст1>/<текст2>(/<модификатор>): при ответе на сообщение будет выполнена операция замены. 'текст1' будет везде заменен на 'текст2'. \
+Модификаторы необязательны и, на данный момент, включают в себя `i` для регистронезависимого поиска и 'g' для поиска по всему сообщению. \
+В качестве разделителя могут использоваться `/`, `_`, `|`, и `:`. Также поддерживаются группировки. Длина результирующего сообщения \
+не может быть больше чем {}.
 
-*Reminder:* Sed uses some special characters to make matching easier, such as these: `+*.?\\`
-If you want to use these characters, make sure you escape them!
-eg: \\?.
+*НАПОМИНАНИЕ:* Sed использует специальные символы, например: `+*.?\\`
+Если вы хотите чтобы 'текст1' включал в себя такие символы - убедитесь что они экранированы. \
+Например: \\?.
 """.format(telegram.MAX_MESSAGE_LENGTH)
 
-__mod_name__ = "Sed/Regex"
+__mod_name__ = "Sed/Regex (Замена по регулярному выражению)"
 
 
 SED_HANDLER = DisableAbleRegexHandler(r's([{}]).*?\1.*'.format("".join(DELIMITERS)), sed, friendly="sed")

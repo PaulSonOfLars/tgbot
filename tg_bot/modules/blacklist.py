@@ -144,22 +144,23 @@ def __stats__():
                                                             sql.num_blacklist_filter_chats())
 
 
-__mod_name__ = "Word Blacklists"
+__mod_name__ = "Word Blacklists (Запрещённые слова)"
 
 __help__ = """
-Blacklists are used to stop certain triggers from being said in a group. Any time the trigger is mentioned, \
-the message will immediately be deleted. A good combo is sometimes to pair this up with warn filters!
+Черные списки используются для предотвращения произнесения определенных триггеров в группе. \
+При каждом упоминании триггера сообщение будет немедленно удалено. Хорошая комбинация — иногда \
+сочетать это с предупреждающими фильтрами!
 
-*NOTE:* blacklists do not affect group admins.
+*ПРИМЕЧАНИЕ:* черные списки не влияют на администраторов групп.
 
- - /blacklist: View the current blacklisted words.
+ - /blacklist: просмотреть текущие слова из черного списка.
 
 *Admin only:*
- - /addblacklist <triggers>: Add a trigger to the blacklist. Each line is considered one trigger, so using different \
-lines will allow you to add multiple triggers.
- - /unblacklist <triggers>: Remove triggers from the blacklist. Same newline logic applies here, so you can remove \
-multiple triggers at once.
- - /rmblacklist <triggers>: Same as above.
+ - /addblacklist <триггеры>: добавить триггер в черный список. Каждая строка считается одним триггером, \
+поэтому использование разных строк позволит вам добавить несколько триггеров.
+ - /unblacklist <триггеры>: удалить триггеры из черного списка. Здесь применяется та же логика новой строки, \
+поэтому вы можете удалить сразу несколько триггеров.
+ - /rmblacklist <триггеры>: то же, что и выше.
 """
 
 BLACKLIST_HANDLER = DisableAbleCommandHandler("blacklist", blacklist, filters=Filters.group, pass_args=True,

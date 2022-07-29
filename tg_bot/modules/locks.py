@@ -290,21 +290,20 @@ def __chat_settings__(chat_id, user_id):
 
 
 __help__ = """
- - /locktypes: a list of possible locktypes
+ - /locktypes: список возможных типов блоков
 
-*Admin only:*
- - /lock <type>: lock items of a certain type (not available in private)
- - /unlock <type>: unlock items of a certain type (not available in private)
- - /locks: the current list of locks in this chat.
+*Только администратор:*
+ - /lock <тип>: заблокировать элементы определенного типа (недоступно в приватном режиме)
+ - /unlock <тип>: разблокировать предметы определенного типа (недоступно в приватном режиме)
+ - /locks: текущий список замков в этом чате.
 
-Locks can be used to restrict a group's users.
-eg:
-Locking urls will auto-delete all messages with urls, locking stickers will delete all \
-stickers, etc.
-Locking bots will stop non-admins from adding bots to the chat.
+Блокировки можно использовать для ограничения пользователей группы.
+например:
+Блокировка URL-адресов автоматически удалит все сообщения с URL-адресами, блокировка стикеров удалит все стикеры и т.д.
+Блокировка ботов не позволит пользователям, не являющимся администраторами, добавлять ботов в чат.
 """
 
-__mod_name__ = "Locks"
+__mod_name__ = "Locks (Блоки)"
 
 LOCKTYPES_HANDLER = DisableAbleCommandHandler("locktypes", locktypes)
 LOCK_HANDLER = CommandHandler("lock", lock, pass_args=True, filters=Filters.group)
