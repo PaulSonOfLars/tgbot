@@ -213,7 +213,7 @@ __help__ = """
  - /invitelink: получает ссылку приглашения в чат
 """
 
-__mod_name__ = "Admin (Админы)"
+__mod_name__ = "Админы"
 
 PIN_HANDLER = CommandHandler("pin", pin, pass_args=True, filters=Filters.group)
 UNPIN_HANDLER = CommandHandler("unpin", unpin, filters=Filters.group)
