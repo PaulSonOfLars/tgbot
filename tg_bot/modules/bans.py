@@ -288,7 +288,7 @@ __help__ = """
  - /kick <имя пользователя>: удаляет пользователя из чата (через имя пользователя или ответ)
 """
 
-__mod_name__ = "Bans (Баны)"
+__mod_name__ = "Баны"
 
 BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
 TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, filters=Filters.group)
