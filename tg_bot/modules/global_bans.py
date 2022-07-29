@@ -46,6 +46,10 @@ UNGBAN_ERRORS = {
 
 @run_async
 def gban(bot: Bot, update: Update, args: List[str]):
+    if int(update.effective_user.id) not in SUDO_USERS:
+        update.effective_message.reply_text("Only SUDO users can use this command")
+        return
+    
     message = update.effective_message  # type: Optional[Message]
 
     user_id, reason = extract_user_and_text(message, args)
@@ -130,6 +134,10 @@ def gban(bot: Bot, update: Update, args: List[str]):
 
 @run_async
 def ungban(bot: Bot, update: Update, args: List[str]):
+    if int(update.effective_user.id) not in SUDO_USERS:
+        update.effective_message.reply_text("Only SUDO users can use this command")
+        return
+    
     message = update.effective_message  # type: Optional[Message]
 
     user_id = extract_user(message, args)
