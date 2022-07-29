@@ -118,22 +118,21 @@ def __gdpr__(user_id):
 
 
 __help__ = """
- - /bio: получить вашу биографию или биографию другого пользователя (последнюю заметку о нём от другого пользователя). Не может быть установлено для самого себя.
- - /me: получить информацию о вас или другом пользователе (установленную пользователем о себе)
+ - /bio: получить заметку вашу или другого пользователя.
 
  *Admin only:*
- - /setbio <text>: при ответе будет сохранена биография другого пользователя (ваша заметка о нём)
+ - /setbio <text>: при ответе на сообщение будет сохранена заметка о пользователе пользователя (ваша заметка о нём)
 """
 
-__mod_name__ = "Bios (Биографии) и Abouts (Презентации)"
+__mod_name__ = "Заметки о юзере"
 
 SET_BIO_HANDLER = DisableAbleCommandHandler("setbio", set_about_bio)
 GET_BIO_HANDLER = DisableAbleCommandHandler("bio", about_bio, pass_args=True)
 
 #SET_ABOUT_HANDLER = DisableAbleCommandHandler("setme", set_about_me)
-GET_ABOUT_HANDLER = DisableAbleCommandHandler("me", about_me, pass_args=True)
+#GET_ABOUT_HANDLER = DisableAbleCommandHandler("me", about_me, pass_args=True)
 
 dispatcher.add_handler(SET_BIO_HANDLER)
 dispatcher.add_handler(GET_BIO_HANDLER)
 #dispatcher.add_handler(SET_ABOUT_HANDLER)
-dispatcher.add_handler(GET_ABOUT_HANDLER)
+#dispatcher.add_handler(GET_ABOUT_HANDLER)
