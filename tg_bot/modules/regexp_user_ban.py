@@ -137,10 +137,11 @@ __help__ = """
 Имена пользователей обрабатываются без символа @ в начале. Например, имя_пользователя вместо @имя_пользователя
  - /user\_regexpban\_add [регулярное выражение] - добавить регулярное выражение
  - /user\_regexpban\_list - список регулярных выражений
- - /user\_regexpban\_delete [регулярное выражение] - удалить регулярное выражение. Не разблокирует уже забаненных пользователей.
+ - /user\_regexpban\_del [регулярное выражение] - удалить регулярное выражение. Не разблокирует уже забаненных пользователей.
+ 
  - /g\_user\_regexpban\_add [регулярное выражение] - добавить регулярное выражение
  - /g\_user\_regexpban\_list - список глобальных регулярных выражений
- - /g\_user\_regexpban\_delete [регулярное выражение] - удалить глобальное регулярное выражение. Не разблокирует уже забаненных пользователей.
+ - /g\_user\_regexpban\_del [регулярное выражение] - удалить глобальное регулярное выражение. Не разблокирует уже забаненных пользователей.
 
 Например: блокировать имена, состящие из минимум трёх и более букв подряд и двух цифр (sdf11, dfsd87): `/regexpuserban ^[a-zA-Z]{3,}[0-9]{2}$` Если в имени \
 две буквы (aa11), три цифры (aaaa111), среди букв есть лишняя цифра(aa1a11), они не будут заблокированы.
@@ -150,11 +151,11 @@ __mod_name__ = "Regexp ник бан"
 
 REGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_add", userregexpadd, pass_args=True, filters=Filters.group)
 LISTREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_list", userregexplist, pass_args=False, filters=Filters.group)
-UNBANREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_delete", userregexpdelete, pass_args=True, filters=Filters.group)
+UNBANREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_del", userregexpdelete, pass_args=True, filters=Filters.group)
 
 G_REGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_add", g_userregexpadd, pass_args=True, filters=Filters.group)
 G_LISTREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_list", g_userregexplist, pass_args=False, filters=Filters.group)
-G_UNBANREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_delete", g_userregexpdelete, pass_args=True, filters=Filters.group)
+G_UNBANREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_del", g_userregexpdelete, pass_args=True, filters=Filters.group)
 
 dispatcher.add_handler(REGEXPUSERBAN_HANDLER)
 dispatcher.add_handler(LISTREGEXPUSERBAN_HANDLER)
