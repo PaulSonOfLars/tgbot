@@ -17,15 +17,6 @@ from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import users_sql
 from tg_bot.modules.sql import regex_name_bans_sql as sql
 
-# /regexp_name_ban [regex]
-# /list_regexp_name_ban
-# /regexp_name_unban [regex]
-
-# и глобальный по всем чатам:
-# /g_regexp_name_ban [regex]
-# /g_list_regexp_name_ban
-# /g_regexp_name_unban [regex]
-
 @user_admin
 @bot_can_delete
 @loggable
@@ -144,24 +135,24 @@ __help__ = """
 *Только администратор:*
 Блокирует новых участников чата, имя или фамилия которых соответствуют одному из добавленных шаблонов регулярных выражений.
 Regexp проверяет как имя, так и фамилию.
- - /regexp\_name\_ban [регулярное выражение] - добавить регулярное выражение
- - /list\_regexp\_name\_ban - перечислить все регулярные выражения
- - /regexp\_name\_unban [регулярное выражение] - удалить регулярное выражение
+ - /name\_regexpban\_add [регулярное выражение] - добавить регулярное выражение
+ - /name\_regexpban\_list - перечислить все регулярные выражения
+ - /name\_regexpban\_del [регулярное выражение] - удалить регулярное выражение
 
- - /g\_regexp\_name\_ban [регулярное выражение] - добавить глобальное регулярное выражение
- - /g\_list\_regexp\_name\_ban - перечислить все глобальные регулярные выражения
- - /g\_regexp\_name\_unban [регулярное выражение] - удалить глобальное регулярное выражение
+ - /g\_name\_regexpban\_add [регулярное выражение] - добавить глобальное регулярное выражение
+ - /g\_name\_regexpban\_list - перечислить все глобальные регулярные выражения
+ - /g\_name\_regexpban\_del [регулярное выражение] - удалить глобальное регулярное выражение
 """
 
 __mod_name__ = "Regexp имя бан"
 
-REGEXPNAMEBAN_HANDLER = CommandHandler("regexp_name_ban", regexpnameban, pass_args=True, filters=Filters.group)
-LISTREGEXPNAMEBAN_HANDLER = CommandHandler("list_regexp_name_ban", listregexpnameban, pass_args=False, filters=Filters.group)
-UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("regexp_name_unban", regexpnameunban, pass_args=True, filters=Filters.group)
+REGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_add", regexpnameban, pass_args=True, filters=Filters.group)
+LISTREGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_list", listregexpnameban, pass_args=False, filters=Filters.group)
+UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_del", regexpnameunban, pass_args=True, filters=Filters.group)
 
-G_REGEXPNAMEBAN_HANDLER = CommandHandler("g_regexp_name_ban", g_regexpnameban, pass_args=True, filters=Filters.group)
-G_LISTREGEXPNAMEBAN_HANDLER = CommandHandler("g_list_regexp_name_ban", g_listregexpnameban, pass_args=False, filters=Filters.group)
-G_UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("g_regexp_name_unban", g_regexpnameunban, pass_args=True, filters=Filters.group)
+G_REGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_add", g_regexpnameban, pass_args=True, filters=Filters.group)
+G_LISTREGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_list", g_listregexpnameban, pass_args=False, filters=Filters.group)
+G_UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_del", g_regexpnameunban, pass_args=True, filters=Filters.group)
 
 dispatcher.add_handler(REGEXPNAMEBAN_HANDLER)
 dispatcher.add_handler(LISTREGEXPNAMEBAN_HANDLER)
