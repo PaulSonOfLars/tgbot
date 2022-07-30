@@ -171,7 +171,4 @@ dispatcher.add_handler(G_REGEXPNAMEBAN_HANDLER)
 dispatcher.add_handler(G_LISTREGEXPNAMEBAN_HANDLER)
 dispatcher.add_handler(G_UNBANREGEXPNAMEBAN_HANDLER)
 
-
-PERM_GROUP = 5
-
-dispatcher.add_handler(MessageHandler(Filters.status_update.new_chat_members, remove_banned_nicknames), PERM_GROUP)
+dispatcher.add_handler(MessageHandler(Filters.status_update.new_chat_members, remove_banned_nicknames))
