@@ -30,7 +30,7 @@ from tg_bot.modules.sql import regex_user_bans_sql as sql
 @user_admin
 @bot_can_delete
 @loggable
-def regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
+def userregexpadd(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message  # type: Optional[Message]
     chat_id = update.effective_chat.id
 
@@ -43,7 +43,7 @@ def regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
 
 @user_admin
 @loggable
-def listregexpuserban(bot: Bot, update: Update):
+def userregexplist(bot: Bot, update: Update):
     res = sql.get_regex_bans(update.effective_chat.id)
     if res is not None:
         res = list(map(lambda x: x.regex_to_ban, res))
@@ -54,7 +54,7 @@ def listregexpuserban(bot: Bot, update: Update):
 @run_async
 @user_admin
 @loggable
-def regexpuserunban(bot: Bot, update: Update, args: List[str]):
+def userregexpdelete(bot: Bot, update: Update, args: List[str]):
     regex = args[0]
     if regex is None:
         update.effective_message.reply_text("Regexp value is missing")
@@ -66,7 +66,7 @@ def regexpuserunban(bot: Bot, update: Update, args: List[str]):
 @user_admin
 @bot_can_delete
 @loggable
-def g_regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
+def g_userregexpadd(bot: Bot, update: Update, args: List[str]) -> str:
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -82,7 +82,7 @@ def g_regexpuserban(bot: Bot, update: Update, args: List[str]) -> str:
 
 @user_admin
 @loggable
-def g_listregexpuserban(bot: Bot, update: Update):
+def g_userregexplist(bot: Bot, update: Update):
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -97,7 +97,7 @@ def g_listregexpuserban(bot: Bot, update: Update):
 @run_async
 @user_admin
 @loggable
-def g_regexpuserunban(bot: Bot, update: Update, args: List[str]):
+def g_userregexpdelete(bot: Bot, update: Update, args: List[str]):
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -145,12 +145,12 @@ __help__ = """
 *Только администратор:*
 Блокирует новых участников чата, ник (имя пользователя) которых соответствует одному из добавленных шаблонов регулярных выражений.
 Имена пользователей обрабатываются без символа @ в начале. Например, имя_пользователя вместо @имя_пользователя
- - /regexpuserban [регулярное выражение] - добавить регулярное выражение
- - /listregexpuserban - список регулярных выражений
- - /regexpuserunban [регулярное выражение] - удалить регулярное выражение. Не разблокирует уже забаненных пользователей.
- - /g\_regexpuserban [регулярное выражение] - добавить регулярное выражение
- - /g\_listregexpuserban - список глобальных регулярных выражений
- - /g\_regexpuserunban [регулярное выражение] - удалить глобальное регулярное выражение. Не разблокирует уже забаненных пользователей.
+ - /user\_regexpban\_add [регулярное выражение] - добавить регулярное выражение
+ - /user\_regexpban\_list - список регулярных выражений
+ - /user\_regexpban\_delete [регулярное выражение] - удалить регулярное выражение. Не разблокирует уже забаненных пользователей.
+ - /g\_user\_regexpban\_add [регулярное выражение] - добавить регулярное выражение
+ - /g\_user\_regexpban\_list - список глобальных регулярных выражений
+ - /g\_user\_regexpban\_delete [регулярное выражение] - удалить глобальное регулярное выражение. Не разблокирует уже забаненных пользователей.
 
 Например: блокировать имена, состящие из минимум трёх и более букв подряд и двух цифр (sdf11, dfsd87): `/regexpuserban ^[a-zA-Z]{3,}[0-9]{2}$` Если в имени \
 две буквы (aa11), три цифры (aaaa111), среди букв есть лишняя цифра(aa1a11), они не будут заблокированы.
@@ -158,13 +158,13 @@ __help__ = """
 
 __mod_name__ = "Regexp ник бан"
 
-REGEXPUSERBAN_HANDLER = CommandHandler("regexpuserban", regexpuserban, pass_args=True, filters=Filters.group)
-LISTREGEXPUSERBAN_HANDLER = CommandHandler("listregexpuserban", listregexpuserban, pass_args=False, filters=Filters.group)
-UNBANREGEXPUSERBAN_HANDLER = CommandHandler("regexpuserunban", regexpuserunban, pass_args=True, filters=Filters.group)
+REGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_add", userregexpadd, pass_args=True, filters=Filters.group)
+LISTREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_list", userregexplist, pass_args=False, filters=Filters.group)
+UNBANREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_delete", userregexpdelete, pass_args=True, filters=Filters.group)
 
-G_REGEXPUSERBAN_HANDLER = CommandHandler("g_regexpuserban", g_regexpuserban, pass_args=True, filters=Filters.group)
-G_LISTREGEXPUSERBAN_HANDLER = CommandHandler("g_listregexpuserban", g_listregexpuserban, pass_args=False, filters=Filters.group)
-G_UNBANREGEXPUSERBAN_HANDLER = CommandHandler("g_regexpuserunban", g_regexpuserunban, pass_args=True, filters=Filters.group)
+G_REGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_add", g_userregexpadd, pass_args=True, filters=Filters.group)
+G_LISTREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_list", g_userregexplist, pass_args=False, filters=Filters.group)
+G_UNBANREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_delete", g_userregexpdelete, pass_args=True, filters=Filters.group)
 
 dispatcher.add_handler(REGEXPUSERBAN_HANDLER)
 dispatcher.add_handler(LISTREGEXPUSERBAN_HANDLER)
