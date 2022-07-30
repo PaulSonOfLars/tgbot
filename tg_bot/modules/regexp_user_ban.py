@@ -17,16 +17,6 @@ from tg_bot.modules.log_channel import loggable
 from tg_bot.modules.sql import users_sql
 from tg_bot.modules.sql import regex_user_bans_sql as sql
 
-# /regexpuserban [regex]
-# /listregexpuserban
-# /regexpuserunban [regex]
-# example regex .*\d+
-#
-
-# /g_regexpuserban [regex]
-# /g_listregexpuserban
-# /g_regexpuserunban [regex]
-
 @user_admin
 @bot_can_delete
 @loggable
