@@ -113,7 +113,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
                 is_banned = re.match(regex, name.first_name) or re.match(regex, name.last_name)
 
                 if is_banned:
-                    update.effective_message.reply_text("You're not welcome here!")
+                    update.effective_message.reply_text("#бан_банан тебе!")
                     chat.kick_member(name.id)
                     break
 
@@ -121,15 +121,9 @@ def remove_banned_nicknames(bot: Bot, update: Update):
                 is_banned = re.match(regex, name.username)
 
                 if is_banned:
-                    update.effective_message.reply_text("You're not welcome globally!")
+                    update.effective_message.reply_text("#бан_банан тебе!")
                     chat.kick_member(name.id)
                     break
-
-                # is_exists_in_global = sql.is_global_regex_ban_exists(joined_name)
-                # if is_exists_in_global:
-                #     update.effective_message.reply_text("User fitting " + regex + " banned in global ban list")
-                #     update.effective_message.delete()
-                #     break
 
 __help__ = """
 *Только администратор:*
