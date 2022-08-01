@@ -22,11 +22,13 @@ def is_user_ban_protected(chat: Chat, user_id: int, member: ChatMember = None) -
     return member.status in ('administrator', 'creator')
 
 
-def is_user_admin(chat: Chat, user_id: int, member: ChatMember = None) -> bool:
+def is_user_admin(chat: Chat, user_id: int, member: ChatMember = None, forward_from_chat=None) -> bool:
+    if forward_from_chat is not None:
+        return False
 
     if user_id == 1087968824:
         return True
-    
+
     if chat.type == 'private' \
             or user_id in SUDO_USERS \
             or chat.all_members_are_administrators:
@@ -115,7 +117,7 @@ def user_admin(func):
     @wraps(func)
     def is_admin(bot: Bot, update: Update, *args, **kwargs):
         user = update.effective_user  # type: Optional[User]
-        if user and is_user_admin(update.effective_chat, user.id):
+        if user and is_user_admin(update.effective_chat, user.id, forward_from_chat=update.message.forward_from_chat):
             return func(bot, update, *args, **kwargs)
 
         elif not user:
