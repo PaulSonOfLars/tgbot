@@ -3,7 +3,7 @@ from typing import Optional
 
 from telegram import User, Chat, ChatMember, Update, Bot
 
-from tg_bot import DEL_CMDS, SUDO_USERS, WHITELIST_USERS
+from tg_bot import DEL_CMDS, SUDO_USERS, WHITELIST_USERS, LOGGER
 
 
 def can_delete(chat: Chat, bot_id: int) -> bool:
@@ -127,6 +127,7 @@ def user_admin(func):
             update.effective_message.delete()
 
         else:
+            LOGGER.info("User with id: %s tried to execute: %s", str(user.id), str(update.effective_message.text))
             update.effective_message.reply_text("Who dis non-admin telling me what to do?")
 
     return is_admin
