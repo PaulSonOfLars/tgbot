@@ -55,7 +55,7 @@ if is_module_loaded(FILENAME):
                 bot.send_message(log_chat_id, result + "\n\nFormatting has been disabled due to an unexpected error.")
 
 
-    @run_async
+    # @run_async
     @user_admin
     def logging(bot: Bot, update: Update):
         message = update.effective_message  # type: Optional[Message]
@@ -73,7 +73,7 @@ if is_module_loaded(FILENAME):
             message.reply_text("No log channel has been set for this group!")
 
 
-    @run_async
+    # @run_async
     @user_admin
     def setlog(bot: Bot, update: Update):
         message = update.effective_message  # type: Optional[Message]
@@ -110,7 +110,7 @@ if is_module_loaded(FILENAME):
                                " - forward the /setlog to the group\n")
 
 
-    @run_async
+    # @run_async
     @user_admin
     def unsetlog(bot: Bot, update: Update):
         message = update.effective_message  # type: Optional[Message]

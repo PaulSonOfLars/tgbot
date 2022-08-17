@@ -49,7 +49,7 @@ def separate_sed(sed_string):
         return replace, replace_with, flags.lower()
 
 
-@run_async
+# @run_async
 def sed(bot: Bot, update: Update):
     sed_result = separate_sed(update.effective_message.text)
     if sed_result and update.effective_message.reply_to_message:

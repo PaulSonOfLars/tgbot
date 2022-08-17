@@ -15,12 +15,13 @@ from tg_bot.modules.helper_funcs.extraction import extract_user
 from tg_bot.modules.log_channel import loggable
 
 
-@run_async
+# @run_async
 @bot_admin
 @can_promote
 @user_admin
 @loggable
-def promote(bot: Bot, update: Update, args: List[str]) -> str:
+def promote(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat_id = update.effective_chat.id
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
@@ -62,12 +63,13 @@ def promote(bot: Bot, update: Update, args: List[str]) -> str:
                                       mention_html(user_member.user.id, user_member.user.first_name))
 
 
-@run_async
+# @run_async
 @bot_admin
 @can_promote
 @user_admin
 @loggable
-def demote(bot: Bot, update: Update, args: List[str]) -> str:
+def demote(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]
     user = update.effective_user  # type: Optional[User]
@@ -114,12 +116,13 @@ def demote(bot: Bot, update: Update, args: List[str]) -> str:
         return ""
 
 
-@run_async
+# @run_async
 @bot_admin
 @can_pin
 @user_admin
 @loggable
-def pin(bot: Bot, update: Update, args: List[str]) -> str:
+def pin(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     user = update.effective_user  # type: Optional[User]
     chat = update.effective_chat  # type: Optional[Chat]
 
@@ -146,7 +149,7 @@ def pin(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @bot_admin
 @can_pin
 @user_admin
@@ -169,7 +172,7 @@ def unpin(bot: Bot, update: Update) -> str:
                                        mention_html(user.id, user.first_name))
 
 
-@run_async
+# @run_async
 @bot_admin
 @user_admin
 def invite(bot: Bot, update: Update):
@@ -187,7 +190,7 @@ def invite(bot: Bot, update: Update):
         update.effective_message.reply_text("I can only give you invite links for supergroups and channels, sorry!")
 
 
-@run_async
+# @run_async
 def adminlist(bot: Bot, update: Update):
     administrators = update.effective_chat.get_administrators()
     text = "Admins in *{}*:".format(update.effective_chat.title or "this chat")

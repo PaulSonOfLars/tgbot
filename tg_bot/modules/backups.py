@@ -11,7 +11,7 @@ from tg_bot.__main__ import DATA_IMPORT
 from tg_bot.modules.helper_funcs.chat_status import user_admin
 
 
-@run_async
+# @run_async
 @user_admin
 def import_data(bot: Bot, update):
     msg = update.effective_message  # type: Optional[Message]
@@ -59,7 +59,7 @@ def import_data(bot: Bot, update):
         msg.reply_text("Backup fully imported. Welcome back! :D")
 
 
-@run_async
+# @run_async
 @user_admin
 def export_data(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]

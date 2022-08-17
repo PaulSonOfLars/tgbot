@@ -21,7 +21,7 @@ HANDLER_GROUP = 10
 BASIC_FILTER_STRING = "*Filters in this chat:*\n"
 
 
-@run_async
+# @run_async
 def list_handlers(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     all_handlers = sql.get_chat_triggers(chat.id)
@@ -141,7 +141,7 @@ def stop_filter(bot: Bot, update: Update):
     update.effective_message.reply_text("That's not a current filter - run /filters for all active filters.")
 
 
-@run_async
+# @run_async
 def reply_filter(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     message = update.effective_message  # type: Optional[Message]

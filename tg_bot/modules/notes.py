@@ -109,8 +109,9 @@ def get(bot, update, notename, show_none=True, no_format=False):
         message.reply_text("This note doesn't exist")
 
 
-@run_async
-def cmd_get(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def cmd_get(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if len(args) >= 2 and args[1].lower() == "noformat":
         get(bot, update, args[0], show_none=True, no_format=True)
     elif len(args) >= 1:
@@ -119,7 +120,7 @@ def cmd_get(bot: Bot, update: Update, args: List[str]):
         update.effective_message.reply_text("Get rekt")
 
 
-@run_async
+# @run_async
 def hash_get(bot: Bot, update: Update):
     message = update.effective_message.text
     fst_word = message.split()[0]
@@ -127,7 +128,7 @@ def hash_get(bot: Bot, update: Update):
     get(bot, update, no_hash, show_none=False)
 
 
-@run_async
+# @run_async
 @user_admin
 def save(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
@@ -161,9 +162,10 @@ def save(bot: Bot, update: Update):
         return
 
 
-@run_async
+# @run_async
 @user_admin
-def clear(bot: Bot, update: Update, args: List[str]):
+def clear(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     chat_id = update.effective_chat.id
     if len(args) >= 1:
         notename = args[0]
@@ -174,7 +176,7 @@ def clear(bot: Bot, update: Update, args: List[str]):
             update.effective_message.reply_text("That's not a note in my database!")
 
 
-@run_async
+# @run_async
 def list_notes(bot: Bot, update: Update):
     chat_id = update.effective_chat.id
     note_list = sql.get_all_chat_notes(chat_id)

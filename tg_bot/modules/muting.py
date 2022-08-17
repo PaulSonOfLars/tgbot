@@ -14,11 +14,12 @@ from tg_bot.modules.helper_funcs.string_handling import extract_time
 from tg_bot.modules.log_channel import loggable
 
 
-@run_async
+# @run_async
 @bot_admin
 @user_admin
 @loggable
-def mute(bot: Bot, update: Update, args: List[str]) -> str:
+def mute(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
@@ -56,11 +57,12 @@ def mute(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @bot_admin
 @user_admin
 @loggable
-def unmute(bot: Bot, update: Update, args: List[str]) -> str:
+def unmute(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
@@ -102,12 +104,13 @@ def unmute(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @bot_admin
 @can_restrict
 @user_admin
 @loggable
-def temp_mute(bot: Bot, update: Update, args: List[str]) -> str:
+def temp_mute(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]

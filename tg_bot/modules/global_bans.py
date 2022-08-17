@@ -44,8 +44,9 @@ UNGBAN_ERRORS = {
 }
 
 
-@run_async
-def gban(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def gban(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -132,8 +133,9 @@ def gban(bot: Bot, update: Update, args: List[str]):
     message.reply_text("Person has been gbanned.")
 
 
-@run_async
-def ungban(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def ungban(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -193,7 +195,7 @@ def ungban(bot: Bot, update: Update, args: List[str]):
     message.reply_text("Person has been un-gbanned.")
 
 
-@run_async
+# @run_async
 def gbanlist(bot: Bot, update: Update):
     banned_users = sql.get_gban_list()
 
@@ -220,7 +222,7 @@ def check_and_ban(update, user_id, should_message=True):
             update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
 
 
-@run_async
+# @run_async
 def enforce_gban(bot: Bot, update: Update):
     # Not using @restrict handler to avoid spamming - just ignore if cant gban.
     if sql.does_chat_gban(update.effective_chat.id) and update.effective_chat.get_member(bot.id).can_restrict_members:
@@ -242,9 +244,10 @@ def enforce_gban(bot: Bot, update: Update):
                 check_and_ban(update, user.id, should_message=False)
 
 
-@run_async
+# @run_async
 @user_admin
-def gbanstat(bot: Bot, update: Update, args: List[str]):
+def gbanstat(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if len(args) > 0:
         if args[0].lower() in ["on", "yes"]:
             sql.enable_gbans(update.effective_chat.id)

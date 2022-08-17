@@ -13,7 +13,7 @@ AFK_GROUP = 7
 AFK_REPLY_GROUP = 8
 
 
-@run_async
+# @run_async
 def afk(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     if len(args) >= 2:
@@ -25,7 +25,7 @@ def afk(bot: Bot, update: Update):
     update.effective_message.reply_text("{} is now AFK!".format(update.effective_user.first_name))
 
 
-@run_async
+# @run_async
 def no_longer_afk(bot: Bot, update: Update):
     user = update.effective_user  # type: Optional[User]
 
@@ -37,7 +37,7 @@ def no_longer_afk(bot: Bot, update: Update):
         update.effective_message.reply_text("{} is no longer AFK!".format(update.effective_user.first_name))
 
 
-@run_async
+# @run_async
 def reply_afk(bot: Bot, update: Update):
     message = update.effective_message  # type: Optional[Message]
     entities = message.parse_entities([MessageEntity.TEXT_MENTION, MessageEntity.MENTION])

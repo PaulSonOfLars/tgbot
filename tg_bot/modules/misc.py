@@ -134,13 +134,14 @@ GMAPS_LOC = "https://maps.googleapis.com/maps/api/geocode/json"
 GMAPS_TIME = "https://maps.googleapis.com/maps/api/timezone/json"
 
 
-@run_async
+# @run_async
 def runs(bot: Bot, update: Update):
     update.effective_message.reply_text(random.choice(RUN_STRINGS))
 
 
-@run_async
-def slap(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def slap(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     msg = update.effective_message  # type: Optional[Message]
 
     # reply to correct message
@@ -177,7 +178,7 @@ def slap(bot: Bot, update: Update, args: List[str]):
     reply_text(repl, parse_mode=ParseMode.MARKDOWN)
 
 
-@run_async
+# @run_async
 def get_bot_ip(bot: Bot, update: Update):
     """ Sends the bot's IP address, so as to be able to ssh in if necessary.
         OWNER ONLY.
@@ -186,8 +187,9 @@ def get_bot_ip(bot: Bot, update: Update):
     update.message.reply_text(res.text)
 
 
-@run_async
-def get_id(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def get_id(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     user_id = extract_user(update.effective_message, args)
     if user_id:
         if update.effective_message.reply_to_message and update.effective_message.reply_to_message.forward_from:
@@ -215,8 +217,9 @@ def get_id(bot: Bot, update: Update, args: List[str]):
                                                 parse_mode=ParseMode.MARKDOWN)
 
 
-@run_async
-def info(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def info(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     msg = update.effective_message  # type: Optional[Message]
     user_id = extract_user(update.effective_message, args)
 
@@ -270,8 +273,9 @@ def info(bot: Bot, update: Update, args: List[str]):
     update.effective_message.reply_text(text, parse_mode=ParseMode.HTML)
 
 
-@run_async
-def get_time(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def get_time(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     location = " ".join(args)
     if location.lower() == bot.first_name.lower():
         update.effective_message.reply_text("Its always banhammer time for me!")
@@ -312,7 +316,7 @@ def get_time(bot: Bot, update: Update, args: List[str]):
                 update.message.reply_text("It's {} in {}".format(time_there, location))
 
 
-@run_async
+# @run_async
 def echo(bot: Bot, update: Update):
     args = update.effective_message.text.split(None, 1)
     message = update.effective_message
@@ -323,7 +327,7 @@ def echo(bot: Bot, update: Update):
     message.delete()
 
 
-@run_async
+# @run_async
 def gdpr(bot: Bot, update: Update):
     update.effective_message.reply_text("Deleting identifiable data...")
     for mod in GDPR:
@@ -364,7 +368,7 @@ Keep in mind that your message <b>MUST</b> contain some text other than just a b
 """.format(dispatcher.bot.first_name)
 
 
-@run_async
+# @run_async
 def markdown_help(bot: Bot, update: Update):
     update.effective_message.reply_text(MARKDOWN_HELP, parse_mode=ParseMode.HTML)
     update.effective_message.reply_text("Try forwarding the following message to me, and you'll see!")
@@ -373,7 +377,7 @@ def markdown_help(bot: Bot, update: Update):
                                         "[button2](buttonurl://google.com:same)")
 
 
-@run_async
+# @run_async
 def stats(bot: Bot, update: Update):
     update.effective_message.reply_text("Current stats:\n" + "\n".join([mod.__stats__() for mod in STATS]))
 
