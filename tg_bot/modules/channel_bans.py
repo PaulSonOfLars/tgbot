@@ -13,7 +13,8 @@ from tg_bot.modules.sql import channel_bans_sql as sql
 @user_admin
 @bot_can_delete
 @loggable
-def ban_channel(bot: Bot, update: Update, args: List[str]):
+def ban_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.add_channel_bans(chat_id, channel_name)
@@ -23,7 +24,8 @@ def ban_channel(bot: Bot, update: Update, args: List[str]):
 @user_admin
 @bot_can_delete
 @loggable
-def global_ban_channel(bot: Bot, update: Update, args: List[str]):
+def global_ban_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -31,17 +33,18 @@ def global_ban_channel(bot: Bot, update: Update, args: List[str]):
     sql.add_channel_global_bans(channel_name)
     update.effective_message.reply_text("Channel " + channel_name + " was added to global ban list")
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def unban_channel(bot: Bot, update: Update, args: List[str]):
+def unban_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     channel_name = args[0]
     chat_id = update.effective_chat.id
     sql.delete_channel_ban(chat_id, channel_name)
     update.effective_message.reply_text("Channel was removed from ban list")
 
 
-@run_async
+# @run_async
 @user_admin
 def banned_channels(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
@@ -56,7 +59,8 @@ def banned_channels(bot: Bot, update: Update):
 @user_admin
 @bot_can_delete
 @loggable
-def global_ban_channel(bot: Bot, update: Update, args: List[str]):
+def global_ban_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -65,10 +69,11 @@ def global_ban_channel(bot: Bot, update: Update, args: List[str]):
     update.effective_message.reply_text("Channel " + channel_name + " was added to global ban list")
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def global_unban_channel(bot: Bot, update: Update, args: List[str]):
+def global_unban_channel(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -77,7 +82,7 @@ def global_unban_channel(bot: Bot, update: Update, args: List[str]):
     update.effective_message.reply_text("Channel " + channel_name + " was removed from global ban list")
 
 
-@run_async
+# @run_async
 @user_admin
 def global_banned_channels(bot: Bot, update: Update):
     if int(update.effective_user.id) not in SUDO_USERS:
@@ -91,7 +96,7 @@ def global_banned_channels(bot: Bot, update: Update):
         update.effective_message.reply_text("There are no channels in global ban")
 
 
-@run_async
+# @run_async
 def remove_banned_forwardings(bot: Bot, update: Update):
     if update.effective_message.forward_from_chat is not None:
         forwarder_from_channel_name = update.effective_message.forward_from_chat.username

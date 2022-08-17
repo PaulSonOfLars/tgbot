@@ -92,7 +92,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
     return log_reason
 
 
-@run_async
+# @run_async
 @user_admin_no_reply
 @bot_admin
 @loggable
@@ -124,11 +124,12 @@ def button(bot: Bot, update: Update) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @user_admin
 @can_restrict
 @loggable
-def warn_user(bot: Bot, update: Update, args: List[str]) -> str:
+def warn_user(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     warner = update.effective_user  # type: Optional[User]
@@ -145,11 +146,12 @@ def warn_user(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @user_admin
 @bot_admin
 @loggable
-def reset_warns(bot: Bot, update: Update, args: List[str]) -> str:
+def reset_warns(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
@@ -172,8 +174,9 @@ def reset_warns(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
-def warns(bot: Bot, update: Update, args: List[str]):
+# @run_async
+def warns(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     message = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     user_id = extract_user(message, args) or update.effective_user.id
@@ -262,7 +265,7 @@ def remove_warn_filter(bot: Bot, update: Update):
     msg.reply_text("That's not a current warning filter - run /warnlist for all active warning filters.")
 
 
-@run_async
+# @run_async
 def list_warn_filters(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     all_handlers = sql.get_chat_warn_triggers(chat.id)
@@ -284,7 +287,7 @@ def list_warn_filters(bot: Bot, update: Update):
         update.effective_message.reply_text(filter_list, parse_mode=ParseMode.HTML)
 
 
-@run_async
+# @run_async
 @loggable
 def reply_filter(bot: Bot, update: Update) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
@@ -304,10 +307,11 @@ def reply_filter(bot: Bot, update: Update) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def set_warn_limit(bot: Bot, update: Update, args: List[str]) -> str:
+def set_warn_limit(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]
@@ -333,9 +337,10 @@ def set_warn_limit(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @user_admin
-def set_warn_strength(bot: Bot, update: Update, args: List[str]):
+def set_warn_strength(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     msg = update.effective_message  # type: Optional[Message]

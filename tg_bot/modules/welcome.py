@@ -76,7 +76,7 @@ def send(update, message, keyboard, backup_message):
     return msg
 
 
-@run_async
+# @run_async
 def new_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
 
@@ -141,7 +141,7 @@ def new_member(bot: Bot, update: Update):
                 sql.set_clean_welcome(chat.id, sent.message_id)
 
 
-@run_async
+# @run_async
 def left_member(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     should_goodbye, cust_goodbye, goodbye_type = sql.get_gdbye_pref(chat.id)
@@ -192,9 +192,10 @@ def left_member(bot: Bot, update: Update):
             send(update, res, keyboard, sql.DEFAULT_GOODBYE)
 
 
-@run_async
+# @run_async
 @user_admin
-def welcome(bot: Bot, update: Update, args: List[str]):
+def welcome(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     # if no args, show current replies.
     if len(args) == 0 or args[0].lower() == "noformat":
@@ -238,9 +239,10 @@ def welcome(bot: Bot, update: Update, args: List[str]):
             update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
 
 
-@run_async
+# @run_async
 @user_admin
-def goodbye(bot: Bot, update: Update, args: List[str]):
+def goodbye(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
 
     if len(args) == 0 or args[0] == "noformat":
@@ -284,7 +286,7 @@ def goodbye(bot: Bot, update: Update, args: List[str]):
             update.effective_message.reply_text("I understand 'on/yes' or 'off/no' only!")
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
 def set_welcome(bot: Bot, update: Update) -> str:
@@ -308,7 +310,7 @@ def set_welcome(bot: Bot, update: Update) -> str:
                                                mention_html(user.id, user.first_name))
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
 def reset_welcome(bot: Bot, update: Update) -> str:
@@ -323,7 +325,7 @@ def reset_welcome(bot: Bot, update: Update) -> str:
                                                             mention_html(user.id, user.first_name))
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
 def set_goodbye(bot: Bot, update: Update) -> str:
@@ -345,7 +347,7 @@ def set_goodbye(bot: Bot, update: Update) -> str:
                                                mention_html(user.id, user.first_name))
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
 def reset_goodbye(bot: Bot, update: Update) -> str:
@@ -360,10 +362,11 @@ def reset_goodbye(bot: Bot, update: Update) -> str:
                                                  mention_html(user.id, user.first_name))
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def clean_welcome(bot: Bot, update: Update, args: List[str]) -> str:
+def clean_welcome(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
 
@@ -418,7 +421,7 @@ WELC_HELP_TXT = "Приветственные/прощальные сообще�
                 "ответив на нужный носитель и вызвав команду /setwelcome.".format(dispatcher.bot.username)
 
 
-@run_async
+# @run_async
 @user_admin
 def welcome_help(bot: Bot, update: Update):
     update.effective_message.reply_text(WELC_HELP_TXT, parse_mode=ParseMode.MARKDOWN)

@@ -14,9 +14,10 @@ from tg_bot.modules.sql import reporting_sql as sql
 REPORT_GROUP = 5
 
 
-@run_async
+# @run_async
 @user_admin
-def report_setting(bot: Bot, update: Update, args: List[str]):
+def report_setting(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     msg = update.effective_message  # type: Optional[Message]
 
@@ -48,7 +49,7 @@ def report_setting(bot: Bot, update: Update, args: List[str]):
                            parse_mode=ParseMode.MARKDOWN)
 
 
-@run_async
+# @run_async
 @user_not_admin
 @loggable
 def report(bot: Bot, update: Update) -> str:

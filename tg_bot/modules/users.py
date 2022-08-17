@@ -47,7 +47,7 @@ def get_user_id(username):
     return None
 
 
-@run_async
+# @run_async
 def broadcast(bot: Bot, update: Update):
     to_send = update.effective_message.text.split(None, 1)
     if len(to_send) >= 2:
@@ -65,7 +65,7 @@ def broadcast(bot: Bot, update: Update):
                                             "due to being kicked.".format(failed))
 
 
-@run_async
+# @run_async
 def log_user(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
     msg = update.effective_message  # type: Optional[Message]
@@ -86,7 +86,7 @@ def log_user(bot: Bot, update: Update):
                         msg.forward_from.username)
 
 
-@run_async
+# @run_async
 def chats(bot: Bot, update: Update):
     all_chats = sql.get_all_chats() or []
     chatfile = 'List of chats.\n'

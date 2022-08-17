@@ -20,7 +20,8 @@ from tg_bot.modules.sql import regex_user_bans_sql as sql
 @user_admin
 @bot_can_delete
 @loggable
-def userregexpadd(bot: Bot, update: Update, args: List[str]) -> str:
+def userregexpadd(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     message = update.effective_message  # type: Optional[Message]
     chat_id = update.effective_chat.id
 
@@ -41,10 +42,11 @@ def userregexplist(bot: Bot, update: Update):
     elif res is [] or res is None:
         update.effective_message.reply_text("There are no regexp in ban")
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def userregexpdelete(bot: Bot, update: Update, args: List[str]):
+def userregexpdelete(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     regex = args[0]
     if regex is None:
         update.effective_message.reply_text("Regexp value is missing")
@@ -56,7 +58,8 @@ def userregexpdelete(bot: Bot, update: Update, args: List[str]):
 @user_admin
 @bot_can_delete
 @loggable
-def g_userregexpadd(bot: Bot, update: Update, args: List[str]) -> str:
+def g_userregexpadd(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -84,10 +87,11 @@ def g_userregexplist(bot: Bot, update: Update):
     elif res is [] or res is None:
         update.effective_message.reply_text("There are no regexp in ban globally")
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def g_userregexpdelete(bot: Bot, update: Update, args: List[str]):
+def g_userregexpdelete(bot: Bot, update: Update):
+    args = update.effective_message.text.split(" ")[1:]
     if int(update.effective_user.id) not in SUDO_USERS:
         update.effective_message.reply_text("Only SUDO users can use this command")
         return
@@ -100,7 +104,7 @@ def g_userregexpdelete(bot: Bot, update: Update, args: List[str]):
     sql.delete_regex_global_ban(regex)
     update.effective_message.reply_text("Regexp " + regex + " was removed from global ban list")
 
-@run_async
+# @run_async
 def remove_banned_nicknames(bot: Bot, update: Update):
     joined_names = update.effective_message.new_chat_members
     chat = update.effective_chat

@@ -14,7 +14,7 @@ from tg_bot.modules.sql import antiflood_sql as sql
 FLOOD_GROUP = 3
 
 
-@run_async
+# @run_async
 @loggable
 def check_flood(bot: Bot, update: Update) -> str:
     user = update.effective_user  # type: Optional[User]
@@ -52,11 +52,12 @@ def check_flood(bot: Bot, update: Update) -> str:
                "\nDon't have kick permissions, so automatically disabled antiflood.".format(chat.title)
 
 
-@run_async
+# @run_async
 @user_admin
 @can_restrict
 @loggable
-def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
+def set_flood(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
@@ -96,7 +97,7 @@ def set_flood(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 def flood(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
 

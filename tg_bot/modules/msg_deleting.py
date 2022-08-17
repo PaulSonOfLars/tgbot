@@ -12,10 +12,11 @@ from tg_bot.modules.helper_funcs.chat_status import user_admin, can_delete
 from tg_bot.modules.log_channel import loggable
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def purge(bot: Bot, update: Update, args: List[str]) -> str:
+def purge(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     msg = update.effective_message  # type: Optional[Message]
     if msg.reply_to_message:
         user = update.effective_user  # type: Optional[User]
@@ -64,7 +65,7 @@ def purge(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
 def del_message(bot: Bot, update: Update) -> str:

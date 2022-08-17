@@ -64,9 +64,10 @@ if is_module_loaded(FILENAME):
             return super().check_update(update) and not sql.is_command_disabled(chat.id, self.friendly)
 
 
-    @run_async
+    # @run_async
     @user_admin
-    def disable(bot: Bot, update: Update, args: List[str]):
+    def disable(bot: Bot, update: Update):
+        args = update.effective_message.text.split(" ")[1:]
         chat = update.effective_chat  # type: Optional[Chat]
         if len(args) >= 1:
             disable_cmd = args[0]
@@ -84,9 +85,10 @@ if is_module_loaded(FILENAME):
             update.effective_message.reply_text("What should I disable?")
 
 
-    @run_async
+    # @run_async
     @user_admin
-    def enable(bot: Bot, update: Update, args: List[str]):
+    def enable(bot: Bot, update: Update):
+        args = update.effective_message.text.split(" ")[1:]
         chat = update.effective_chat  # type: Optional[Chat]
         if len(args) >= 1:
             enable_cmd = args[0]
@@ -103,7 +105,7 @@ if is_module_loaded(FILENAME):
             update.effective_message.reply_text("What should I enable?")
 
 
-    @run_async
+    # @run_async
     @user_admin
     def list_cmds(bot: Bot, update: Update):
         if DISABLE_CMDS + DISABLE_OTHER:
@@ -128,7 +130,7 @@ if is_module_loaded(FILENAME):
         return "The following commands are currently restricted:\n{}".format(result)
 
 
-    @run_async
+    # @run_async
     def commands(bot: Bot, update: Update):
         chat = update.effective_chat
         update.effective_message.reply_text(build_curr_disabled(chat.id), parse_mode=ParseMode.MARKDOWN)

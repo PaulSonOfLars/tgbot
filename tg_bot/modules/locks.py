@@ -90,7 +90,7 @@ def unrestr_members(bot, chat_id, members, messages=True, media=True, other=True
             pass
 
 
-@run_async
+# @run_async
 def locktypes(bot: Bot, update: Update):
     update.effective_message.reply_text("\n - ".join(["Locks: "] + list(LOCK_TYPES) + list(RESTRICTION_TYPES)))
 
@@ -98,7 +98,8 @@ def locktypes(bot: Bot, update: Update):
 @user_admin
 @bot_can_delete
 @loggable
-def lock(bot: Bot, update: Update, args: List[str]) -> str:
+def lock(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
@@ -136,10 +137,11 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @user_admin
 @loggable
-def unlock(bot: Bot, update: Update, args: List[str]) -> str:
+def unlock(bot: Bot, update: Update) -> str:
+    args = update.effective_message.text.split(" ")[1:]
     chat = update.effective_chat  # type: Optional[Chat]
     user = update.effective_user  # type: Optional[User]
     message = update.effective_message  # type: Optional[Message]
@@ -189,7 +191,7 @@ def unlock(bot: Bot, update: Update, args: List[str]) -> str:
     return ""
 
 
-@run_async
+# @run_async
 @user_not_admin
 def del_lockables(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
@@ -220,7 +222,7 @@ def del_lockables(bot: Bot, update: Update):
             break
 
 
-@run_async
+# @run_async
 @user_not_admin
 def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
@@ -271,7 +273,7 @@ def build_lock_message(chat_id):
     return res
 
 
-@run_async
+# @run_async
 @user_admin
 def list_locks(bot: Bot, update: Update):
     chat = update.effective_chat  # type: Optional[Chat]
