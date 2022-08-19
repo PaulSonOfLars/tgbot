@@ -144,13 +144,13 @@ Regexp проверяет как имя, так и фамилию.
 
 __mod_name__ = "Regexp имя бан"
 
-REGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_add", regexpnameban, pass_args=True, filters=Filters.group)
-LISTREGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_list", listregexpnameban, pass_args=False, filters=Filters.group)
-UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_del", regexpnameunban, pass_args=True, filters=Filters.group)
+REGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_add", regexpnameban, pass_args=True, filters=Filters.chat_type.groups)
+LISTREGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_list", listregexpnameban, pass_args=False, filters=Filters.chat_type.groups)
+UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("name_regexpban_del", regexpnameunban, pass_args=True, filters=Filters.chat_type.groups)
 
-G_REGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_add", g_regexpnameban, pass_args=True, filters=Filters.group)
-G_LISTREGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_list", g_listregexpnameban, pass_args=False, filters=Filters.group)
-G_UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_del", g_regexpnameunban, pass_args=True, filters=Filters.group)
+G_REGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_add", g_regexpnameban, pass_args=True, filters=Filters.chat_type.groups)
+G_LISTREGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_list", g_listregexpnameban, pass_args=False, filters=Filters.chat_type.groups)
+G_UNBANREGEXPNAMEBAN_HANDLER = CommandHandler("g_name_regexpban_del", g_regexpnameunban, pass_args=True, filters=Filters.chat_type.groups)
 
 dispatcher.add_handler(REGEXPNAMEBAN_HANDLER)
 dispatcher.add_handler(LISTREGEXPNAMEBAN_HANDLER)

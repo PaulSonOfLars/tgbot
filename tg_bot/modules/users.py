@@ -128,7 +128,7 @@ __help__ = """
 __mod_name__ = "Пользователи"
 
 BROADCAST_HANDLER = CommandHandler("broadcast", broadcast, filters=Filters.user(OWNER_ID))
-USER_HANDLER = MessageHandler(Filters.all & Filters.group, log_user)
+USER_HANDLER = MessageHandler(Filters.all & Filters.chat_type.groups, log_user)
 CHATLIST_HANDLER = CommandHandler("chatlist", chats, filters=CustomFilters.sudo_filter)
 
 dispatcher.add_handler(USER_HANDLER, USERS_GROUP)

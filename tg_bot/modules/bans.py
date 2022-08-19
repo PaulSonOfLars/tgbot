@@ -294,11 +294,11 @@ __help__ = """
 
 __mod_name__ = "Баны"
 
-BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.group)
-TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, filters=Filters.group)
-KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.group)
-UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=Filters.group)
-KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=Filters.group)
+BAN_HANDLER = CommandHandler("ban", ban, pass_args=True, filters=Filters.chat_type.groups)
+TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, filters=Filters.chat_type.groups)
+KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.chat_type.groups)
+UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=Filters.chat_type.groups)
+KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=Filters.chat_type.groups)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(TEMPBAN_HANDLER)

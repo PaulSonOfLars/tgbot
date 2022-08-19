@@ -164,12 +164,12 @@ __help__ = """
  - /rmblacklist <триггеры>: то же, что и выше.
 """
 
-BLACKLIST_HANDLER = DisableAbleCommandHandler("blacklist", blacklist, filters=Filters.group, pass_args=True,
+BLACKLIST_HANDLER = DisableAbleCommandHandler("blacklist", blacklist, filters=Filters.chat_type.groups, pass_args=True,
                                               admin_ok=True)
-ADD_BLACKLIST_HANDLER = CommandHandler("addblacklist", add_blacklist, filters=Filters.group)
-UNBLACKLIST_HANDLER = CommandHandler(["unblacklist", "rmblacklist"], unblacklist, filters=Filters.group)
+ADD_BLACKLIST_HANDLER = CommandHandler("addblacklist", add_blacklist, filters=Filters.chat_type.groups)
+UNBLACKLIST_HANDLER = CommandHandler(["unblacklist", "rmblacklist"], unblacklist, filters=Filters.chat_type.groups)
 BLACKLIST_DEL_HANDLER = MessageHandler(
-    (Filters.text | Filters.command | Filters.sticker | Filters.photo) & Filters.group, del_blacklist, edited_updates=True)
+    (Filters.text | Filters.command | Filters.sticker | Filters.photo) & Filters.chat_type.groups, del_blacklist, edited_updates=True)
 
 dispatcher.add_handler(BLACKLIST_HANDLER)
 dispatcher.add_handler(ADD_BLACKLIST_HANDLER)
