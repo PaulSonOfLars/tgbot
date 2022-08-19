@@ -128,12 +128,12 @@ __help__ = """
 
 __mod_name__ = "Бан Каналов"
 
-BAN_CHANNEL_HANDLER = CommandHandler("banchannel", ban_channel, pass_args=True, filters=Filters.group)
-UNBAN_CHANNEL_HANDLER = CommandHandler("unbanchannel", unban_channel, pass_args=True, filters=Filters.group)
-BANNED_CHANNELS_HANDLER = CommandHandler("bannedchannels", banned_channels, filters=Filters.group)
-GLOBAL_BAN_CHANNEL_HANDLER = CommandHandler("gbanchannel", global_ban_channel, pass_args=True, filters=Filters.group)
-GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("gunbanchannel", global_unban_channel, pass_args=True, filters=Filters.group)
-GLOBAL_BANNED_CHANNELS_HANDLER = CommandHandler("gbannedchannels", global_banned_channels, filters=Filters.group)
+BAN_CHANNEL_HANDLER = CommandHandler("banchannel", ban_channel, pass_args=True, filters=Filters.chat_type.groups)
+UNBAN_CHANNEL_HANDLER = CommandHandler("unbanchannel", unban_channel, pass_args=True, filters=Filters.chat_type.groups)
+BANNED_CHANNELS_HANDLER = CommandHandler("bannedchannels", banned_channels, filters=Filters.chat_type.groups)
+GLOBAL_BAN_CHANNEL_HANDLER = CommandHandler("gbanchannel", global_ban_channel, pass_args=True, filters=Filters.chat_type.groups)
+GLOBAL_UNBAN_CHANNEL_HANDLER = CommandHandler("gunbanchannel", global_unban_channel, pass_args=True, filters=Filters.chat_type.groups)
+GLOBAL_BANNED_CHANNELS_HANDLER = CommandHandler("gbannedchannels", global_banned_channels, filters=Filters.chat_type.groups)
 
 dispatcher.add_handler(BAN_CHANNEL_HANDLER)
 dispatcher.add_handler(UNBAN_CHANNEL_HANDLER)
@@ -144,4 +144,4 @@ dispatcher.add_handler(GLOBAL_BANNED_CHANNELS_HANDLER)
 
 PERM_GROUP = 5
 
-dispatcher.add_handler(MessageHandler(Filters.forwarded & Filters.group, remove_banned_forwardings), PERM_GROUP)
+dispatcher.add_handler(MessageHandler(Filters.forwarded & Filters.chat_type.groups, remove_banned_forwardings), PERM_GROUP)

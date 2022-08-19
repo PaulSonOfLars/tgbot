@@ -153,13 +153,13 @@ __help__ = """
 
 __mod_name__ = "Regexp ник бан"
 
-REGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_add", userregexpadd, pass_args=True, filters=Filters.group)
-LISTREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_list", userregexplist, pass_args=False, filters=Filters.group)
-UNBANREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_del", userregexpdelete, pass_args=True, filters=Filters.group)
+REGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_add", userregexpadd, pass_args=True, filters=Filters.chat_type.groups)
+LISTREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_list", userregexplist, pass_args=False, filters=Filters.chat_type.groups)
+UNBANREGEXPUSERBAN_HANDLER = CommandHandler("user_regexpban_del", userregexpdelete, pass_args=True, filters=Filters.chat_type.groups)
 
-G_REGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_add", g_userregexpadd, pass_args=True, filters=Filters.group)
-G_LISTREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_list", g_userregexplist, pass_args=False, filters=Filters.group)
-G_UNBANREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_del", g_userregexpdelete, pass_args=True, filters=Filters.group)
+G_REGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_add", g_userregexpadd, pass_args=True, filters=Filters.chat_type.groups)
+G_LISTREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_list", g_userregexplist, pass_args=False, filters=Filters.chat_type.groups)
+G_UNBANREGEXPUSERBAN_HANDLER = CommandHandler("g_user_regexpban_del", g_userregexpdelete, pass_args=True, filters=Filters.chat_type.groups)
 
 dispatcher.add_handler(REGEXPUSERBAN_HANDLER)
 dispatcher.add_handler(LISTREGEXPUSERBAN_HANDLER)

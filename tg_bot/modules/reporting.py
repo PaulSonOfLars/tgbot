@@ -134,7 +134,7 @@ __help__ = """
    - Если в чате, включит или отключит для всего чата.
 """
 
-REPORT_HANDLER = CommandHandler("report", report, filters=Filters.group)
+REPORT_HANDLER = CommandHandler("report", report, filters=Filters.chat_type.groups)
 SETTING_HANDLER = CommandHandler("reports", report_setting, pass_args=True)
 ADMIN_REPORT_HANDLER = RegexHandler("(?i)@admin(s)?", report)
 
