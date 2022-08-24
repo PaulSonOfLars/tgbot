@@ -10,7 +10,8 @@ from tg_bot.modules.helper_funcs.chat_status import user_admin
 from tg_bot.modules.sql import rss_sql as sql
 
 
-def show_url(bot, update, args):
+def show_url(bot, update):
+    args = update.effective_message.text.split(None, 1)
     tg_chat_id = str(update.effective_chat.id)
 
     if len(args) >= 1:
@@ -72,7 +73,8 @@ def list_urls(bot, update):
 
 
 @user_admin
-def add_url(bot, update, args):
+def add_url(bot, update):
+    args = update.effective_message.text.split(None, 1)
     if len(args) >= 1:
         chat = update.effective_chat
 
@@ -106,7 +108,8 @@ def add_url(bot, update, args):
 
 
 @user_admin
-def remove_url(bot, update, args):
+def remove_url(bot, update):
+    args = update.effective_message.text.split(None, 1)
     if len(args) >= 1:
         tg_chat_id = str(update.effective_chat.id)
 
