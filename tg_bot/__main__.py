@@ -51,7 +51,7 @@ the things I can help you with.
 And the following:
 """.format(dispatcher.bot.first_name, "" if not ALLOW_EXCL else "\nAll commands can either be used with / or !.\n")
 
-DONATE_STRING = ""
+DONATE_STRING = DONATION_LINK
 
 IMPORTED = {}
 MIGRATEABLE = []
