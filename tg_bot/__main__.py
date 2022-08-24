@@ -492,7 +492,11 @@ def process_update(self, update):
     for group in self.groups:
         try:
             for handler in (x for x in self.handlers[group] if x.check_update(update)):
-                handler.handle_update(update=update, dispatcher=self, check_result=handler.check_update(update))
+                try:
+                    handler.handle_update(update=update, dispatcher=self, check_result=handler.check_update(update))
+                except Exception as e:
+                    self.logger.error("update raised error:" + str(update))
+                    raise e
                 break
 
         # Stop processing with any other handler.
