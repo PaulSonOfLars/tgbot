@@ -32,7 +32,7 @@ services:
 
   db:
     container_name: db
-    image: postgres:14.2-alpine
+    image: postgres:14.4-bullseye
     restart: always
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
