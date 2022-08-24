@@ -4,22 +4,11 @@ import sys
 
 import telegram.ext as tg
 
-# enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO)
-
-LOGGER = logging.getLogger(__name__)
-
-# if version < 3.6, stop bot.
-if sys.version_info[0] < 3 or sys.version_info[1] < 6:
-    LOGGER.error("You MUST have a python version of at least 3.6! Multiple features depend on this. Bot quitting.")
-    quit(1)
-
 ENV = bool(os.environ.get('ENV', False))
 
 if ENV:
     TOKEN = os.environ.get('TOKEN', None)
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', None)
     try:
         OWNER_ID = int(os.environ.get('OWNER_ID', None))
     except ValueError:
@@ -59,45 +48,19 @@ if ENV:
     ALLOW_EXCL = os.environ.get('ALLOW_EXCL', False)
 
 else:
-    from tg_bot.config import Development as Config
-    TOKEN = Config.API_KEY
-    try:
-        OWNER_ID = int(Config.OWNER_ID)
-    except ValueError:
-        raise Exception("Your OWNER_ID variable is not a valid integer.")
+    raise Exception("No env config")
 
-    MESSAGE_DUMP = Config.MESSAGE_DUMP
-    OWNER_USERNAME = Config.OWNER_USERNAME
+# enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.getLevelName(LOG_LEVEL))
 
-    try:
-        SUDO_USERS = set(int(x) for x in Config.SUDO_USERS or [])
-    except ValueError:
-        raise Exception("Your sudo users list does not contain valid integers.")
+LOGGER = logging.getLogger(__name__)
 
-    try:
-        SUPPORT_USERS = set(int(x) for x in Config.SUPPORT_USERS or [])
-    except ValueError:
-        raise Exception("Your support users list does not contain valid integers.")
-
-    try:
-        WHITELIST_USERS = set(int(x) for x in Config.WHITELIST_USERS or [])
-    except ValueError:
-        raise Exception("Your whitelisted users list does not contain valid integers.")
-
-    WEBHOOK = Config.WEBHOOK
-    URL = Config.URL
-    PORT = Config.PORT
-    CERT_PATH = Config.CERT_PATH
-
-    DB_URI = Config.SQLALCHEMY_DATABASE_URI
-    DONATION_LINK = Config.DONATION_LINK
-    LOAD = Config.LOAD
-    NO_LOAD = Config.NO_LOAD
-    DEL_CMDS = Config.DEL_CMDS
-    STRICT_GBAN = Config.STRICT_GBAN
-    WORKERS = Config.WORKERS
-    BAN_STICKER = Config.BAN_STICKER
-    ALLOW_EXCL = Config.ALLOW_EXCL
+# if version < 3.6, stop bot.
+if sys.version_info[0] < 3 or sys.version_info[1] < 6:
+    LOGGER.error("You MUST have a python version of at least 3.6! Multiple features depend on this. Bot quitting.")
+    quit(1)
 
 
 SUDO_USERS.add(OWNER_ID)
