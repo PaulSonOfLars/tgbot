@@ -8,7 +8,7 @@ ENV = bool(os.environ.get('ENV', False))
 
 if ENV:
     TOKEN = os.environ.get('TOKEN', None)
-    LOG_LEVEL = os.environ.get('LOG_LEVEL', None)
+    LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     try:
         OWNER_ID = int(os.environ.get('OWNER_ID', None))
     except ValueError:
