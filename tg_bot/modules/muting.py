@@ -1,7 +1,7 @@
 import html
 from typing import Optional, List
 
-from telegram import Message, Chat, Update, Bot, User
+from telegram import Message, Chat, Update, Bot, User, ChatPermissions
 from telegram.error import BadRequest
 from telegram.ext import CommandHandler, Filters
 from telegram.ext.dispatcher import run_async
@@ -40,7 +40,7 @@ def mute(bot: Bot, update: Update) -> str:
             message.reply_text("Afraid I can't stop an admin from talking!")
 
         elif member.can_send_messages is None or member.can_send_messages:
-            bot.restrict_chat_member(chat.id, user_id, can_send_messages=False)
+            bot.restrict_chat_member(chat.id, user_id, permissions=ChatPermissions(can_send_messages=False))
             message.reply_text("Muted!")
             return "<b>{}:</b>" \
                    "\n#MUTE" \
@@ -85,11 +85,11 @@ def unmute(bot: Bot, update: Update) -> str:
                 message.reply_text("This user already has the right to speak.")
                 return ""
             else:
-                bot.restrict_chat_member(chat.id, int(user_id),
-                                         can_send_messages=True,
-                                         can_send_media_messages=True,
-                                         can_send_other_messages=True,
-                                         can_add_web_page_previews=True)
+                bot.restrict_chat_member(chat.id, int(user_id), permissions=ChatPermissions(can_send_messages=True,
+                                                                                            can_send_media_messages=True,
+                                                                                            can_send_other_messages=True,
+                                                                                            can_add_web_page_previews=True)
+                                         )
                 message.reply_text("Unmuted!")
                 return "<b>{}:</b>" \
                        "\n#UNMUTE" \
@@ -166,7 +166,8 @@ def temp_mute(bot: Bot, update: Update) -> str:
 
     try:
         if member.can_send_messages is None or member.can_send_messages:
-            bot.restrict_chat_member(chat.id, user_id, until_date=mutetime, can_send_messages=False)
+            bot.restrict_chat_member(chat.id, user_id, until_date=mutetime,
+                                     permissions=ChatPermissions(can_send_messages=False))
             message.reply_text("Muted for {}!".format(time_val))
             return log
         else:
