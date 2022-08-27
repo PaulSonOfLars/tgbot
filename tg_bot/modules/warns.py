@@ -44,7 +44,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
             reply = "{} предупреждений, {} удален из чата".format(limit, mention_html(user.id, user.first_name))
 
         else:  # ban
-            chat.kick_member(user.id)
+            chat.ban_member(user.id)
             reply = "{} предупреждений, {} забанен!".format(limit, mention_html(user.id, user.first_name))
 
         for warn_reason in reasons:

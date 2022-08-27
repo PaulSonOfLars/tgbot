@@ -217,7 +217,7 @@ def gbanlist(bot: Bot, update: Update):
 
 def check_and_ban(update, user_id, should_message=True):
     if sql.is_user_gbanned(user_id):
-        update.effective_chat.kick_member(user_id)
+        update.effective_chat.ban_member(user_id)
         if should_message:
             update.effective_message.reply_text("This is a bad person, they shouldn't be here!")
 

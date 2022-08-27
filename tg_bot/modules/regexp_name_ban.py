@@ -118,7 +118,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
 
                 if is_banned:
                     update.effective_message.reply_text("#бан_банан 🍌 тебе!")
-                    chat.kick_member(name.id)
+                    chat.ban_member(name.id)
                     break
 
             for regex in regexes_global:
@@ -126,7 +126,7 @@ def remove_banned_nicknames(bot: Bot, update: Update):
 
                 if is_banned:
                     update.effective_message.reply_text("#бан_банан 🍌 тебе!")
-                    chat.kick_member(name.id)
+                    chat.ban_member(name.id)
                     break
 
 __help__ = """
