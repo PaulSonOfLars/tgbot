@@ -198,7 +198,7 @@ def del_lockables(bot: Bot, update: Update):
     message = update.effective_message  # type: Optional[Message]
 
     for lockable, filter in LOCK_TYPES.items():
-        if filter(message) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
+        if filter(update) and sql.is_locked(chat.id, lockable) and can_delete(chat, bot.id):
             if lockable == "bots":
                 new_members = update.effective_message.new_chat_members
                 for new_mem in new_members:
@@ -228,7 +228,7 @@ def rest_handler(bot: Bot, update: Update):
     msg = update.effective_message  # type: Optional[Message]
     chat = update.effective_chat  # type: Optional[Chat]
     for restriction, filter in RESTRICTION_TYPES.items():
-        if filter(msg) and sql.is_restr_locked(chat.id, restriction) and can_delete(chat, bot.id):
+        if filter(update) and sql.is_restr_locked(chat.id, restriction) and can_delete(chat, bot.id):
             try:
                 msg.delete()
             except BadRequest as excp:
