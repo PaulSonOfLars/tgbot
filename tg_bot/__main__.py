@@ -149,6 +149,18 @@ def test(bot: Bot, update: Update):
 
 
 @run_async
+def delete_channel_messages(bot: Bot, update: Update):
+    """
+        Check if the user is a channel, delete the message silently.
+    """
+    # cc https://docs.python-telegram-bot.org/en/stable/telegram.update.html
+    # ?highlight=effective_user#telegram.Update.effective_user
+    if update.effective_user.is_bot is True and update.effective_user.username is "Channel_Bot":
+        message_id = update.effective_message.id
+        bot.delete_message(update.effective_message.chat.id, message_id)
+
+
+@run_async
 def start(bot: Bot, update: Update, args: List[str]):
     if update.effective_chat.type == "private":
         if len(args) >= 1:
@@ -591,6 +603,10 @@ def main():
     coc_handler = CommandHandler("CoCDone", CoCDone)
     coc_callback_handler = CallbackQueryHandler(CoCDone, pattern=r"CoCDone_")
 
+    delete_channel_messages_handler = MessageHandler(
+        Filters.all & ~Filters.status_update & Filters.group, delete_channel_messages
+    )
+
     # dispatcher.add_handler(test_handler)
     dispatcher.add_handler(start_handler)
     dispatcher.add_handler(help_handler)
@@ -601,6 +617,7 @@ def main():
     dispatcher.add_handler(donate_handler)
     dispatcher.add_handler(coc_handler)
     dispatcher.add_handler(coc_callback_handler)
+    dispatcher.add_handler(delete_channel_messages_handler, 3)  # Check for every incoming message with priority 3
 
     # dispatcher.add_error_handler(error_callback)
 
