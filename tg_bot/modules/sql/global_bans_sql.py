@@ -8,19 +8,22 @@ from tg_bot.modules.sql import BASE, SESSION
 class GloballyBannedUsers(BASE):
     __tablename__ = "gbans"
     user_id = Column(BigInteger, primary_key=True)
+    is_channel = Column(Boolean, primary_key=True)
     name = Column(UnicodeText, nullable=False)
     reason = Column(UnicodeText)
 
-    def __init__(self, user_id, name, reason=None):
+    def __init__(self, user_id, is_channel, name, reason=None):
         self.user_id = user_id
+        self.is_channel = is_channel
         self.name = name
         self.reason = reason
 
     def __repr__(self):
-        return "<GBanned User {} ({})>".format(self.name, self.user_id)
+        return "<GBanned User {} ({}) is channel: >".format(self.name, self.user_id, self.is_channel)
 
     def to_dict(self):
         return {"user_id": self.user_id,
+                "is_channel": self.is_channel,
                 "name": self.name,
                 "reason": self.reason}
 
@@ -47,11 +50,12 @@ GBANNED_LIST = set()
 GBANSTAT_LIST = set()
 
 
-def gban_user(user_id, name, reason=None):
+def gban_user(user_id, is_channel, name, reason=None):
     with GBANNED_USERS_LOCK:
-        user = SESSION.query(GloballyBannedUsers).get(user_id)
+        user = SESSION.query(GloballyBannedUsers).filter(GloballyBannedUsers.user_id == user_id,
+                                                         GloballyBannedUsers.is_channel == is_channel).first()
         if not user:
-            user = GloballyBannedUsers(user_id, name, reason)
+            user = GloballyBannedUsers(user_id, is_channel, name, reason)
         else:
             user.name = name
             user.reason = reason
@@ -61,13 +65,15 @@ def gban_user(user_id, name, reason=None):
         __load_gbanned_userid_list()
 
 
-def update_gban_reason(user_id, name, reason=None):
+def update_gban_reason(user_id, is_channel, name, reason=None):
     with GBANNED_USERS_LOCK:
-        user = SESSION.query(GloballyBannedUsers).get(user_id)
+        user = SESSION.query(GloballyBannedUsers).filter(GloballyBannedUsers.user_id == user_id,
+                                                         GloballyBannedUsers.is_channel == is_channel)
         if not user:
             return None
         old_reason = user.reason
         user.name = name
+        user.is_channel = is_channel
         user.reason = reason
 
         SESSION.merge(user)
@@ -75,9 +81,10 @@ def update_gban_reason(user_id, name, reason=None):
         return old_reason
 
 
-def ungban_user(user_id):
+def ungban_user(user_id, is_channel):
     with GBANNED_USERS_LOCK:
-        user = SESSION.query(GloballyBannedUsers).get(user_id)
+        user = SESSION.query(GloballyBannedUsers).filter(GloballyBannedUsers.user_id == user_id,
+                                                         GloballyBannedUsers.is_channel == is_channel)
         if user:
             SESSION.delete(user)
 
@@ -85,13 +92,14 @@ def ungban_user(user_id):
         __load_gbanned_userid_list()
 
 
-def is_user_gbanned(user_id):
-    return user_id in GBANNED_LIST
+def is_user_gbanned(user_id, is_channel):
+    return (user_id, is_channel) in GBANNED_LIST
 
 
-def get_gbanned_user(user_id):
+def get_gbanned_user(user_id, is_channel):
     try:
-        return SESSION.query(GloballyBannedUsers).get(user_id)
+        return SESSION.query(GloballyBannedUsers).filter(GloballyBannedUsers.user_id == user_id,
+                                                         GloballyBannedUsers.is_channel == is_channel)
     finally:
         SESSION.close()
 
@@ -139,7 +147,7 @@ def num_gbanned_users():
 def __load_gbanned_userid_list():
     global GBANNED_LIST
     try:
-        GBANNED_LIST = {x.user_id for x in SESSION.query(GloballyBannedUsers).all()}
+        GBANNED_LIST = {(x.user_id, x.is_channel) for x in SESSION.query(GloballyBannedUsers).all()}
     finally:
         SESSION.close()
 
