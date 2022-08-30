@@ -21,28 +21,42 @@ def check_flood(bot: Bot, update: Update) -> str:
     chat = update.effective_chat  # type: Optional[Chat]
     msg = update.effective_message  # type: Optional[Message]
 
+    is_channel = update.effective_message.sender_chat is not None
+
     if not user:  # ignore channels
         return ""
 
     # ignore admins
     if is_user_admin(chat, user.id):
-        sql.update_flood(chat.id, None)
+        sql.update_flood(chat.id, None, is_channel)
         return ""
 
-    should_ban = sql.update_flood(chat.id, user.id)
+    should_ban = sql.update_flood(chat.id, user.id, is_channel)
     if not should_ban:
         return ""
 
     try:
-        chat.ban_member(user.id)
-        msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
-                       "disappointment. Get out.")
+        if not is_channel:
+            chat.ban_member(user.id)
+            msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
+                           "disappointment. Get out.")
 
-        return "<b>{}:</b>" \
-               "\n#BANNED" \
-               "\n<b>User:</b> {}" \
-               "\nFlooded the group.".format(html.escape(chat.title),
-                                             mention_html(user.id, user.first_name))
+            return "<b>{}:</b>" \
+                   "\n#BANNED" \
+                   "\n<b>User:</b> {}" \
+                   "\nFlooded the group.".format(html.escape(chat.title),
+                                                 mention_html(user.id, user.first_name))
+        else:
+            sender_chat = update.effective_message.sender_chat
+            chat.ban_sender_chat(sender_chat.id)
+            msg.reply_text("I like to leave the flooding to natural disasters. But you, you were just a "
+                           "disappointment. Get out.")
+
+            return "<b>{}:</b>" \
+                   "\n#BANNED" \
+                   "\n<b>User:</b> {}" \
+                   "\nFlooded the group.".format(html.escape(chat.title),
+                                                 mention_html(sender_chat.id, sender_chat.username))
 
     except BadRequest:
         msg.reply_text("I can't kick people here, give me permissions first! Until then, I'll disable antiflood.")
