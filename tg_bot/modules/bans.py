@@ -272,41 +272,53 @@ def unban(bot: Bot, update: Update) -> str:
     user = update.effective_user  # type: Optional[User]
     chat = update.effective_chat  # type: Optional[Chat]
 
-    user_id, reason = extract_user_and_text(message, args)
+    user_id, reason, is_channel = extract_user_and_text_and_is_channel(message, args)
 
-    if not user_id:
-        return ""
-
-    try:
-        member = chat.get_member(user_id)
-    except BadRequest as excp:
-        if excp.message == "User not found":
-            message.reply_text("I can't seem to find this user")
+    if not is_channel:
+        if not user_id:
             return ""
-        else:
-            raise
 
-    if user_id == bot.id:
-        message.reply_text("How would I unban myself if I wasn't here...?")
-        return ""
+        try:
+            member = chat.get_member(user_id)
+        except BadRequest as excp:
+            if excp.message == "User not found":
+                message.reply_text("I can't seem to find this user")
+                return ""
+            else:
+                raise
 
-    if is_user_in_chat(chat, user_id):
-        message.reply_text("Why are you trying to unban someone that's already in the chat?")
-        return ""
+        if user_id == bot.id:
+            message.reply_text("How would I unban myself if I wasn't here...?")
+            return ""
 
-    chat.unban_member(user_id)
-    message.reply_text("Yep, this user can join!")
+        if is_user_in_chat(chat, user_id):
+            message.reply_text("Why are you trying to unban someone that's already in the chat?")
+            return ""
 
-    log = "<b>{}:</b>" \
-          "\n#UNBANNED" \
-          "\n<b>Admin:</b> {}" \
-          "\n<b>User:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
-                                                       mention_html(user.id, user.first_name),
-                                                       mention_html(member.user.id, member.user.first_name),
-                                                       member.user.id)
-    if reason:
-        log += "\n<b>Reason:</b> {}".format(reason)
+        chat.unban_member(user_id)
+        message.reply_text("Yep, this user can join!")
 
+        log = "<b>{}:</b>" \
+              "\n#UNBANNED" \
+              "\n<b>Admin:</b> {}" \
+              "\n<b>User:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
+                                                           mention_html(user.id, user.first_name),
+                                                           mention_html(member.user.id, member.user.first_name),
+                                                           member.user.id)
+        if reason:
+            log += "\n<b>Reason:</b> {}".format(reason)
+    else:
+        chat.unban_sender_chat(user_id)
+        message.reply_text("Yep, this user can join!")
+        log = "<b>{}:</b>" \
+              "\n#UNBANNED" \
+              "\n<b>Admin:</b> {}" \
+              "\n<b>User:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
+                                                           mention_html(user.id, user.first_name),
+                                                           mention_html(user_id, str(user_id)),
+                                                           user_id)
+        if reason:
+            log += "\n<b>Reason:</b> {}".format(reason)
     return log
 
 
