@@ -9,10 +9,25 @@ from telegram.utils.helpers import mention_html
 from tg_bot import dispatcher, BAN_STICKER, LOGGER
 from tg_bot.modules.disable import DisableAbleCommandHandler
 from tg_bot.modules.helper_funcs.chat_status import bot_admin, user_admin, is_user_ban_protected, can_restrict, \
-    is_user_admin, is_user_in_chat
+    is_user_admin, is_user_in_chat, is_bot_admin
 from tg_bot.modules.helper_funcs.extraction import extract_user_and_text
 from tg_bot.modules.helper_funcs.string_handling import extract_time
 from tg_bot.modules.log_channel import loggable
+from tg_bot.modules.helper_funcs.filters import CustomFilters
+
+RBAN_ERRORS = {
+    "User is an administrator of the chat",
+    "Chat not found",
+    "Not enough rights to restrict/unrestrict chat member",
+    "User_not_participant",
+    "Peer_id_invalid",
+    "Group chat was deactivated",
+    "Need to be inviter of a user to kick it from a basic group",
+    "Chat_admin_required",
+    "Only the creator of a basic group can kick group administrators",
+    "Channel_private",
+    "Not in the chat"
+}
 
 
 @run_async
@@ -278,6 +293,74 @@ def unban(bot: Bot, update: Update, args: List[str]) -> str:
     return log
 
 
+@run_async
+@bot_admin
+def rban(bot: Bot, update: Update, args: List[str]):
+    message = update.effective_message
+
+    if not args:
+        message.reply_text("You don't seem to be referring to a chat/user.")
+        return
+
+    user_id, chat_id = extract_user_and_text(message, args)
+
+    if not user_id:
+        message.reply_text("You don't seem to be referring to a user.")
+        return
+    elif not chat_id:
+        message.reply_text("You don't seem to be referring to a chat.")
+        return
+
+    try:
+        chat = bot.get_chat(chat_id.split()[0])
+    except BadRequest as excp:
+        if excp.message == "Chat not found":
+            message.reply_text("Chat not found! Make sure you entered a valid chat ID and I'm part of that chat.")
+            return
+        else:
+            raise
+
+    if chat.type == 'private':
+        message.reply_text("I'm sorry, but that's a private chat!")
+        return
+
+    if not is_bot_admin(chat, bot.id) or not chat.get_member(bot.id).can_restrict_members:
+        message.reply_text("I can't restrict people there! Make sure I'm admin and can ban users.")
+        return
+
+    try:
+        member = chat.get_member(user_id)
+    except BadRequest as excp:
+        if excp.message == "User not found":
+            message.reply_text("I can't seem to find this user")
+            return
+        else:
+            raise
+
+    if is_user_ban_protected(chat, user_id, member):
+        message.reply_text("I really wish I could ban admins...")
+        return
+
+    if user_id == bot.id:
+        message.reply_text("I'm not gonna BAN myself, are you crazy?")
+        return
+
+    try:
+        chat.kick_member(user_id)
+        message.reply_text("Banned!")
+    except BadRequest as excp:
+        if excp.message == "Reply message not found":
+            # Do not reply
+            message.reply_text('Banned!', quote=False)
+        elif excp.message in RBAN_ERRORS:
+            message.reply_text(excp.message)
+        else:
+            LOGGER.warning(update)
+            LOGGER.exception("ERROR banning user %s in chat %s (%s) due to %s", user_id, chat.title, chat.id,
+                             excp.message)
+            message.reply_text("Well damn, I can't ban that user.")
+
+
 __help__ = """
  - /kickme: kicks the user who issued the command
 
@@ -295,9 +378,11 @@ TEMPBAN_HANDLER = CommandHandler(["tban", "tempban"], temp_ban, pass_args=True, 
 KICK_HANDLER = CommandHandler("kick", kick, pass_args=True, filters=Filters.group)
 UNBAN_HANDLER = CommandHandler("unban", unban, pass_args=True, filters=Filters.group)
 KICKME_HANDLER = DisableAbleCommandHandler("kickme", kickme, filters=Filters.group)
+RBAN_HANDLER = CommandHandler("rban", rban, pass_args=True, filters=CustomFilters.sudo_filter)
 
 dispatcher.add_handler(BAN_HANDLER)
 dispatcher.add_handler(TEMPBAN_HANDLER)
 dispatcher.add_handler(KICK_HANDLER)
 dispatcher.add_handler(UNBAN_HANDLER)
 dispatcher.add_handler(KICKME_HANDLER)
+dispatcher.add_handler(RBAN_HANDLER)
