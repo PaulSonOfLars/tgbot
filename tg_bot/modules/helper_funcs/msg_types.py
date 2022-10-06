@@ -15,6 +15,7 @@ class Types(IntEnum):
     AUDIO = 5
     VOICE = 6
     VIDEO = 7
+    VIDEO_NOTE = 8
 
 
 def get_note_type(msg: Message):
@@ -76,6 +77,11 @@ def get_note_type(msg: Message):
             text, buttons = button_markdown_parser(msgtext, entities=entities)
             data_type = Types.VIDEO
 
+        elif msg.reply_to_message.video_note:
+            content = msg.reply_to_message.video_note.file_id
+            text, buttons = button_markdown_parser(msgtext, entities=entities)
+            data_type = Types.VIDEO_NOTE
+            
     return note_name, text, data_type, content, buttons
 
 
@@ -126,5 +132,10 @@ def get_welcome_type(msg: Message):
         content = msg.reply_to_message.video.file_id
         text = msg.reply_to_message.caption
         data_type = Types.VIDEO
+
+    elif msg.reply_to_message and msg.reply_to_message.video_note:
+        content = msg.reply_to_message.video_note.file_id
+        text = msg.reply_to_message.text
+        data_type = Types.VIDEO_NOTE
 
     return text, data_type, content, buttons
